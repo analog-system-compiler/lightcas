@@ -11,34 +11,35 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\Test.cpp" />
-    <ClCompile Include="..\..\src\Debug.cpp" />
-    <ClCompile Include="..\..\src\Element.cpp" />
-    <ClCompile Include="..\..\src\ElementDataBase.cpp" />
-    <ClCompile Include="..\..\src\Equation_Core.cpp" />
-    <ClCompile Include="..\..\src\Equation_eval.cpp" />
-    <ClCompile Include="..\..\src\Equation_parser.cpp" />
-    <ClCompile Include="..\..\src\Equation_Simplify.cpp" />
-    <ClCompile Include="..\..\src\Equation_Transform.cpp" />
-    <ClCompile Include="..\..\src\Evaluator.cpp" />
-    <ClCompile Include="..\..\src\Function.cpp" />
-    <ClCompile Include="..\..\src\Parser.cpp" />
-    <ClCompile Include="..\..\src\Rules.cpp" />
-    <ClCompile Include="..\..\src\Value.cpp" />
+    <ClInclude Include="..\src\Debug.h" />
+    <ClInclude Include="..\src\Display.h" />
+    <ClInclude Include="..\src\Element.h" />
+    <ClInclude Include="..\src\ElementDataBase.h" />
+    <ClInclude Include="..\src\Equation.h" />
+    <ClInclude Include="..\src\Evaluator.h" />
+    <ClInclude Include="..\src\Function.h" />
+    <ClInclude Include="..\src\Parser.h" />
+    <ClInclude Include="..\src\Rules.h" />
+    <ClInclude Include="..\src\String.h" />
+    <ClInclude Include="..\src\Value.h" />
+    <ClInclude Include="..\src\Vector.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\Debug.h" />
-    <ClInclude Include="..\..\src\Display.h" />
-    <ClInclude Include="..\..\src\Element.h" />
-    <ClInclude Include="..\..\src\ElementDataBase.h" />
-    <ClInclude Include="..\..\src\Equation.h" />
-    <ClInclude Include="..\..\src\Evaluator.h" />
-    <ClInclude Include="..\..\src\Function.h" />
-    <ClInclude Include="..\..\src\Parser.h" />
-    <ClInclude Include="..\..\src\Rules.h" />
-    <ClInclude Include="..\..\src\String.h" />
-    <ClInclude Include="..\..\src\Value.h" />
-    <ClInclude Include="..\..\src\Vector.h" />
+    <ClCompile Include="..\src\Console.cpp" />
+    <ClCompile Include="..\src\Debug.cpp" />
+    <ClCompile Include="..\src\Element.cpp" />
+    <ClCompile Include="..\src\ElementDataBase.cpp" />
+    <ClCompile Include="..\src\Equation_core.cpp" />
+    <ClCompile Include="..\src\Equation_eval.cpp" />
+    <ClCompile Include="..\src\Equation_parser.cpp" />
+    <ClCompile Include="..\src\Equation_simplify.cpp" />
+    <ClCompile Include="..\src\Equation_transform.cpp" />
+    <ClCompile Include="..\src\Evaluator.cpp" />
+    <ClCompile Include="..\src\Function.cpp" />
+    <ClCompile Include="..\src\Parser.cpp" />
+    <ClCompile Include="..\src\Rules.cpp" />
+    <ClCompile Include="..\src\Test.cpp" />
+    <ClCompile Include="..\src\Value.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{09035957-A236-47ED-A64D-36C5998A7530}</ProjectGuid>
