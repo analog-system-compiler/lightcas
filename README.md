@@ -5,11 +5,11 @@ LightCAS is a minimal "Computer Algebra System". It is written in C++ and only u
 ## Features ##
 LightCAS can:
 
-* simplify symbolic expression
+* simplify symbolic expressions
 * solve systems with symbolic expressions
 * computes derivatives
 * computes Taylor series
-* evaluates expression
+* evaluate expression
 
 ## Version ##
 * Current version is alpha
