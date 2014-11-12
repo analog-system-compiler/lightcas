@@ -18,7 +18,7 @@
 
 #include <cstring>
 #include "Debug.h"
-#include "Vector.h"
+#include "LCVector.h"
 #include "Equation.h"
 #include "Element.h"
 #include "Function.h"
@@ -47,16 +47,12 @@ bool CEquation::OptimizeConst()
 
   if( e3->IsNumeric() && !e3->IsVoid() )
   {
-
     e1 = RefToElement( Pop( pos ) );
-
     if( e1->IsConst() )
     {
-
       if( e3->IsBinary()  )
       {
         e2 = RefToElement( Pop( pos ) );
-
         if( e2->IsConst() )
         {
           bOk = true;
@@ -64,7 +60,7 @@ bool CEquation::OptimizeConst()
       }
       else if( e3->IsUnary()  )
       {
-        bOk = true;
+        bOk = true; //( e3->ToRef() == CElementDataBase::OP_NEG ) ? false : true;
       }
     }
   }
@@ -72,9 +68,9 @@ bool CEquation::OptimizeConst()
 
   if( bOk )
   {
-    CValue& v = Evaluate( pos, GetElementDB()->GetEvaluator() );
+    const CValue& v = Evaluate( pos, GetElementDB()->GetEvaluator() );
     m_StackSize = pos;
-    PushElement( v );
+    Push( v );
 
 #ifdef DEBUG_OPTIMIZE
     Display( ds );
@@ -110,7 +106,8 @@ void CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
   OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
 
   OP_CODE op = GetLastOperator();
-  CFunction* funct = RefToElement( op )->GetFunction();
+  CElement *e = RefToElement( op );
+  CFunction* funct = e->GetFunction();
 
   if( funct )
   {
@@ -130,7 +127,8 @@ void CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
 #ifdef DEBUG_OPTIMIZE
         CDisplay ds;
         ds += "OptimizeTree rule #" ;
-        ds += CString( rule->m_LineNo );
+        //        ds += CString( rule->m_LineNo );
+        e->Display(ds);
         ds += " : ";
         rule->m_SrcEquation.Display( ds );
         ds += " => ";
@@ -145,7 +143,7 @@ void CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
           //CEquation equ2( m_ElementDB );
           equ2.ApplyRule( *this, elem_array, pos_array, &rule->m_DstEquation );
           m_StackSize = pos;
-          PushEquation( equ2 );
+          Push( equ2 );
           /*if( m_StackSize >= MAX_STACK_SIZE )
           {
             Init( RefToElement( CElementDataBase::OP_ERROR_SIZE ) );
@@ -239,8 +237,8 @@ unsigned CEquation::Match( const CEquation* equ, OP_CODE elem_array[], unsigned 
 void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CEquation* rule_equ, bool optimize )
 {
   OP_CODE op3;
-  unsigned j;
   unsigned pos = 0;
+  unsigned j;
   CElement* e;
   CEquation equ2( m_ElementDB );
   //TODO : suppress elem_array and access pos_array by pos_array[ op3 - CElementDataBase::OP_EXP1 ]
@@ -269,38 +267,12 @@ void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], uns
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
       ASSERT( m_StackSize );
     }
-    else if( op3 == CElementDataBase::OP_SET )
-    {
-      equ2.CopyBranch( *this, m_StackSize );
-      op3 = GetLastOperator();
-      e = RefToElement( op3 );
-      e->AddFunction( *this, equ2 );
-      Clear();
-      PushEquation( equ2 );
-    }
-    else if ( op3 == CElementDataBase::OP_RANK )
-    {
-      OP_CODE op1 = Pop( m_StackSize );
-      OP_CODE op2 = Pop( m_StackSize );
-      Push( op1 > op2 ? op1 : op2 );
-    }
-    else if ( op3 == CElementDataBase::OP_SUBST )
-    {
-        OP_CODE opd = Pop( m_StackSize );
-        OP_CODE op1 = Pop( m_StackSize );
-        ASSERT(op1==CElementDataBase::OP_CONCAT);
-        OP_CODE ops = Pop( m_StackSize );        
-        equ2.CopyBranch( *this, m_StackSize );
-        equ2.Replace(ops,opd);
-        PushEquation( equ2 );
-    }
-    /*else if ( op3 == CElementDataBase::OP_NEW )
-    {
-        PushElement(m_ElementDB->GetElement());
-    }*/
-    else
-    {
-      PushOperator( op3 );
+    else {
+        bool bOk= ExecuteInternalCommand( op3, equ2 );   
+        if( !bOk ) 
+            bOk=ExecuteExternalCommand( op3, equ2 );
+        if( !bOk ) 
+            Push( op3 );
     }
 
     //TODO: put the code below just after PushOperator( op3 )
@@ -323,6 +295,41 @@ void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], uns
     TRACE( ds.GetBufferPtr() );
 #endif
   }
+}
+
+bool CEquation::ExecuteInternalCommand( OP_CODE op3, CEquation& equ )
+{
+  CElement* e;
+  bool bOK=false;
+  if( op3 == CElementDataBase::OP_SET )
+  {
+    equ.CopyBranch( *this, m_StackSize );
+    op3 = GetLastOperator();
+    e = RefToElement( op3 );
+    e->AddFunction( *this, equ );
+    Clear();
+    Push( equ );
+    bOK=true;
+  }
+  else if ( op3 == CElementDataBase::OP_RANK )
+  {
+    OP_CODE op1 = Pop( m_StackSize );
+    OP_CODE op2 = Pop( m_StackSize );
+    Push( op1 > op2 ? op1 : op2 );
+    bOK=true;
+  }
+  else if ( op3 == CElementDataBase::OP_SUBST )
+  {
+    OP_CODE opd = Pop( m_StackSize );
+    OP_CODE op1 = Pop( m_StackSize );
+    ASSERT( op1 == CElementDataBase::OP_CONCAT );
+    OP_CODE ops = Pop( m_StackSize );
+    equ.CopyBranch( *this, m_StackSize );
+    equ.Replace( ops, opd );
+    Push( equ );
+    bOK=true;
+  } 
+  return bOK;
 }
 
 OP_CODE CEquation::GetLastOperator() const

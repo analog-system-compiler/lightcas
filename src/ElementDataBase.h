@@ -18,34 +18,34 @@
 
 #pragma once
 
-#include "String.h"
+#include "LCString.h"
 #include "Parser.h"
 #include "Evaluator.h"
 #include "Rules.h"
-#include "Vector.h"
+#include "LCVector.h"
 
 class CEquation;
 class CElement;
 struct CSymbolSyntaxStruct;
 
-typedef CVector< class CElement* >		CElementArray;
+typedef CVector< class CElement* >		            CElementArray;
 typedef CVector< struct CSymbolSyntaxStruct* >		CSymbolSyntaxArray;
 typedef short OP_CODE;
 
 class CElementDataBase : public CElementArray
 {
     
-  private:
+  protected:
 
     CElementDataBase*         m_Parent;
-    CEvaluator                m_Evaluator;
+    CEvaluator*               m_Evaluator;
     static CElementArray      m_ElementRefArray;
     static CSymbolSyntaxArray m_SymbolSyntaxArray;
 
   public :
     
     enum PRIVATE_OPCODE {
-      OP_ZERO,
+      OP_ZERO=0,
       OP_EXP1,
       OP_EXP2,
       OP_EXP3,
@@ -71,38 +71,43 @@ class CElementDataBase : public CElementArray
 
     CString			m_Name;
 
-  private:
+  protected:
 
-    CElementDataBase* GetParent() const    {      return m_Parent;    }
-    unsigned	Register( CElement* e , unsigned index );
-    void      AddReservedElements();
-    void      AddOperandTable(const char *operand_table, unsigned operand_nb);
-    void      AddSyntaxSymbolTable(const char *symbol_table);
-    void			AddAlgebraRuleTable(const char *rule_table);
-    void      AddEvalFunctionTable( const SProperties *property_table, unsigned size );
-    void			Initialize();
+    unsigned    Register( CElement* e , unsigned index );
+    CElement *  CreateElement( const CString& string, unsigned pos );
+    virtual void AddReservedElements();
+    virtual void CreateEvaluator();
+    void        AddOperandTable(const char *operand_table, unsigned operand_nb);
+    void        AddSyntaxSymbolTable(const char *symbol_table);
+    void        AddAlgebraRuleTable(const char *rule_table);
+    void        AddEvalFunctionTable( const SProperties *property_table, unsigned size );
+    void        AddEvalFunction( CString& name, CEvaluatorFunct funct );
 
 #ifdef _DEBUG
-    void Check( const char*s1, const char *s2 );
-    void CheckCatch( const char* s1 );
+    void        Check( const char*s1, const char *s2 );
+    void        CheckCatch( const char* s1 );
 #endif
 
   CElementDataBase(const CElementDataBase& db );
 
   public:
 
-    void			    Clear();
-    CEvaluator&		GetEvaluator()    {      return m_Evaluator;    }
+    void			Clear();
+    void            SetName( const CString& name ) { m_Name=name; }
+    void            Initialize();
+    CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
+    //const CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
     CElement* 		GetElement();
     CElement* 		GetElement( const CValue& value );
     CElement* 		GetElement( const CString& );
     CElement* 		SearchElement( const CString&, unsigned& pos ) const;
-    CElement*     SearchElement( const CValue& v, unsigned& pos ) const;
+    CElement*       SearchElement( const CValue& v, unsigned& pos ) const;
     
     static CElement* RefToElement( OP_CODE op )    {      return m_ElementRefArray[ ( unsigned )op ];    }
     static void      UnRef( OP_CODE op )    {      m_ElementRefArray[ ( unsigned )op ] = NULL;    }
     static OP_CODE   ElementToRef( const CElement* e );    
     static const CSymbolSyntaxArray& GetSymbolTable() { return m_SymbolSyntaxArray; }
+     CElementDataBase* GetParent() const    {      return m_Parent;    }
 
 #ifdef _DEBUG    
         void Test();
@@ -110,7 +115,7 @@ class CElementDataBase : public CElementArray
 
   public:
 
-    CElementDataBase(CElementDataBase *db=NULL,const CString& name = CString());
+    CElementDataBase(CElementDataBase *db=NULL,const CString& name = CString(),bool bInitialize=true);
     virtual ~CElementDataBase();
 
 };

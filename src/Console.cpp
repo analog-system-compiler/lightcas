@@ -23,10 +23,9 @@
 #include "ElementDataBase.h"
 
 //ToDO
-//allow redefinition of funvtion:f(x):=4*x;f(x):=2*x
+//allow redefinition of function:f(x):=4*x;f(x):=2*x
 //add CLEAR()
 //add mul 2a
-//add suite
 
 #ifndef _WIN32
 #define COLOR_CYAN "\e[35;m"
@@ -50,10 +49,6 @@ int main()
 
   setlocale( LC_NUMERIC, "C" );
 
-#ifdef _DEBUG
-  CElementDataBase test_db( NULL, "test" );
-  test_db.Test();
-#endif
 #ifdef _WIN32
   CDisplay ds;
 #else
@@ -62,6 +57,10 @@ int main()
 
   CElementDataBase db_main( NULL );
   CElementDataBase db( &db_main );
+#ifdef _DEBUG
+  db.Test();
+  db.Initialize();
+#endif
   CEquation equ( &db );
   CParser IC;
   CElement* simplify = db_main.GetElement( "SIMPLIFY" );
@@ -78,16 +77,17 @@ int main()
     try
     {
       equ.GetFromText( IC );
-      equ.UnaryOperation( simplify_op );
+      equ.UnaryOperation( simplify_op );   
+      ans->SetEquation( equ );
       ds.Clear();
       equ.Display( ds );
-      ans->SetEquation( equ );
+      std::cout << ds << "\n";
     }
     catch( CParserException e )
     {
      std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
     }
-    std::cout << ds << "\n";
+    
   }
 
   return 0;

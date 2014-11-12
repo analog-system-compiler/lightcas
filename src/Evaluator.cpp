@@ -17,40 +17,48 @@
 /*******************************************************************************/
 
 #include "Evaluator.h"
-#include "Element.h"
 #include <cstdlib>
 #include <cmath>
 
 CEvaluator::CEvaluator(  )
 {
-  m_ValueStack = NULL;
-  m_ReferenceStack = NULL;
-  m_StackSize = 0;
   m_ValPos = 0;
 }
 
 CEvaluator::~CEvaluator(  )
 {
-  if( m_ValueStack )
-  {
-    free ( m_ValueStack );
-  }
-  if( m_ReferenceStack )
-  {
-    free ( m_ReferenceStack );
-  }
 }
 
 void CEvaluator::AllocateStack( unsigned size )
 {
   m_ValPos = 0;
-  if( size >= m_StackSize )
-  {
-    m_StackSize		 = size;
-    m_ValueStack	 = ( double* )     realloc( m_ValueStack,     size * sizeof( double ) );
-    m_ReferenceStack = (  CElement** ) realloc( m_ReferenceStack, size * sizeof( CElement ) );
-  }
+  m_ValueStack.SetSize(size);
 }
+
+void CEvaluator::SetElementValue( unsigned index, const CValue& v )
+{
+  m_ElementValueArray.CheckSize( index );
+  m_ElementValueArray.SetAt( index, v );
+}
+
+const CValue& CEvaluator::GetElementValue( unsigned index ) const
+{
+  return m_ElementValueArray.GetAt( index );
+}
+
+void CEvaluator::SetFunction( unsigned index, const CEvaluatorFunct funct )
+{
+  m_FunctionArray.CheckSize( index );
+  m_FunctionArray.SetAt( index, funct );
+}
+/*
+void CEvaluator::InitializeValues()
+{
+  for( unsigned i = 0; i < m_InitialValue.GetSize(); i++ )
+  {
+    m_CurrentValue[i] = m_InitialValue[i];
+  }
+}*/
 
 void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
 {
@@ -79,21 +87,21 @@ void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
 
 }
 
-void CEvaluator::Evaluate( CElement* e )
+void CEvaluator::Evaluate( unsigned index )
 {
-  m_ReferenceStack[ m_ValPos ] = e;
-  void ( CEvaluator::*funct_ptr )() = e->GetEvalFunction();
+  //m_ReferenceStack[ m_ValPos ] = e;
+  CEvaluatorFunct funct_ptr = m_FunctionArray.GetAt( index );
   if( funct_ptr )
   {
     ( this->*funct_ptr ) ();
   }
   else
   {
-    m_ValueStack[ m_ValPos++ ] = e->GetValue().GetValue();
+    m_ValueStack[ m_ValPos++ ] = GetElementValue( index ).GetValue();
   }
 }
 
-CValue& CEvaluator::GetValue()
+const CValue& CEvaluator::GetValue()
 {
 
   if( m_ValPos == 0 )
@@ -109,7 +117,6 @@ CValue& CEvaluator::GetValue()
 }
 
 /***** void ****/
-
 void CEvaluator::Rand( void )
 {
   m_ValueStack[ m_ValPos++ ] =  ( double )rand() / ( double )RAND_MAX ;
@@ -243,8 +250,6 @@ void CEvaluator::LNot()
   double v = m_ValueStack[ --m_ValPos ];
   m_ValueStack[ m_ValPos++ ] =  ( double )( v != 0. );
 }
-
-
 void CEvaluator::Fact()
 {
   double v = m_ValueStack[ --m_ValPos ];
@@ -261,13 +266,13 @@ void CEvaluator::Fact()
 
 void CEvaluator::Not()
 {
- // int n, m;
-//  double x;
+  // int n, m;
+  //  double x;
   double v = m_ValueStack[ --m_ValPos ];
   /*x = frexp( v, &n ) * ( double )( 1 << 30 );
   m = ~( int )x;
   m_ValueStack[ m_ValPos++ ] = ldexp( ( double )m, n - 30 );*/
-  m_ValueStack[ m_ValPos++ ] = -v-1;
+  m_ValueStack[ m_ValPos++ ] = -v - 1;
 }
 
 void CEvaluator::Square()

@@ -21,8 +21,8 @@
 
 struct SProperties
 {
-  const char*	m_FunctionName;
-  void          ( CEvaluator::*m_FunctionCall ) ();
+  const char*	  m_FunctionName;
+  CEvaluatorFunct m_FunctionCall;
 };
 
 class CRules

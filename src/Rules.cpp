@@ -191,9 +191,9 @@ const char CRules::m_VoidFunctions[] =
 const char CRules::m_FunctionSymbol[] = // priority is defined here
 {
   //a,b,c,d,e,f,g,h // priority => priority+1
-  //A,B,C,D,E,F,G,H // priority => 0
-  "a:=b      =>  a b SET;"
+  //A,B,C,D,E,F,G,H // priority => 0  
   "a,b       =>  a b CONCAT;"
+  "a:=b      =>  a b SET;"
   "a+b       =>  a b ADD;"
   "a-b       =>  a b SUB;"
   "a*b       =>  a b MUL;"
@@ -413,26 +413,26 @@ const char CRules::m_AlgebraRuleString[] =
 
   "IPOLY(a,b,v)                       := IPOLY(a,v),IPOLY(b,v);"
   "IPOLY({a},v)                       := {IPOLY(a,v)};"
-  "IPOLY(TED(a,b)/TED(c,d),p)          := IPOLY(TED(a,b),p) / IPOLY(TED(c,d),p);" //TODO:IPOLY(a/c,p)
+  "IPOLY(TED(a,b)/TED(c,d),e)          := IPOLY(TED(a,b),e) / IPOLY(TED(c,d),e);" //TODO:IPOLY(a/c,p)
   "IPOLY(TED(TED(TED(TED(a,b),c),d),e),j) := SIMPLIFY(e-c+j*(d-b)+IPOLY(a,j));"
   "IPOLY(       TED(TED(TED(b,c),d),e),j) := e-c+j*(d-b);"
   "IPOLY(              TED(TED(c,d),e),j) := e-c+j*d;"
   "IPOLY(                     TED(d,e),j) := e+j*d;"
-  "IPOLY(TED(a,b),p)                   := b+IPOLY3(a,p);"
+  "IPOLY(TED(a,b),q)                   := b+IPOLY3(a,q);"
 
-  "IPOLY3(TED(a,b),p^CONST(n))         := IPOLY3(b,p^n)+IPOLY3(a,p^(n+1));"
-  "IPOLY3(TED(a,b),p)                  := IPOLY3(b,p)+IPOLY3(a,p^2);"
-  "IPOLY3(a,p)                         := a*p;"
+  "IPOLY3(TED(a,b),q^CONST(n))         := IPOLY3(b,q^n)+IPOLY3(a,q^(n+1));"
+  "IPOLY3(TED(a,b),q)                  := IPOLY3(b,q)+IPOLY3(a,q^2);"
+  "IPOLY3(a,q)                         := a*q;"
 
-  "IPOLY2(TED(a,b),{p,n})              := IPOLY2(b,{p,n})+IPOLY2(a,{p,n+1});"
-  "IPOLY2(-a,{p,n})                    := -IPOLY2(a,{p,n});"
-  "IPOLY2(a,{p,n})                     := (a^(1/n)*p)^n;"
+  "IPOLY2(TED(a,b),{q,n})              := IPOLY2(b,{q,n})+IPOLY2(a,{q,n+1});"
+  "IPOLY2(-a,{q,n})                    := -IPOLY2(a,{q,n});"
+  "IPOLY2(a,{q,n})                     := (a^(1/n)*q)^n;"
 
-  "NORM(TED(a,b)/TED(c,CONST(d)),p)    := ( b/d + IPOLY2(a/d,{p,1}) ) / ( 1 + IPOLY2(c/d,{p,1}) );"
-  "NORM(a,p)                           := NORM(POLY(a,p),p);"
+  "NORM(TED(a,b)/TED(c,CONST(d)),q)    := ( b/d + IPOLY2(a/d,{q,1}) ) / ( 1 + IPOLY2(c/d,{q,1}) );"
+  "NORM(a,q)                           := NORM(POLY(a,q),q);"
 
-  "NORM2(TED(a,b)/c,p)                 := p+b/a;"
-  "NORM2(a,p)                          := NORM2(POLY(a,p),p);"
+  "NORM2(TED(a,b)/c,q)                 := q+b/a;"
+  "NORM2(a,q)                          := NORM2(POLY(a,q),q);"
 
   "SIMPLIFY(ELEM(a))                    := a ;"
   "SIMPLIFY(-ELEM(a))                   := -a ;"

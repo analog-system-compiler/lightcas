@@ -28,12 +28,12 @@ CElement::CElement( const CString& name )
   m_Type = ELEM_VAR;
   CommonInit();
 }
-
+/*
 CElement::CElement( const CValue& val )
 {
   SetConstValue( val );
   CommonInit();
-}
+}*/
 
 CElement::~CElement()
 {
@@ -46,7 +46,7 @@ void CElement::CommonInit()
   m_bAux      = false;
   m_Ref       = 0;
   m_Global    = false;
-  m_EvalFunct = NULL;
+  m_Numeric   = false;
 }
 
 void CElement::Display( CDisplay& ds ) const
@@ -57,20 +57,21 @@ void CElement::Display( CDisplay& ds ) const
   {
     if( m_Name.GetLength() )
     {
-      ds.AddString( m_Name );
+      ds.Add( m_Name );
     }
     else
     {
-      m_Value.Display( ds );
+      ASSERT( false );
+      //m_Value.Display( ds );
     }
   }
   else if( m_PseudoName.GetLength() )
   {
-    ds.AddString( m_PseudoName );
+    ds.Add( m_PseudoName );
   }
   else
   {
-    ds.AddString( m_Name );
+    ds.Add( m_Name );
   }
 }
 
@@ -97,6 +98,7 @@ void CElement::SetEquation( const CEquation& dst )
 {
   CEquation src( dst.GetElementDB() );
   src.Init( this ); // f()
+  RemoveRules();
   AddFunction( src,  dst );
 }
 

@@ -25,11 +25,12 @@
 CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 
-CElementDataBase::CElementDataBase( CElementDataBase* parent, const CString& name )
+CElementDataBase::CElementDataBase( CElementDataBase* parent, const CString& name, bool bInitialize )
 {
   m_Parent = parent;
   m_Name = name;
-  Initialize();
+  m_Evaluator = NULL;
+  if(bInitialize) Initialize();
 }
 
 CElementDataBase::~CElementDataBase()
@@ -43,6 +44,7 @@ void CElementDataBase::Initialize()
   Clear();
   if( m_Parent == NULL )
   {
+    CreateEvaluator();
     AddReservedElements();
     AddOperandTable     ( CRules::m_VoidFunctions,   0  );
     AddOperandTable     ( CRules::m_UnaryFunctions,  1  );
@@ -56,6 +58,15 @@ void CElementDataBase::Initialize()
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleTaylorSeries );
     AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
   }
+  else
+  {
+    m_Evaluator = m_Parent->GetEvaluator();
+  }
+}
+
+void CElementDataBase::CreateEvaluator()
+{
+ m_Evaluator = new CEvaluator();
 }
 
 void CElementDataBase::AddReservedElements()
@@ -70,35 +81,35 @@ void CElementDataBase::AddReservedElements()
   GetElement()->SetPseudoName(  "g"  );
   GetElement()->SetPseudoName(  "h"  );
   GetElement( "CONCAT" )->SetOperandNb( 2 );
-  GetElement( "SET" )->SetOperandNb( 2 );
-  GetElement( "NONE" );
-  GetElement( "CONST" );
-  GetElement( "ELEM" );
-  GetElement( "NEG" )->SetOperandNb( 1 );
-  GetElement( "j" );
-  GetElement( "RANK" )->SetOperandNb( 2 );
-  GetElement( "SUBST" )->SetOperandNb( 2 );
+  GetElement( "SET"    )->SetOperandNb( 2 );
+  GetElement( "NONE"   );//->SetOperandNb( 0 );
+  GetElement( "CONST"  )->SetOperandNb( 1 );
+  GetElement( "ELEM"   )->SetOperandNb( 1 );
+  GetElement( "NEG"    )->SetOperandNb( 1 );
+  GetElement( "j"      );//->SetOperandNb( 0 );
+  GetElement( "RANK"   )->SetOperandNb( 2 );
+  GetElement( "SUBST"  )->SetOperandNb( 2 );
   //GetElement( "STACK_SIZE_ERROR" );
   // GetElement( "NEW" );
 
-  ASSERT( ElementToRef( m_ElementRefArray[ 0] ) == OP_ZERO   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 1] ) == OP_EXP1   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 2] ) == OP_EXP2   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 3] ) == OP_EXP3   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 4] ) == OP_EXP4   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 5] ) == OP_EXP5   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 6] ) == OP_EXP6   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 7] ) == OP_EXP7   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 8] ) == OP_EXP8   );
-  ASSERT( ElementToRef( m_ElementRefArray[ 9] ) == OP_CONCAT );
-  ASSERT( ElementToRef( m_ElementRefArray[10] ) == OP_SET    );
-  ASSERT( ElementToRef( m_ElementRefArray[11] ) == OP_NONE   );
-  ASSERT( ElementToRef( m_ElementRefArray[12] ) == OP_CONST  );
-  ASSERT( ElementToRef( m_ElementRefArray[13] ) == OP_ELEM   );
-  ASSERT( ElementToRef( m_ElementRefArray[14] ) == OP_NEG    );
-  ASSERT( ElementToRef( m_ElementRefArray[15] ) == OP_CPLX   );
-  ASSERT( ElementToRef( m_ElementRefArray[16] ) == OP_RANK   );
-  ASSERT( ElementToRef( m_ElementRefArray[17] ) == OP_SUBST   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP3   ] ) == OP_EXP3   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP4   ] ) == OP_EXP4   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP5   ] ) == OP_EXP5   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP6   ] ) == OP_EXP6   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP7   ] ) == OP_EXP7   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP8   ] ) == OP_EXP8   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONCAT ] ) == OP_CONCAT );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_SET    ] ) == OP_SET    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE   ] ) == OP_NONE   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST  ] ) == OP_CONST  );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM   ] ) == OP_ELEM   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG    ] ) == OP_NEG    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
   //ASSERT( ElementToRef( m_ElementRefArray[17] ) == OP_ERROR_SIZE   );
   //  ASSERT( ElementToRef( m_ElementRefArray[16] ) == OP_NEW    );
 }
@@ -168,19 +179,25 @@ void CElementDataBase::AddAlgebraRuleTable( const char* rules_table )
   CElementDataBase db(  this, "tmp1"  );
   CEquation src( &db );
   CParser IC(  rules_table );
-  src.GetFromText( IC );
+  do src.GetFromText( IC );
+  while( IC.TryFind( ';' ) );
 }
 
 void CElementDataBase::AddEvalFunctionTable( const SProperties* property_table, unsigned size )
 {
-  CElement* e;
-  unsigned pos;
   for( unsigned i = 0; i < size; i++ )
   {
-    //Elements have to be declared before
-    e = SearchElement( property_table[i].m_FunctionName, pos );
-    e->SetEvalFunct(   property_table[i].m_FunctionCall );
+    AddEvalFunction( CString( property_table[i].m_FunctionName ), property_table[i].m_FunctionCall );
   }
+}
+
+void CElementDataBase::AddEvalFunction( CString& name, CEvaluatorFunct funct )
+{
+  unsigned pos;
+  CElement* e;
+  e = SearchElement( name, pos );
+  e->SetNumeric();
+  GetEvaluator()->SetFunction( e->ToRef(), funct );
 }
 
 OP_CODE CElementDataBase::ElementToRef( const CElement* e )
@@ -195,19 +212,23 @@ void CElementDataBase::Clear()
   {
     m_ElementRefArray.RemoveAll();
     m_SymbolSyntaxArray.DeleteAll();
+    if( m_Evaluator )
+    {
+      delete m_Evaluator;
+      m_Evaluator=NULL;
+    }
   }
 }
 
-
 CElement* CElementDataBase::GetElement()
 {
-  int			n;
+  unsigned n;
   CElement*	e;
   CString		s;
 
   n = GetSize();
   s = "_";
-  s += CString( n );
+  s += CString( ( int )n );
   e = new CElement( s );
   e->SetTemporary();
   Register( e, n );
@@ -228,8 +249,11 @@ CElement* CElementDataBase::GetElement( const CValue& v )
     e = SearchElement( v, pos );
     if( e == NULL )
     {
-      e = new CElement( v );
-      Register( e, pos );
+      CDisplay ds;
+      v.Display( ds );
+      e = CreateElement( ds, pos );
+      e->SetConst();
+      GetEvaluator()->SetElementValue( e->ToRef(), v );
     }
   }
   return( e );
@@ -243,9 +267,18 @@ CElement* CElementDataBase::GetElement( const CString& string )
   e = SearchElement( string, pos );
   if( e == NULL )
   {
-    e = new CElement( string );
-    Register( e, pos );
+    e = CreateElement( string, pos );
   }
+  return e;
+}
+
+CElement* CElementDataBase::CreateElement( const CString& string, unsigned pos )
+{
+  CElement* e;
+  e = new CElement( string );
+  Register( e, pos );
+  GetEvaluator()->SetElementValue( e->ToRef(), CValue( 0. ) );
+  GetEvaluator()->SetFunction( e->ToRef(), NULL );
   return e;
 }
 
@@ -262,7 +295,7 @@ CElement* CElementDataBase::SearchElement( const CValue& v1, unsigned& pos ) con
 
     if( e->IsConst() )
     {
-      const CValue& v2 = e->GetConstValue() ;
+      const CValue& v2 = GetEvaluator()->GetElementValue( e->ToRef() );
 
       if(  v1 == v2  )
       {
@@ -292,8 +325,8 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
 
   if( m_Parent )
   {
-
     e = m_Parent->SearchElement( string, pos );
+
     if( e )
     {
       return e;

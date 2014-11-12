@@ -18,12 +18,10 @@
 
 #pragma once
 
-#include "String.h"
+#include "LCString.h"
 
 class CParserException
 {
-
-
   public:
     enum EXCEPTION_ID
     {
@@ -33,12 +31,12 @@ class CParserException
     };
 
   private:
-    EXCEPTION_ID  m_ErrorID;
+    unsigned  m_ErrorID;
     unsigned m_LineNb;
     CString m_ErrorStr;
 
   public:
-    void SetErrorID( EXCEPTION_ID id )
+    void SetErrorID( unsigned id )
     {
       m_ErrorID = id;
     }
@@ -59,7 +57,7 @@ class CParserException
     {
       return m_ErrorStr;
     }
-    EXCEPTION_ID GetErrorID() const
+    unsigned GetErrorID() const
     {
       return m_ErrorID;
     }
@@ -77,18 +75,20 @@ class CParser : public CString
 
   private:
 
-    const char*			m_Pos;
     static	const char	m_CharTab[];
     int		m_LineNb;
 
-  private:
+  public:
+    const char*			m_Pos;
+
+  protected:
     void	SkipComment();
     void	SkipSpaceNL();
     void	SkipSpace();
 
   public:
 
-    void	Error( CParserException::EXCEPTION_ID id, const CString* str = NULL ) const;
+    void	Error( unsigned id, const CString* str = NULL ) const;
 
     void	Find( char c );
     bool	TryFind( char c );

@@ -22,9 +22,7 @@
 
 void CValue::Display( CDisplay& ds ) const
 {
-  char buffer[32];
-  snprintf( buffer, 32, "%.12g", m_Value );
-  ds.AddValue( buffer );
+  ds.Add( m_Value );
 }
 
 const char* CValue::GetFromString( const char* s1 )

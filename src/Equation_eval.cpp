@@ -18,28 +18,24 @@
 
 #include "Equation.h"
 
-CValue& CEquation::Evaluate( CEvaluator& val ) const
+const CValue& CEquation::Evaluate( CEvaluator* val ) const
 {
   return Evaluate( 0, val );
 }
 
-CValue& CEquation::Evaluate( unsigned pos_init, CEvaluator& val ) const
+const CValue& CEquation::Evaluate( unsigned pos_init, CEvaluator* val ) const
 {
   unsigned pos;
-  CElement* e;
   OP_CODE op;
   unsigned size = m_StackSize;
 
-  val.AllocateStack( size );
+  val->AllocateStack( size );
 
   for( pos = pos_init; pos < m_StackSize; pos ++ )
   {
-
     op = Get( pos );
-    e = RefToElement( op );
-    val.Evaluate( e );
-
+    val->Evaluate( op );
   }
 
-  return val.GetValue();
+  return val->GetValue();
 }

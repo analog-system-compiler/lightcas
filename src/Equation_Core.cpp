@@ -17,19 +17,23 @@
 /*******************************************************************************/
 #include <cstring>
 #include "Debug.h"
-#include "Vector.h"
+#include "LCVector.h"
 #include "Equation.h"
 #include "Element.h"
 #include "Function.h"
 
 CEquation::CEquation( CElementDataBase* db )
 {
+  m_StackArray = NULL;
+  m_AllocSize = 0;
   Initialize( db );
 }
 
 // Copy Constructor
 CEquation::CEquation( const CEquation& equ )
 {
+  m_StackArray = NULL;
+  m_AllocSize = 0;
   Initialize( equ.m_ElementDB );
   Copy( equ );
 }
@@ -44,15 +48,11 @@ CEquation::~CEquation()
 
 void CEquation::Initialize( CElementDataBase* db )
 {
-  m_StackArray = NULL;
-  m_StackSize = 0;
-  m_OldStackSize = 0;
-  m_AllocSize = 0;
+  Clear();
   m_ElementDB  = db;
-
 }
 
-void CEquation::PushEquation( const CEquation& equ )
+void CEquation::Push( const CEquation& equ )
 {
   if( equ.IsNull() )
   {
@@ -103,7 +103,7 @@ void CEquation::Copy( const CEquation& equ )
 
   if( !equ.IsNull() ) // TODO : to remove
   {
-    PushEquation( equ );
+    Push( equ );
   }
 }
 
@@ -133,20 +133,20 @@ void CEquation::NextBranch( unsigned& pos ) const
   }
 }
 
-void CEquation::PushElement( CValue& v )
+void CEquation::Push( CValue v )
 {
   if( v.IsNegative() )
   {
     v.Negate();
     CElement* e =  m_ElementDB->GetElement( v );
-    PushElement( e );
+    Push( e );
     Push( CElementDataBase::OP_NEG );
   }
 
   else
   {
     CElement* e = m_ElementDB->GetElement( v );
-    PushElement( e );
+    Push( e );
   }
 }
 
@@ -174,14 +174,12 @@ unsigned CEquation::MatchParameter( const OP_CODE elem_array[], OP_CODE op )
   return i;
 }
 
-#ifdef FUNCT_EXT
-
 void CEquation::BinaryOperation( OP_CODE op, const CEquation& equ )
 {
   ASSERT( RefToElement( op )->IsBinary() );
 
   AddZero();
-  PushEquation( equ );
+  Push( equ );
   Push( op );
   OptimizeTree();
   RemoveZero();
@@ -195,7 +193,7 @@ void CEquation::BinaryOperation( OP_CODE op, const CElement* e1 )
   ASSERT( RefToElement( op )->IsBinary() );
 
   AddZero();
-  PushElement( e1 );
+  Push( e1 );
   Push( op );
   OptimizeTree();
   RemoveZero();
@@ -232,5 +230,3 @@ void CEquation::RemoveZero()
     Clear();
   }
 }
-
-#endif

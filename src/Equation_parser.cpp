@@ -23,16 +23,16 @@
 void CEquation::GetFromText( CParser& IC )
 {
   Clear();
-  do
+  //do
   {
     GetLevel( IC, 0 );
   }
-  while( IC.TryFind( ';' ) );
+  //while( IC.TryFind( ';' ) );
 
-  if( IC.GetChar() != '\0' )
+ /* if( IC.GetChar() != '\0' )
   {
     IC.Error( CParserException::ID_SYNTAX_ERROR );
-  }
+  }*/
 }
 
 void CEquation::Display( CDisplay& ds ) const
@@ -199,7 +199,7 @@ bool CEquation::GetAtom( CParser& IC )
   if( pos != IC.GetPos() )
   {
     IC.SetPos( pos );
-    PushElement( v );
+    Push( v );
   }
   else if( IC.IsWord() )
   {
@@ -369,7 +369,7 @@ void CEquation::ParseElement( CParser& IC )
     }
   }
 
-  PushElement( e );
+  Push( e );
 
 }
 
@@ -380,7 +380,7 @@ void CEquation::GetFromTextRPN( CParser& IC )
   while( !IC.TryFind( ';' ) )
   {
     e = m_ElementDB->GetElement( IC.GetWord() );
-    PushElement( e );
+    Push( e );
 
   }
 }
@@ -405,7 +405,7 @@ const char* CEquation::ParseExpression( const char* sp, OP_CODE* elem_array, uns
   {
     CEquation equ( m_ElementDB );
     equ.GetLevel( IC, priority );
-    PushEquation( equ );
+    Push( equ );
   }
 
   elem_array[index] = CElementDataBase::OP_EXP1 + elem_id;

@@ -56,6 +56,7 @@ public:
   void AddAlgebraRule( const CEquation & src, const CEquation & dst, unsigned line_no );
   unsigned GetParameterNb() const { return m_ParameterNb; }
   void SetParameterNb( unsigned parameter_nb ) { m_ParameterNb=parameter_nb; }
+  const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }
 
   CFunction();
   ~CFunction();

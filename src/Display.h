@@ -16,15 +16,13 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 #pragma once
-#include "String.h"
-
-#ifdef _WIN32
-#define snprintf _snprintf
-#endif
+#include "LCString.h"
 
 class CDisplay : public CString
 {
 public:
-    virtual void AddString( const CString& str ) { *this += str; }
-    virtual void AddValue( const CString& str ) { *this += str; }
+    virtual void Add( char c )              { *this += c; }
+    virtual void Add( const CString& str )  { *this += str; }
+    virtual void Add( double v )            { *this += CString( v );  }
+    virtual void Add( int i )               { *this += CString( i );  }
 };

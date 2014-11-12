@@ -19,86 +19,96 @@
 #pragma once
 
 #include "Value.h"
+#include "LCVector.h"
 
 class CElement;
+class CEvaluator;
+
+typedef void (CEvaluator::*CEvaluatorFunct)();
+typedef CVector< class CValue > CValueArray;
+typedef CVector< double > CDoubleArray;
+typedef CVector< CEvaluatorFunct > CFunctArray;
 
 class CEvaluator
 {
 
-private:
-  double*    m_ValueStack;
-  CElement** m_ReferenceStack;
-  unsigned   m_StackSize;
-  unsigned   m_ValPos;
-  CValue     m_Value;
+  protected:
+    CDoubleArray    m_ValueStack;
+    unsigned   m_ValPos;
+    CValue     m_Value;
+    CValueArray m_ElementValueArray;
+    CFunctArray m_FunctionArray;
 
-public:
-  void AllocateStack( unsigned size );
-  void Evaluate( CElement* e );
-  void GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n );
-  CValue& GetValue();
+  public:
+    virtual void AllocateStack( unsigned size );
+    void Evaluate( unsigned index );
+    void GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n );    
 
-private:  
+    void SetElementValue( unsigned index, const CValue& v );
+    void SetFunction( unsigned index, const CEvaluatorFunct funct );
+    const CValue& GetElementValue( unsigned index ) const;    
+    const CValue& GetValue();    
 
-public:
-  void VectorStart();
-  void VectorNext();
-  void At();
-  void PI();
-  void Fsrc();
-  void Rand();
-  void Sin();
-  void Cos();
-  void Tan();
-  void Asin();
-  void Acos();
-  void Atan();
-  void SinH();
-  void CosH();
-  void TanH();
-  void AsinH();
-  void AcosH();
-  void AtanH();
-  void Exp();
-  void Ln();
-  void Log();
-  void Sqrt();
-  void Floor();
-  void Ceil();
-  void Abs();
-  void Sqr();
-  void Neg();
-  void Inv();
-  void Id();
-  void Bool();
-  void LNot();
-  void Fact();
-  void Not();
-  void Square();
-  void Add();
-  void Sub();
-  void Mul();
-  void Div();
-  void Lower();
-  void LowerOrEqual();
-  void Greater();
-  void GreaterOrEqual();
-  void Equal();
-  void NotEqual();
-  void Min();
-  void Max();
-  void LAnd();
-  void LOr();
-  void Pow();
-  void Par();
-  void Mod();
-  void And();
-  void Or();
-  void Xor();
-  void ShiftRight();
-  void ShiftLeft();
-  
-public:
-  CEvaluator( void );
-  ~CEvaluator( void );
+  protected:
+
+  public:
+    void VectorStart();
+    void VectorNext();
+    void At();
+    void PI();
+    void Rand();
+    void Sin();
+    void Cos();
+    void Tan();
+    void Asin();
+    void Acos();
+    void Atan();
+    void SinH();
+    void CosH();
+    void TanH();
+    void AsinH();
+    void AcosH();
+    void AtanH();
+    void Exp();
+    void Ln();
+    void Log();
+    void Sqrt();
+    void Floor();
+    void Ceil();
+    void Abs();
+    void Sqr();
+    void Neg();
+    void Inv();
+    void Id();
+    void Bool();
+    void LNot();
+    void Fact();
+    void Not();
+    void Square();
+    void Add();
+    void Sub();
+    void Mul();
+    void Div();
+    void Lower();
+    void LowerOrEqual();
+    void Greater();
+    void GreaterOrEqual();
+    void Equal();
+    void NotEqual();
+    void Min();
+    void Max();
+    void LAnd();
+    void LOr();
+    void Pow();
+    void Par();
+    void Mod();
+    void And();
+    void Or();
+    void Xor();
+    void ShiftRight();
+    void ShiftLeft();
+
+  public:
+    CEvaluator( void );
+    ~CEvaluator( void );
 };

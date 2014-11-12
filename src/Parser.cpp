@@ -236,7 +236,7 @@ unsigned CParser::TryMatchSymbol( const char* s1, const char* s2 )
   return i;
 }
 
-void CParser::Error( CParserException::EXCEPTION_ID id, const CString* str ) const
+void CParser::Error( unsigned id, const CString* str ) const
 {
   CParserException ex;
   ex.SetErrorID( id );
