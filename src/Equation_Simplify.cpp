@@ -307,8 +307,7 @@ bool CEquation::ExecuteInternalCommand( OP_CODE op3, CEquation& equ )
     op3 = GetLastOperator();
     e = RefToElement( op3 );
     e->AddFunction( *this, equ );
-    Clear();
-    Push( equ );
+    //Copy( *this );
     bOK=true;
   }
   else if ( op3 == CElementDataBase::OP_RANK )

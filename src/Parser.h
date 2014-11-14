@@ -95,7 +95,7 @@ class CParser : public CString
 
     void	Init( const char* pText );
 
-    static unsigned TryMatchSymbol( const char* s1, const char* s2 );
+    bool TryMatchSymbol( const char *& symbol_str );
 
     const   CString& GetWord();
     char    GetChar();

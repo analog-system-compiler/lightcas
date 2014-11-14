@@ -29,10 +29,10 @@ void CEquation::GetFromText( CParser& IC )
   }
   //while( IC.TryFind( ';' ) );
 
- /* if( IC.GetChar() != '\0' )
-  {
-    IC.Error( CParserException::ID_SYNTAX_ERROR );
-  }*/
+  /* if( IC.GetChar() != '\0' )
+   {
+     IC.Error( CParserException::ID_SYNTAX_ERROR );
+   }*/
 }
 
 void CEquation::Display( CDisplay& ds ) const
@@ -71,9 +71,9 @@ unsigned CEquation::DisplayBranch( unsigned pos , unsigned priority, CDisplay& d
   unsigned i;
   CElement* e;
   unsigned pos2;
-  ASSERT( pos );
   CDisplay ds2, ds3;
 
+  ASSERT( pos );
   pos2 = DisplaySymbol(  pos, priority, ds );
 
   if( pos == pos2 ) //no symbol displayed
@@ -174,7 +174,7 @@ void CEquation::GetLevel( CParser& IC, unsigned priority )
 {
   if( !IC.IsStopChar() )
   {
-    if( !GetAtom( IC ) )
+    if( !ParseElement( IC ) )
     {
       if( !SearchOperator( IC, 0, true ) )
       {
@@ -192,6 +192,7 @@ void CEquation::GetLevel( CParser& IC, unsigned priority )
   }
 }
 
+/*
 bool CEquation::GetAtom( CParser& IC )
 {
   CValue v;
@@ -215,7 +216,7 @@ bool CEquation::GetAtom( CParser& IC )
     return false;
   }
   return true;
-}
+}*/
 bool CEquation::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
   unsigned i;
@@ -237,9 +238,8 @@ bool CEquation::SearchOperator( CParser& IC, unsigned priority, bool symbol_firs
 
 bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& rule_equ, unsigned priority, bool symbol_first )
 {
-  unsigned index, j;
+  unsigned index;
   const char* sp = s.GetBufferPtr();
-  const char* pos;
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
   OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
 
@@ -270,14 +270,14 @@ bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& r
 
     if( !CParser::IsWord( *sp ) )
     {
-      pos = IC.GetPos();
-      j = CParser::TryMatchSymbol( sp, pos );
+      if( !IC.TryMatchSymbol( sp ) ) break;
+      /*j = CParser::TryMatchSymbol( sp, pos );
       if( j == 0 )
       {
         break;
       }
       sp += j;
-      IC.SetPos( pos + j );
+      IC.SetPos( pos + j );*/
     }
 
     if( *sp == '\0' )
@@ -309,7 +309,7 @@ bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& r
   return false;
 }
 
-void CEquation::ParseElement( CParser& IC )
+bool CEquation::ParseElement( CParser& IC )
 {
   CElement* e;
   CFunction* f;
@@ -317,71 +317,82 @@ void CEquation::ParseElement( CParser& IC )
   unsigned n;
 
   //Symbol match failed, try to use default syntax
-  ASSERT( IC.IsWord() );
+  //ASSERT( IC.IsWord() );
 
   n = m_ElementDB->GetSize();
 
-  IC.GetWord();
-  e = m_ElementDB->GetElement( IC );
-
-  element_creation = ( m_ElementDB->GetSize() - n ) != 0;
-  if( element_creation )
+  e = m_ElementDB->ParseElement( IC );
+  if( e )
   {
-    if( IC.TryFind( '(' ) )
+    element_creation = ( m_ElementDB->GetSize() - n ) != 0;
+    if( element_creation )
     {
-      e->SetFunct();
-      if( IC.TryFind( ')' ) )
+      if( IC.TryFind( '(' ) )
       {
-        e->GetFunction()->SetParameterNb( 0 );
-      }
-      else
-      {
-        e->GetFunction()->SetParameterNb( 1 );
-        GetLevel( IC, 0 );
-        IC.Find( ')' );
-      }
-    }
-  }
-  else
-  {
-    f = e->GetFunction();
-    if( f )
-    {
-      if( f->GetParameterNb() == 0 )
-      {
-        if( IC.TryFind( '(' ) )
+        e->SetFunct();
+        if( IC.TryFind( ')' ) )
         {
+          e->GetFunction()->SetParameterNb( 0 );
+        }
+        else
+        {
+          e->GetFunction()->SetParameterNb( 1 );
+          GetLevel( IC, 0 );
           IC.Find( ')' );
         }
       }
-      else
+    }
+    else
+    {
+      f = e->GetFunction();
+      if( f )
       {
-        IC.Find( '(' );
-        GetLevel( IC, 0 );
-        IC.Find( ')' );
-
-        //specific case for 2-operands function
-        if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
+        if( f->GetParameterNb() == 0 )
         {
-          m_StackSize--;
+          if( IC.TryFind( '(' ) )
+          {
+            IC.Find( ')' );
+          }
+        }
+        else
+        {
+          IC.Find( '(' );
+          GetLevel( IC, 0 );
+          IC.Find( ')' );
+
+          //specific case for 2-operands function
+          if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
+          {
+            m_StackSize--;
+          }
         }
       }
     }
+
+    Push( e );
+  }
+  else if( IC.TryFind( '(' ) )
+  {
+    GetLevel( IC, 0 );
+    IC.Find( ')' );
+  }
+  else
+  {
+    return false;
   }
 
-  Push( e );
-
+  return true;
 }
 
 void CEquation::GetFromTextRPN( CParser& IC )
 {
+  // see GetAtom
   CElement* e;
   Clear();
   while( !IC.TryFind( ';' ) )
   {
-    e = m_ElementDB->GetElement( IC.GetWord() );
+    e=m_ElementDB->ParseElement( IC );
     Push( e );
-
   }
 }
 

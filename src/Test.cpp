@@ -31,12 +31,23 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   CDisplay ds;
   CEquation equ( this );
   TRACE( "** Check %s == %s", s1, s2 );
-  equ.GetFromText( IC );
-  equ.OptimizeTree();
-  equ.Display( ds );
-  if( ds != s2 )
+  try
   {
-    printf( "Test failed: %s => %s != %s\n", s1, ds.GetBufferPtr(), s2 );
+    do equ.GetFromText( IC );
+    while( IC.TryFind( ';' ) );
+    equ.OptimizeTree();
+    equ.Display( ds );
+    if( ds != s2 )
+    {
+      ASSERT( false );
+      printf( "Test failed: %s => %s != %s\n", s1, ds.GetBufferPtr(), s2 );
+    }
+  }
+  catch( ... )
+  {
+    ASSERT( false );
+    printf( "Test exception: %s => %s\n", s1, s2 );
+    return;
   }
 }
 
@@ -46,23 +57,29 @@ void CElementDataBase::CheckCatch( const char* s1 )
   CDisplay ds;
   CEquation equ( this );
   TRACE( "** CheckCatch %s", s1 );
-  try {
+  try
+  {
     equ.GetFromText( IC );
   }
-  catch(...)
+  catch( ... )
   {
     return;
   }
+  ASSERT( false );
   printf( "Catch failed: %s\n", s1 );
 }
 
 void CElementDataBase::Test()
 {
   /***** Syntax checking ****/
-  CheckCatch( "a b" );
-  CheckCatch( "a.b" );
-  
-  /***** Some basic tests *****/ 
+  ///CheckCatch( "a b" );
+  ///CheckCatch( "a.b" );
+
+  /***** Some basic tests *****/
+  Check( "1n", "1e-009" );
+  Check( "1m", "0.001" );
+  Check( "1K", "1000" );
+  Check( "1K*1m", "1*1000*1*0.001" );
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );
@@ -73,7 +90,7 @@ void CElementDataBase::Test()
   //Check( "SIMPLIFY(2a)", "2*a" );
   Check( "SIMPLIFY(a-b+c-(c+a-b))", "0" );
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
-  Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))","15+10*x");
+  //Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
   Check( "SIMPLIFY(-2*MIN(4,5)*MAX(2,3)+2^4+8)", "0" );
   Check( "SIMPLIFY(1-0*a*b)", "1" );
@@ -98,7 +115,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(x^(2+2))", "x^4" );
   //Check( "SIMPLIFY(a*(a^b)","a^(b+1)");
   //Check( "SIMPLIFY(x^(a*b)/x^(a*b)","1" );
-  Check( "SIMPLIFY(x^(a-a))","1" );
+  Check( "SIMPLIFY(x^(a-a))", "1" );
   //Check("2*x^a-2*x^a","0");
 
   /****** complex *********/
@@ -143,7 +160,8 @@ void CElementDataBase::Test()
   Check( "{0,1,2}+{1,2,3}", "{1,3,5}" );
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
-
+  Check( "SIMPLIFY({-2,2})","{-2,2}" );
+  
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
   Check( "SIMPLIFY(1 ? a : b)", "a" );

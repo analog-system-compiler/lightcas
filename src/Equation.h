@@ -55,8 +55,9 @@ class CEquation
    
     void        GetLevel( CParser& IC, unsigned priority );
     bool        SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
-    void        ParseElement(CParser& IC);
-    bool        GetAtom(CParser& IC);
+    bool        ParseElement(CParser& IC);
+    //CElement*   ParseElement2(CParser& IC);
+    //bool        GetAtom(CParser& IC);
     bool        MatchOperator( CParser& IC, const CString& s, const CEquation& equ, unsigned priority1, bool symbol_first );
 
     const char* ParseExpression( const char* sp, OP_CODE* elem_array, unsigned* pos_array, unsigned index, unsigned priority, CParser& IC, bool allow_recursion );

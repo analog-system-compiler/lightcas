@@ -32,7 +32,7 @@ CEvaluator::~CEvaluator(  )
 void CEvaluator::AllocateStack( unsigned size )
 {
   m_ValPos = 0;
-  m_ValueStack.SetSize(size);
+  m_ValueStack.SetSize( size );
 }
 
 void CEvaluator::SetElementValue( unsigned index, const CValue& v )
@@ -89,8 +89,13 @@ void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
 
 void CEvaluator::Evaluate( unsigned index )
 {
-  //m_ReferenceStack[ m_ValPos ] = e;
-  CEvaluatorFunct funct_ptr = m_FunctionArray.GetAt( index );
+  CEvaluatorFunct funct_ptr = NULL;
+  
+  if( index < m_FunctionArray.GetSize() )
+  {
+    funct_ptr = m_FunctionArray.GetAt( index );
+  }
+
   if( funct_ptr )
   {
     ( this->*funct_ptr ) ();

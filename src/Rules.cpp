@@ -224,14 +224,14 @@ const char CRules::m_FunctionSymbol[] = // priority is defined here
   "{A}       =>  a VECT;"
   //  "\\da/\\db =>  a b DER;"
   // "\\Sa\\db  =>  INT(a,b);"
-  //"a\\p     =>  MUL(a,1e-12);"
-  //"a\\n     =>  MUL(a,1e-9);"
-  //"a\\u     =>  MUL(a,1e-6);"
-  //"a\\m     =>  MUL(a,1e-3);"
-  //"a\\k     =>  MUL(a,1e3);"
-  //"a\\K     =>  MUL(a,1e3);"
-  //"a\\M     =>  MUL(a,1e6);"
-  //"a\\G     =>  MUL(a,1e9);"
+  "a\\p     =>  a 1e-12 MUL;"
+  "a\\n     =>  a 1e-9  MUL;"
+  "a\\u     =>  a 1e-6  MUL;"
+  "a\\m     =>  a 1e-3  MUL;"
+  "a\\k     =>  a 1e3   MUL;"
+  "a\\K     =>  a 1e3   MUL;"
+  "a\\M     =>  a 1e6   MUL;"
+  "a\\G     =>  a 1e9   MUL;"
 };
 
 const char CRules::m_AlgebraRuleString[] =
@@ -314,7 +314,7 @@ const char CRules::m_AlgebraRuleString[] =
   "POLY(a[b],v)        := TED(0,SIMPLIFY(a)[SIMPLIFY(b)])/TED(0,1);"
   //"POLY(TED(a,b),v) := TED(POLY(a,v),POLY(b,v));"
   "POLY({a},v)         := {POLY(a,v)};"
-  "POLY((a,b),v)       := POLY(a,v),POLY(b,v);"
+  "POLY((a,b),v)       := (POLY(a,v),POLY(b,v));" //parenthesis are important there!!!
   "POLY(v,v)           := TED(1,0)/TED(0,1);"
   "POLY(a,v)           := TED(0,a)/TED(0,1);"
 
@@ -402,8 +402,14 @@ const char CRules::m_AlgebraRuleString[] =
   //"a*(a^b)              := a^(b+1)  ;"
   //"(a*b)^c          := (a^c)*(b^c)  ;"
 
-  "BOOL(0)              := 0;"
-  "BOOL(CONST(a))       := 1;"
+  "BOOL(a==b) := (a==b);"
+  "BOOL(a<>b) := (a<>b);"
+  "BOOL(a>=b) := (a>=b);"
+  "BOOL(a<=b) := (a<=b);"
+  "BOOL(a>b)  := (a>b);"
+  "BOOL(a<b)  := (a<b);"
+  "BOOL(!a)   := !a;"
+  "BOOL(a)    := !(a==0);"
 
   "RE(TED(a,b)/TED(0,1))     := b;"
   "RE(a)                     := RE(POLY(a,j));"
@@ -411,7 +417,7 @@ const char CRules::m_AlgebraRuleString[] =
   "IM(TED(a,b)/TED(0,1))     := a;"
   "IM(a)                     := IM(POLY(a,j));"
 
-  "IPOLY(a,b,v)                       := IPOLY(a,v),IPOLY(b,v);"
+  "IPOLY(a,b,v)                       := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
   "IPOLY({a},v)                       := {IPOLY(a,v)};"
   "IPOLY(TED(a,b)/TED(c,d),e)          := IPOLY(TED(a,b),e) / IPOLY(TED(c,d),e);" //TODO:IPOLY(a/c,p)
   "IPOLY(TED(TED(TED(TED(a,b),c),d),e),j) := SIMPLIFY(e-c+j*(d-b)+IPOLY(a,j));"
@@ -485,22 +491,22 @@ const char CRules::m_AlgebraRuleDerivals[] =
 
 const char CRules::m_AlgebraRuleSystems[] =
 
-  "REDUCE(    TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := TED(a,b),TED(0,d);"
-  "REDUCE(    TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := TED(c,d),TED(0,c*b-d*a);"
-  "REDUCE( e, TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := REDUCE( e, TED(a,b)/TED(0,1)) , TED(0,d);"
-  "REDUCE( e, TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := REDUCE( e, TED(c,d)/TED(0,1)) , TED(0,c*b-d*a);"
+  "REDUCE(    TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := (TED(a,b),TED(0,d));"
+  "REDUCE(    TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := (TED(c,d),TED(0,c*b-d*a));"
+  "REDUCE( e, TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := (REDUCE( e, TED(a,b)/TED(0,1)) , TED(0,d));"
+  "REDUCE( e, TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := (REDUCE( e, TED(c,d)/TED(0,1)) , TED(0,c*b-d*a));"
 
   "SYSTEM_SOLVE3({a},{x,y})   := SYSTEM_SOLVE3({IPOLY(REDUCE(POLY(a,y)),y)},{x});"
   "SYSTEM_SOLVE3({a},{x})     := IPOLY(REDUCE(POLY(a,x)),x);"
 
-  "SYSTEM_SOLVE4({a,b},{x,y})   := SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y});"
+  "SYSTEM_SOLVE4({a,b},{x,y})   := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));"
   "SYSTEM_SOLVE4({a},{x})       := SYSTEM_SOLVE5(POLY(a,x));"
 
   "SYSTEM_SOLVE5(TED(a,b)/TED(0,1)) := -b/a;"
 
   "SYSTEM_SOLVE ({a},{x})          := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};"
 
-  "SYSTEM_AUTO_SOLVE4({a,b})       := SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b});"
+  "SYSTEM_AUTO_SOLVE4({a,b})       := (SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b}));"
   "SYSTEM_AUTO_SOLVE4({a})         := NORM2(a,GETVAR(a));"
   "SYSTEM_AUTO_SOLVE3({a,b})       := SYSTEM_SOLVE3({a,b},{GETVAR(b)});"
   "SYSTEM_AUTO_SOLVE2({a},{c,d})   := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{c});"

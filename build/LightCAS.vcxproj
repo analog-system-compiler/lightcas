@@ -25,7 +25,6 @@
     <ClInclude Include="..\src\Value.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\Console.cpp" />
     <ClCompile Include="..\src\Debug.cpp" />
     <ClCompile Include="..\src\Element.cpp" />
     <ClCompile Include="..\src\ElementDataBase.cpp" />

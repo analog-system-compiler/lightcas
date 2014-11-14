@@ -220,6 +220,27 @@ void CElementDataBase::Clear()
   }
 }
 
+CElement* CElementDataBase::ParseElement( CParser& IC )
+{
+    CElement *e;
+    CValue v;
+    const char* pos = v.GetFromString( IC.GetPos() );
+    if( pos != IC.GetPos() )
+    {
+        IC.SetPos( pos );
+        e = GetElement( v );
+    }
+    else if( IC.IsWord() )
+    {
+        IC.GetWord();
+        e = GetElement( IC );
+    }
+    else 
+        e=NULL;
+
+    return e;
+}
+
 CElement* CElementDataBase::GetElement()
 {
   unsigned n;

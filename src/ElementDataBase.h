@@ -97,6 +97,7 @@ class CElementDataBase : public CElementArray
     void            Initialize();
     CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
     //const CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
+    CElement*       ParseElement( CParser& IC );
     CElement* 		GetElement();
     CElement* 		GetElement( const CValue& value );
     CElement* 		GetElement( const CString& );

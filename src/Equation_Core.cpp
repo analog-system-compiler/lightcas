@@ -101,7 +101,7 @@ void CEquation::Copy( const CEquation& equ )
   ASSERT( equ.m_ElementDB );
   Clear();
 
-  if( !equ.IsNull() ) // TODO : to remove
+  if( !equ.IsNull() ) 
   {
     Push( equ );
   }

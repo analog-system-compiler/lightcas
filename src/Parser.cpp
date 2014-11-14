@@ -27,16 +27,16 @@
 const char CParser::m_CharTab[] =
 {
   /*                              \n       \r                                                      */
-    2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
   /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
-    0, 0, 1, 1, 0, 1, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 4, 4, 4, 4, 4, 4,
+  0, 0, 1, 1, 0, 1, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 4, 4, 4, 4, 4, 4,
 
   /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 4, 1,
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 4, 1,
 
   /*   a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  {  |  }       */
-    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 2, 0, 0
+  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 2, 0, 0
 };
 
 CParser::CParser()
@@ -214,12 +214,20 @@ void CParser::SkipComment()
   }
 }
 
-unsigned CParser::TryMatchSymbol( const char* s1, const char* s2 )
+bool CParser::TryMatchSymbol( const char *& symbol_str )
 {
   unsigned i = 0;
 
+  const char* s1 = symbol_str;
+  const char* s2 = m_Pos;
+
   while( *s1 && !IsWord( *s1 ) )
   {
+    if( *s1 == '\\' )
+    {
+      s1++;
+    }
+
     if ( *s2 == *s1 )
     {
       i++;
@@ -228,12 +236,13 @@ unsigned CParser::TryMatchSymbol( const char* s1, const char* s2 )
     }
     else
     {
-      i = 0;
-      break;
+      return false;
     }
   }
 
-  return i;
+  symbol_str = s1;
+  m_Pos = s2;
+  return true;
 }
 
 void CParser::Error( unsigned id, const CString* str ) const
@@ -241,14 +250,19 @@ void CParser::Error( unsigned id, const CString* str ) const
   CParserException ex;
   ex.SetErrorID( id );
   ex.SetLineNb( m_LineNb );
-  if( str ) ex.SetErrorString( *str );
+  if( str )
+  {
+    ex.SetErrorString( *str );
+  }
 
 #if _DEBUG
   char buffer[32];
-  sprintf( buffer, "Error found line %d", ex.GetLineNb() ); 
+  sprintf( buffer, "Error found line %d", ex.GetLineNb() );
   TRACE( buffer );
   if( str )
-  TRACE( str->c_str() );
+  {
+    TRACE( str->c_str() );
+  }
 #endif
 
   throw( ex );
