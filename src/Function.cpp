@@ -82,7 +82,7 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
   ds += CString( (int)i );
   ds += " ";
   rule2->m_SrcEquation.Display( ds );
-  ds += "\t=> ";
+  ds += "\t:= ";
   rule2->m_DstEquation.Display( ds );
   ds += "\t";
   TRACE( ds.GetBufferPtr() );

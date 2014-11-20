@@ -118,7 +118,7 @@ void CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
       CEquation* equ = &( rule->m_SrcEquation );
 
-      pos = Match( equ, elem_array, pos_array );
+      pos = Match( *equ, elem_array, pos_array );
       match = ( pos != m_StackSize );
 
       if( match )
@@ -164,18 +164,18 @@ bool CEquation::Match( const CEquation& equ ) const
 {
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
   OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
-  return Match( &equ, elem_array, pos_array ) != m_StackSize;
+  return Match( equ, elem_array, pos_array ) != m_StackSize;
 }
 
-unsigned CEquation::Match( const CEquation* equ, OP_CODE elem_array[], unsigned pos_array[] ) const
+unsigned CEquation::Match( const CEquation& equ, OP_CODE elem_array[], unsigned pos_array[] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
   CElement* e;
-  unsigned pos1 = equ->GetSize();
+  unsigned pos1 = equ.GetSize();
   unsigned pos2 = GetSize();
 
-  op1 = equ->Pop( pos1 ); // to trash
+  op1 = equ.Pop( pos1 ); // to trash
   op2 = Pop( pos2 ); // to trash
   ASSERT( op1 == op2 );
 
@@ -183,12 +183,12 @@ unsigned CEquation::Match( const CEquation* equ, OP_CODE elem_array[], unsigned 
 
   while( match && pos1 )
   {
-    op1 = equ->Pop( pos1 );
+    op1 = equ.Pop( pos1 );
 
     if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_ELEM /*|| op1 == CElementDataBase::OP_UNARY || op1 == CElementDataBase::OP_BINARY*/ )
     {
       op3 = op1;
-      op1 = equ->Pop( pos1 );
+      op1 = equ.Pop( pos1 );
       ASSERT( IsReserved( op1 ) );
 
       match = MatchBranch(  elem_array,  pos_array,  op1,  pos2 );

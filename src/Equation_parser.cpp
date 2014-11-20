@@ -396,7 +396,7 @@ void CEquation::GetFromTextRPN( CParser& IC )
   }
 }
 
-const char* CEquation::ParseExpression( const char* sp, OP_CODE* elem_array, unsigned* pos_array, unsigned index, unsigned priority, CParser& IC, bool allow_recursion )
+const char* CEquation::ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion )
 {
   char elem_id;
 

@@ -42,13 +42,13 @@ class CEquation
     void		SetSize( unsigned i );
     void        Set( unsigned pos, OP_CODE op )   {  m_StackArray[ pos ] = op;    }
     OP_CODE     Get( unsigned pos )	const         {  return m_StackArray[ pos ];  }
-    OP_CODE     Pop( unsigned& pos )  const       {  ASSERT( pos );      ASSERT( m_StackSize );      pos --;      return Get( pos );    }
+    OP_CODE     Pop( unsigned& pos )  const       {  ASSERT( pos > 0 && pos<=m_StackSize ); pos--; return Get( pos );    }
 
     const CValue&     Evaluate( unsigned pos, CEvaluator* val ) const;
     
     void		PushBranch( const CEquation& equ, unsigned& pos );        
     bool		CompareBranch( unsigned pos1, unsigned pos2 ) const;    
-    void		CopyBranch( const CEquation& equ, unsigned& pos )        {        Clear();        PushBranch( equ, pos );        }
+    void		CopyBranch( const CEquation& equ, unsigned& pos )        { Clear(); PushBranch( equ, pos );  }
     void		NextBranch( unsigned& pos ) const;    
 
     void		Append( const OP_CODE* array, unsigned size );
@@ -60,13 +60,13 @@ class CEquation
     //bool        GetAtom(CParser& IC);
     bool        MatchOperator( CParser& IC, const CString& s, const CEquation& equ, unsigned priority1, bool symbol_first );
 
-    const char* ParseExpression( const char* sp, OP_CODE* elem_array, unsigned* pos_array, unsigned index, unsigned priority, CParser& IC, bool allow_recursion );
+    const char* ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion );
 
     bool		OptimizeConst();
     void		OptimizeTree(CEquation& equ);
     void		OptimizeTree2(CEquation& equ);
     void		ApplyRule( const CEquation& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CEquation* rule_equ, bool optimize=true );
-    unsigned    Match( const CEquation* equ, OP_CODE elem_array[], unsigned pos_array[] ) const;    
+    unsigned    Match( const CEquation& equ, OP_CODE elem_array[], unsigned pos_array[] ) const;    
     bool        MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
     static void InitParameterLUT( OP_CODE elem_array[] );
     static unsigned MatchParameter( const OP_CODE elem_array[], OP_CODE op );
