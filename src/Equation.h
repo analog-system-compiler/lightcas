@@ -48,7 +48,7 @@ class CEquation
     
     void		PushBranch( const CEquation& equ, unsigned& pos );        
     bool		CompareBranch( unsigned pos1, unsigned pos2 ) const;    
-    void		CopyBranch( const CEquation& equ, unsigned& pos )        { Clear(); PushBranch( equ, pos );  }
+    void		CopyBranch( const CEquation& equ, unsigned& pos )        { Clear(); PushBranch( equ, pos ); RemoveZero(); }
     void		NextBranch( unsigned& pos ) const;    
 
     void		Append( const OP_CODE* array, unsigned size );
@@ -63,8 +63,8 @@ class CEquation
     const char* ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion );
 
     bool		OptimizeConst();
+    bool		OptimizeTree2(CEquation& equ);
     void		OptimizeTree(CEquation& equ);
-    void		OptimizeTree2(CEquation& equ);
     void		ApplyRule( const CEquation& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CEquation* rule_equ, bool optimize=true );
     unsigned    Match( const CEquation& equ, OP_CODE elem_array[], unsigned pos_array[] ) const;    
     bool        MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;

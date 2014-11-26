@@ -70,16 +70,12 @@ void CElementDataBase::CheckCatch( const char* s1 )
 }
 
 void CElementDataBase::Test()
-{return;
+{//return;
   /***** Syntax checking ****/
   ///CheckCatch( "a b" );
   ///CheckCatch( "a.b" );
 
   /***** Some basic tests *****/
-  Check( "1n", "1e-009" );
-  Check( "1m", "0.001" );
-  Check( "1K", "1000" );
-  Check( "1K*1m", "1*1000*1*0.001" );
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );

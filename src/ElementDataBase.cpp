@@ -137,7 +137,7 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
   CElementDataBase db( this, "tmp2" );
   CEquation equ( &db );
   CEquation dummy_equ( &db );
-  CSymbolSyntaxArray tmp_syntax_array;
+  //CSymbolSyntaxArray tmp_syntax_array;
 
   CParser IC( symbol_table );
 
@@ -158,7 +158,7 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
     CEquation::ConvertToRule( equ , dummy_equ ); //TODO remove dummy_equ
 
     sss->m_Equation.Copy( equ );
-    tmp_syntax_array.Append( sss );
+    m_SymbolSyntaxArray.Append( sss );
 
 #ifdef _DEBUG
     CDisplay ds;
@@ -170,7 +170,7 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 #endif
   }
 
-  m_SymbolSyntaxArray.Copy( tmp_syntax_array );
+  //m_SymbolSyntaxArray.Copy( tmp_syntax_array );
 
 }
 
