@@ -19,7 +19,7 @@
 #include "Element.h"
 #include "Equation.h"
 
-void CEquation::ConvertToRule( CEquation& src, CEquation& dst )
+void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst )
 {
   OP_CODE op;
   unsigned i;
@@ -49,7 +49,7 @@ void CEquation::ConvertToRule( CEquation& src, CEquation& dst )
   //RefToElement( CElementDataBase::OP_CPLX )->Unlock();
 }
 
-void CEquation::Replace( OP_CODE op1, OP_CODE op2 )
+void CMathExpression::Replace( OP_CODE op1, OP_CODE op2 )
 {
   unsigned	pos;
 

@@ -24,10 +24,10 @@
 #include "ElementDataBase.h"
 #define MAX_STACK_SIZE 1024
 
-typedef	CVector< class CEquation* > CEquationArray;
+typedef	CVector< class CMathExpression* > CEquationArray;
 class CAlgebraRule;
 
-class CEquation
+class CMathExpression
 {    
 
   protected:
@@ -39,101 +39,89 @@ class CEquation
 
   protected:
 
-    void		SetSize( unsigned i );
+    void		    SetSize( unsigned i );
     void        Set( unsigned pos, OP_CODE op )   {  m_StackArray[ pos ] = op;    }
     OP_CODE     Get( unsigned pos )	const         {  return m_StackArray[ pos ];  }
     OP_CODE     Pop( unsigned& pos )  const       {  ASSERT( pos > 0 && pos<=m_StackSize ); pos--; return Get( pos );    }
-
-    const CValue&     Evaluate( unsigned pos, CEvaluator* val ) const;
     
-    void		PushBranch( const CEquation& equ, unsigned& pos );        
-    bool		CompareBranch( unsigned pos1, unsigned pos2 ) const;    
-    void		CopyBranch( const CEquation& equ, unsigned& pos )        { Clear(); PushBranch( equ, pos ); RemoveZero(); }
-    void		NextBranch( unsigned& pos ) const;    
-
-    void		Append( const OP_CODE* array, unsigned size );
+    unsigned    Push( OP_CODE op )                {  SetSize( m_StackSize + 1  );      Set( m_OldStackSize, op );      return m_StackSize;    }
+    void		    Push( const CElement* e )         {  Push( ElementToRef( e ) );    }
+    void		    Push( const CMathExpression& equ );
+    void        Push( const CValue& v );    
+    void		    Append( const OP_CODE* array, unsigned size );
+    
+    void		    PushBranch( const CMathExpression& equ, unsigned& pos );        
+    bool		    CompareBranch( unsigned pos1, unsigned pos2 ) const;    
+    void		    CopyBranch( const CMathExpression& equ, unsigned& pos );
+    void		    NextBranch( unsigned& pos ) const;    
    
     void        GetLevel( CParser& IC, unsigned priority );
     bool        SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
     bool        ParseElement(CParser& IC);
-    //CElement*   ParseElement2(CParser& IC);
-    //bool        GetAtom(CParser& IC);
-    bool        MatchOperator( CParser& IC, const CString& s, const CEquation& equ, unsigned priority1, bool symbol_first );
+    bool        MatchOperator( CParser& IC, const CString& s, const CMathExpression& equ, unsigned priority1, bool symbol_first );
 
     const char* ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion );
 
-    bool		OptimizeConst();
-    bool		OptimizeTree2(CEquation& equ);
-    void		OptimizeTree(CEquation& equ);
-    void		ApplyRule( const CEquation& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CEquation* rule_equ, bool optimize=true );
-    unsigned    Match( const CEquation& equ, OP_CODE elem_array[], unsigned pos_array[] ) const;    
-    bool        MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
-    static void InitParameterLUT( OP_CODE elem_array[] );
-    static unsigned MatchParameter( const OP_CODE elem_array[], OP_CODE op );
-    bool        ExecuteInternalCommand( OP_CODE op, CEquation& equ );
-    virtual bool ExecuteExternalCommand( OP_CODE , CEquation&  ) { return false; }
-    void		AddZero();
-    void		RemoveZero();
-
-    //static bool	IsElement( OP_CODE op )                  {      return ( op > OP_END_RESERVED );      }
-    static CElement* 	RefToElement( OP_CODE op )       {      return CElementDataBase::RefToElement( op );    }
-    static OP_CODE	ElementToRef( const CElement* e )    {      return CElementDataBase::ElementToRef( e );    }
+    bool        OptimizeConst();
+    bool        OptimizeTree2(CMathExpression& equ);
+    void        OptimizeTree(CMathExpression& equ);
     void        Replace( OP_CODE op1, OP_CODE op2 );
+    void        ApplyRule( const CMathExpression& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
+    unsigned    Match( const CMathExpression& equ, OP_CODE elem_array[], unsigned pos_array[] ) const;    
+    bool        MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
+    virtual bool ExecuteExternalCommand( OP_CODE , CMathExpression&  ) { return false; }
+    bool         ExecuteInternalCommand( OP_CODE op3, CMathExpression& equ );
+    void		    AddZero();
+    void		    RemoveZero();
 
-    //display funct
-    unsigned	DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const;
+    static void       InitParameterLUT( OP_CODE elem_array[] );
+    static unsigned   MatchParameter( const OP_CODE elem_array[], OP_CODE op );
+    static CElement* 	RefToElement( OP_CODE op )         { return CElementDataBase::RefToElement( op );  }
+    static OP_CODE	  ElementToRef( const CElement* e )  { return CElementDataBase::ElementToRef( e );   }
+
+    //Display funct
+    unsigned    DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const;
     unsigned    DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const;
-
-public:
-    unsigned    Push( OP_CODE op )                  {  SetSize( m_StackSize + 1  );      Set( m_OldStackSize, op );      return m_StackSize;    }
-    void		Push( const CElement* e )           {  Push( ElementToRef( e ) );    }
-    void		Push( const CEquation& equ );
-    void        Push( CValue v );
-
-    void		BinaryOperation( OP_CODE op, const CEquation& equ );
-    void		BinaryOperation( OP_CODE op, const CElement* e );
-    void		UnaryOperation( OP_CODE op );
-    void		VoidOperation( OP_CODE op );
+    unsigned    DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned priority, CDisplay& ds ) const;
 
   public:
+    void		    Initialize( CElementDataBase* db );
 
-    void		Clear()                             { m_OldStackSize = 0; m_StackSize = 0; }
-    void		Initialize( CElementDataBase* db );
+    void		    BinaryOperation( OP_CODE op, const CMathExpression& equ );
+    void		    BinaryOperation( OP_CODE op, const CElement* e );
+    void		    UnaryOperation( OP_CODE op );
+    void		    VoidOperation( OP_CODE op );
+
+    void		    Clear()                             { m_OldStackSize = 0; m_StackSize = 0; }
     void        Init( const CElement *e )           { Clear(); Push(e);             }
-
-    bool		IsNull() const                      { return ( m_StackSize == 0 );         }     
-    
-    bool        Compare( const CEquation& equ ) const; 
-   
-    void		Copy( const CEquation& equ );    
-    void		Display( CDisplay& ds ) const;
+    void		    Copy( const CMathExpression& equ );    
+    bool		    IsNull() const                      { return ( m_StackSize == 0 );         }         
+    bool        Compare( const CMathExpression& equ ) const;   
+    void		    Display( CDisplay& ds ) const;
     void        GetFromText( const char *text )     { CParser IC( text ); GetFromText( IC ); }
-    void		GetFromText( CParser& IC );
+    void		    GetFromText( CParser& IC );
     void        GetFromTextRPN( CParser& IC );
-    void		OptimizeTree();
-    bool        Match( const CEquation& equ ) const;
+    void		    OptimizeTree();
+    bool        Match( const CMathExpression& equ ) const;
     
-    const CValue& Evaluate( CEvaluator* val ) const;    
+    const CValue& Evaluate() const;
 
-    //void		SimplifyComplex();    
-    static void        ConvertToRule( CEquation& src, CEquation& dst );
+    static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
     static bool IsReserved( OP_CODE op )      { return ( op >= CElementDataBase::OP_EXP1 ) && ( op < ( CElementDataBase::OP_EXP1 + CElementDataBase::MAX_EXP ) ); }
-    unsigned	GetSize()	const             {      return m_StackSize;    }
 
-    CElementDataBase* GetElementDB() const    {      return m_ElementDB;    }
-       OP_CODE		GetLastOperator()	const;
-    // constructor
-    CEquation( CElementDataBase* db = NULL );
-
-    // copy constructor
-    CEquation( const CEquation& equ );
-    virtual ~CEquation();
+    unsigned	GetSize()	const                 { return m_StackSize;    }
+    CElementDataBase* GetElementDB() const    { return m_ElementDB;    }
+    OP_CODE		GetLastOperator()	const;
+    
+    CMathExpression( CElementDataBase* db = NULL );
+    CMathExpression( const CMathExpression& equ );
+    virtual ~CMathExpression();
 
 };
 
 struct CSymbolSyntaxStruct
 {
     char      m_Syntax[8];
-    CEquation m_Equation;
+    CMathExpression m_Equation;
 };
 

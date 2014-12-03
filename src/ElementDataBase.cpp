@@ -25,12 +25,15 @@
 CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 
-CElementDataBase::CElementDataBase( CElementDataBase* parent, const CString& name, bool bInitialize )
+CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator *eval, bool bInitialize )
 {
   m_Parent = parent;
   m_Name = name;
-  m_Evaluator = NULL;
-  if(bInitialize) Initialize();
+  m_Evaluator = eval;
+  if( bInitialize )
+  {
+    Initialize();
+  }
 }
 
 CElementDataBase::~CElementDataBase()
@@ -44,11 +47,9 @@ void CElementDataBase::Initialize()
   Clear();
   if( m_Parent == NULL )
   {
-    CreateEvaluator();
+    //CreateEvaluator();
     AddReservedElements();
-    AddOperandTable     ( CRules::m_VoidFunctions,   0  );
-    AddOperandTable     ( CRules::m_UnaryFunctions,  1  );
-    AddOperandTable     ( CRules::m_BinaryFunctions, 2  );
+    AddOperandTable     ( CRules::m_Functions           );
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleString   );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
@@ -62,11 +63,6 @@ void CElementDataBase::Initialize()
   {
     m_Evaluator = m_Parent->GetEvaluator();
   }
-}
-
-void CElementDataBase::CreateEvaluator()
-{
- m_Evaluator = new CEvaluator();
 }
 
 void CElementDataBase::AddReservedElements()
@@ -89,8 +85,6 @@ void CElementDataBase::AddReservedElements()
   GetElement( "j"      );//->SetOperandNb( 0 );
   GetElement( "RANK"   )->SetOperandNb( 2 );
   GetElement( "SUBST"  )->SetOperandNb( 2 );
-  //GetElement( "STACK_SIZE_ERROR" );
-  // GetElement( "NEW" );
 
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
@@ -110,20 +104,26 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
-  //ASSERT( ElementToRef( m_ElementRefArray[17] ) == OP_ERROR_SIZE   );
-  //  ASSERT( ElementToRef( m_ElementRefArray[16] ) == OP_NEW    );
 }
 
-void CElementDataBase::AddOperandTable( const char* operand_table, unsigned operand_nb )
+void CElementDataBase::AddOperandTable( const char* operand_table )
 {
   CParser IC( operand_table );
   CElement* e;
+  unsigned operand_nb;
 
   while( !IC.IsStopChar() )
   {
+    operand_nb = 0;
     IC.GetWord();
     e = GetElement( IC );
-    IC.Find( ';' );
+    IC.Find( '(' );
+    while( !IC.TryFind( ')' ) )
+    {
+      IC.GetWord();
+      operand_nb++;
+      IC.TryFind( ',' );
+    }
     e->SetOperandNb( operand_nb );
 
   }
@@ -134,9 +134,9 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
   const char* pos1;
   unsigned cnt;
   CSymbolSyntaxStruct* sss;
-  CElementDataBase db( this, "tmp2" );
-  CEquation equ( &db );
-  CEquation dummy_equ( &db );
+  CElementDataBase db( "tmp2", this );
+  CMathExpression equ( &db );
+  CMathExpression dummy_equ( &db );
   //CSymbolSyntaxArray tmp_syntax_array;
 
   CParser IC( symbol_table );
@@ -155,7 +155,7 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 
     equ.GetFromTextRPN( IC );
 
-    CEquation::ConvertToRule( equ , dummy_equ ); //TODO remove dummy_equ
+    CMathExpression::ConvertToRule( equ , dummy_equ ); //TODO remove dummy_equ
 
     sss->m_Equation.Copy( equ );
     m_SymbolSyntaxArray.Append( sss );
@@ -176,10 +176,13 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 
 void CElementDataBase::AddAlgebraRuleTable( const char* rules_table )
 {
-  CElementDataBase db(  this, "tmp1"  );
-  CEquation src( &db );
+  CElementDataBase db(  "tmp1", this  );
+  CMathExpression src( &db );
   CParser IC(  rules_table );
-  do src.GetFromText( IC );
+  do
+  {
+    src.GetFromText( IC );
+  }
   while( IC.TryFind( ';' ) );
 }
 
@@ -211,34 +214,30 @@ void CElementDataBase::Clear()
   if( m_Parent == NULL )
   {
     m_ElementRefArray.RemoveAll();
-    m_SymbolSyntaxArray.DeleteAll();
-    if( m_Evaluator )
-    {
-      delete m_Evaluator;
-      m_Evaluator=NULL;
-    }
+    m_SymbolSyntaxArray.DeleteAll();   
   }
 }
 
 CElement* CElementDataBase::ParseElement( CParser& IC )
 {
-    CElement *e;
-    CValue v;
+  CElement* e = NULL;
+  CValue v;
+
+  if( IC.GetChar() != '-' )
+  {
     const char* pos = v.GetFromString( IC.GetPos() );
     if( pos != IC.GetPos() )
     {
-        IC.SetPos( pos );
-        e = GetElement( v );
+      IC.SetPos( pos );
+      e = GetElement( v );
     }
     else if( IC.IsWord() )
     {
-        IC.GetWord();
-        e = GetElement( IC );
+      IC.GetWord();
+      e = GetElement( IC );
     }
-    else 
-        e=NULL;
-
-    return e;
+  }
+  return e;
 }
 
 CElement* CElementDataBase::GetElement()
@@ -250,9 +249,8 @@ CElement* CElementDataBase::GetElement()
   n = GetSize();
   s = "_";
   s += CString( ( int )n );
-  e = new CElement( s );
+  e = CreateElement( s, n );
   e->SetTemporary();
-  Register( e, n );
   return e;
 }
 
@@ -274,7 +272,7 @@ CElement* CElementDataBase::GetElement( const CValue& v )
       v.Display( ds );
       e = CreateElement( ds, pos );
       e->SetConst();
-      GetEvaluator()->SetElementValue( e->ToRef(), v );
+      SetValue(  e, v );
     }
   }
   return( e );
@@ -298,8 +296,7 @@ CElement* CElementDataBase::CreateElement( const CString& string, unsigned pos )
   CElement* e;
   e = new CElement( string );
   Register( e, pos );
-  GetEvaluator()->SetElementValue( e->ToRef(), CValue( 0. ) );
-  GetEvaluator()->SetFunction( e->ToRef(), NULL );
+  SetValue( e, CValue( 0 ) );
   return e;
 }
 
@@ -405,5 +402,12 @@ unsigned CElementDataBase::Register( CElement* e, unsigned index )
   return  n;
 }
 
+void CElementDataBase::SetValue( const CElement* e, const CValue& v )
+{
+  CEvaluator* eval = GetEvaluator();
+  ASSERT( eval );
+  eval->SetElementValue( e->ToRef(), v );
+  eval->SetFunction( e->ToRef(), NULL );
+}
 
 

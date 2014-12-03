@@ -35,9 +35,7 @@ class CRules
     static   const char m_AlgebraRuleVectors[];
     static   const char m_AlgebraRuleTaylorSeries[];
     static   const SProperties m_FunctionProperties[];
-    static   const char m_VoidFunctions[];
-    static   const char m_UnaryFunctions[];
-    static   const char m_BinaryFunctions[];
+    static   const char m_Functions[];
     static   const char m_FunctionSymbol[];
     static   const unsigned m_FunctionPropertiesSize;
 };

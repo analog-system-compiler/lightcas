@@ -37,5 +37,5 @@ public:
     void   Negate() { m_Value = -m_Value; }
     //Constructors
     CValue( )          { m_Value= 0; }    
-    CValue( double v ) { ASSERT( v >=0 ); m_Value=v;  }    
+    CValue( double v ) { /*ASSERT( v >=0 );*/ m_Value=v;  }    
 };

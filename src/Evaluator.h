@@ -29,6 +29,8 @@ typedef CVector< class CValue > CValueArray;
 typedef CVector< double > CDoubleArray;
 typedef CVector< CEvaluatorFunct > CFunctArray;
 
+typedef short OP_CODE;
+
 class CEvaluator
 {
 
@@ -40,16 +42,17 @@ class CEvaluator
     CFunctArray m_FunctionArray;
 
   public:
-    virtual void AllocateStack( unsigned size );
-    void Evaluate( unsigned index );
     void GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n );    
-
     void SetElementValue( unsigned index, const CValue& v );
     void SetFunction( unsigned index, const CEvaluatorFunct funct );
     const CValue& GetElementValue( unsigned index ) const;    
-    const CValue& GetValue();    
 
   protected:
+    virtual void AllocateStack( unsigned size );
+    void Evaluate( unsigned index );
+    const CValue& GetValue();    
+    double Pop()  { return m_ValueStack[ --m_ValPos ]; }
+    void Push(double v) { m_ValueStack[ m_ValPos++ ]=v; }
 
   public:
     void VectorStart();
@@ -107,6 +110,7 @@ class CEvaluator
     void Xor();
     void ShiftRight();
     void ShiftLeft();
+    const CValue& Evaluate( unsigned size, const OP_CODE *p );
 
   public:
     CEvaluator( void );

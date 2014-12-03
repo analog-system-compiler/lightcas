@@ -24,7 +24,7 @@
 #include "Function.h"
 #define DEBUG_OPTIMIZE
 
-bool CEquation::OptimizeConst()
+bool CMathExpression::OptimizeConst()
 {
   unsigned pos;
   bool bOk = false;
@@ -65,10 +65,9 @@ bool CEquation::OptimizeConst()
     }
   }
 
-
-  if( bOk /*&& ( e3->ToRef() != CElementDataBase::OP_NEG )*/ )
+  if( bOk )
   {
-    const CValue& v = Evaluate( pos, GetElementDB()->GetEvaluator() );
+    const CValue& v = m_ElementDB->GetEvaluator()->Evaluate( m_StackSize - pos, m_StackArray + pos );
     m_StackSize = pos;
     Push( v );
 
@@ -81,13 +80,13 @@ bool CEquation::OptimizeConst()
   return bOk;
 }
 
-void CEquation::OptimizeTree() //( OP_CODE op, const CEquation* equR )
+void CMathExpression::OptimizeTree()
 {
-  CEquation equ( m_ElementDB );
+  CMathExpression equ( m_ElementDB );
   OptimizeTree( equ );
 }
 
-void CEquation::OptimizeTree( CEquation& equ ) //( OP_CODE op, const CEquation* equR )
+void CMathExpression::OptimizeTree( CMathExpression& equ )
 {
   if( !OptimizeTree2( equ ) )
   {
@@ -95,7 +94,7 @@ void CEquation::OptimizeTree( CEquation& equ ) //( OP_CODE op, const CEquation* 
   }
 }
 
-bool CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation* equR )
+bool CMathExpression::OptimizeTree2( CMathExpression& equ2 )
 {
 
   unsigned pos;
@@ -116,7 +115,7 @@ bool CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
     {
 
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
-      CEquation* equ = &( rule->m_SrcEquation );
+      CMathExpression* equ = &( rule->m_SrcEquation );
 
       pos = Match( *equ, elem_array, pos_array );
       match = ( pos != m_StackSize );
@@ -140,7 +139,6 @@ bool CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
 
         if( rule->m_bHasRule )
         {
-          //CEquation equ2( m_ElementDB );
           equ2.ApplyRule( *this, elem_array, pos_array, &rule->m_DstEquation );
           m_StackSize = pos;
           Push( equ2 );
@@ -161,18 +159,17 @@ bool CEquation::OptimizeTree2( CEquation& equ2 ) //( OP_CODE op, const CEquation
   return false;
 }
 
-bool CEquation::Match( const CEquation& equ ) const
+bool CMathExpression::Match( const CMathExpression& equ ) const
 {
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
   OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
   return Match( equ, elem_array, pos_array ) != m_StackSize;
 }
 
-unsigned CEquation::Match( const CEquation& equ, OP_CODE elem_array[], unsigned pos_array[] ) const
+unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[], unsigned pos_array[] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
-  CElement* e;
   unsigned pos1 = equ.GetSize();
   unsigned pos2 = GetSize();
 
@@ -197,22 +194,18 @@ unsigned CEquation::Match( const CEquation& equ, OP_CODE elem_array[], unsigned 
       {
 
         op2 = Pop( pos2 );
+
         if( IsReserved( op2 ) )
         {
           match = false;
         }
-        else
+        else if( op3 == CElementDataBase::OP_ELEM  )
         {
-          e = RefToElement( op2 );
-
-          if( op3 == CElementDataBase::OP_ELEM  )
-          {
-            match = e->IsVar();
-          }
-          else
-          {
-            match = e->IsConst();
-          }
+          match = RefToElement( op2 )->IsVar();
+        }
+        else // CElementDataBase::OP_CONST
+        {
+          match = RefToElement( op2 )->IsConst();
         }
       }
     }
@@ -235,13 +228,13 @@ unsigned CEquation::Match( const CEquation& equ, OP_CODE elem_array[], unsigned 
   return match ? pos2 : m_StackSize;
 }
 
-void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CEquation* rule_equ, bool optimize )
+void CMathExpression::ApplyRule( const CMathExpression& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
 {
   OP_CODE op3;
   unsigned pos = 0;
   unsigned j;
   CElement* e;
-  CEquation equ2( m_ElementDB );
+  CMathExpression equ2( m_ElementDB );
   //TODO : suppress elem_array and access pos_array by pos_array[ op3 - CElementDataBase::OP_EXP1 ]
   //TODO remove Clear() so that we don't need PushEquation( equ )
 
@@ -281,16 +274,11 @@ void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], uns
       }
     }
 
-    //TODO: put the code below just after PushOperator( op3 )
     if( optimize )
     {
       op3 = GetLastOperator();
       e = RefToElement( op3 );
-      if( !e->IsVoid() )
-      {
-        OptimizeTree( equ2 ); // optimization is only made on the top branch
-      }
-      else if( e && e->IsFunct() )
+      if( e && ( !e->IsVoid() || e->IsFunct() ) )
       {
         OptimizeTree( equ2 ); // optimization is only made on the top branch
       }
@@ -303,7 +291,7 @@ void CEquation::ApplyRule( const CEquation& equ, OP_CODE const elem_array[], uns
   }
 }
 
-bool CEquation::ExecuteInternalCommand( OP_CODE op3, CEquation& equ )
+bool CMathExpression::ExecuteInternalCommand( OP_CODE op3, CMathExpression& equ )
 {
   CElement* e;
   bool bOK = false;
@@ -337,9 +325,8 @@ bool CEquation::ExecuteInternalCommand( OP_CODE op3, CEquation& equ )
   return bOK;
 }
 
-OP_CODE CEquation::GetLastOperator() const
+OP_CODE CMathExpression::GetLastOperator() const
 {
-  // check redundancy with ReduceToElement()
   OP_CODE op1;
 
   if( IsNull() )
@@ -354,7 +341,7 @@ OP_CODE CEquation::GetLastOperator() const
   return op1;
 }
 
-bool CEquation::CompareBranch( unsigned pos1, unsigned pos2 ) const
+bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
 {
   OP_CODE op3, op4;
   unsigned pos11, pos22;
@@ -379,7 +366,7 @@ bool CEquation::CompareBranch( unsigned pos1, unsigned pos2 ) const
 
 }
 
-bool CEquation::MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const
+bool CMathExpression::MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const
 {
   unsigned j;
   bool match;

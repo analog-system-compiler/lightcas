@@ -29,6 +29,20 @@ CEvaluator::~CEvaluator(  )
 {
 }
 
+const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE *p )
+{
+    unsigned pos;
+
+    AllocateStack( size );
+
+    for( pos = 0; pos < size; pos ++ )
+    {
+        Evaluate( *p++ );
+    }
+
+    return GetValue();
+}
+
 void CEvaluator::AllocateStack( unsigned size )
 {
   m_ValPos = 0;
@@ -43,6 +57,7 @@ void CEvaluator::SetElementValue( unsigned index, const CValue& v )
 
 const CValue& CEvaluator::GetElementValue( unsigned index ) const
 {
+  ASSERT( index <= m_ElementValueArray.GetSize() );
   return m_ElementValueArray.GetAt( index );
 }
 
@@ -51,46 +66,11 @@ void CEvaluator::SetFunction( unsigned index, const CEvaluatorFunct funct )
   m_FunctionArray.CheckSize( index );
   m_FunctionArray.SetAt( index, funct );
 }
-/*
-void CEvaluator::InitializeValues()
-{
-  for( unsigned i = 0; i < m_InitialValue.GetSize(); i++ )
-  {
-    m_CurrentValue[i] = m_InitialValue[i];
-  }
-}*/
-
-void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
-{
-  int n1, n2;
-  double x1, x2;
-
-  x1 = frexp(  v1 , &n1 );
-  x2 = frexp(  v2 , &n2 );
-
-  if( n2 > n1 )
-  {
-    x2 *= ( double )( 1 << 30 );
-    x1 *= ( double )( 1 << ( 30 - ( n2 - n1 ) ) );
-    n = n2 - 30;
-  }
-
-  else
-  {
-    x1 *= ( double )( 1 << 30 );
-    x2 *= ( double )( 1 << ( 30 - ( n1 - n2 ) ) );
-    n = n1 - 30;
-  }
-
-  m1 = ( int )x1;
-  m2 = ( int )x2;
-
-}
 
 void CEvaluator::Evaluate( unsigned index )
 {
   CEvaluatorFunct funct_ptr = NULL;
-  
+
   if( index < m_FunctionArray.GetSize() )
   {
     funct_ptr = m_FunctionArray.GetAt( index );
@@ -102,7 +82,7 @@ void CEvaluator::Evaluate( unsigned index )
   }
   else
   {
-    m_ValueStack[ m_ValPos++ ] = GetElementValue( index ).GetValue();
+    Push(GetElementValue( index ).GetValue());
   }
 }
 
@@ -115,149 +95,176 @@ const CValue& CEvaluator::GetValue()
   }
   else
   {
-    m_Value = m_ValueStack[ --m_ValPos ];
+    m_Value = Pop();
   }
 
   return m_Value;
 }
 
+void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
+{
+    int n1, n2;
+    double x1, x2;
+
+    x1 = frexp(  v1 , &n1 );
+    x2 = frexp(  v2 , &n2 );
+
+    if( n2 > n1 )
+    {
+        x2 *= ( double )( 1 << 30 );
+        x1 *= ( double )( 1 << ( 30 - ( n2 - n1 ) ) );
+        n = n2 - 30;
+    }
+
+    else
+    {
+        x1 *= ( double )( 1 << 30 );
+        x2 *= ( double )( 1 << ( 30 - ( n1 - n2 ) ) );
+        n = n1 - 30;
+    }
+
+    m1 = ( int )x1;
+    m2 = ( int )x2;
+
+}
+
 /***** void ****/
 void CEvaluator::Rand( void )
 {
-  m_ValueStack[ m_ValPos++ ] =  ( double )rand() / ( double )RAND_MAX ;
+  Push( ( double )rand() / ( double )RAND_MAX ) ;
 }
 
 /***** Unitary ****/
 void CEvaluator::Sin()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  sin(  v  );
+  double v = Pop();
+  Push( sin(  v  ) );
 }
 
 void CEvaluator::Cos()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  cos(  v  );
+  double v = Pop();
+  Push( cos(  v  ));
 }
 void CEvaluator::Tan()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  tan(  v  );
+  double v = Pop();
+  Push( tan(  v  ));
 }
 void CEvaluator::Asin()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  asin(  v  );
+  double v = Pop();
+  Push( asin(  v  ));
 }
 void CEvaluator::Acos()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  acos(  v  );
+  double v = Pop();
+  Push( acos(  v  ));
 }
 void CEvaluator::Atan()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  atan(  v  );
+  double v = Pop();
+  Push( atan(  v  ));
 }
 void CEvaluator::SinH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  sinh(  v  );
+  double v = Pop();
+  Push( sinh(  v  ));
 }
 void CEvaluator::CosH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  cosh(  v  );
+  double v = Pop();
+  Push( cosh(  v  ));
 }
 void CEvaluator::TanH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  tanh(  v  );
+  double v = Pop();
+  Push( tanh(  v  ));
 }
 void CEvaluator::AsinH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  log( v + sqrt( v * v + 1. ) );
+  double v = Pop();
+  Push( log( v + sqrt( v * v + 1. ) ));
 }
 void CEvaluator::AcosH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) );
+  double v = Pop();
+  Push( log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) ));
 }
 void CEvaluator::AtanH()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  0.5 * log( ( 1 + v ) / ( 1 - v ) );
+  double v = Pop();
+  Push( 0.5 * log( ( 1 + v ) / ( 1 - v ) ));
 }
 void CEvaluator::Exp()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  exp(  v  );
+  double v = Pop();
+  Push( exp(  v  ));
 }
 void CEvaluator::Ln()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  log(  v  );
+  double v = Pop();
+  Push( log(  v  ));
 }
 void CEvaluator::Log()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  log10(  v  );
+  double v = Pop();
+  Push( log10(  v  ));
 }
 void CEvaluator::Sqrt()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  sqrt(  v  );
+  double v = Pop();
+  Push( sqrt(  v  ));
 }
 void CEvaluator::Floor()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  floor(  v  );
+  double v = Pop();
+  Push( floor(  v  ));
 }
 void CEvaluator::Ceil()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  ceil(  v  );
+  double v = Pop();
+  Push( ceil(  v  ));
 }
 void CEvaluator::Abs()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  fabs(  v  );
+  double v = Pop();
+  Push( fabs(  v  ));
 }
 
 void CEvaluator::Sqr()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  v * v;
+  double v = Pop();
+  Push( v * v);
 }
 void CEvaluator::Neg()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  -v;
+  double v = Pop();
+  Push( -v);
 }
 void CEvaluator::Inv()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  ( double )1. / v;
+  double v = Pop();
+  Push( ( double )1. / v);
 }
 void CEvaluator::Id()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  v;
+  double v = Pop();
+  Push( v);
 }
 void CEvaluator::Bool()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  ( double )( v == 0. );
+  double v = Pop();
+  Push( ( double )( v == 0. ));
 }
 void CEvaluator::LNot()
 {
-  double v = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] =  ( double )( v != 0. );
+  double v = Pop();
+  Push( ( double )( v != 0. ));
 }
 void CEvaluator::Fact()
 {
-  double v = m_ValueStack[ --m_ValPos ];
+  double v = Pop();
   int a = 1;
   int b = ( int ) v ;
 
@@ -266,23 +273,23 @@ void CEvaluator::Fact()
     a *= i;
   }
 
-  m_ValueStack[ m_ValPos++ ] =  ( double )a;
+  Push( ( double )a);
 }
 
 void CEvaluator::Not()
 {
   // int n, m;
   //  double x;
-  double v = m_ValueStack[ --m_ValPos ];
+  double v = Pop();
   /*x = frexp( v, &n ) * ( double )( 1 << 30 );
   m = ~( int )x;
-  m_ValueStack[ m_ValPos++ ] = ldexp( ( double )m, n - 30 );*/
-  m_ValueStack[ m_ValPos++ ] = -v - 1;
+  Push(ldexp( ( double )m, n - 30 );*/
+  Push(-v - 1);
 }
 
 void CEvaluator::Square()
 {
-  double v = m_ValueStack[ --m_ValPos ];
+  double v = Pop();
   double	v2;
 
   v2 = floor(  v  );
@@ -296,160 +303,160 @@ void CEvaluator::Square()
   {
     v = ( double ) - 0.5;
   }
-  m_ValueStack[ m_ValPos++ ] = v;
+  Push(v);
 }
 
 /******* Binary *******/
 void CEvaluator::Add()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = v1 + v2;
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(v1 + v2);
 }
 
 void CEvaluator::Sub()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = v1 - v2;
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(v1 - v2);
 }
 
 void CEvaluator::Mul()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = v1 * v2;
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(v1 * v2);
 }
 
 void CEvaluator::Div()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   /*ASSERT(v2!=0.);*/
-  m_ValueStack[ m_ValPos++ ] = v1 / v2;
+  Push(v1 / v2);
 }
 
 void CEvaluator::Lower()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 < v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 < v2 ));
 }
 
 void CEvaluator::LowerOrEqual()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 <= v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 <= v2 ));
 }
 
 void CEvaluator::Greater()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 > v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 > v2 ));
 }
 
 void CEvaluator::GreaterOrEqual()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 >= v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 >= v2 ));
 }
 
 void CEvaluator::Equal()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 == v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 == v2 ));
 }
 
 void CEvaluator::NotEqual()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( double )( v1 != v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( double )( v1 != v2 ));
 }
 
 void CEvaluator::Min()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( v1 < v2 ) ? v1 : v2;
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( v1 < v2 ) ? v1 : v2);
 }
 
 void CEvaluator::Max()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( v1 > v2 ) ? v1 : v2;
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( v1 > v2 ) ? v1 : v2);
 }
 
 void CEvaluator::LAnd()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( ( v1 != 0. ) && ( v2 != 0. ) );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( ( v1 != 0. ) && ( v2 != 0. ) ));
 }
 
 void CEvaluator::LOr()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( ( v1 != 0. ) || ( v2 != 0. ) );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( ( v1 != 0. ) || ( v2 != 0. ) ));
 }
 
 void CEvaluator::Pow()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = pow(  v1  ,  v2  );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(pow(  v1  ,  v2  ));
 }
 
 void CEvaluator::Par()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = ( v1 * v2 ) / ( v1 + v2 );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(( v1 * v2 ) / ( v1 + v2 ));
 }
 
 void CEvaluator::Mod()
 {
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
-  m_ValueStack[ m_ValPos++ ] = fmod(  v1 ,  v2   );
+  double v2 = Pop();
+  double v1 = Pop();
+  Push(fmod(  v1 ,  v2   ));
 }
 
 void CEvaluator::And()
 {
   int m1, m2, n;
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 & m2;
-  m_ValueStack[ m_ValPos++ ] = ldexp( ( double )m1, n );
+  Push(ldexp( ( double )m1, n ));
 
 }
 
 void CEvaluator::Or()
 {
   int m1, m2, n;
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 | m2;
-  m_ValueStack[ m_ValPos++ ] = ldexp( ( double )m1, n );
+  Push(ldexp( ( double )m1, n ));
 
 }
 
 void CEvaluator::Xor()
 {
   int m1, m2, n;
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 ^ m2;
-  m_ValueStack[ m_ValPos++ ] = ldexp( ( double )m1, n );
+  Push(ldexp( ( double )m1, n ));
 
 }
 
@@ -457,22 +464,22 @@ void CEvaluator::ShiftRight()
 {
   int		n;
   double	x;
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   x = frexp(  v1 , &n );
   n -= ( int ) v2 ;
-  m_ValueStack[ m_ValPos++ ] = ldexp( x, n );
+  Push(ldexp( x, n ));
 }
 
 void CEvaluator::ShiftLeft()
 {
   int		n;
   double	x;
-  double v2 = m_ValueStack[ --m_ValPos ];
-  double v1 = m_ValueStack[ --m_ValPos ];
+  double v2 = Pop();
+  double v1 = Pop();
   x = frexp(  v1 , &n );
   n += ( int ) v2;
-  m_ValueStack[ m_ValPos++ ] = ldexp( x, n );
+  Push(ldexp( x, n ));
 }
 
 

@@ -34,7 +34,7 @@ void CFunction::Clear()
   m_AlgebraRuleArray.DeleteAll();
 }
 
-void CFunction::AddAlgebraRule( const CEquation& src, const CEquation& dst, unsigned line_no )
+void CFunction::AddAlgebraRule( const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
 {
   ASSERT( src.GetSize() );
   CAlgebraRule* rule = new CAlgebraRule( src, dst, line_no );

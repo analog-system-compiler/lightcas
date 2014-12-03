@@ -24,16 +24,16 @@ class CAlgebraRule
 public:
 	unsigned  m_LineNo;
 	bool      m_bHasRule;
-	CEquation m_SrcEquation;
-	CEquation m_DstEquation;
+	CMathExpression m_SrcEquation;
+	CMathExpression m_DstEquation;
 
-    CAlgebraRule(const CEquation& src, const CEquation& dst, unsigned line_no )
+    CAlgebraRule(const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
 	{
 		m_LineNo = 0;
         m_bHasRule = ( dst.GetLastOperator() != CElementDataBase::OP_NONE ); //no rule
         m_SrcEquation.Copy( src );
         m_DstEquation.Copy( dst );
-        CEquation::ConvertToRule( m_SrcEquation, m_DstEquation );
+        CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );
         m_LineNo = line_no;
 	}
 };
@@ -53,7 +53,7 @@ private:
 public:
   
   void Clear();
-  void AddAlgebraRule( const CEquation & src, const CEquation & dst, unsigned line_no );
+  void AddAlgebraRule( const CMathExpression & src, const CMathExpression & dst, unsigned line_no );
   unsigned GetParameterNb() const { return m_ParameterNb; }
   void SetParameterNb( unsigned parameter_nb ) { m_ParameterNb=parameter_nb; }
   const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }

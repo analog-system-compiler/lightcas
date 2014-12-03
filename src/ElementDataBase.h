@@ -24,13 +24,12 @@
 #include "Rules.h"
 #include "LCVector.h"
 
-class CEquation;
+class CMathExpression;
 class CElement;
 struct CSymbolSyntaxStruct;
 
 typedef CVector< class CElement* >		            CElementArray;
 typedef CVector< struct CSymbolSyntaxStruct* >		CSymbolSyntaxArray;
-typedef short OP_CODE;
 
 class CElementDataBase : public CElementArray
 {
@@ -75,22 +74,22 @@ class CElementDataBase : public CElementArray
 
     unsigned    Register( CElement* e , unsigned index );
     CElement *  CreateElement( const CString& string, unsigned pos );
-    void        AddReservedElements();
-    void        CreateEvaluator();
-    void        AddSyntaxSymbolTable(const char *symbol_table);
-    void        AddOperandTable(const char *operand_table, unsigned operand_nb);    
-    void        AddAlgebraRuleTable(const char *rule_table);
-    void        AddEvalFunctionTable( const SProperties *property_table, unsigned size );
-    void        AddEvalFunction( CString& name, CEvaluatorFunct funct );
-
-  CElementDataBase(const CElementDataBase& db );
+    virtual void  AddReservedElements();
+    virtual void  AddSyntaxSymbolTable(const char *symbol_table);
+    virtual void  AddOperandTable(const char *operand_table);    
+    virtual void  AddAlgebraRuleTable(const char *rule_table);
+    virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
+    virtual void  AddEvalFunction( CString& name, CEvaluatorFunct funct );
+    void        SetValue( const CElement* e, const CValue& v );
+    CElementDataBase(const CElementDataBase& db );
 
   public:
 
     void			Clear();
     void            SetName( const CString& name ) { m_Name=name; }
     void            Initialize();
-    CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
+    void            SetEvaluator(CEvaluator *eval);
+    CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }    
     //const CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
     CElement*       ParseElement( CParser& IC );
     CElement* 		GetElement();
@@ -111,7 +110,7 @@ class CElementDataBase : public CElementArray
         void CheckCatch( const char* s1 );
 #endif
 
-    CElementDataBase(CElementDataBase *db=NULL,const CString& name = CString(),bool bInitialize=true);
+    CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator*eval=NULL, bool bInitialize=true);
     virtual ~CElementDataBase();
 
 };

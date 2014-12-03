@@ -55,15 +55,18 @@ int main()
   CDisplayEx ds;
 #endif
 
-  CElementDataBase db_main( NULL );
-  CElementDataBase db( &db_main );
+  CEvaluator eval;
+  CElementDataBase db_root("Root",NULL,&eval);
+  CElementDataBase db( "User", &db_root );
+
 #ifdef _DEBUG
   db.Test();
   db.Initialize();
 #endif
-  CEquation equ( &db );
+
+  CMathExpression equ( &db );
   CParser IC;
-  CElement* simplify = db_main.GetElement( "SIMPLIFY" );
+  CElement* simplify = db_root.GetElement( "SIMPLIFY" );
   CElement* ans      = db.GetElement( "ans" );
   OP_CODE simplify_op = simplify->ToRef();
   std::string expression_str;

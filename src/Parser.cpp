@@ -76,7 +76,6 @@ void CParser::Find( char c )
 {
   std::stringstream str_stream;
 
-  //TODO : refactor this function
   if( GetChar() != c )
   {
 

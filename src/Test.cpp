@@ -29,7 +29,7 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
 {
   CParser IC( s1 );
   CDisplay ds;
-  CEquation equ( this );
+  CMathExpression equ( this );
   TRACE( "** Check %s == %s", s1, s2 );
   try
   {
@@ -55,7 +55,7 @@ void CElementDataBase::CheckCatch( const char* s1 )
 {
   CParser IC( s1 );
   CDisplay ds;
-  CEquation equ( this );
+  CMathExpression equ( this );
   TRACE( "** CheckCatch %s", s1 );
   try
   {
@@ -79,6 +79,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );
+  Check( "SIMPLIFY(-0)", "0" );
   Check( "SIMPLIFY(--2)", "2" );
   Check( "SIMPLIFY(2--2)", "4" );
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
@@ -129,7 +130,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
   //Check("sqrt(-1)-(-1)^0.5","0");
-  //Check("sqrt(-25)^2+25","0");
+  Check("SQRT(-25)^2+25","0");
 
   Check( "SIMPLIFY(RE(1+j))", "1" );
   Check( "SIMPLIFY(-IM(1-j))", "1" );
@@ -161,6 +162,9 @@ void CElementDataBase::Test()
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
   Check( "SIMPLIFY(1 ? a : b)", "a" );
+  Check( "SIMPLIFY(5 ? a : b)", "a" );
+  Check( "SIMPLIFY(IF(1,(a,b)))", "a" );
+  Check( "SIMPLIFY(IF(0,(a,b)))", "b" );
 
   /****** logic *********/
   Check( "SIMPLIFY(a|0)", "a" );
@@ -174,7 +178,7 @@ void CElementDataBase::Test()
   Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
   /*********** affectation ***/
-  CEquation equ0( this );
+  CMathExpression equ0( this );
   equ0.GetFromText( "a+b" );
   GetElement( "y" )->SetEquation( equ0 );
   equ0.GetFromText( "a-b" );
@@ -198,11 +202,19 @@ void CElementDataBase::Test()
 
   /****** fonction *********/
   Initialize();
-  CElementDataBase db( this );
+  CElementDataBase db( "test_function", this );
   db.Check( "a:=4;SIMPLIFY(a-3)", "1" );
   db.Check( "a:=6;SIMPLIFY(a-5)", "1" );
   db.Check( "f(x):=4*x;SIMPLIFY(f(z)-4*z+1)", "1" );
+  db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
+  /****** evaluator ******/
+  db.GetEvaluator()->SetElementValue(db.GetElement("a")->ToRef(),CValue(4));
+  db.GetEvaluator()->SetElementValue(db.GetElement("b")->ToRef(),CValue(8));
+  db.GetEvaluator()->SetElementValue(db.GetElement("c")->ToRef(),CValue(9));
+  CMathExpression equ(&db);
+  equ.GetFromText("a+b-c+2");
+  ASSERT( equ.Evaluate() == CValue(5) );
 }
 
 #endif

@@ -29,7 +29,6 @@
     <ClCompile Include="..\src\Element.cpp" />
     <ClCompile Include="..\src\ElementDataBase.cpp" />
     <ClCompile Include="..\src\Equation_core.cpp" />
-    <ClCompile Include="..\src\Equation_eval.cpp" />
     <ClCompile Include="..\src\Equation_parser.cpp" />
     <ClCompile Include="..\src\Equation_simplify.cpp" />
     <ClCompile Include="..\src\Equation_transform.cpp" />

@@ -22,7 +22,7 @@
 #include "Element.h"
 #include "Function.h"
 
-CEquation::CEquation( CElementDataBase* db )
+CMathExpression::CMathExpression( CElementDataBase* db )
 {
   m_StackArray = NULL;
   m_AllocSize = 0;
@@ -30,7 +30,7 @@ CEquation::CEquation( CElementDataBase* db )
 }
 
 // Copy Constructor
-CEquation::CEquation( const CEquation& equ )
+CMathExpression::CMathExpression( const CMathExpression& equ )
 {
   m_StackArray = NULL;
   m_AllocSize = 0;
@@ -38,7 +38,7 @@ CEquation::CEquation( const CEquation& equ )
   Copy( equ );
 }
 
-CEquation::~CEquation()
+CMathExpression::~CMathExpression()
 {
   if( m_StackArray )
   {
@@ -46,13 +46,13 @@ CEquation::~CEquation()
   }
 }
 
-void CEquation::Initialize( CElementDataBase* db )
+void CMathExpression::Initialize( CElementDataBase* db )
 {
   Clear();
   m_ElementDB  = db;
 }
 
-void CEquation::Push( const CEquation& equ )
+void CMathExpression::Push( const CMathExpression& equ )
 {
   if( equ.IsNull() )
   {
@@ -64,7 +64,7 @@ void CEquation::Push( const CEquation& equ )
   }
 }
 
-void CEquation::Append( const OP_CODE* src, unsigned size )
+void CMathExpression::Append( const OP_CODE* src, unsigned size )
 {
   if( size != 0 )
   {
@@ -73,7 +73,7 @@ void CEquation::Append( const OP_CODE* src, unsigned size )
   }
 }
 
-void CEquation::SetSize( unsigned i )
+void CMathExpression::SetSize( unsigned i )
 {
 
   m_OldStackSize = m_StackSize;
@@ -86,12 +86,12 @@ void CEquation::SetSize( unsigned i )
   }
 }
 
-bool  CEquation::Compare( const CEquation& equ ) const
+bool  CMathExpression::Compare( const CMathExpression& equ ) const
 {
-  return ( equ.m_StackSize == m_StackSize ) && !memcmp( equ.m_StackArray, m_StackArray, m_StackSize* sizeof( OP_CODE ) );
+  return ( equ.m_StackSize == m_StackSize ) && !memcmp( equ.m_StackArray, m_StackArray, m_StackSize * sizeof( OP_CODE ) );
 }
 
-void CEquation::Copy( const CEquation& equ )
+void CMathExpression::Copy( const CMathExpression& equ )
 {
   if( m_ElementDB == NULL )
   {
@@ -101,24 +101,26 @@ void CEquation::Copy( const CEquation& equ )
   ASSERT( equ.m_ElementDB );
   Clear();
 
-  if( !equ.IsNull() ) 
+  if( !equ.IsNull() )
   {
     Push( equ );
   }
 }
 
-void CEquation::PushBranch( const CEquation& equ, unsigned& pos )
+void CMathExpression::PushBranch( const CMathExpression& equ, unsigned& pos )
 {
   unsigned pos1 = pos;
   equ.NextBranch( pos );
   Append( &equ.m_StackArray[pos] , pos1 - pos );
 }
 
-void CEquation::NextBranch( unsigned& pos ) const
+void CMathExpression::NextBranch( unsigned& pos ) const
 {
   unsigned i = 1;
   OP_CODE op;
   CElement* e;
+  
+  ASSERT(pos);
 
   while( pos && i )
   {
@@ -133,12 +135,20 @@ void CEquation::NextBranch( unsigned& pos ) const
   }
 }
 
-void CEquation::Push( CValue v )
+void CMathExpression::CopyBranch( const CMathExpression& equ, unsigned& pos )
+{
+  Clear();
+  PushBranch( equ, pos );
+  RemoveZero();
+}
+
+void CMathExpression::Push( const CValue& v )
 {
   if( v.IsNegative() )
   {
-    v.Negate();
-    CElement* e =  m_ElementDB->GetElement( v );
+    CValue v1 = v;
+    v1.Negate();
+    CElement* e =  m_ElementDB->GetElement( v1 );
     Push( e );
     Push( CElementDataBase::OP_NEG );
   }
@@ -150,7 +160,7 @@ void CEquation::Push( CValue v )
   }
 }
 
-void CEquation::InitParameterLUT( OP_CODE elem_array[] )
+void CMathExpression::InitParameterLUT( OP_CODE elem_array[] )
 {
   unsigned i;
   for( i = 0; i < CElementDataBase::MAX_EXP; i++ )
@@ -159,7 +169,7 @@ void CEquation::InitParameterLUT( OP_CODE elem_array[] )
   }
 }
 
-unsigned CEquation::MatchParameter( const OP_CODE elem_array[], OP_CODE op )
+unsigned CMathExpression::MatchParameter( const OP_CODE elem_array[], OP_CODE op )
 {
   unsigned i;
   OP_CODE op1;
@@ -174,7 +184,7 @@ unsigned CEquation::MatchParameter( const OP_CODE elem_array[], OP_CODE op )
   return i;
 }
 
-void CEquation::BinaryOperation( OP_CODE op, const CEquation& equ )
+void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 {
   ASSERT( RefToElement( op )->IsBinary() );
 
@@ -186,7 +196,7 @@ void CEquation::BinaryOperation( OP_CODE op, const CEquation& equ )
 
 }
 
-void CEquation::BinaryOperation( OP_CODE op, const CElement* e1 )
+void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
 {
 
   ASSERT( e1 );
@@ -200,7 +210,7 @@ void CEquation::BinaryOperation( OP_CODE op, const CElement* e1 )
 
 }
 
-void CEquation::UnaryOperation( OP_CODE op )
+void CMathExpression::UnaryOperation( OP_CODE op )
 {
   ASSERT( RefToElement( op )->IsUnary() );
   AddZero();
@@ -209,13 +219,13 @@ void CEquation::UnaryOperation( OP_CODE op )
   RemoveZero();
 }
 
-void CEquation::VoidOperation( OP_CODE op )
+void CMathExpression::VoidOperation( OP_CODE op )
 {
   Push( op );
   RemoveZero();
 }
 
-void CEquation::AddZero()
+void CMathExpression::AddZero()
 {
   if( IsNull() )
   {
@@ -223,10 +233,15 @@ void CEquation::AddZero()
   }
 }
 
-void CEquation::RemoveZero()
+void CMathExpression::RemoveZero()
 {
   if( GetLastOperator() == CElementDataBase::OP_ZERO && ( m_StackSize == 1 ) )
   {
     Clear();
   }
+}
+
+const CValue& CMathExpression::Evaluate() const
+{
+    return m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
 }

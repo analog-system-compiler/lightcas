@@ -94,15 +94,15 @@ void CElement::RemoveRules()
   m_Type = ELEM_VAR;
 }
 
-void CElement::SetEquation( const CEquation& dst )
+void CElement::SetEquation( const CMathExpression& dst )
 {
-  CEquation src( dst.GetElementDB() );
+  CMathExpression src( dst.GetElementDB() );
   src.Init( this ); // f()
   RemoveRules();
   AddFunction( src,  dst );
 }
 
-void CElement::AddFunction( const CEquation& src, const CEquation& dst, unsigned line_nb )
+void CElement::AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb )
 {
   m_Type = ELEM_FUNCT;
   Lock(); // to avoid function to be replaced by exp in "ConvertToRule"

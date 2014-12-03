@@ -20,22 +20,13 @@
 #include "Equation.h"
 
 
-void CEquation::GetFromText( CParser& IC )
+void CMathExpression::GetFromText( CParser& IC )
 {
   Clear();
-  //do
-  {
-    GetLevel( IC, 0 );
-  }
-  //while( IC.TryFind( ';' ) );
-
-  /* if( IC.GetChar() != '\0' )
-   {
-     IC.Error( CParserException::ID_SYNTAX_ERROR );
-   }*/
+  GetLevel( IC, 0 );
 }
 
-void CEquation::Display( CDisplay& ds ) const
+void CMathExpression::Display( CDisplay& ds ) const
 {
   unsigned pos;
 
@@ -46,10 +37,6 @@ void CEquation::Display( CDisplay& ds ) const
 
   else
   {
-
-    /* CString s1;
-     s1 = ds;
-     ds.Clear();*/
 
     pos = m_StackSize;
     while( pos )
@@ -62,11 +49,10 @@ void CEquation::Display( CDisplay& ds ) const
       }
     }
 
-    //ds.Prepend( s1 );
     ASSERT( pos == 0 );
   }
 }
-unsigned CEquation::DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const
+unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const
 {
   unsigned i;
   CElement* e;
@@ -109,68 +95,87 @@ unsigned CEquation::DisplayBranch( unsigned pos , unsigned priority, CDisplay& d
   return pos;
 }
 
-unsigned  CEquation::DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const
+unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const
 {
-  char c;
-  unsigned i, k;
-  CDisplay ds2, ds3;
-  OP_CODE op = Pop( pos );
 
+  OP_CODE op = Get( pos-1 );
+  
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
-  for( i = 0; i < st.GetSize(); i++ )
+  for( unsigned i = 0; i < st.GetSize(); i++ )
   {
-
-    const CEquation& equ =  st[i]->m_Equation;
-    if( equ.GetLastOperator() == op )
+    const CSymbolSyntaxStruct* ss = st[i];
+    const CMathExpression* equ =  &ss->m_Equation;
+    if( equ->GetLastOperator() == op )
     {
-      break;
+      if( i < priority )
+      {
+        ds += '(' ;
+      }
+      pos = DisplaySymbolString( *ss,  pos,  i,  ds );
+      if( i < priority )
+      {
+        ds += ')' ;
+      }
     }
-  }
-
-  if( i == st.GetSize() ) // not found
-  {
-    pos ++;
-    return pos;
-  }
-
-  const CString& s = st[i]->m_Syntax;
-
-  for( k = s.GetLength(); k > 0; k-- )
-  {
-    ds2.Clear();
-    c = s[k - 1];
-
-    if( c >= 'a' && c <= 'h' )
-    {
-      pos = DisplayBranch( pos, i, ds2 );
-    }
-    else if ( c >= 'A' && c <= 'H' )
-    {
-      pos = DisplayBranch( pos, 0, ds2 );
-    }
-    else
-    {
-      ds2 += c ;
-    }
-
-    ds3.Prepend( ds2 );
-  }
-
-  if( i < priority )
-  {
-    ds += '(' ;
-    ds += ds3 ;
-    ds += ')' ;
-  }
-  else
-  {
-    ds += ds3 ;
   }
 
   return pos;
 }
 
-void CEquation::GetLevel( CParser& IC, unsigned priority )
+unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned i, CDisplay& ds ) const
+{
+  char c;
+  unsigned k, j;
+
+  unsigned pos2, reserved_pos[8];
+  //CDisplay ds2, ds3;
+
+  const CMathExpression& equ =  st.m_Equation;
+  j = 0;
+
+  pos2 = equ.GetSize();
+  while( pos2 )
+  {
+    OP_CODE op = equ.Pop( pos2 );
+    if( IsReserved( op ) ) 
+    {
+      ASSERT( j < sizeof( reserved_pos ) / sizeof( unsigned ) );
+      reserved_pos[j++] = pos;
+      NextBranch( pos );
+    }
+    else
+    {
+      Pop( pos );
+    }
+  }
+  const CString& s = st.m_Syntax;
+
+  for( k = 0; k < s.GetLength(); k++ )
+  {
+    //ds2.Clear();
+    c = s[k];
+
+    if( c >= 'a' && c <= 'h' )
+    {
+      DisplayBranch( reserved_pos[--j], i, ds );
+    }
+    else if ( c >= 'A' && c <= 'H' )
+    {
+      DisplayBranch( reserved_pos[--j], 0, ds );
+    }
+    else
+    {
+      ds += c ;
+    }
+
+    //ds3.Prepend( ds2 );
+  }
+  //ds += ds3;
+
+  return pos;
+}
+
+void CMathExpression::GetLevel( CParser& IC, unsigned priority )
 {
   if( !IC.IsStopChar() )
   {
@@ -192,32 +197,7 @@ void CEquation::GetLevel( CParser& IC, unsigned priority )
   }
 }
 
-/*
-bool CEquation::GetAtom( CParser& IC )
-{
-  CValue v;
-  const char* pos = v.GetFromString( IC.GetPos() );
-  if( pos != IC.GetPos() )
-  {
-    IC.SetPos( pos );
-    Push( v );
-  }
-  else if( IC.IsWord() )
-  {
-    ParseElement( IC );
-  }
-  else if( IC.TryFind( '(' ) )
-  {
-    GetLevel( IC, 0 );
-    IC.Find( ')' );
-  }
-  else
-  {
-    return false;
-  }
-  return true;
-}*/
-bool CEquation::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
+bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
   unsigned i;
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
@@ -225,7 +205,7 @@ bool CEquation::SearchOperator( CParser& IC, unsigned priority, bool symbol_firs
   for( i = priority; i < st.GetSize(); i++ )
   {
     const CString& s = st[i]->m_Syntax;
-    const CEquation& equ =  st[i]->m_Equation;
+    const CMathExpression& equ =  st[i]->m_Equation;
 
     if( MatchOperator( IC, s, equ, i + 1, symbol_first  ) )
     {
@@ -236,7 +216,7 @@ bool CEquation::SearchOperator( CParser& IC, unsigned priority, bool symbol_firs
   return false;
 }
 
-bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& rule_equ, unsigned priority, bool symbol_first )
+bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathExpression& rule_equ, unsigned priority, bool symbol_first )
 {
   unsigned index;
   const char* sp = s.GetBufferPtr();
@@ -270,14 +250,10 @@ bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& r
 
     if( !CParser::IsWord( *sp ) )
     {
-      if( !IC.TryMatchSymbol( sp ) ) break;
-      /*j = CParser::TryMatchSymbol( sp, pos );
-      if( j == 0 )
+      if( !IC.TryMatchSymbol( sp ) )
       {
         break;
       }
-      sp += j;
-      IC.SetPos( pos + j );*/
     }
 
     if( *sp == '\0' )
@@ -294,7 +270,7 @@ bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& r
 
     if( rule_equ.GetSize() )
     {
-      CEquation equ( m_ElementDB );
+      CMathExpression equ( m_ElementDB );
       equ.Copy( *this );
       ApplyRule( equ, elem_array, pos_array, &rule_equ, false );
 
@@ -309,15 +285,12 @@ bool CEquation::MatchOperator( CParser& IC, const CString& s, const CEquation& r
   return false;
 }
 
-bool CEquation::ParseElement( CParser& IC )
+bool CMathExpression::ParseElement( CParser& IC )
 {
   CElement* e;
   CFunction* f;
   bool element_creation;
   unsigned n;
-
-  //Symbol match failed, try to use default syntax
-  //ASSERT( IC.IsWord() );
 
   n = m_ElementDB->GetSize();
 
@@ -384,19 +357,19 @@ bool CEquation::ParseElement( CParser& IC )
   return true;
 }
 
-void CEquation::GetFromTextRPN( CParser& IC )
+void CMathExpression::GetFromTextRPN( CParser& IC )
 {
   // see GetAtom
   CElement* e;
   Clear();
   while( !IC.TryFind( ';' ) )
   {
-    e=m_ElementDB->ParseElement( IC );
+    e = m_ElementDB->ParseElement( IC );
     Push( e );
   }
 }
 
-const char* CEquation::ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion )
+const char* CMathExpression::ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion )
 {
   char elem_id;
 
@@ -414,7 +387,7 @@ const char* CEquation::ParseExpression( const char* sp, OP_CODE* elem_array, uns
 
   if( allow_recursion )
   {
-    CEquation equ( m_ElementDB );
+    CMathExpression equ( m_ElementDB );
     equ.GetLevel( IC, priority );
     Push( equ );
   }
