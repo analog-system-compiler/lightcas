@@ -18,7 +18,7 @@
 #include <cstring>
 #include "Debug.h"
 #include "LCVector.h"
-#include "Equation.h"
+#include "MathExpression.h"
 #include "Element.h"
 #include "Function.h"
 
@@ -160,28 +160,14 @@ void CMathExpression::Push( const CValue& v )
   }
 }
 
-void CMathExpression::InitParameterLUT( OP_CODE elem_array[] )
+void CMathExpression::InitPositionTable( unsigned pos_array[] )
 {
-  unsigned i;
-  for( i = 0; i < CElementDataBase::MAX_EXP; i++ )
-  {
-    elem_array[ i ] = CElementDataBase::OP_NONE;
-  }
+    memset( pos_array, 0, CElementDataBase::MAX_EXP*sizeof(unsigned) ) ;
 }
 
-unsigned CMathExpression::MatchParameter( const OP_CODE elem_array[], OP_CODE op )
+unsigned CMathExpression::ReservedParameterIndex( OP_CODE op )
 {
-  unsigned i;
-  OP_CODE op1;
-  for( i = 0; i < CElementDataBase::MAX_EXP; i++ )
-  {
-    op1 = elem_array[i];
-    if( ( op1 == op ) || ( op1 == CElementDataBase::OP_NONE ) )
-    {
-      break;
-    }
-  }
-  return i;
+  return op - CElementDataBase::OP_EXP1;
 }
 
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )

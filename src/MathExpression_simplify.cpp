@@ -19,23 +19,15 @@
 #include <cstring>
 #include "Debug.h"
 #include "LCVector.h"
-#include "Equation.h"
+#include "MathExpression.h"
 #include "Element.h"
 #include "Function.h"
 #define DEBUG_OPTIMIZE
 
 bool CMathExpression::OptimizeConst()
 {
-  unsigned pos;
-  bool bOk = false;
-  CElement* e3, *e1, *e2;
-
-#ifdef DEBUG_OPTIMIZE
-  CDisplay ds;
-  ds += "OptimizeConst :" ;
-  Display( ds );
-  ds += " => ";
-#endif
+  unsigned pos, i, n;
+  CElement* e3;
 
   pos = m_StackSize;
   if( !pos )
@@ -47,26 +39,22 @@ bool CMathExpression::OptimizeConst()
 
   if( e3->IsNumeric() && !e3->IsVoid() )
   {
-    e1 = RefToElement( Pop( pos ) );
-    if( e1->IsConst() )
+    n = e3->GetFunction()->GetParameterNb();
+    for( i = 0; i < n; i++ )
     {
-      if( e3->IsBinary()  )
+      if( !RefToElement( Pop( pos ) )->IsConst() )
       {
-        e2 = RefToElement( Pop( pos ) );
-        if( e2->IsConst() )
-        {
-          bOk = true;
-        }
-      }
-      else if( e3->IsUnary() )
-      {
-        bOk = true;
+        return false;
       }
     }
-  }
 
-  if( bOk )
-  {
+#ifdef DEBUG_OPTIMIZE
+    CDisplay ds;
+    ds += "OptimizeConst :" ;
+    Display( ds );
+    ds += " => ";
+#endif
+
     const CValue& v = m_ElementDB->GetEvaluator()->Evaluate( m_StackSize - pos, m_StackArray + pos );
     m_StackSize = pos;
     Push( v );
@@ -75,9 +63,12 @@ bool CMathExpression::OptimizeConst()
     Display( ds );
     TRACE( ds.GetBufferPtr() );
 #endif
+
+    return true;
+
   }
 
-  return bOk;
+  return false;
 }
 
 void CMathExpression::OptimizeTree()
@@ -102,7 +93,6 @@ bool CMathExpression::OptimizeTree2( CMathExpression& equ2 )
   unsigned n;
   bool match;
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
-  OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
 
   OP_CODE op = GetLastOperator();
   CElement* e = RefToElement( op );
@@ -110,14 +100,14 @@ bool CMathExpression::OptimizeTree2( CMathExpression& equ2 )
 
   if( funct )
   {
-    n   = funct->m_AlgebraRuleArray.GetSize();
+    n = funct->m_AlgebraRuleArray.GetSize();
     for( i = 0; i < n; i++ )
     {
 
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
       CMathExpression* equ = &( rule->m_SrcEquation );
 
-      pos = Match( *equ, elem_array, pos_array );
+      pos = Match( *equ, pos_array );
       match = ( pos != m_StackSize );
 
       if( match )
@@ -139,7 +129,7 @@ bool CMathExpression::OptimizeTree2( CMathExpression& equ2 )
 
         if( rule->m_bHasRule )
         {
-          equ2.ApplyRule( *this, elem_array, pos_array, &rule->m_DstEquation );
+          equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           m_StackSize = pos;
           Push( equ2 );
           /*if( m_StackSize >= MAX_STACK_SIZE )
@@ -162,11 +152,10 @@ bool CMathExpression::OptimizeTree2( CMathExpression& equ2 )
 bool CMathExpression::Match( const CMathExpression& equ ) const
 {
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
-  OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
-  return Match( equ, elem_array, pos_array ) != m_StackSize;
+  return Match( equ, pos_array ) != m_StackSize;
 }
 
-unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[], unsigned pos_array[] ) const
+unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
@@ -177,7 +166,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[
   op2 = Pop( pos2 ); // to trash
   ASSERT( op1 == op2 );
 
-  InitParameterLUT( elem_array );
+  InitPositionTable( pos_array );
 
   while( match && pos1 )
   {
@@ -189,7 +178,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[
       op1 = equ.Pop( pos1 );
       ASSERT( IsReserved( op1 ) );
 
-      match = MatchBranch(  elem_array,  pos_array,  op1,  pos2 );
+      match = MatchBranch(  pos_array,  op1,  pos2 );
       if( match )
       {
 
@@ -212,7 +201,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[
     else if( IsReserved( op1 ) ) //a,b or c
     {
 
-      match = MatchBranch(  elem_array,  pos_array,  op1,  pos2 );
+      match = MatchBranch(  pos_array,  op1,  pos2 );
       if( match )
       {
         NextBranch( pos2 );
@@ -228,7 +217,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, OP_CODE elem_array[
   return match ? pos2 : m_StackSize;
 }
 
-void CMathExpression::ApplyRule( const CMathExpression& equ, OP_CODE const elem_array[], unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
+void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
 {
   OP_CODE op3;
   unsigned pos = 0;
@@ -254,24 +243,15 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, OP_CODE const elem_
 
     if( IsReserved( op3 ) )
     {
-      j = MatchParameter( elem_array, op3 );
-      ASSERT( j < CElementDataBase::MAX_EXP );
+      j = ReservedParameterIndex( op3 );
       ASSERT( pos_array[ j ] != 0 );
       unsigned pos2 = pos_array[ j ];
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
       ASSERT( m_StackSize );
     }
-    else
+    else if( !ExecuteCommand( op3, equ2 ) )
     {
-      bool bOk = ExecuteInternalCommand( op3, equ2 );
-      if( !bOk )
-      {
-        bOk = ExecuteExternalCommand( op3, equ2 );
-      }
-      if( !bOk )
-      {
-        Push( op3 );
-      }
+      Push( op3 );
     }
 
     if( optimize )
@@ -291,7 +271,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, OP_CODE const elem_
   }
 }
 
-bool CMathExpression::ExecuteInternalCommand( OP_CODE op3, CMathExpression& equ )
+bool CMathExpression::ExecuteCommand( OP_CODE op3, CMathExpression& equ )
 {
   CElement* e;
   bool bOK = false;
@@ -366,15 +346,14 @@ bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
 
 }
 
-bool CMathExpression::MatchBranch( OP_CODE elem_array[], unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const
+bool CMathExpression::MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const
 {
   unsigned j;
   bool match;
 
-  j = MatchParameter( elem_array, op1 );
-  if( elem_array[ j ] == CElementDataBase::OP_NONE )
+  j = ReservedParameterIndex( op1 );
+  if( pos_array[ j ] == 0 )
   {
-    elem_array[ j ] = op1;
     pos_array[ j ] = pos2;
     ASSERT( pos2 != 0 );
     match = true;

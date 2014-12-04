@@ -17,7 +17,7 @@
 /*******************************************************************************/
 
 #pragma once
-#include "Equation.h"
+#include "MathExpression.h"
 
 class CAlgebraRule
 {

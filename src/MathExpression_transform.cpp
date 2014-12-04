@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -16,26 +16,53 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#include "Equation.h"
+#include "Element.h"
+#include "MathExpression.h"
 
-const CValue& CEquation::Evaluate( CEvaluator* val ) const
+void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst )
 {
-  return Evaluate( 0, val );
-}
-
-const CValue& CEquation::Evaluate( unsigned pos_init, CEvaluator* val ) const
-{
-  unsigned pos;
   OP_CODE op;
-  unsigned size = m_StackSize;
+  unsigned i;
+  unsigned pos;
+  OP_CODE  elem_array[CElementDataBase::MAX_EXP];
+  unsigned index=0;
 
-  val->AllocateStack( size );
+  //RefToElement( CElementDataBase::OP_CPLX )->Lock();
 
-  for( pos = pos_init; pos < m_StackSize; pos ++ )
+  for( pos = 0; pos < src.GetSize();  pos ++ )
   {
-    op = Get( pos );
-    val->Evaluate( op );
+    op = src.Get( pos );
+    if( RefToElement( op )->IsVar() && !RefToElement( op )->IsGlobal() && !RefToElement( op )->IsLocked() )
+    {
+      for( i = 0; (i < index) && (i < CElementDataBase::MAX_EXP); i++ )
+      {
+        if( elem_array[i] == op )
+        {
+          break;
+        }        
+      }
+      ASSERT( i < CElementDataBase::MAX_EXP );
+      if(i==index)
+      {
+        elem_array[index++] = op;
+      }
+      src.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+      dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+    }
   }
 
-  return val->GetValue();
+  //RefToElement( CElementDataBase::OP_CPLX )->Unlock();
+}
+
+void CMathExpression::Replace( OP_CODE op1, OP_CODE op2 )
+{
+  unsigned	pos;
+
+  for( pos = 0; pos < m_StackSize; pos++ )
+  {
+    if( Get( pos ) == op1  )
+    {
+      Set( pos, op2 );
+    }
+  }
 }

@@ -154,10 +154,12 @@ bool CParser::TryFind( char c )
 
 void CParser::SkipComment()
 {
+  char c;
   if( m_Pos[0] == '/' )
   {
 
-    if( m_Pos[1] == '/' )
+    c = m_Pos[1];
+    if( c == '/' || c == '*' )
     {
 
       m_Pos += 2;
@@ -167,36 +169,16 @@ void CParser::SkipComment()
 
         if( eol( *m_Pos ) )
         {
-
-          m_Pos++;
+          
           m_LineNb++;
-          SkipSpace();
-          return;
+          if( c == '/' )
+          {
+            m_Pos++;
+            SkipSpace();
+            return;
+          }
         }
-
-        else
-        {
-          m_Pos++;
-        }
-      }
-    }
-
-    else if( m_Pos[1] == '*' )
-    {
-
-      m_Pos += 2;
-
-      while( !eof( *m_Pos ) )
-      {
-
-        if( eol( *m_Pos ) )
-        {
-
-          m_Pos++;
-          m_LineNb++;
-        }
-
-        else if( ( m_Pos[0] == '*' ) && ( m_Pos[1] == '/' ) )
+        else if( c == '*' && ( m_Pos[0] == '*' ) && ( m_Pos[1] == '/' ) )
         {
 
           m_Pos += 2;
@@ -204,10 +186,7 @@ void CParser::SkipComment()
           return;
         }
 
-        else
-        {
-          m_Pos++;
-        }
+        m_Pos++;
       }
     }
   }

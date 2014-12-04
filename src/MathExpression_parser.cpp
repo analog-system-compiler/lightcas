@@ -17,10 +17,10 @@
 /*******************************************************************************/
 
 #include "Element.h"
-#include "Equation.h"
+#include "MathExpression.h"
 
 
-void CMathExpression::GetFromText( CParser& IC )
+void CMathExpression::GetFromString( CParser& IC )
 {
   Clear();
   GetLevel( IC, 0 );
@@ -28,9 +28,9 @@ void CMathExpression::GetFromText( CParser& IC )
 
 void CMathExpression::Display( CDisplay& ds ) const
 {
-  unsigned pos;
+  unsigned pos= m_StackSize;;
 
-  if( IsNull() )
+  if( pos == 0 )
   {
     ds += '0';
   }
@@ -38,7 +38,6 @@ void CMathExpression::Display( CDisplay& ds ) const
   else
   {
 
-    pos = m_StackSize;
     while( pos )
     {
 
@@ -48,8 +47,6 @@ void CMathExpression::Display( CDisplay& ds ) const
         ds += " ; ";
       }
     }
-
-    ASSERT( pos == 0 );
   }
 }
 unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const
@@ -74,12 +71,12 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
 
       for( i = 0; i < e->GetFunction()->GetParameterNb(); i++ )
       {
-        ds2.Clear();
-        if( i < ( e->GetFunction()->GetParameterNb() - 1 ) )
-        {
-          ds2 += ',' ;
-        }
+        ds2.Clear();       
         pos = DisplayBranch( pos, 0, ds2 );
+        if( i != 0 )
+        {
+            ds2 += ',' ;
+        }
         ds3.Prepend( ds2 );
       }
       ds += ds3 ;
@@ -95,7 +92,7 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
   return pos;
 }
 
-unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const
+unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CDisplay& ds ) const
 {
 
   OP_CODE op = Get( pos-1 );
@@ -107,12 +104,12 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned priority, CDis
     const CMathExpression* equ =  &ss->m_Equation;
     if( equ->GetLastOperator() == op )
     {
-      if( i < priority )
+      if( i < precedence )
       {
         ds += '(' ;
       }
       pos = DisplaySymbolString( *ss,  pos,  i,  ds );
-      if( i < priority )
+      if( i < precedence )
       {
         ds += ')' ;
       }
@@ -152,7 +149,6 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
 
   for( k = 0; k < s.GetLength(); k++ )
   {
-    //ds2.Clear();
     c = s[k];
 
     if( c >= 'a' && c <= 'h' )
@@ -168,9 +164,7 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
       ds += c ;
     }
 
-    //ds3.Prepend( ds2 );
   }
-  //ds += ds3;
 
   return pos;
 }
@@ -218,14 +212,11 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
 
 bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathExpression& rule_equ, unsigned priority, bool symbol_first )
 {
-  unsigned index;
   const char* sp = s.GetBufferPtr();
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
-  OP_CODE elem_array[ CElementDataBase::MAX_EXP ];
 
-  InitParameterLUT( elem_array );
+  InitPositionTable( pos_array );
 
-  index = 0;
   if( symbol_first )
   {
     if( CParser::IsWord( *sp ) )
@@ -240,7 +231,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathE
       return false;
     }
 
-    sp = ParseExpression( sp, elem_array, pos_array, index++, priority, IC, false );
+    sp = ParseExpression( sp, pos_array, priority, IC, false );
 
   }
   // try to match prefix operator
@@ -261,7 +252,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathE
       break;  // case [a]
     }
 
-    sp = ParseExpression( sp, elem_array, pos_array, index++, priority, IC, true );
+    sp = ParseExpression( sp, pos_array, priority, IC, true );
 
   }
 
@@ -272,7 +263,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathE
     {
       CMathExpression equ( m_ElementDB );
       equ.Copy( *this );
-      ApplyRule( equ, elem_array, pos_array, &rule_equ, false );
+      ApplyRule( equ, pos_array, &rule_equ, false );
 
     }
 #if 0//_DEBUG
@@ -369,7 +360,7 @@ void CMathExpression::GetFromTextRPN( CParser& IC )
   }
 }
 
-const char* CMathExpression::ParseExpression( const char* sp, OP_CODE* elem_array, unsigned pos_array[], unsigned index, unsigned priority, CParser& IC, bool allow_recursion )
+const char* CMathExpression::ParseExpression( const char* sp, unsigned pos_array[], unsigned precedence, CParser& IC, bool allow_recursion )
 {
   char elem_id;
 
@@ -380,7 +371,7 @@ const char* CMathExpression::ParseExpression( const char* sp, OP_CODE* elem_arra
   else
   {
     elem_id = *sp - 'A';
-    priority = 0;
+    precedence = 0;
   }
 
   sp++;
@@ -388,12 +379,12 @@ const char* CMathExpression::ParseExpression( const char* sp, OP_CODE* elem_arra
   if( allow_recursion )
   {
     CMathExpression equ( m_ElementDB );
-    equ.GetLevel( IC, priority );
+    equ.GetLevel( IC, precedence );
     Push( equ );
   }
 
-  elem_array[index] = CElementDataBase::OP_EXP1 + elem_id;
-  pos_array[index]  = m_StackSize;
+  ASSERT( elem_id < CElementDataBase::MAX_EXP );
+  pos_array[elem_id]  = m_StackSize;
 
   return sp;
 }

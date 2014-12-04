@@ -181,7 +181,7 @@ void CElementDataBase::AddAlgebraRuleTable( const char* rules_table )
   CParser IC(  rules_table );
   do
   {
-    src.GetFromText( IC );
+    src.GetFromString( IC );
   }
   while( IC.TryFind( ';' ) );
 }

@@ -18,7 +18,7 @@
 
 #include "Debug.h"
 #include "ElementDataBase.h"
-#include "Equation.h"
+#include "MathExpression.h"
 #include "Element.h"
 #include "Parser.h"
 #include "Display.h"
@@ -33,7 +33,7 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   TRACE( "** Check %s == %s", s1, s2 );
   try
   {
-    do equ.GetFromText( IC );
+    do equ.GetFromString( IC );
     while( IC.TryFind( ';' ) );
     equ.OptimizeTree();
     equ.Display( ds );
@@ -59,7 +59,7 @@ void CElementDataBase::CheckCatch( const char* s1 )
   TRACE( "** CheckCatch %s", s1 );
   try
   {
-    equ.GetFromText( IC );
+    equ.GetFromString( IC );
   }
   catch( ... )
   {
@@ -113,7 +113,7 @@ void CElementDataBase::Test()
   //Check( "SIMPLIFY(a*(a^b)","a^(b+1)");
   //Check( "SIMPLIFY(x^(a*b)/x^(a*b)","1" );
   Check( "SIMPLIFY(x^(a-a))", "1" );
-  //Check("2*x^a-2*x^a","0");
+  //FAIL!!:Check( "SIMPLIFY(2*x^a-2*x^a)","0");!!!!
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
@@ -129,8 +129,8 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(2/(1+j)-(1-j))", "0" );
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
-  //Check("sqrt(-1)-(-1)^0.5","0");
-  Check("SQRT(-25)^2+25","0");
+  Check("SQRT(-25)","j*5");
+  Check("SIMPLIFY(SQRT(-25)^2+25)","0");
 
   Check( "SIMPLIFY(RE(1+j))", "1" );
   Check( "SIMPLIFY(-IM(1-j))", "1" );
@@ -163,9 +163,9 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(0 ? a : b)", "b" );
   Check( "SIMPLIFY(1 ? a : b)", "a" );
   Check( "SIMPLIFY(5 ? a : b)", "a" );
-  Check( "SIMPLIFY(IF(1,(a,b)))", "a" );
-  Check( "SIMPLIFY(IF(0,(a,b)))", "b" );
-
+  Check( "SIMPLIFY(2>3 ? a : b)", "b" );
+  Check( "SIMPLIFY(a<=a ? b : c)", "b" );
+  
   /****** logic *********/
   Check( "SIMPLIFY(a|0)", "a" );
   Check( "SIMPLIFY(a|~0)", "-1" );
@@ -179,9 +179,9 @@ void CElementDataBase::Test()
 
   /*********** affectation ***/
   CMathExpression equ0( this );
-  equ0.GetFromText( "a+b" );
+  equ0.GetFromString( "a+b" );
   GetElement( "y" )->SetEquation( equ0 );
-  equ0.GetFromText( "a-b" );
+  equ0.GetFromString( "a-b" );
   GetElement( "z" )->SetEquation( equ0 );
   Check( "SIMPLIFY(y-z)", "2*b" );
 
@@ -209,11 +209,12 @@ void CElementDataBase::Test()
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/
+  db.Initialize();
   db.GetEvaluator()->SetElementValue(db.GetElement("a")->ToRef(),CValue(4));
   db.GetEvaluator()->SetElementValue(db.GetElement("b")->ToRef(),CValue(8));
   db.GetEvaluator()->SetElementValue(db.GetElement("c")->ToRef(),CValue(9));
   CMathExpression equ(&db);
-  equ.GetFromText("a+b-c+2");
+  equ.GetFromString("a+b-c+2");
   ASSERT( equ.Evaluate() == CValue(5) );
 }
 

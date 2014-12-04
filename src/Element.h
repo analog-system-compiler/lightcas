@@ -74,7 +74,7 @@ class CElement
     bool IsConst()	 const                      { return ( m_Type == ELEM_CONST);  }
     bool IsFunct()   const                      { return ( m_Type == ELEM_FUNCT ); }
     bool IsNumeric() const                      { return m_Numeric;                }
-    bool IsAux()	 const                        { return m_bAux;                   }
+    bool IsAux()	 const                      { return m_bAux;                   }
     bool IsLocked()	 const                      { return m_bLock;                  }
     bool IsGlobal()  const                      { return m_Global;                 }                      
     bool IsVoid() const                         { return ( m_Function.GetParameterNb() == 0 );  }

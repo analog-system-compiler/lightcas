@@ -18,7 +18,7 @@
 #include <iostream>
 #include <string>
 #include "Display.h"
-#include "Equation.h"
+#include "MathExpression.h"
 #include "Element.h"
 #include "ElementDataBase.h"
 
@@ -48,6 +48,7 @@ int main()
 {
 
   setlocale( LC_NUMERIC, "C" );
+  std::cout << "*** LighCAS example ***\n";
 
 #ifdef _WIN32
   CDisplay ds;
@@ -79,7 +80,7 @@ int main()
     IC.SetPos( expression_str.c_str() );
     try
     {
-      equ.GetFromText( IC );
+      equ.GetFromString( IC );
       equ.UnaryOperation( simplify_op );   
       ans->SetEquation( equ );
       ds.Clear();
