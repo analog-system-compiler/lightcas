@@ -17,6 +17,7 @@
 /*******************************************************************************/
 
 #pragma once
+
 #include "Debug.h"
 #include "Parser.h"
 #include "LCVector.h"
@@ -33,18 +34,16 @@ class CMathExpression
   protected:
     OP_CODE*    m_StackArray;
     unsigned	m_StackSize;
-    unsigned	m_OldStackSize;
     unsigned	m_AllocSize;
     CElementDataBase*	m_ElementDB;
 
   protected:
-
     void		 SetSize( unsigned i );
     void         Set( unsigned pos, OP_CODE op )   {  m_StackArray[ pos ] = op;    }
-    OP_CODE      Get( unsigned pos )	const         {  return m_StackArray[ pos ];  }
+    OP_CODE      Get( unsigned pos )	const      {  return m_StackArray[ pos ];  }
     OP_CODE      Pop( unsigned& pos )  const       {  ASSERT( pos > 0 && pos<=m_StackSize ); pos--; return Get( pos );    }
     
-    unsigned     Push( OP_CODE op )                {  SetSize( m_StackSize + 1  );      Set( m_OldStackSize, op );      return m_StackSize;    }
+    void         Push( OP_CODE op )                {  SetSize( m_StackSize + 1  );  Set( m_StackSize-1, op );  }
     void		 Push( const CElement* e )         {  Push( ElementToRef( e ) );    }
     void		 Push( const CMathExpression& equ );
     void         Push( const CValue& v );    
@@ -52,7 +51,6 @@ class CMathExpression
                  
     void		 PushBranch( const CMathExpression& equ, unsigned& pos );        
     bool		 CompareBranch( unsigned pos1, unsigned pos2 ) const;    
-    void		 CopyBranch( const CMathExpression& equ, unsigned& pos );
     void		 NextBranch( unsigned& pos ) const;    
                  
     void         GetLevel( CParser& IC, unsigned priority );
@@ -63,20 +61,20 @@ class CMathExpression
     const char*  ParseExpression( const char* sp, unsigned pos_array[], unsigned priority, CParser& IC, bool allow_recursion );
 
     bool         OptimizeConst();
-    bool         OptimizeTree2(CMathExpression& equ);
-    void         OptimizeTree(CMathExpression& equ);
+    bool         OptimizeTree2();
+    void	     OptimizeTree3();
     void         Replace( OP_CODE op1, OP_CODE op2 );
     void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
     unsigned     Match( const CMathExpression& equ, unsigned pos_array[] ) const;    
     bool         MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
-    virtual bool ExecuteCommand( OP_CODE , CMathExpression&  );
+    virtual bool ExecuteCommand( OP_CODE );
     void		 AddZero();
     void		 RemoveZero();
 
     static void       InitPositionTable( unsigned pos_array[] );
-    static unsigned   ReservedParameterIndex( OP_CODE op );
-    static CElement*  RefToElement( OP_CODE op )         { return CElementDataBase::RefToElement( op );  }
-    static OP_CODE	  ElementToRef( const CElement* e )  { return CElementDataBase::ElementToRef( e );   }
+    static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
+    static OP_CODE	  ElementToRef( const CElement* e )       { return CElementDataBase::ElementToRef( e );   }
+    static unsigned   ReservedParameterIndex( OP_CODE op )    { return op - CElementDataBase::OP_EXP1;  }
 
     //Display funct
     unsigned    DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const;
@@ -91,11 +89,11 @@ class CMathExpression
     void	UnaryOperation( OP_CODE op );
     void	VoidOperation( OP_CODE op );
 
-    void	Clear()                             { m_OldStackSize = 0; m_StackSize = 0; }
+    void	Clear()                             { m_StackSize = 0; }
     void    Init( const CElement *e )           { Clear(); Push(e);                    }
-    void	Copy( const CMathExpression& equ );    
     bool	IsNull() const                      { return ( m_StackSize == 0 );         }         
     bool    Compare( const CMathExpression& equ ) const;   
+    void	Copy( const CMathExpression& equ );    
     void	Display( CDisplay& ds ) const;
     void    GetFromString( const char *text )   { CParser IC( text ); GetFromString( IC ); }
     void	GetFromString( CParser& IC );

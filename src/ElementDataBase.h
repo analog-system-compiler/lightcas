@@ -62,8 +62,7 @@ class CElementDataBase : public CElementArray
       OP_CPLX,
       OP_RANK,
       OP_SUBST,
-      //OP_ERROR_SIZE
-      //OP_NEW
+      OP_ERROR_SIZE
     };
 
     enum { MAX_EXP = OP_EXP8-OP_EXP1+1 };
@@ -72,15 +71,15 @@ class CElementDataBase : public CElementArray
 
   protected:
 
-    unsigned    Register( CElement* e , unsigned index );
-    CElement *  CreateElement( const CString& string, unsigned pos );
+    unsigned      Register( CElement* e , unsigned index );
+    CElement *    CreateElement( const CString& string, unsigned pos );
     virtual void  AddReservedElements();
     virtual void  AddSyntaxSymbolTable(const char *symbol_table);
     virtual void  AddOperandTable(const char *operand_table);    
     virtual void  AddAlgebraRuleTable(const char *rule_table);
     virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
-    virtual void  AddEvalFunction( CString& name, CEvaluatorFunct funct );
-    void        SetValue( const CElement* e, const CValue& v );
+    virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
+    void          SetValue( const CElement* e, const CValue& v );
     CElementDataBase(const CElementDataBase& db );
 
   public:
@@ -107,6 +106,7 @@ class CElementDataBase : public CElementArray
 #ifdef _DEBUG    
         void Test();
         void Check( const char*s1, const char *s2 );
+        void Check( const char* s1, const CValue& v1 );
         void CheckCatch( const char* s1 );
 #endif
 

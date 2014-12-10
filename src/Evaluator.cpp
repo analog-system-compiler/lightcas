@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2006 The SIMCAS project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -29,18 +29,18 @@ CEvaluator::~CEvaluator(  )
 {
 }
 
-const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE *p )
+const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
-    unsigned pos;
+  unsigned pos;
 
-    AllocateStack( size );
+  AllocateStack( size );
 
-    for( pos = 0; pos < size; pos ++ )
-    {
-        Evaluate( *p++ );
-    }
+  for( pos = 0; pos < size; pos ++ )
+  {
+    Evaluate( *p++ );
+  }
 
-    return GetValue();
+  return GetValue();
 }
 
 void CEvaluator::AllocateStack( unsigned size )
@@ -82,7 +82,7 @@ void CEvaluator::Evaluate( unsigned index )
   }
   else
   {
-    Push(GetElementValue( index ).GetValue());
+    Push( GetElementValue( index ).GetValue() );
   }
 }
 
@@ -103,28 +103,28 @@ const CValue& CEvaluator::GetValue()
 
 void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
 {
-    int n1, n2;
-    double x1, x2;
+  int n1, n2;
+  double x1, x2;
 
-    x1 = frexp(  v1 , &n1 );
-    x2 = frexp(  v2 , &n2 );
+  x1 = frexp(  v1 , &n1 );
+  x2 = frexp(  v2 , &n2 );
 
-    if( n2 > n1 )
-    {
-        x2 *= ( double )( 1 << 30 );
-        x1 *= ( double )( 1 << ( 30 - ( n2 - n1 ) ) );
-        n = n2 - 30;
-    }
+  if( n2 > n1 )
+  {
+    x2 *= ( double )( 1 << 30 );
+    x1 *= ( double )( 1 << ( 30 - ( n2 - n1 ) ) );
+    n = n2 - 30;
+  }
 
-    else
-    {
-        x1 *= ( double )( 1 << 30 );
-        x2 *= ( double )( 1 << ( 30 - ( n1 - n2 ) ) );
-        n = n1 - 30;
-    }
+  else
+  {
+    x1 *= ( double )( 1 << 30 );
+    x2 *= ( double )( 1 << ( 30 - ( n1 - n2 ) ) );
+    n = n1 - 30;
+  }
 
-    m1 = ( int )x1;
-    m2 = ( int )x2;
+  m1 = ( int )x1;
+  m2 = ( int )x2;
 
 }
 
@@ -144,123 +144,123 @@ void CEvaluator::Sin()
 void CEvaluator::Cos()
 {
   double v = Pop();
-  Push( cos(  v  ));
+  Push( cos(  v  ) );
 }
 void CEvaluator::Tan()
 {
   double v = Pop();
-  Push( tan(  v  ));
+  Push( tan(  v  ) );
 }
 void CEvaluator::Asin()
 {
   double v = Pop();
-  Push( asin(  v  ));
+  Push( asin(  v  ) );
 }
 void CEvaluator::Acos()
 {
   double v = Pop();
-  Push( acos(  v  ));
+  Push( acos(  v  ) );
 }
 void CEvaluator::Atan()
 {
   double v = Pop();
-  Push( atan(  v  ));
+  Push( atan(  v  ) );
 }
 void CEvaluator::SinH()
 {
   double v = Pop();
-  Push( sinh(  v  ));
+  Push( sinh(  v  ) );
 }
 void CEvaluator::CosH()
 {
   double v = Pop();
-  Push( cosh(  v  ));
+  Push( cosh(  v  ) );
 }
 void CEvaluator::TanH()
 {
   double v = Pop();
-  Push( tanh(  v  ));
+  Push( tanh(  v  ) );
 }
 void CEvaluator::AsinH()
 {
   double v = Pop();
-  Push( log( v + sqrt( v * v + 1. ) ));
+  Push( log( v + sqrt( v * v + 1. ) ) );
 }
 void CEvaluator::AcosH()
 {
   double v = Pop();
-  Push( log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) ));
+  Push( log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) ) );
 }
 void CEvaluator::AtanH()
 {
   double v = Pop();
-  Push( 0.5 * log( ( 1 + v ) / ( 1 - v ) ));
+  Push( 0.5 * log( ( 1 + v ) / ( 1 - v ) ) );
 }
 void CEvaluator::Exp()
 {
   double v = Pop();
-  Push( exp(  v  ));
+  Push( exp(  v  ) );
 }
 void CEvaluator::Ln()
 {
   double v = Pop();
-  Push( log(  v  ));
+  Push( log(  v  ) );
 }
 void CEvaluator::Log()
 {
   double v = Pop();
-  Push( log10(  v  ));
+  Push( log10(  v  ) );
 }
 void CEvaluator::Sqrt()
 {
   double v = Pop();
-  Push( sqrt(  v  ));
+  Push( sqrt(  v  ) );
 }
 void CEvaluator::Floor()
 {
   double v = Pop();
-  Push( floor(  v  ));
+  Push( floor(  v  ) );
 }
 void CEvaluator::Ceil()
 {
   double v = Pop();
-  Push( ceil(  v  ));
+  Push( ceil(  v  ) );
 }
 void CEvaluator::Abs()
 {
   double v = Pop();
-  Push( fabs(  v  ));
+  Push( fabs(  v  ) );
 }
 
 void CEvaluator::Sqr()
 {
   double v = Pop();
-  Push( v * v);
+  Push( v * v );
 }
 void CEvaluator::Neg()
 {
   double v = Pop();
-  Push( -v);
+  Push( -v );
 }
 void CEvaluator::Inv()
 {
   double v = Pop();
-  Push( ( double )1. / v);
+  Push( ( double )1. / v );
 }
 void CEvaluator::Id()
 {
   double v = Pop();
-  Push( v);
+  Push( v );
 }
 void CEvaluator::Bool()
 {
   double v = Pop();
-  Push( ( double )( v == 0. ));
+  Push( ( double )( v == 0. ) );
 }
 void CEvaluator::LNot()
 {
   double v = Pop();
-  Push( ( double )( v != 0. ));
+  Push( ( double )( v != 0. ) );
 }
 void CEvaluator::Fact()
 {
@@ -273,7 +273,7 @@ void CEvaluator::Fact()
     a *= i;
   }
 
-  Push( ( double )a);
+  Push( ( double )a );
 }
 
 void CEvaluator::Not()
@@ -284,7 +284,7 @@ void CEvaluator::Not()
   /*x = frexp( v, &n ) * ( double )( 1 << 30 );
   m = ~( int )x;
   Push(ldexp( ( double )m, n - 30 );*/
-  Push(-v - 1);
+  Push( -v - 1 );
 }
 
 void CEvaluator::Square()
@@ -303,7 +303,7 @@ void CEvaluator::Square()
   {
     v = ( double ) - 0.5;
   }
-  Push(v);
+  Push( v );
 }
 
 /******* Binary *******/
@@ -311,21 +311,21 @@ void CEvaluator::Add()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(v1 + v2);
+  Push( v1 + v2 );
 }
 
 void CEvaluator::Sub()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(v1 - v2);
+  Push( v1 - v2 );
 }
 
 void CEvaluator::Mul()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(v1 * v2);
+  Push( v1 * v2 );
 }
 
 void CEvaluator::Div()
@@ -333,98 +333,98 @@ void CEvaluator::Div()
   double v2 = Pop();
   double v1 = Pop();
   /*ASSERT(v2!=0.);*/
-  Push(v1 / v2);
+  Push( v1 / v2 );
 }
 
 void CEvaluator::Lower()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 < v2 ));
+  Push( ( double )( v1 < v2 ) );
 }
 
 void CEvaluator::LowerOrEqual()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 <= v2 ));
+  Push( ( double )( v1 <= v2 ) );
 }
 
 void CEvaluator::Greater()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 > v2 ));
+  Push( ( double )( v1 > v2 ) );
 }
 
 void CEvaluator::GreaterOrEqual()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 >= v2 ));
+  Push( ( double )( v1 >= v2 ) );
 }
 
 void CEvaluator::Equal()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 == v2 ));
+  Push( ( double )( v1 == v2 ) );
 }
 
 void CEvaluator::NotEqual()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( double )( v1 != v2 ));
+  Push( ( double )( v1 != v2 ) );
 }
 
 void CEvaluator::Min()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( v1 < v2 ) ? v1 : v2);
+  Push( ( v1 < v2 ) ? v1 : v2 );
 }
 
 void CEvaluator::Max()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( v1 > v2 ) ? v1 : v2);
+  Push( ( v1 > v2 ) ? v1 : v2 );
 }
 
 void CEvaluator::LAnd()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( ( v1 != 0. ) && ( v2 != 0. ) ));
+  Push( ( ( v1 != 0. ) && ( v2 != 0. ) ) );
 }
 
 void CEvaluator::LOr()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( ( v1 != 0. ) || ( v2 != 0. ) ));
+  Push( ( ( v1 != 0. ) || ( v2 != 0. ) ) );
 }
 
 void CEvaluator::Pow()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(pow(  v1  ,  v2  ));
+  Push( pow(  v1  ,  v2  ) );
 }
 
 void CEvaluator::Par()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(( v1 * v2 ) / ( v1 + v2 ));
+  Push( ( v1 * v2 ) / ( v1 + v2 ) );
 }
 
 void CEvaluator::Mod()
 {
   double v2 = Pop();
   double v1 = Pop();
-  Push(fmod(  v1 ,  v2   ));
+  Push( fmod(  v1 ,  v2   ) );
 }
 
 void CEvaluator::And()
@@ -434,7 +434,7 @@ void CEvaluator::And()
   double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 & m2;
-  Push(ldexp( ( double )m1, n ));
+  Push( ldexp( ( double )m1, n ) );
 
 }
 
@@ -445,7 +445,7 @@ void CEvaluator::Or()
   double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 | m2;
-  Push(ldexp( ( double )m1, n ));
+  Push( ldexp( ( double )m1, n ) );
 
 }
 
@@ -456,7 +456,7 @@ void CEvaluator::Xor()
   double v1 = Pop();
   GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 ^ m2;
-  Push(ldexp( ( double )m1, n ));
+  Push( ldexp( ( double )m1, n ) );
 
 }
 
@@ -468,7 +468,7 @@ void CEvaluator::ShiftRight()
   double v1 = Pop();
   x = frexp(  v1 , &n );
   n -= ( int ) v2 ;
-  Push(ldexp( x, n ));
+  Push( ldexp( x, n ) );
 }
 
 void CEvaluator::ShiftLeft()
@@ -479,9 +479,23 @@ void CEvaluator::ShiftLeft()
   double v1 = Pop();
   x = frexp(  v1 , &n );
   n += ( int ) v2;
-  Push(ldexp( x, n ));
+  Push( ldexp( x, n ) );
 }
 
+void CEvaluator::If()
+{
+  double v1 = Pop();
+  double v2 = Pop();
+  double v3 = Pop();
+  if( v3 != 0 )
+  {
+    Push( v2 );
+  }
+  else
+  {
+    Push( v1 );
+  }
+}
 
 
 

@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -25,7 +25,7 @@
 CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 
-CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator *eval, bool bInitialize )
+CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
   m_Parent = parent;
   m_Name = name;
@@ -47,17 +47,16 @@ void CElementDataBase::Initialize()
   Clear();
   if( m_Parent == NULL )
   {
-    //CreateEvaluator();
     AddReservedElements();
-    AddOperandTable     ( CRules::m_Functions           );
+    AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
+    AddOperandTable     ( CRules::m_Functions           );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleString   );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleSystems  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleLogic    );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleVectors  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleTaylorSeries );
-    AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
   }
   else
   {
@@ -85,6 +84,7 @@ void CElementDataBase::AddReservedElements()
   GetElement( "j"      );//->SetOperandNb( 0 );
   GetElement( "RANK"   )->SetOperandNb( 2 );
   GetElement( "SUBST"  )->SetOperandNb( 2 );
+  GetElement( "ERROR_SIZE"  );//->SetOperandNb( 0 );
 
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
@@ -104,6 +104,7 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR_SIZE  ] ) == OP_ERROR_SIZE  );
 }
 
 void CElementDataBase::AddOperandTable( const char* operand_table )
@@ -125,9 +126,9 @@ void CElementDataBase::AddOperandTable( const char* operand_table )
       IC.TryFind( ',' );
     }
     e->SetOperandNb( operand_nb );
-
   }
 }
+
 
 void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 {
@@ -137,7 +138,6 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
   CElementDataBase db( "tmp2", this );
   CMathExpression equ( &db );
   CMathExpression dummy_equ( &db );
-  //CSymbolSyntaxArray tmp_syntax_array;
 
   CParser IC( symbol_table );
 
@@ -162,15 +162,15 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 
 #ifdef _DEBUG
     CDisplay ds;
-    ds += "Adding symbol syntax: ";
+    ds += "Adding symbol syntax #";
+    ds += CString( (int)(m_SymbolSyntaxArray.GetSize() - 1) );
+    ds += ": ";
     ds += sss->m_Syntax;
     ds += " => ";
     sss->m_Equation.Display( ds );
     TRACE( ds.GetBufferPtr() );
 #endif
   }
-
-  //m_SymbolSyntaxArray.Copy( tmp_syntax_array );
 
 }
 
@@ -190,17 +190,21 @@ void CElementDataBase::AddEvalFunctionTable( const SProperties* property_table, 
 {
   for( unsigned i = 0; i < size; i++ )
   {
-    AddEvalFunction( CString( property_table[i].m_FunctionName ), property_table[i].m_FunctionCall );
+    const SProperties& prop = property_table[i];
+    AddEvalFunction( CString( prop.m_FunctionName ), prop.m_ParameterNb, prop.m_FunctionCall );
   }
 }
 
-void CElementDataBase::AddEvalFunction( CString& name, CEvaluatorFunct funct )
+void CElementDataBase::AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct )
 {
-  unsigned pos;
   CElement* e;
-  e = SearchElement( name, pos );
-  e->SetNumeric();
-  GetEvaluator()->SetFunction( e->ToRef(), funct );
+  e = GetElement( name );
+  e->SetOperandNb( parameter_nb );
+  if( funct )
+  {
+    e->SetNumeric();
+    GetEvaluator()->SetFunction( e->ToRef(), funct );
+  }
 }
 
 OP_CODE CElementDataBase::ElementToRef( const CElement* e )
@@ -214,7 +218,7 @@ void CElementDataBase::Clear()
   if( m_Parent == NULL )
   {
     m_ElementRefArray.RemoveAll();
-    m_SymbolSyntaxArray.DeleteAll();   
+    m_SymbolSyntaxArray.DeleteAll();
   }
 }
 
@@ -246,7 +250,7 @@ CElement* CElementDataBase::GetElement()
   CElement*	e;
   CString		s;
 
-  n = GetSize();
+  n = m_ElementRefArray.GetSize();
   s = "_";
   s += CString( ( int )n );
   e = CreateElement( s, n );
@@ -388,7 +392,7 @@ unsigned CElementDataBase::Register( CElement* e, unsigned index )
   e->SetGlobal( m_Parent == NULL );
   m_ElementRefArray.Append( e );
 
-#if _DEBUG
+#ifdef _DEBUG
   CDisplay ds;
   ds += "Register #";
   ds += CString( e->ToRef() );

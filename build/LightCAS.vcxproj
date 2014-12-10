@@ -15,7 +15,7 @@
     <ClInclude Include="..\src\Display.h" />
     <ClInclude Include="..\src\Element.h" />
     <ClInclude Include="..\src\ElementDataBase.h" />
-    <ClInclude Include="..\src\Equation.h" />
+    <ClInclude Include="..\src\MathExpression.h" />
     <ClInclude Include="..\src\Evaluator.h" />
     <ClInclude Include="..\src\Function.h" />
     <ClInclude Include="..\src\Parser.h" />
@@ -28,10 +28,10 @@
     <ClCompile Include="..\src\Debug.cpp" />
     <ClCompile Include="..\src\Element.cpp" />
     <ClCompile Include="..\src\ElementDataBase.cpp" />
-    <ClCompile Include="..\src\Equation_core.cpp" />
-    <ClCompile Include="..\src\Equation_parser.cpp" />
-    <ClCompile Include="..\src\Equation_simplify.cpp" />
-    <ClCompile Include="..\src\Equation_transform.cpp" />
+    <ClCompile Include="..\src\MathExpression_parser.cpp" />
+    <ClCompile Include="..\src\MathExpression_core.cpp" />
+    <ClCompile Include="..\src\MathExpression_simplify.cpp" />
+    <ClCompile Include="..\src\MathExpression_transform.cpp" />
     <ClCompile Include="..\src\Evaluator.cpp" />
     <ClCompile Include="..\src\Function.cpp" />
     <ClCompile Include="..\src\Parser.cpp" />

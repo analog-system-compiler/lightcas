@@ -22,11 +22,6 @@
 #include "Element.h"
 #include "ElementDataBase.h"
 
-//ToDO
-//allow redefinition of function:f(x):=4*x;f(x):=2*x
-//add CLEAR()
-//add mul 2a
-
 #ifndef _WIN32
 #define COLOR_CYAN "\e[35;m"
 #define COLOR_BLUE "\e[36;m"
@@ -48,7 +43,9 @@ int main()
 {
 
   setlocale( LC_NUMERIC, "C" );
-  std::cout << "*** LighCAS example ***\n";
+  std::cout << "************************************\n";
+  std::cout << "*** LighCAS Console ("__DATE__")***\n";
+  std::cout << "************************************\n";
 
 #ifdef _WIN32
   CDisplay ds;

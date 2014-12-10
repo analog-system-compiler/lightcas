@@ -31,42 +31,20 @@ class CParserException
     };
 
   private:
-    unsigned  m_ErrorID;
+    unsigned m_ErrorID;
     unsigned m_LineNb;
-    CString m_ErrorStr;
+    CString  m_ErrorStr;
 
   public:
-    void SetErrorID( unsigned id )
-    {
-      m_ErrorID = id;
-    }
-    void SetLineNb( unsigned n )
-    {
-      m_LineNb = n;
-    }
-    void SetErrorString( const CString& s )
-    {
-      m_ErrorStr = s;
-    }
+    void SetErrorID( unsigned id )             { m_ErrorID = id;    }
+    void SetLineNb( unsigned n )               { m_LineNb = n;      }
+    void SetErrorString( const CString& s )    { m_ErrorStr = s;    }
 
-    unsigned GetLineNb() const
-    {
-      return m_LineNb;
-    }
-    const CString& GetErrorString() const
-    {
-      return m_ErrorStr;
-    }
-    unsigned GetErrorID() const
-    {
-      return m_ErrorID;
-    }
+    unsigned GetLineNb() const                 { return m_LineNb;   }
+    const CString& GetErrorString() const      { return m_ErrorStr; }
+    unsigned GetErrorID() const                { return m_ErrorID;  }
 
-    CParserException()
-    {
-      m_ErrorID = ID_OK;
-      m_LineNb = 0;
-    }
+    CParserException()                         { m_ErrorID = ID_OK; m_LineNb = 0;  }
 };
 
 
@@ -79,7 +57,7 @@ class CParser : public CString
     int		m_LineNb;
 
   public:
-    const char*			m_Pos;
+    const char*	m_Pos;
 
   protected:
     void	SkipComment();
@@ -87,57 +65,25 @@ class CParser : public CString
     void	SkipSpace();
 
   public:
-
     void	Error( unsigned id, const CString* str = NULL ) const;
-
     void	Find( char c );
     bool	TryFind( char c );
-
     void	Init( const char* pText );
-
-    bool TryMatchSymbol( const char *& symbol_str );
+    bool    TryMatchSymbol( const char *& symbol_str );
 
     const   CString& GetWord();
     char    GetChar();
 
-    bool	IsWord()
-    {
-      return IsWord( GetChar() );
-    }
-    bool	IsStopChar()
-    {
-      return IsStopChar( GetChar() );
-    }
-    bool    IsChar( char c )
-    {
-      return GetChar() == c;
-    }
+    bool	IsWord()                       { return IsWord( GetChar() );     }
+    bool	IsStopChar()                   { return IsStopChar( GetChar() ); }
+    bool    IsChar( char c )               { return GetChar() == c;          }
 
-    /* position */
-    const char* GetPos()	const
-    {
-      return m_Pos;
-    }
-    void	SetPos( const char* pText )
-    {
-      m_Pos = pText;
-    }
-    void	Next()
-    {
-      if( *m_Pos )
-      {
-        m_Pos++;
-      }
-    }
+    const char* GetPos() const             { return m_Pos;          }
+    void	SetPos( const char* pText )    { m_Pos = pText;         }
+    void	Next()                         { if( *m_Pos )  m_Pos++; }
 
-    static	bool	IsWord( char c )
-    {
-      return ( bool )( ( m_CharTab[( int )c] & 1 ) != 0 );
-    }
-    static	bool	IsStopChar( char c )
-    {
-      return ( bool )( ( m_CharTab[( int )c] & 2 ) != 0 );
-    }
+    static	bool	IsWord( char c )       { return ( m_CharTab[( int )c] & 1 ) != 0; }
+    static	bool	IsStopChar( char c )   { return ( m_CharTab[( int )c] & 2 ) != 0; }
 
     CParser();
     CParser( const char* pText );

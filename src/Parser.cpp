@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The LightCAS project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -74,27 +74,29 @@ const CString& CParser::GetWord()
 
 void CParser::Find( char c )
 {
-  std::stringstream str_stream;
+  CString error_str;
 
   if( GetChar() != c )
   {
 
     if( eof( *m_Pos ) )
     {
-      str_stream << "end of file was found instead of \'" << c << '\'';
+      error_str = "end of file";
     }
-
     else if( eol( *m_Pos ) )
     {
-      str_stream << "end of line was found instead of \'" << c << '\'';
+      error_str = "end of line";
     }
-
     else
     {
-      str_stream << "character \'" << *m_Pos << "\' was found instead of \'" << c << '\'';
+      error_str = "character \'";
+      error_str += *m_Pos;
+      error_str += '\'';
     }
 
-    CString error_str( str_stream.str() );
+    error_str += " was found instead of \'";
+    error_str += c;
+    error_str += '\'';
     Error( CParserException::ID_SYNTAX_ERROR, &error_str );
 
   }
@@ -109,11 +111,9 @@ void CParser::SkipSpaceNL()
 
   while( eol( *m_Pos ) )
   {
-
     m_LineNb++;
     m_Pos++;
     SkipSpace();
-
   }
 }
 
@@ -140,36 +140,29 @@ void CParser::Init( const char* pText )
 
 bool CParser::TryFind( char c )
 {
-
   if( GetChar() == c )
   {
 
     Next();
     return true;
   }
-
   return false;
-
 }
 
 void CParser::SkipComment()
 {
   char c;
+
   if( m_Pos[0] == '/' )
   {
-
     c = m_Pos[1];
     if( c == '/' || c == '*' )
     {
-
       m_Pos += 2;
-
       while( !eof( *m_Pos ) )
       {
-
         if( eol( *m_Pos ) )
         {
-          
           m_LineNb++;
           if( c == '/' )
           {
@@ -180,12 +173,10 @@ void CParser::SkipComment()
         }
         else if( c == '*' && ( m_Pos[0] == '*' ) && ( m_Pos[1] == '/' ) )
         {
-
           m_Pos += 2;
           SkipSpace();
           return;
         }
-
         m_Pos++;
       }
     }

@@ -24,17 +24,18 @@
 
 CMathExpression::CMathExpression( CElementDataBase* db )
 {
-  m_StackArray = NULL;
-  m_AllocSize = 0;
-  Initialize( db );
+  m_StackArray   = NULL;
+  m_AllocSize    = 0;
+  m_StackSize    = 0;
+  m_ElementDB    = db;
 }
 
 // Copy Constructor
 CMathExpression::CMathExpression( const CMathExpression& equ )
 {
-  m_StackArray = NULL;
-  m_AllocSize = 0;
-  Initialize( equ.m_ElementDB );
+  m_StackArray   = NULL;
+  m_AllocSize    = 0;
+  m_StackSize    = 0;
   Copy( equ );
 }
 
@@ -68,17 +69,15 @@ void CMathExpression::Append( const OP_CODE* src, unsigned size )
 {
   if( size != 0 )
   {
+    unsigned old_size = m_StackSize;
     SetSize( m_StackSize + size );
-    memcpy( &m_StackArray[m_OldStackSize], src, size * sizeof( OP_CODE ) );
+    memcpy( &m_StackArray[old_size], src, size * sizeof( OP_CODE ) );
   }
 }
 
 void CMathExpression::SetSize( unsigned i )
 {
-
-  m_OldStackSize = m_StackSize;
   m_StackSize = i;
-
   if( i > m_AllocSize )
   {
     m_AllocSize = i + 16;
@@ -110,6 +109,7 @@ void CMathExpression::Copy( const CMathExpression& equ )
 void CMathExpression::PushBranch( const CMathExpression& equ, unsigned& pos )
 {
   unsigned pos1 = pos;
+  ASSERT( pos );
   equ.NextBranch( pos );
   Append( &equ.m_StackArray[pos] , pos1 - pos );
 }
@@ -124,22 +124,11 @@ void CMathExpression::NextBranch( unsigned& pos ) const
 
   while( pos && i )
   {
-
     op = Pop( pos );
     e = RefToElement( op );
-    if( e && e->IsFunct()  )
-    {
-      i += e->GetFunction()->GetParameterNb();
-    }
+    i += e->GetFunction()->GetParameterNb();
     i--;
   }
-}
-
-void CMathExpression::CopyBranch( const CMathExpression& equ, unsigned& pos )
-{
-  Clear();
-  PushBranch( equ, pos );
-  RemoveZero();
 }
 
 void CMathExpression::Push( const CValue& v )
@@ -165,11 +154,6 @@ void CMathExpression::InitPositionTable( unsigned pos_array[] )
     memset( pos_array, 0, CElementDataBase::MAX_EXP*sizeof(unsigned) ) ;
 }
 
-unsigned CMathExpression::ReservedParameterIndex( OP_CODE op )
-{
-  return op - CElementDataBase::OP_EXP1;
-}
-
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 {
   ASSERT( RefToElement( op )->IsBinary() );
@@ -184,7 +168,6 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 
 void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
 {
-
   ASSERT( e1 );
   ASSERT( RefToElement( op )->IsBinary() );
 
@@ -193,7 +176,6 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
   Push( op );
   OptimizeTree();
   RemoveZero();
-
 }
 
 void CMathExpression::UnaryOperation( OP_CODE op )

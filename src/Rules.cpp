@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -20,60 +20,65 @@
 
 const SProperties CRules::m_FunctionProperties[] =
 {
-  { "ADD",   &CEvaluator::Add           },
-  { "SUB",   &CEvaluator::Sub           },
-  { "OR",    &CEvaluator::Or            },
-  { "LOR",   &CEvaluator::LOr           },
-  { "XOR",   &CEvaluator::Xor           },
-  { "MUL",   &CEvaluator::Mul           },
-  { "PAR",   &CEvaluator::Par           },
-  { "DIV",   &CEvaluator::Div           },
-  { "AND",   &CEvaluator::And           },
-  { "LAND",  &CEvaluator::LAnd          },
-  { "EQ",    &CEvaluator::Equal         },
-  { "NEQ",   &CEvaluator::NotEqual      },
-  { "LTE",   &CEvaluator::LowerOrEqual  },
-  { "SHL",   &CEvaluator::ShiftLeft     },
-  { "LT",    &CEvaluator::Lower         },
-  { "GTE",   &CEvaluator::GreaterOrEqual},
-  { "SHR",   &CEvaluator::ShiftRight    },
-  { "GT",    &CEvaluator::Greater       },
-  { "MIN",   &CEvaluator::Min           },
-  { "MAX",   &CEvaluator::Max           },
-  { "MOD",   &CEvaluator::Mod           },
-  { "POW",   &CEvaluator::Pow           },
-  { "NEG",   &CEvaluator::Neg           },
-  { "INV",   &CEvaluator::Inv           },
-  { "NOT",   &CEvaluator::Not           },
-  { "ID",    &CEvaluator::Id            },
-  { "BOOL",  &CEvaluator::Bool          },
-  { "LNOT",  &CEvaluator::LNot          },
-  { "SIN",   &CEvaluator::Sin           },
-  { "COS",   &CEvaluator::Cos           },
-  { "TAN",   &CEvaluator::Tan           },
-  { "ASIN",  &CEvaluator::Asin          },
-  { "ACOS",  &CEvaluator::Acos          },
-  { "ATAN",  &CEvaluator::Atan          },
-  { "SINH",  &CEvaluator::SinH          },
-  { "COSH",  &CEvaluator::CosH          },
-  { "TANH",  &CEvaluator::TanH          },
-  { "ASINH", &CEvaluator::AsinH         },
-  { "ACOSH", &CEvaluator::AcosH         },
-  { "ATANH", &CEvaluator::AtanH         },
-  { "EXP",   &CEvaluator::Exp           },
-  { "LOG",   &CEvaluator::Ln            },
-  { "LOG10", &CEvaluator::Log           },
-  { "SQRT",  &CEvaluator::Sqrt          },
-  { "SQR",   &CEvaluator::Sqr           },
-  { "FACT",  &CEvaluator::Fact          },
-  { "ABS",   &CEvaluator::Abs           },
-  { "FLOOR", &CEvaluator::Floor         },
-  { "CEIL",  &CEvaluator::Ceil          },
-  { "SQUARE",&CEvaluator::Square        },
-  { "RAND",  &CEvaluator::Rand          }
-
+  { "ADD",   2, &CEvaluator::Add           },
+  { "SUB",   2, &CEvaluator::Sub           },
+  { "OR",    2, &CEvaluator::Or            },
+  { "LOR",   2, &CEvaluator::LOr           },
+  { "XOR",   2, &CEvaluator::Xor           },
+  { "MUL",   2, &CEvaluator::Mul           },
+  { "DIV",   2, &CEvaluator::Div           },
+  { "AND",   2, &CEvaluator::And           },
+  { "LAND",  2, &CEvaluator::LAnd          },
+  { "EQ",    2, &CEvaluator::Equal         },
+  { "NEQ",   2, &CEvaluator::NotEqual      },
+  { "LTE",   2, &CEvaluator::LowerOrEqual  },
+  { "SHL",   2, &CEvaluator::ShiftLeft     },
+  { "LT",    2, &CEvaluator::Lower         },
+  { "GTE",   2, &CEvaluator::GreaterOrEqual},
+  { "SHR",   2, &CEvaluator::ShiftRight    },
+  { "GT",    2, &CEvaluator::Greater       },
+  { "MIN",   2, &CEvaluator::Min           },
+  { "MAX",   2, &CEvaluator::Max           },
+  { "MOD",   2, &CEvaluator::Mod           },
+  { "POW",   2, &CEvaluator::Pow           },
+  { "NEG",   1, &CEvaluator::Neg           },
+  { "INV",   1, &CEvaluator::Inv           },
+  { "NOT",   1, &CEvaluator::Not           },
+  { "ID",    1, &CEvaluator::Id            },
+  { "BOOL",  1, &CEvaluator::Bool          },
+  { "LNOT",  1, &CEvaluator::LNot          },
+  { "SIN",   1, &CEvaluator::Sin           },
+  { "COS",   1, &CEvaluator::Cos           },
+  { "TAN",   1, &CEvaluator::Tan           },
+  { "ASIN",  1, &CEvaluator::Asin          },
+  { "ACOS",  1, &CEvaluator::Acos          },
+  { "ATAN",  1, &CEvaluator::Atan          },
+  { "SINH",  1, &CEvaluator::SinH          },
+  { "COSH",  1, &CEvaluator::CosH          },
+  { "TANH",  1, &CEvaluator::TanH          },
+  { "ASINH", 1, &CEvaluator::AsinH         },
+  { "ACOSH", 1, &CEvaluator::AcosH         },
+  { "ATANH", 1, &CEvaluator::AtanH         },
+  { "EXP",   1, &CEvaluator::Exp           },
+  { "LOG",   1, &CEvaluator::Ln            },
+  { "LOG10", 1, &CEvaluator::Log           },
+  { "SQRT",  1, &CEvaluator::Sqrt          },
+  { "SQR",   1, &CEvaluator::Sqr           },
+  { "FACT",  1, &CEvaluator::Fact          },
+  { "ABS",   1, &CEvaluator::Abs           },
+  { "FLOOR", 1, &CEvaluator::Floor         },
+  { "CEIL",  1, &CEvaluator::Ceil          },
+  { "SQUARE",1, &CEvaluator::Square        },
+  { "RAND",  0, &CEvaluator::Rand          },
+  { "IF2",   2, &CEvaluator::If            },
+  { "IF",    2, &CEvaluator::If            },
+  { "CONCAT",2, &CEvaluator::Concat        },
+  { "SET",   2, NULL                       },
+  { "AT",    2, NULL                       },
+  { "VECT",  1, NULL                       }
 
 };
+
 const unsigned CRules::m_FunctionPropertiesSize = sizeof( CRules::m_FunctionProperties ) / sizeof( SProperties );
 
 const char CRules::m_Functions[] =
@@ -107,7 +112,7 @@ const char CRules::m_Functions[] =
   "MOD(a,b)"
   "TED(a,b)"
   "POLY(a,b)"
-  "POLY2(a,b)"
+  "POLY_POW(a,b)"
   "IPOLY(a,b)"
   "IPOLY2(a,b)"
   "IPOLY3(a,b)"
@@ -181,7 +186,7 @@ const char CRules::m_Functions[] =
 
    //void
   "RAND()"
-  
+
 };
 
 const char CRules::m_FunctionSymbol[] = // precedence is defined here
@@ -220,11 +225,11 @@ const char CRules::m_FunctionSymbol[] = // precedence is defined here
 
 const char CRules::m_AlgebraRuleString[] =
 
-  "(TED(a,b) / c ) + ( TED(e,f) / c )                  := ( TED(a,b) + TED(e,f) ) / c;"
-  "(TED(a,b) / c ) - ( TED(e,f) / c )                  := ( TED(a,b) - TED(e,f) ) / c;"
+    "(TED(a,b) / c ) + ( TED(e,f) / c )              := ( TED(a,b) + TED(e,f) ) / c;"
+    "(TED(a,b) / c ) - ( TED(e,f) / c )              := ( TED(a,b) - TED(e,f) ) / c;"
 
-  "(TED(a,b) / TED(c,d)) + (TED(e,f) / TED(g,h))       := ( TED(a,b) * TED(g,h) + TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
-  "(TED(a,b) / TED(c,d)) - (TED(e,f) / TED(g,h))       := ( TED(a,b) * TED(g,h) - TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
+    "(TED(a,b) / TED(c,d)) + (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(g,h) + TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
+    "(TED(a,b) / TED(c,d)) - (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(g,h) - TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
 
   "(TED(a,b) / TED(c,d)) * (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(e,f) ) / ( TED(c,d) * TED(g,h) );"
   "(TED(a,b) / TED(c,d)) / (TED(g,h) / TED(e,f))   := ( TED(a,b) * TED(e,f) ) / ( TED(c,d) * TED(g,h) );"
@@ -235,7 +240,7 @@ const char CRules::m_AlgebraRuleString[] =
   "TED( TED(a,b),0)    / TED(c,0)                  := TED(a,b)   / TED(0,c);"
   "TED( a,0)           / TED(b,0)                  := TED(0,a/b) / TED(0,1);"
 
-  // euclidian division
+  // Euclidian division
   //"(TED(a,b) / TED(0,1)) + (TED(0,f) / TED(g,h))       := NONE;"
   //"TED( TED(a,b),c )   / TED( d, e )               := TED(a/d,a/d*(b/a-e/d)) / TED(0,1) + TED( 0, c-e*a/d*(b/a-e/d)) / TED(d, e) ;"
   
@@ -266,7 +271,7 @@ const char CRules::m_AlgebraRuleString[] =
   "(TED(a,b)/TED(c,d))^1         := TED(a,b)/TED(c,d);"
   "(TED(a,b)/TED(c,d))^-CONST(e) := (TED(c,d)/TED(a,b))^e;"
   "(TED(a,b)/TED(c,d))^CONST(e)  := (TED(a,b)/TED(c,d)) * (TED(a,b)/TED(c,d))^(e-1);"
-
+  //"(TED(a,b)/TED(c,d))^e         := TED(0,IPOLY(TED(a,b)/TED(c,d))^e)/TED(0,1);"
   /* "c+TED(a,b)   := TED(a,b+c);"
    "c-TED(a,b)   := TED(-a,c-b);"
    "c*TED(a,b)   := TED(a*c,b*c);"
@@ -281,14 +286,12 @@ const char CRules::m_AlgebraRuleString[] =
   "POLY(a-b,v)    := POLY(a,v)-POLY(b,v);"
   "POLY(a*b,v)    := POLY(a,v)*POLY(b,v);"
   "POLY(a/b,v)    := POLY(a,v)/POLY(b,v);"
-  "POLY(a^b,v)           := POLY2(a^SIMPLIFY(b),v);"
+  "POLY(a^b,v)    := POLY_POW(a^SIMPLIFY(b),v);"
 
-  "POLY2(a^CONST(b),v)   := POLY(a,v)^b;"
-  "POLY2(a^-CONST(b),v)  := POLY(a,v)^-b;"
-  "POLY2(a^b,v)          := TED(0,a^b)/TED(0,1);"
-  "POLY2(a,v)            := POLY(a,v);"
-
-  //"POLY(a!,v)     := POLY(a,v)!;"
+  "POLY_POW(a^CONST(b),v)   := POLY(a,v)^b;"
+  "POLY_POW(a^-CONST(b),v)  := POLY(a,v)^-b;"
+  "POLY_POW(a^b,v)          := TED(0,SIMPLIFY(a)^b)/TED(0,1);"
+  "POLY_POW(a,v)            := POLY(a,v);"
 
   "POLY(COS(a),v)      := TED(0,COS( SIMPLIFY(a)))/TED(0,1);"
   "POLY(SIN(a),v)      := TED(0,SIN( SIMPLIFY(a)))/TED(0,1);"
@@ -308,6 +311,8 @@ const char CRules::m_AlgebraRuleString[] =
   //"SOLVE2(a,b,v)                      := SOLVE2(a,v),SOLVE2(b,v);"
   "SOLVE(a,v)                         := SOLVE2(POLY(a,v),v);"
   //"SOLVE(a)                           := SOLVE(a,GETVAR(a));"
+
+  "CONCAT(CONST(a),CONST(b)) := NONE;" // no simplification for concatenation op
 
   "--a          := a  ;"
   "-0           := 0  ;"
@@ -417,7 +422,7 @@ const char CRules::m_AlgebraRuleString[] =
   "IF2(1,(a,b)) := a;"
   "IF(c,(a,b))  := IF2(BOOL(c),(a,b));"
 
-  "IPOLY(a,b,v)                           := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
+  "IPOLY((a,b),v)                         := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
   "IPOLY({a},v)                           := {IPOLY(a,v)};"
   "IPOLY(TED(a,b)/TED(c,d),e)             := IPOLY(TED(a,b),e) / IPOLY(TED(c,d),e);" //TODO:IPOLY(a/c,p)
   "IPOLY(TED(TED(TED(TED(a,b),c),d),e),j) := SIMPLIFY(e-c+j*(d-b)+IPOLY(a,j));"
@@ -458,7 +463,6 @@ const char CRules::m_AlgebraRuleString[] =
   "GETVAR(a/b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a^b)                         := GETVAR(a);"
   "GETVAR(-a)                          := GETVAR(a);"
-  "GETVAR(CONST(a))                    := 1;"
   "GETVAR(ELEM(a))                     := a;"
   "GETVAR(a)                           := 1;"
 

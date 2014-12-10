@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -17,6 +17,7 @@
 /*******************************************************************************/
 
 #pragma once
+
 #include "MathExpression.h"
 
 class CAlgebraRule
@@ -29,12 +30,11 @@ public:
 
     CAlgebraRule(const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
 	{
-		m_LineNo = 0;
+		m_LineNo = line_no;
         m_bHasRule = ( dst.GetLastOperator() != CElementDataBase::OP_NONE ); //no rule
         m_SrcEquation.Copy( src );
         m_DstEquation.Copy( dst );
-        CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );
-        m_LineNo = line_no;
+        CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );        
 	}
 };
 
@@ -54,8 +54,8 @@ public:
   
   void Clear();
   void AddAlgebraRule( const CMathExpression & src, const CMathExpression & dst, unsigned line_no );
-  unsigned GetParameterNb() const { return m_ParameterNb; }
   void SetParameterNb( unsigned parameter_nb ) { m_ParameterNb=parameter_nb; }
+  unsigned GetParameterNb() const { return m_ParameterNb; }
   const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }
 
   CFunction();

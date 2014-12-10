@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The LightCAS project                                      */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -32,23 +32,38 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   CMathExpression equ( this );
   TRACE( "** Check %s == %s", s1, s2 );
   try
-  {
-    do equ.GetFromString( IC );
-    while( IC.TryFind( ';' ) );
+  {    
+    equ.GetFromString( IC );   
     equ.OptimizeTree();
     equ.Display( ds );
     if( ds != s2 )
     {
       ASSERT( false );
-      printf( "Test failed: %s => %s != %s\n", s1, ds.GetBufferPtr(), s2 );
+      printf( "FAIL: %s => %s != %s\n", s1, ds.GetBufferPtr(), s2 );
+      return;
     }
   }
   catch( ... )
   {
     ASSERT( false );
-    printf( "Test exception: %s => %s\n", s1, s2 );
+    printf( "FAIL: Test exception: %s => %s\n", s1, s2 );
     return;
   }
+  printf( "OK: %s => %s\n", s1, s2 );
+}
+
+void CElementDataBase::Check( const char* s1, const CValue& v1 )
+{
+  CMathExpression equ( this );
+  equ.GetFromString( s1 );
+  CValue v2 = equ.Evaluate();
+  if( v2.GetValue() != v1.GetValue() )
+  {
+    ASSERT( false );
+    printf( "FAIL: %s => %g != %g\n", s1, v2.GetValue(), v1.GetValue() );
+    return;
+  }
+  printf( "OK: %s => %g\n", s1, v1.GetValue() );
 }
 
 void CElementDataBase::CheckCatch( const char* s1 )
@@ -70,10 +85,13 @@ void CElementDataBase::CheckCatch( const char* s1 )
 }
 
 void CElementDataBase::Test()
-{//return;
+{
+
+  printf( "Running tests...\n" );
+
   /***** Syntax checking ****/
-  ///CheckCatch( "a b" );
-  ///CheckCatch( "a.b" );
+  //CheckCatch( "a b" );
+  //CheckCatch( "a.b" );
 
   /***** Some basic tests *****/
   Check( "SIMPLIFY(0)", "0" );
@@ -123,17 +141,17 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(j*j+1)", "0" );
   Check( "SIMPLIFY(1/j+j)", "0" );
   Check( "SIMPLIFY(1+j+j^2+j^3)", "0" );
-  Check( "SIMPLIFY(1+j+j^2+j^7)", "0" );
+  Check( "SIMPLIFY(1+2*j+j^2+j^7)", "j" );
 
   //Check("SIMPLIFY(2/(1+j))","(1-j)"); TODO : do not fix that
   Check( "SIMPLIFY(2/(1+j)-(1-j))", "0" );
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
-  Check("SQRT(-25)","j*5");
-  Check("SIMPLIFY(SQRT(-25)^2+25)","0");
+  Check( "SQRT(-25)", "j*5" );
+  Check( "SIMPLIFY(SQRT(-25)^2+25)", "0" );
 
-  Check( "SIMPLIFY(RE(1+j))", "1" );
-  Check( "SIMPLIFY(-IM(1-j))", "1" );
+  Check( "SIMPLIFY(RE(4+j))", "4" );
+  Check( "SIMPLIFY(-IM(1-5*j))", "5" );
 
   /******* In function reduction ******/
   Check( "SIMPLIFY((a+a)*COS(a+a))", "2*COS(2*a)*a" );
@@ -157,15 +175,15 @@ void CElementDataBase::Test()
   Check( "{0,1,2}+{1,2,3}", "{1,3,5}" );
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
-  Check( "SIMPLIFY({-2,2})","{-2,2}" );
-  
+  Check( "SIMPLIFY({-2,2})", "{-2,2}" );
+
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
   Check( "SIMPLIFY(1 ? a : b)", "a" );
   Check( "SIMPLIFY(5 ? a : b)", "a" );
   Check( "SIMPLIFY(2>3 ? a : b)", "b" );
   Check( "SIMPLIFY(a<=a ? b : c)", "b" );
-  
+
   /****** logic *********/
   Check( "SIMPLIFY(a|0)", "a" );
   Check( "SIMPLIFY(a|~0)", "-1" );
@@ -177,7 +195,7 @@ void CElementDataBase::Test()
   /********** transform **********/
   Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
-  /*********** affectation ***/
+  /*********** assignment ***/
   CMathExpression equ0( this );
   equ0.GetFromString( "a+b" );
   GetElement( "y" )->SetEquation( equ0 );
@@ -199,6 +217,8 @@ void CElementDataBase::Test()
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );
+  Check( "TAYLOR(COS(x),x,0,3)", "1-x^2/2" );
+  Check( "TAYLOR(EXP(x),x,0,5)", "1+x+x^2/2+x^3/6+x^4/24+x^5/120" );
 
   /****** fonction *********/
   Initialize();
@@ -209,14 +229,29 @@ void CElementDataBase::Test()
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/
-  db.Initialize();
-  db.GetEvaluator()->SetElementValue(db.GetElement("a")->ToRef(),CValue(4));
-  db.GetEvaluator()->SetElementValue(db.GetElement("b")->ToRef(),CValue(8));
-  db.GetEvaluator()->SetElementValue(db.GetElement("c")->ToRef(),CValue(9));
-  CMathExpression equ(&db);
-  equ.GetFromString("a+b-c+2");
-  ASSERT( equ.Evaluate() == CValue(5) );
+  Initialize();
+  SetValue( GetElement( "a" ), CValue( 4 ) );
+  SetValue( GetElement( "b" ), CValue( 8 ) );
+  SetValue( GetElement( "c" ), CValue( 9 ) );
+
+  Check( "a+b-c+2", CValue( 5 ) );
+  Check( "a>b?2:3", CValue( 3 ) );
+
 }
 
 #endif
 
+//TODO :
+//- add binary alias
+//- remove binary declaration
+//- m_Type (ELEM_VAR/FUNCT/CONST). Only IsConst is used. Use m_Numeric but with Eval:m_Function=NULL.
+//- CONST : m_Parameter==0 && m_Numeric && m_Function==NULL;
+//- ELEM: m_Parameter==0 (=IsVoid()) && !Numeric(=rand)
+//- NUMFUNCT: m_Parameter!=0 && m_Numeric
+//OK use static CEquation for temporary buffer
+//OK compil linux
+//add CLEAR()
+//add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
+//add mul 2a
+//enlever TODOS
+//résoudre pbm x^a

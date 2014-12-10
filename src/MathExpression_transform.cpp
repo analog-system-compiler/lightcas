@@ -25,24 +25,22 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   unsigned i;
   unsigned pos;
   OP_CODE  elem_array[CElementDataBase::MAX_EXP];
-  unsigned index=0;
+  unsigned index = 0;
 
-  //RefToElement( CElementDataBase::OP_CPLX )->Lock();
-
-  for( pos = 0; pos < src.GetSize();  pos ++ )
+  for( pos = 0; pos < src.GetSize();  pos++ )
   {
     op = src.Get( pos );
     if( RefToElement( op )->IsVar() && !RefToElement( op )->IsGlobal() && !RefToElement( op )->IsLocked() )
     {
-      for( i = 0; (i < index) && (i < CElementDataBase::MAX_EXP); i++ )
+      for( i = 0; ( i < index ) && ( i < CElementDataBase::MAX_EXP ); i++ )
       {
         if( elem_array[i] == op )
         {
           break;
-        }        
+        }
       }
       ASSERT( i < CElementDataBase::MAX_EXP );
-      if(i==index)
+      if( i == index )
       {
         elem_array[index++] = op;
       }
@@ -50,8 +48,6 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
       dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
     }
   }
-
-  //RefToElement( CElementDataBase::OP_CPLX )->Unlock();
 }
 
 void CMathExpression::Replace( OP_CODE op1, OP_CODE op2 )

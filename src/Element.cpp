@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLigh project                                     */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -28,12 +28,6 @@ CElement::CElement( const CString& name )
   m_Type = ELEM_VAR;
   CommonInit();
 }
-/*
-CElement::CElement( const CValue& val )
-{
-  SetConstValue( val );
-  CommonInit();
-}*/
 
 CElement::~CElement()
 {
@@ -44,9 +38,9 @@ void CElement::CommonInit()
 {
   m_bLock     = false;
   m_bAux      = false;
-  m_Ref       = 0;
   m_Global    = false;
   m_Numeric   = false;
+  m_Ref       = 0;
 }
 
 void CElement::Display( CDisplay& ds ) const
@@ -62,7 +56,6 @@ void CElement::Display( CDisplay& ds ) const
     else
     {
       ASSERT( false );
-      //m_Value.Display( ds );
     }
   }
   else if( m_PseudoName.GetLength() )

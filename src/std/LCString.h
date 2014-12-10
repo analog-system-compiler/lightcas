@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                     */
+/*  Copyright (C) 2014 The LightCAS project                                    */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -17,6 +17,7 @@
 /*******************************************************************************/
 
 #pragma once
+
 #include <string>
 #include <algorithm>
 #include <cstdio>
@@ -36,7 +37,7 @@ class CString: public std::string
     void Prepend( const CString& s )                 { insert( 0, s ); }
     void Append( const CString& s )                  { append( s ); }
     int Compare(  const CString& s ) const           { return compare(s); }
-    CString Right( unsigned n ) const                { CString s; n>length()? s.Copy(*this): s.append( *this, length()-n, n ); return s;  }
+    CString Right( unsigned n ) const                { CString s; (n>length())? s.assign(*this): s.append( *this, length()-n, n ); return s;  }
     size_t Search( char c ) const                    { return find(c); }
     void SetLength( size_t n )                       { resize( n ); }
     operator const char * () const                   { return GetBufferPtr();  }
@@ -54,8 +55,7 @@ class CString: public std::string
     
     //Constructors
     CString(const char*s):std::string(s)             {}
-    //CString(const CString &s):std::string(s)         {} //implicit
-    CString(const std::string &s):std::string(s)         {} //implicit
+    CString(const std::string &s):std::string(s)     {} //implicit
     CString():std::string()                          {}
     CString(int i, unsigned base=10)    { Set(i,base); }
     CString(double v)                    { Set(v); }

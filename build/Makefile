@@ -1,13 +1,12 @@
 
-TOP_DIR         = ../src
+SRC_DIR         = ../src
 CXX             = $(CROSS_COMPILE)g++
-SRCDIRS         = $(shell (find  $(TOP_DIR) -type d \( -name CVS -o -name build \) -prune -o -type d ))
-SRCS_W_DIRS     = $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.cpp))
-SRCS            = $(notdir $(SRCS_W_DIRS))
+SRCS            = $(notdir $(wildcard $(SRC_DIR)/*.cpp))
 OBJDIR          = $(shell mkdir -p ./objs) ./objs
+INCDIR          = $(SRC_DIR)/std 
 EXE             = LightCAS
 
-vpath %.cpp    ${SRCDIRS}
+vpath %.cpp    $(SRC_DIR)
 vpath %.o      $(OBJDIR)
 LIB_OBJS       = $(SRCS:%.cpp=${OBJDIR}/%.o)
 
@@ -16,14 +15,14 @@ LIB_OBJS       = $(SRCS:%.cpp=${OBJDIR}/%.o)
 DEBUG_FLAGS = -g -D_DEBUG
 GPROF_FLAGS = -pg
 
-BUILD_CFLAGS  = $(CFLAGS) -MD -Wall
+BUILD_CFLAGS  = $(CFLAGS) -MD -Wall -I$(INCDIR)
 BUILD_CFLAGS += $(GPROF_FLAGS)
 BUILD_CFLAGS += $(DEBUG_FLAGS)
 
 all: $(EXE)
 
 $(EXE):$(LIB_OBJS)
-	@echo  [Linking   ... $(notdir $@)]
+	@echo  [Linking ... $(notdir $@)]
 	$(CXX) -o $@  $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) ${LIB_OBJS}
 
 $(OBJDIR)/%.o: %.cpp

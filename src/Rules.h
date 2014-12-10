@@ -17,12 +17,14 @@
 /*******************************************************************************/
 
 #pragma once
+
 #include "Evaluator.h"
 
 struct SProperties
 {
   const char*	  m_FunctionName;
-  CEvaluatorFunct m_FunctionCall;
+  unsigned        m_ParameterNb;
+  CEvaluatorFunct m_FunctionCall;  
 };
 
 class CRules

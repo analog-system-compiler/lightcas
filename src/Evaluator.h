@@ -49,10 +49,10 @@ class CEvaluator
 
   protected:
     virtual void AllocateStack( unsigned size );
-    void Evaluate( unsigned index );
+    void         Evaluate( unsigned index );
     const CValue& GetValue();    
-    double Pop()  { return m_ValueStack[ --m_ValPos ]; }
-    void Push(double v) { m_ValueStack[ m_ValPos++ ]=v; }
+    double       Pop()           { return m_ValueStack[ --m_ValPos ]; }
+    void         Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
 
   public:
     void VectorStart();
@@ -110,6 +110,8 @@ class CEvaluator
     void Xor();
     void ShiftRight();
     void ShiftLeft();
+    void If();
+    void Concat() {}
     const CValue& Evaluate( unsigned size, const OP_CODE *p );
 
   public:

@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The CASLight project                                     */
+/*  Copyright (C) 2014 The LightCAS project                                     */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -36,15 +36,15 @@ class CElement
       ELEM_FUNCT
     };
 
-    CString   m_Name;
-    CString   m_PseudoName;
-    CFunction m_Function;
-    bool      m_Global;
-    bool      m_Numeric;
-    bool	    m_bLock;				    // for recursivity    
+    CString     m_Name;
+    CString     m_PseudoName;
+    CFunction   m_Function;
     ELEM_TYPE	m_Type;
-    bool		  m_bAux;
-    unsigned  m_Ref;
+    bool        m_Global;
+    bool        m_Numeric;
+    bool	    m_bLock;				    // for recursivity    
+    bool		m_bAux;
+    unsigned    m_Ref;
     
   private:
 
@@ -61,18 +61,18 @@ class CElement
 
     // *INDENT-OFF* 
     const CString&	GetName() const             { return m_Name;                   }    
-    void SetPseudoName( const CString& s )      { m_PseudoName = s;                }   
-    void SetOperandNb( unsigned operand_nb )    { m_Type = ELEM_FUNCT;  ASSERT(m_Function.GetParameterNb()==0||m_Function.GetParameterNb()==operand_nb);   m_Function.SetParameterNb( operand_nb );    }
-    void SetNumeric()                           { m_Numeric = true;                }
+    void SetPseudoName( const CString& s )      { m_PseudoName = s;                }       
     void SetFunct()                             { m_Type = ELEM_FUNCT;             }
     void SetVar()                               { m_Type = ELEM_VAR;               }
     void SetConst()                             { m_Type = ELEM_CONST;             }
+    void SetOperandNb( unsigned operand_nb )    { SetFunct(); ASSERT(m_Function.GetParameterNb()==0||m_Function.GetParameterNb()==operand_nb);   m_Function.SetParameterNb( operand_nb );    }
+    void SetNumeric()                           { m_Numeric = true;                }
     void SetGlobal( bool global )               { m_Global=global;                 }
     void SetTemporary(bool bAux=true)           { m_bAux=bAux;                     }
     void SetRef( OP_CODE op )                   { m_Ref = op;                      }
     bool IsVar()     const                      { return ( m_Type == ELEM_VAR);    }
     bool IsConst()	 const                      { return ( m_Type == ELEM_CONST);  }
-    bool IsFunct()   const                      { return ( m_Type == ELEM_FUNCT ); }
+    //bool IsFunct()   const                      { return ( m_Type == ELEM_FUNCT);  }
     bool IsNumeric() const                      { return m_Numeric;                }
     bool IsAux()	 const                      { return m_bAux;                   }
     bool IsLocked()	 const                      { return m_bLock;                  }
