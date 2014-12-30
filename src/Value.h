@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <stdlib.h>
+#include <cstdlib>
 #include "Debug.h"
 #include "Display.h"
 
@@ -27,9 +27,9 @@ class CValue
 private:
     double m_Value;
 public:
-    bool   operator <  ( const CValue& v ) const { return ( m_Value < v.m_Value );  }
-    bool   operator >  ( const CValue& v ) const { return ( m_Value > v.m_Value );  }
-    bool   operator == ( const CValue& v ) const { return ( m_Value == v.m_Value ); }
+    //bool   operator <  ( const CValue& v ) const { return ( m_Value < v.m_Value );  }
+    //bool   operator >  ( const CValue& v ) const { return ( m_Value > v.m_Value );  }
+    //bool   operator == ( const CValue& v ) const { return ( m_Value == v.m_Value ); }
     void   operator =  ( const CValue& v )       { m_Value = v.m_Value; }
     void   operator =  ( double v )              { m_Value = v;}
     double GetValue( )   const                   { return m_Value;    }

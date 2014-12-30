@@ -25,11 +25,18 @@ class CAlgebraRule
 public:
 	unsigned  m_LineNo;
 	bool      m_bHasRule;
+#ifdef _DEBUG
+    unsigned m_AccessNb;
+#endif
+
 	CMathExpression m_SrcEquation;
 	CMathExpression m_DstEquation;
 
     CAlgebraRule(const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
 	{
+#ifdef _DEBUG
+        m_AccessNb=0;
+#endif
 		m_LineNo = line_no;
         m_bHasRule = ( dst.GetLastOperator() != CElementDataBase::OP_NONE ); //no rule
         m_SrcEquation.Copy( src );
@@ -44,11 +51,11 @@ class CFunction
 {
 
 public:
-    unsigned m_ParameterNb;
+  unsigned m_ParameterNb;
   CAlgebraRuleArray m_AlgebraRuleArray;
 
 private:
-    void AddOrReplaceRule( CAlgebraRule*rule2);
+  void AddOrReplaceRule( CAlgebraRule*rule2);
 
 public:
   

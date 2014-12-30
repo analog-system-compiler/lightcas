@@ -36,10 +36,10 @@ class CString: public std::string
     void Clear()                                     { clear(); }
     void Prepend( const CString& s )                 { insert( 0, s ); }
     void Append( const CString& s )                  { append( s ); }
-    int Compare(  const CString& s ) const           { return compare(s); }
-    CString Right( unsigned n ) const                { CString s; (n>length())? s.assign(*this): s.append( *this, length()-n, n ); return s;  }
-    size_t Search( char c ) const                    { return find(c); }
     void SetLength( size_t n )                       { resize( n ); }
+    int  Compare(  const CString& s ) const          { return compare(s); }
+    CString Right( unsigned n ) const                { CString s; (n>length())? s.assign(*this): s.append( *this, length()-n, n ); return s;  }
+    size_t Search( char c ) const                    { return find(c); }    
     operator const char * () const                   { return GetBufferPtr();  }
     bool IsEmpty() const                             { return empty(); }
     char At( unsigned n ) const                      { return at(n); }

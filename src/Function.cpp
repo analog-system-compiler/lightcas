@@ -79,7 +79,7 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
 #endif
   }
 #ifdef _DEBUG
-  ds += CString( (int)i );
+  ds += CString( ( int )i );
   ds += " ";
   rule2->m_SrcEquation.Display( ds );
   ds += "\t:= ";

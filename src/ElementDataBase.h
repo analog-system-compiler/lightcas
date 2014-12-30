@@ -62,7 +62,8 @@ class CElementDataBase : public CElementArray
       OP_CPLX,
       OP_RANK,
       OP_SUBST,
-      OP_ERROR_SIZE
+      OP_ERROR_SIZE,
+      OP_END_RESERVED
     };
 
     enum { MAX_EXP = OP_EXP8-OP_EXP1+1 };
@@ -80,6 +81,7 @@ class CElementDataBase : public CElementArray
     virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
     virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
     void          SetValue( const CElement* e, const CValue& v );
+    void          SetConstValue( CElement* e, const CValue& v );
     CElementDataBase(const CElementDataBase& db );
 
   public:
@@ -87,27 +89,27 @@ class CElementDataBase : public CElementArray
     void			Clear();
     void            SetName( const CString& name ) { m_Name=name; }
     void            Initialize();
-    void            SetEvaluator(CEvaluator *eval);
     CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }    
-    //const CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }
     CElement*       ParseElement( CParser& IC );
     CElement* 		GetElement();
     CElement* 		GetElement( const CValue& value );
     CElement* 		GetElement( const CString& );
     CElement* 		SearchElement( const CString&, unsigned& pos ) const;
-    CElement*       SearchElement( const CValue& v, unsigned& pos ) const;
     
-    static CElement* RefToElement( OP_CODE op )    {      return m_ElementRefArray[ ( unsigned )op ];    }
-    static void      UnRef( OP_CODE op )    {      m_ElementRefArray[ ( unsigned )op ] = NULL;    }
+    static CElement* RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
+    static void      UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
     static OP_CODE   ElementToRef( const CElement* e );    
-    static const CSymbolSyntaxArray& GetSymbolTable() { return m_SymbolSyntaxArray; }
-    CElementDataBase* GetParent() const    {      return m_Parent;    }
+    static const CSymbolSyntaxArray& GetSymbolTable()   { return m_SymbolSyntaxArray; }
+    CElementDataBase* GetParent() const                 { return m_Parent;    }
 
 #ifdef _DEBUG    
+        void Printf( const char* format, ... );
         void Test();
+        void CheckPrintf( const char * format, ... );
         void Check( const char*s1, const char *s2 );
         void Check( const char* s1, const CValue& v1 );
         void CheckCatch( const char* s1 );
+        void DisplayStats();
 #endif
 
     CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator*eval=NULL, bool bInitialize=true);

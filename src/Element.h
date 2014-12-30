@@ -72,7 +72,7 @@ class CElement
     void SetRef( OP_CODE op )                   { m_Ref = op;                      }
     bool IsVar()     const                      { return ( m_Type == ELEM_VAR);    }
     bool IsConst()	 const                      { return ( m_Type == ELEM_CONST);  }
-    //bool IsFunct()   const                      { return ( m_Type == ELEM_FUNCT);  }
+    bool IsFunct()   const                      { return ( m_Type == ELEM_FUNCT);  }
     bool IsNumeric() const                      { return m_Numeric;                }
     bool IsAux()	 const                      { return m_bAux;                   }
     bool IsLocked()	 const                      { return m_bLock;                  }

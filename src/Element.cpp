@@ -25,12 +25,18 @@
 CElement::CElement( const CString& name )
 {
   m_Name = name;
-  m_Type = ELEM_VAR;
+  SetVar();
   CommonInit();
 }
 
 CElement::~CElement()
 {
+#ifdef _DEBUG
+  CDisplay ds;
+  ds.Add( "Unregistering : " );
+  ds.Add( m_Name );
+  TRACE( ds.GetBufferPtr() );
+#endif
   CElementDataBase::UnRef( ToRef() );
 }
 
@@ -84,7 +90,7 @@ void CElement::Unlock()
 void CElement::RemoveRules()
 {
   m_Function.Clear();
-  m_Type = ELEM_VAR;
+  SetVar();
 }
 
 void CElement::SetEquation( const CMathExpression& dst )
@@ -97,9 +103,7 @@ void CElement::SetEquation( const CMathExpression& dst )
 
 void CElement::AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb )
 {
-  m_Type = ELEM_FUNCT;
-  Lock(); // to avoid function to be replaced by exp in "ConvertToRule"
+  SetFunct(); // to avoid function to be replaced by exp in "ConvertToRule"
   m_Function.AddAlgebraRule( src, dst, line_nb );
-  Unlock();
 }
 

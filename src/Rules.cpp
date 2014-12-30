@@ -118,6 +118,7 @@ const char CRules::m_Functions[] =
   "IPOLY3(a,b)"
   "AT(a,b)"
   "CHOOSEVAR(a,b)"
+  "CHOOSEVARDIV(a,b)"
   "SET(a,b)"
   "CONCAT(a,b)"
   "DER(a,b)"
@@ -128,6 +129,16 @@ const char CRules::m_Functions[] =
   "SUBST(a,b)"
   "IF(a,b)"
   "IF2(a,b)"
+#if 1
+"MON(a,b)"
+"MONADD(a,b)"
+"POLYSTORE(a,b)"
+"MONMUL(a,b)"
+"MONDIV(a,b)"
+"MONPOW(a,b)"
+"REDUCE_COMPLEX(a)"
+"MONNEG(a)"
+#endif
 
   //Unary
   "NEG(a)"
@@ -191,8 +202,8 @@ const char CRules::m_Functions[] =
 
 const char CRules::m_FunctionSymbol[] = // precedence is defined here
 {
-  //a,b,c,d,e,f,g,h // precedence(n) => precedence(n-1)+1
-  //A,B,C,D,E,F,G,H // precedence(n) => 0  
+  // lowercase: new precedence = precedence + 1
+  // uppercase: new precedence = 0  
   "a,b       =>  a b CONCAT;"
   "a:=b      =>  a b SET;"
   "a?B:C     =>  a b c CONCAT IF;"
@@ -223,91 +234,90 @@ const char CRules::m_FunctionSymbol[] = // precedence is defined here
   "{A}       =>  a VECT;"
 };
 
-const char CRules::m_AlgebraRuleString[] =
+const char CRules::m_AlgebraRulePolynom[] =
 
-    "(TED(a,b) / c ) + ( TED(e,f) / c )              := ( TED(a,b) + TED(e,f) ) / c;"
-    "(TED(a,b) / c ) - ( TED(e,f) / c )              := ( TED(a,b) - TED(e,f) ) / c;"
+//Mult
+"MONMUL( MON(a,b),MON(c,d))                      := MON(a*c,b+d);"
+//"MONMUL( MON(b,c),POLYSTORE(d,MON(e,f)))            := POLYSTORE(MONMUL(MON(b,c),MON(e,f)),MONMUL(d,MON(b,c)));"
+//"MONMUL( POLYSTORE(a,MON(b,c)),MON(e,f))            := POLYSTORE(MONMUL(MON(b,c),MON(e,f)),MONMUL(a,MON(e,f)));"
+"MONMUL( a,POLYSTORE(b,MON(c,d)) )                  := MONADD(MONMUL(a,b),MONMUL(a,MON(c,d)));"
+"MONMUL( POLYSTORE(a,MON(b,c)),d )                  := MONADD(MONMUL(a,d),MONMUL(d,MON(b,c)));"
+//"MONMUL( POLYSTORE(a,b),POLYSTORE(c,d))                := POLYSTORE(POLYSTORE(MONMUL(a,c),MONMUL(a,d)),MONMUL(b,c)),MONMUL(b,d));"
 
-    "(TED(a,b) / TED(c,d)) + (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(g,h) + TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
-    "(TED(a,b) / TED(c,d)) - (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(g,h) - TED(e,f) * TED(c,d) ) / ( TED(c,d) * TED(g,h) ) ;"
+//Add
+"MONADD( MON(a,b),MON(c,b)      )                := MON(a+c,b);"
+"MONADD( MON(a,b),MON(c,d)      )                := POLYSTORE(MON(a,b),MON(c,d));"
+//"POLYSTORE( MON(b,c),POLYSTORE(d,MON(e,c))  )          := POLYSTORE(d,MON(b+e,c));"
+"MONADD( POLYSTORE(a,MON(b,c)),MON(d,c)  )          := POLYSTORE( a,MON(d+b,c));"
+"MONADD( POLYSTORE(a,b),MON(d,e)  )                 := POLYSTORE( MONADD(a,MON(d,e)), b);"
+//"POLYSTORE( a,POLYSTORE(b,MON(c,d))  )                 := POLYSTORE( POLYSTORE(a,b), MON(c,d) );"
+"MONADD( a,POLYSTORE(b,c)  )                        := MONADD( MONADD(a,b), c );"
+//"POLYSTORE( a,POLYSTORE(b,c)  )                        := POLYSTORE( POLYSTORE(a,b), c );"
+//"POLYSTORE( POLYSTORE(a,b),c  )                        := POLYSTORE( POLYSTORE(a,c), b);"
+//"POLYSTORE( POLYSTORE(a,b),POLYSTORE(c,d ) )              := POLYSTORE(POLYSTORE(a,d),c );"
 
-  "(TED(a,b) / TED(c,d)) * (TED(e,f) / TED(g,h))   := ( TED(a,b) * TED(e,f) ) / ( TED(c,d) * TED(g,h) );"
-  "(TED(a,b) / TED(c,d)) / (TED(g,h) / TED(e,f))   := ( TED(a,b) * TED(e,f) ) / ( TED(c,d) * TED(g,h) );"
+//"MONRANK(MON(a,b),MON(c,d))  := RANK(b,d)==b ? POLYSTORE(MON(c,d),MON(a,b)) : POLYSTORE(MON(a,b),MON(c,d));"
 
-  "TED( TED(a,b),0 )   / TED( TED(c,d), 0 )        := TED(a,b)   / TED(c,d);"
+//Neg
+"MONNEG( MON(a,b))             := MON(-a,b);"
+"MONNEG( POLYSTORE(a,b))          := POLYSTORE(MONNEG(a),MONNEG(b));"
+//"MONNEG( MONMUL(a,b))          := MONMUL(MONNEG(a),b);"
+"MONNEG( MONDIV(a,b))          := MONDIV(MONNEG(a),b);"
 
-  "TED( a,0)           / TED( TED(b,c),0)          := TED(0,a)   / TED(b,c);"
-  "TED( TED(a,b),0)    / TED(c,0)                  := TED(a,b)   / TED(0,c);"
-  "TED( a,0)           / TED(b,0)                  := TED(0,a/b) / TED(0,1);"
+//Div                            
+"MONDIV( a,MON(b,0))           := NONE;" 
+//"MONDIV( a,MON(b,c))           := MONDIV( MONMUL(a,MON(1,-c)), MON(b,0) );"
+"MONDIV( a,MON(b,c))           := MONMUL(a,MON(1/b,-c));"
 
-  // Euclidian division
-  //"(TED(a,b) / TED(0,1)) + (TED(0,f) / TED(g,h))       := NONE;"
-  //"TED( TED(a,b),c )   / TED( d, e )               := TED(a/d,a/d*(b/a-e/d)) / TED(0,1) + TED( 0, c-e*a/d*(b/a-e/d)) / TED(d, e) ;"
-  
-  "TED(a,b)              / TED(0,1)                := NONE     ; "
-  "TED(a,b)              / TED(0,c)                := TED(a/c,b/c) / TED(0,1);" // recursion*/
-  "TED(a,b)/CONST(c)      := TED(a/c,b/c);"
+//Pow
+//"MONPOW( MON(a,b),1 )          := MON(a,b);"
+"MONPOW( MON(a,b),CONST(c) )   := MON(a^c,b*c);"
+"MONPOW( MON(a,b),-CONST(c) )  := MON(a^-c,b/c);"
+"MONPOW( MON(a,b),ELEM(c) )    := MON(a^c,b*c);"
+"MONPOW( MON(a,b),-ELEM(c) )   := MON(a^-c,b/c);"
+"MONPOW( a, 1 )                := a;"
+"MONPOW( a,CONST(e) )          := MONMUL( MONPOW(a,e-1), a );"
+"MONPOW( a,-CONST(e) )         := MONDIV( MON(1,0), MONMUL(a,MONPOW(a,e-1)) );"
 
-  "TED(a,b)*TED(c,d)      := TED(TED(a*c,0),b*d) + TED(a*d+b*c,0);"
-  "c*TED(a,b)             := TED(a*c,b*c);"
-  "TED(a,b)*c             := TED(a*c,b*c);"
+//Fract
+"MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );"                        //a+b/c   := (a*c+b)/c;"
+"MONADD(MONDIV(a,c),b)            := MONDIV( MONADD( MONMUL(b,c) ,a ), c );"                        //"a/c+b   := (a+b*c)/c;"
+"MONADD(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONADD( MONMUL(a,c) , MONMUL(b,d) ), MONMUL( c,d ) );" //"a/d+b/c := (a*c+b*d)/(c*d);"
+"MONMUL(a,MONDIV(b,c))            := MONDIV( MONMUL(a,b) ,c );"                                     //"a*b/c   := (a*b)/c;"
+"MONMUL(MONDIV(a,c),b)            := MONDIV( MONMUL(a,b) ,c );"                                     //"a/c*b   := (a*b)/c;"
+"MONMUL(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONMUL(a,c) , MONMUL(b,d) );"                          //"a/b*c/d := (a*c)/(b*d);"
+"MONDIV(MONDIV(a,b),c)            := MONDIV( a,MONMUL(c,b ) );"                                     //"(a/b)/c := a/(c*b);"
 
-  "TED(a,b)+TED(c,d)    := TED(a+c,b+d);"
-  "c+TED(a,b)        := TED(a,b+c);"
-  "TED(a,b)+c        := TED(a,b+c);"
+//Poly
+//"POLY(a[b],v)          := MON(SIMPLIFY(a)[SIMPLIFY(b)],0);"
+"POLY(v,v)             := MON(1,1);"
+"POLY(a,v)             := MON(a,0);"
+"POLY(-a,v)            := MONNEG(POLY(a,v));"
+"POLY(/a,v)            := MONDIV( MON(1,0)  , POLY(a,v)    );"
+"POLY(a+b,v)           := MONADD( POLY(a,v) , POLY(b,v)    );"
+"POLY(a-b,v)           := MONADD( POLY(a,v) , MONNEG(POLY(b,v)));"
+"POLY(a*b,v)           := MONMUL( POLY(a,v) , POLY(b,v)    );"
+"POLY(a/b,v)           := MONDIV( POLY(a,v) , POLY(b,v)    );"
+"POLY(a^b,v)           := MONPOW( POLY(a,v) , SIMPLIFY(b)  );"
 
-  "TED(a,b)-TED(c,d)    := TED(a-c,b-d);"
-  "c-TED(a,b)        := TED(-a,c-b);"
-  "TED(a,b)-c        := TED(a,b-c);"
+//IPoly
+"IPOLY2(MON(a,b),v)             := a*v^b;"
+"IPOLY2(POLYSTORE(a,b),v)       := IPOLY2(a,v)+IPOLY2(b,v);"
+"IPOLY(a,j)                     := IPOLY2(REDUCE_COMPLEX(a),j);"
+"IPOLY(a,v)                     := IPOLY2(a,v);"
+"IPOLY(MONDIV(a,b),v)           := IPOLY(a,v)/IPOLY(b,v);"
 
-  //"TED(a,TED(b,c))      := TED(a+b,c);"
-  "TED( TED(0,a),b )    := TED(a,b);"
+"REDUCE_COMPLEX(MON(a,0))         := MON(a,0);"
+"REDUCE_COMPLEX(MON(a,1))         := MON(a,1);"
+"REDUCE_COMPLEX(MON(a,CONST(b)))  := REDUCE_COMPLEX(MON(-a,b-2));"
+"REDUCE_COMPLEX(MON(a,-CONST(b))) := REDUCE_COMPLEX(MON(-a,b+2));"
+"REDUCE_COMPLEX(POLYSTORE(a,b))   := MONADD(REDUCE_COMPLEX(a),REDUCE_COMPLEX(b));"
 
-  /*"TED(a,b)+c   := TED(a,b+c);"
-  "TED(a,b)-c   := TED(a,b-c);"
-  "TED(a,b)*c   := TED(a*c,b*c);"
-  "TED(a,b)/c   := TED(a/c,b/c);"*/
-  //"(TED(a,b)/TED(c,d))^0         := TED(0,1)/TED(0,1);"
-  "(TED(a,b)/TED(c,d))^1         := TED(a,b)/TED(c,d);"
-  "(TED(a,b)/TED(c,d))^-CONST(e) := (TED(c,d)/TED(a,b))^e;"
-  "(TED(a,b)/TED(c,d))^CONST(e)  := (TED(a,b)/TED(c,d)) * (TED(a,b)/TED(c,d))^(e-1);"
-  //"(TED(a,b)/TED(c,d))^e         := TED(0,IPOLY(TED(a,b)/TED(c,d))^e)/TED(0,1);"
-  /* "c+TED(a,b)   := TED(a,b+c);"
-   "c-TED(a,b)   := TED(-a,c-b);"
-   "c*TED(a,b)   := TED(a*c,b*c);"
-   "c/TED(a,b)   := /TED(a/c,b/c );"*/
-  "-TED(a,b)                 := TED(-a,-b);"
-  "-(TED(a,b)/TED(c,d))    := (-TED(a,b))/TED(c,d);"
-  "/(TED(a,b)/TED(c,d))    := TED(c,d)/TED(a,b);"
+"SIMPLIFY(MON(a,b))               := MON(SIMPLIFY(a),b);"
+"SIMPLIFY(POLYSTORE(a,b))         := POLYSTORE(SIMPLIFY(a),SIMPLIFY(b));"
+;
 
-  "POLY(-a,v)     := -POLY(a,v);"
-  "POLY(/a,v)     := /POLY(a,v);"
-  "POLY(a+b,v)    := POLY(a,v)+POLY(b,v);"
-  "POLY(a-b,v)    := POLY(a,v)-POLY(b,v);"
-  "POLY(a*b,v)    := POLY(a,v)*POLY(b,v);"
-  "POLY(a/b,v)    := POLY(a,v)/POLY(b,v);"
-  "POLY(a^b,v)    := POLY_POW(a^SIMPLIFY(b),v);"
-
-  "POLY_POW(a^CONST(b),v)   := POLY(a,v)^b;"
-  "POLY_POW(a^-CONST(b),v)  := POLY(a,v)^-b;"
-  "POLY_POW(a^b,v)          := TED(0,SIMPLIFY(a)^b)/TED(0,1);"
-  "POLY_POW(a,v)            := POLY(a,v);"
-
-  "POLY(COS(a),v)      := TED(0,COS( SIMPLIFY(a)))/TED(0,1);"
-  "POLY(SIN(a),v)      := TED(0,SIN( SIMPLIFY(a)))/TED(0,1);"
-  "POLY(EXP(a),v)      := TED(0,EXP( SIMPLIFY(a)))/TED(0,1);"
-  "POLY(FACT(a),v)     := TED(0,FACT(SIMPLIFY(a)))/TED(0,1);"
-
-  //"POLY({a,b},v)       := TED(0,{SIMPLIFY(a),SIMPLIFY(b)})/TED(0,1);"
-  "POLY(a[b],v)        := TED(0,SIMPLIFY(a)[SIMPLIFY(b)])/TED(0,1);"
-  //"POLY(TED(a,b),v) := TED(POLY(a,v),POLY(b,v));"
-  "POLY({a},v)         := {POLY(a,v)};"
-  "POLY((a,b),v)       := (POLY(a,v),POLY(b,v));" //parenthesis are important there!!!
-  "POLY(v,v)           := TED(1,0)/TED(0,1);"
-  "POLY(a,v)           := TED(0,a)/TED(0,1);"
-
-  "SOLVE2(TED(TED(a,b),c)/e,v)        := { (-b-SQRT(b^2-4*a*c))/(2*a), (-b+SQRT(b^2-4*a*c))/(2*a) };"
-  "SOLVE2(TED(a,b)/e,v)               := (-b)/a;"
+const char CRules::m_AlgebraRuleMisc[] =
   //"SOLVE2(a,b,v)                      := SOLVE2(a,v),SOLVE2(b,v);"
   "SOLVE(a,v)                         := SOLVE2(POLY(a,v),v);"
   //"SOLVE(a)                           := SOLVE(a,GETVAR(a));"
@@ -335,6 +345,10 @@ const char CRules::m_AlgebraRuleString[] =
 
   "SIN(-a)      := -SIN(a)  ;"
   "COS(-a)      := COS(a)  ;"
+  //"SIN(a+PI/2)  := COS(a)  ;"
+  //"COS(a+PI/2)  := -SIN(a)  ;"
+  //"SIN(PI/2+a)  := COS(a)  ;"
+  //"COS(PI/2+a)  := -SIN(a)  ;"
   "EXP(-a)      := 1/EXP(a)  ;"
 
   "0+b        := b  ;"
@@ -387,7 +401,7 @@ const char CRules::m_AlgebraRuleString[] =
   "LOG(EXP(1))      := 1;"
   "EXP(a)/EXP(b)    := EXP(a-b)  ;"
   "SQRT(a)/SQRT(b)  := SQRT(a/b)  ;"
-  "SQRT(-CONST(a))  := j*SQRT(a);"
+  "SQRT(-CONST(a))  := SQRT(a)*j;"
   "SQR(a)/SQR(b)    := SQR(a/b)  ;"
 
   "a^0              := 1  ;"
@@ -397,6 +411,7 @@ const char CRules::m_AlgebraRuleString[] =
   "a^-b             := 1/(a^b)  ;"
   "x^a*x^b          := x^(a+b);"
   "x^a/x^b          := x^(a-b);"
+  "(x^a)^b          := x^(a*b);"
 
   //"a*(a^b)              := a^(b+1)  ;"
   //"(a^b)*a              := a^(b+1)  ;"
@@ -412,46 +427,26 @@ const char CRules::m_AlgebraRuleString[] =
   "BOOL(!a)   := !a;"
   "BOOL(a)    := !(a==0);"
 
-  "RE(TED(a,b)/TED(0,1))     := b;"
   "RE(a)                     := RE(POLY(a,j));"
 
-  "IM(TED(a,b)/TED(0,1))     := a;"
   "IM(a)                     := IM(POLY(a,j));"
 
   "IF2(0,(a,b)) := b;"
   "IF2(1,(a,b)) := a;"
   "IF(c,(a,b))  := IF2(BOOL(c),(a,b));"
 
+  "POLY((a,b),v)         := (POLY(a,v),POLY(b,v));" //parenthesis are important there!!!
+  "POLY({a},v)           := {POLY(a,v)};"
+
   "IPOLY((a,b),v)                         := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
   "IPOLY({a},v)                           := {IPOLY(a,v)};"
-  "IPOLY(TED(a,b)/TED(c,d),e)             := IPOLY(TED(a,b),e) / IPOLY(TED(c,d),e);" //TODO:IPOLY(a/c,p)
-  "IPOLY(TED(TED(TED(TED(a,b),c),d),e),j) := SIMPLIFY(e-c+j*(d-b)+IPOLY(a,j));"
-  "IPOLY(       TED(TED(TED(b,c),d),e),j) := e-c+j*(d-b);"
-  "IPOLY(              TED(TED(c,d),e),j) := e-c+j*d;"
-  "IPOLY(                     TED(d,e),j) := e+j*d;"
-  "IPOLY(TED(a,b),q)                      := b+IPOLY3(a,q);"
-
-  "IPOLY3(TED(a,b),q^CONST(n))         := IPOLY3(b,q^n)+IPOLY3(a,q^(n+1));"
-  "IPOLY3(TED(a,b),q)                  := IPOLY3(b,q)+IPOLY3(a,q^2);"
-  "IPOLY3(a,q)                         := a*q;"
-
-  "IPOLY2(TED(a,b),{q,n})              := IPOLY2(b,{q,n})+IPOLY2(a,{q,n+1});"
-  "IPOLY2(-a,{q,n})                    := -IPOLY2(a,{q,n});"
-  "IPOLY2(a,{q,n})                     := (a^(1/n)*q)^n;"
-
-  "NORM(TED(a,b)/TED(c,CONST(d)),q)    := ( b/d + IPOLY2(a/d,{q,1}) ) / ( 1 + IPOLY2(c/d,{q,1}) );"
-  "NORM(a,q)                           := NORM(POLY(a,q),q);"
-
-  "NORM2(TED(a,b)/c,q)                 := q+b/a;"
+  
   "NORM2(a,q)                          := NORM2(POLY(a,q),q);"
 
   "SIMPLIFY(ELEM(a))                   := a ;"
   "SIMPLIFY(-ELEM(a))                  := -a ;"
   "SIMPLIFY(CONST(a))                  := a ;"
   "SIMPLIFY(-CONST(a))                 := -a ;"
-  "SIMPLIFY(TED(a,b))                  := TED(SIMPLIFY(a),SIMPLIFY(b));"
-  "SIMPLIFY(TED(a,b)/TED(0,1))         := TED(SIMPLIFY(a),SIMPLIFY(b));"
-  "SIMPLIFY(TED(a,b)/TED(c,d))         := TED(SIMPLIFY(a),SIMPLIFY(b))/TED(SIMPLIFY(c),SIMPLIFY(d));"
   "SIMPLIFY(a)                         := SIMPLIFY2(a,GETVAR(a));"
 
   "SIMPLIFY2(a,1)                      := IPOLY(POLY(a,1),1);"
@@ -460,8 +455,15 @@ const char CRules::m_AlgebraRuleString[] =
   "GETVAR(a+b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a-b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a*b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
-  "GETVAR(a/b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
-  "GETVAR(a^b)                         := GETVAR(a);"
+  "GETVAR(a/b)                         := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );"
+#if 0
+"GETVAR(a^b)                  := GETVAR(a);"
+#else
+  "GETVAR(a^CONST(b))                  := GETVAR(a);"
+  "GETVAR(a^-CONST(b))                 := GETVAR(a);"
+  //"GETVAR(a^b)                         := GETVAR(a^SIMPLIFY(b));"
+
+#endif
   "GETVAR(-a)                          := GETVAR(a);"
   "GETVAR(ELEM(a))                     := a;"
   "GETVAR(a)                           := 1;"
@@ -469,6 +471,8 @@ const char CRules::m_AlgebraRuleString[] =
   "CHOOSEVAR(1,b)                      := b;"
   "CHOOSEVAR(a,1)                      := a;"
   "CHOOSEVAR(a,b)                      := RANK(a,b);"
+  "CHOOSEVARDIV(1,b)                   := b;"
+  "CHOOSEVARDIV(a,b)                   := a;" //Not RANK there !!!
   ;
 
 const char CRules::m_AlgebraRuleDerivals[] =

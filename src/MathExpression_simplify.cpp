@@ -22,7 +22,7 @@
 #include "MathExpression.h"
 #include "Element.h"
 #include "Function.h"
-//#define DEBUG_OPTIMIZE
+#define DEBUG_OPTIMIZE
 
 bool CMathExpression::OptimizeConst()
 {
@@ -111,7 +111,9 @@ bool CMathExpression::OptimizeTree2()
 
       if( match )
       {
-
+#ifdef _DEBUG
+       rule->m_AccessNb++;
+#endif
 #ifdef DEBUG_OPTIMIZE
         CDisplay ds;
         ds += "OptimizeTree rule #" ;
@@ -128,10 +130,17 @@ bool CMathExpression::OptimizeTree2()
 
         if( rule->m_bHasRule )
         {
+#if 1
           CMathExpression equ2(m_ElementDB);
           equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           SetSize( pos );
           Push(equ2);
+#else
+          unsigned pos2 = m_StackSize;
+          ApplyRule( *this, pos_array, &rule->m_DstEquation );
+          memcpy( m_StackArray + pos, m_StackArray + pos2, ( m_StackSize - pos2 ) * sizeof( OP_CODE ) );
+          SetSize( pos + m_StackSize - pos2 );
+#endif
           if( m_StackSize >= MAX_STACK_SIZE )
           {
             Init( RefToElement( CElementDataBase::OP_ERROR_SIZE ) );
@@ -198,16 +207,6 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
         }
       }
     }
-    /* else if( op1 == CElementDataBase::OP_ALIAS2 )
-     {
-         op2 = Pop( pos2 );
-         match = RefToElement( op2 )->IsBinary();
-     }
-     else if( op1 == CElementDataBase::OP_ALIAS1 )
-     {
-         op2 = Pop( pos2 );
-         match = RefToElement( op2 )->IsUnary();
-     }*/
     else if( IsReserved( op1 ) ) //a,b or c
     {
 
@@ -233,10 +232,13 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
   unsigned pos;
   unsigned j;
 
-#ifdef DEBUG_OPTIMIZE
+#if 0//def DEBUG_OPTIMIZE
   CDisplay ds;
+  ds += "Apply rule " ;
   rule_equ->Display( ds );
+  ds += " : ";
   equ.Display( ds );
+  ds += " => " ;
 #endif
 
   for( pos = 0; pos < rule_equ->GetSize(); pos++ )
@@ -259,23 +261,23 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
     {
       OptimizeTree3(); // optimization is only made on the top branch
     }
-
-#ifdef DEBUG_OPTIMIZE
-    ds.Clear();
-    Display( ds );
-    TRACE( ds.GetBufferPtr() );
-#endif
   }
+
+#if 0//def DEBUG_OPTIMIZE
+  Display( ds );
+  TRACE( ds.GetBufferPtr() );
+#endif
+
 }
 
 bool CMathExpression::ExecuteCommand( OP_CODE op3 )
 {
-  CMathExpression equ(m_ElementDB);
   CElement* e;
   bool bOK = false;
   
   if( op3 == CElementDataBase::OP_SET )
   {
+    CMathExpression equ(m_ElementDB);
     equ.PushBranch( *this, m_StackSize );
     op3 = GetLastOperator();
     e = RefToElement( op3 );
@@ -292,6 +294,7 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
   }
   else if ( op3 == CElementDataBase::OP_SUBST )
   {
+    CMathExpression equ(m_ElementDB);
     OP_CODE opd = Pop( m_StackSize );
     OP_CODE op1 = Pop( m_StackSize );
     ASSERT( op1 == CElementDataBase::OP_CONCAT );

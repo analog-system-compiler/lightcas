@@ -23,16 +23,17 @@
 
 #ifdef _DEBUG
 
+int (*PUTS)( const char *) = puts;
 static FILE* debug_file = NULL;
-static char buffer[ 8192 ];
 
 void TRACE( const char* format, ... )
 {
 
+  static char buffer[ 8192 ];
   va_list args;
   va_start ( args, format );
 
-  vsprintf ( buffer, format, args );
+  vsnprintf ( buffer, sizeof(buffer), format, args );
   strncat( buffer, "\n", sizeof( buffer ) );
   va_end ( args );
 

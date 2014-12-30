@@ -51,7 +51,8 @@ void CElementDataBase::Initialize()
     AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
     AddOperandTable     ( CRules::m_Functions           );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleString   );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRuleMisc     );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleSystems  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleLogic    );
@@ -66,6 +67,7 @@ void CElementDataBase::Initialize()
 
 void CElementDataBase::AddReservedElements()
 {
+  const double PI = 3.14159265358979323846264338327950288;
   GetElement( CValue( 0. ) );
   GetElement()->SetPseudoName(  "a"  );
   GetElement()->SetPseudoName(  "b"  );
@@ -85,7 +87,7 @@ void CElementDataBase::AddReservedElements()
   GetElement( "RANK"   )->SetOperandNb( 2 );
   GetElement( "SUBST"  )->SetOperandNb( 2 );
   GetElement( "ERROR_SIZE"  );//->SetOperandNb( 0 );
-
+  SetConstValue( GetElement( "PI" ), CValue( PI ) );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
@@ -163,7 +165,7 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 #ifdef _DEBUG
     CDisplay ds;
     ds += "Adding symbol syntax #";
-    ds += CString( (int)(m_SymbolSyntaxArray.GetSize() - 1) );
+    ds += CString( ( int )( m_SymbolSyntaxArray.GetSize() - 1 ) );
     ds += ": ";
     ds += sss->m_Syntax;
     ds += " => ";
@@ -248,38 +250,38 @@ CElement* CElementDataBase::GetElement()
 {
   unsigned n;
   CElement*	e;
-  CString		s;
+  CString	s;
 
   n = m_ElementRefArray.GetSize();
   s = "_";
   s += CString( ( int )n );
-  e = CreateElement( s, n );
+  e = CreateElement( s, GetSize() );
   e->SetTemporary();
   return e;
 }
 
 CElement* CElementDataBase::GetElement( const CValue& v )
 {
-  unsigned pos;
   CElement*	e;
+  CDisplay ds;
+  v.Display( ds );
 
+  unsigned old_size = m_ElementRefArray.GetSize();
   if( m_Parent )
   {
-    e = m_Parent->GetElement( v );
+    e = m_Parent->GetElement( ds );
   }
   else
   {
-    e = SearchElement( v, pos );
-    if( e == NULL )
-    {
-      CDisplay ds;
-      v.Display( ds );
-      e = CreateElement( ds, pos );
-      e->SetConst();
-      SetValue(  e, v );
-    }
+    e = GetElement( ds );
   }
-  return( e );
+  if( m_ElementRefArray.GetSize() != old_size )
+  {
+    e->SetConst();
+    SetValue( e, v );
+  }
+
+  return e ;
 }
 
 CElement* CElementDataBase::GetElement( const CString& string )
@@ -298,45 +300,11 @@ CElement* CElementDataBase::GetElement( const CString& string )
 CElement* CElementDataBase::CreateElement( const CString& string, unsigned pos )
 {
   CElement* e;
+
   e = new CElement( string );
   Register( e, pos );
   SetValue( e, CValue( 0 ) );
   return e;
-}
-
-CElement* CElementDataBase::SearchElement( const CValue& v1, unsigned& pos ) const
-{
-  unsigned	i, n;
-  CElement*	e;
-
-  n = GetSize();
-
-  for( i = 0; i < n; i++ )
-  {
-    e = GetAt( i );
-
-    if( e->IsConst() )
-    {
-      const CValue& v2 = GetEvaluator()->GetElementValue( e->ToRef() );
-
-      if(  v1 == v2  )
-      {
-        return e ;
-      }
-
-      if( v1 < v2 )
-      {
-        break;
-      }
-    }
-    else
-    {
-      break;
-    }
-  }
-  pos = i;
-
-  return NULL;
 }
 
 CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos ) const
@@ -361,7 +329,7 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
   {
 
     e = GetAt( i );
-    if( !e->IsConst() )
+    //if( !e->IsConst() )
     {
       compare = string.Compare( e->GetName() );
 
@@ -386,7 +354,6 @@ unsigned CElementDataBase::Register( CElement* e, unsigned index )
   unsigned n;
 
   InsertAt( index, e );
-
   n = m_ElementRefArray.GetSize();
   e->SetRef( n );
   e->SetGlobal( m_Parent == NULL );
@@ -412,6 +379,12 @@ void CElementDataBase::SetValue( const CElement* e, const CValue& v )
   ASSERT( eval );
   eval->SetElementValue( e->ToRef(), v );
   eval->SetFunction( e->ToRef(), NULL );
+}
+
+void CElementDataBase::SetConstValue( CElement* e, const CValue& v )
+{
+  SetValue( e, v );
+  e->SetConst();
 }
 
 

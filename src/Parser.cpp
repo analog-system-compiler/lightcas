@@ -17,7 +17,6 @@
 /*******************************************************************************/
 #define _CRT_SECURE_NO_WARNINGS
 #include <ctype.h>
-#include <sstream>
 #include "Debug.h"
 #include "Parser.h"
 #include "Display.h"
@@ -74,10 +73,10 @@ const CString& CParser::GetWord()
 
 void CParser::Find( char c )
 {
-  CString error_str;
 
   if( GetChar() != c )
   {
+    CString error_str;
 
     if( eof( *m_Pos ) )
     {
@@ -225,13 +224,16 @@ void CParser::Error( unsigned id, const CString* str ) const
   }
 
 #if _DEBUG
-  char buffer[32];
-  sprintf( buffer, "Error found line %d", ex.GetLineNb() );
-  TRACE( buffer );
+  CDisplay ds;
+  ds += "Error found line ";
+  ds += CString( (int)ex.GetLineNb() );
+  ds += " : ";
   if( str )
   {
-    TRACE( str->c_str() );
+    ds += *str;
   }
+  PUTS( ds.GetBufferPtr() );
+  TRACE( ds.GetBufferPtr() );
 #endif
 
   throw( ex );

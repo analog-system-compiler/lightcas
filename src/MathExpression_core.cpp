@@ -25,18 +25,9 @@
 CMathExpression::CMathExpression( CElementDataBase* db )
 {
   m_StackArray   = NULL;
-  m_AllocSize    = 0;
-  m_StackSize    = 0;
   m_ElementDB    = db;
-}
-
-// Copy Constructor
-CMathExpression::CMathExpression( const CMathExpression& equ )
-{
-  m_StackArray   = NULL;
   m_AllocSize    = 0;
   m_StackSize    = 0;
-  Copy( equ );
 }
 
 CMathExpression::~CMathExpression()

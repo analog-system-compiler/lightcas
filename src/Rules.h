@@ -30,7 +30,8 @@ struct SProperties
 class CRules
 {
   public:
-    static   const char m_AlgebraRuleString[];
+    static   const char m_AlgebraRulePolynom[];
+    static   const char m_AlgebraRuleMisc[];
     static   const char m_AlgebraRuleDerivals[];
     static   const char m_AlgebraRuleSystems[];
     static   const char m_AlgebraRuleLogic[];

@@ -24,52 +24,67 @@
 #include "Display.h"
 
 #ifdef _DEBUG
+#include <cstdarg>
+#ifdef _WIN32
+#define vsnprintf _vsnprintf_s
+#endif
+
+void CElementDataBase::Printf( const char* format, ... )
+{
+    static char buffer[2048];
+    va_list args;
+    va_start ( args, format );
+    vsnprintf ( buffer, sizeof(buffer), format, args );
+    PUTS(buffer);
+    va_end ( args );
+}
 
 void CElementDataBase::Check( const char* s1, const char* s2 )
 {
-  CParser IC( s1 );
   CDisplay ds;
+  CParser IC( s1 );
   CMathExpression equ( this );
   TRACE( "** Check %s == %s", s1, s2 );
   try
-  {    
-    equ.GetFromString( IC );   
+  {
+    equ.GetFromString( IC );
     equ.OptimizeTree();
     equ.Display( ds );
     if( ds != s2 )
     {
       ASSERT( false );
-      printf( "FAIL: %s => %s != %s\n", s1, ds.GetBufferPtr(), s2 );
+      Printf( "FAIL: %s => %s != %s", s1, ds.GetBufferPtr(), s2 );
       return;
     }
   }
   catch( ... )
   {
     ASSERT( false );
-    printf( "FAIL: Test exception: %s => %s\n", s1, s2 );
+    Printf( "FAIL: Test exception: %s => %s", s1, s2 );
     return;
   }
-  printf( "OK: %s => %s\n", s1, s2 );
+  Printf( "OK: %s => %s", s1, s2 );
 }
 
 void CElementDataBase::Check( const char* s1, const CValue& v1 )
 {
+  CDisplay ds;
   CMathExpression equ( this );
   equ.GetFromString( s1 );
   CValue v2 = equ.Evaluate();
   if( v2.GetValue() != v1.GetValue() )
   {
     ASSERT( false );
-    printf( "FAIL: %s => %g != %g\n", s1, v2.GetValue(), v1.GetValue() );
+    Printf( "FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue() );
     return;
   }
-  printf( "OK: %s => %g\n", s1, v1.GetValue() );
+  Printf( "OK: %s => %g", s1, v1.GetValue() );
 }
 
 void CElementDataBase::CheckCatch( const char* s1 )
 {
-  CParser IC( s1 );
   CDisplay ds;
+  CParser IC( s1 );
   CMathExpression equ( this );
   TRACE( "** CheckCatch %s", s1 );
   try
@@ -81,18 +96,40 @@ void CElementDataBase::CheckCatch( const char* s1 )
     return;
   }
   ASSERT( false );
-  printf( "Catch failed: %s\n", s1 );
+  Printf( "Catch failed: %s", s1 );
+}
+
+void CElementDataBase::DisplayStats()
+{
+  CDisplay ds;
+  for( unsigned i = 0; i < m_ElementRefArray.GetSize(); i++ )
+  {
+    CElement* e = m_ElementRefArray.GetAt( i );
+    if( e )
+    {
+      CFunction* funct = e->GetFunction();
+      for( unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++ )
+      {
+        if( j == 0 )
+        {
+          Printf( "**************************" );
+        }
+        CAlgebraRule* rule = funct->m_AlgebraRuleArray.GetAt( j );
+        ds.Clear();
+        rule->m_SrcEquation.Display( ds );
+        Printf( "%4d \t%s\t", rule->m_AccessNb, ds.GetBufferPtr() );
+      }
+    }
+  }
 }
 
 void CElementDataBase::Test()
 {
-
-  printf( "Running tests...\n" );
+  Printf( "Running tests..." );
 
   /***** Syntax checking ****/
   //CheckCatch( "a b" );
   //CheckCatch( "a.b" );
-
   /***** Some basic tests *****/
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
@@ -102,8 +139,15 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(2--2)", "4" );
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
   Check( "SIMPLIFY(a-a)", "0" );
-  //Check( "SIMPLIFY(2a)", "2*a" );
+  Check( "SIMPLIFY(a+a)", "2*a" );
+  Check( "SIMPLIFY(a+a+a)", "3*a" );
+  Check( "SIMPLIFY(a+b)", "a+b" );
+  Check( "SIMPLIFY(a-b)", "a-b" );
+  Check( "SIMPLIFY(a+a+b+b)", "2*a+2*b" );
+  Check( "SIMPLIFY(a+a-(b+b)", "2*a-2*b" );
   Check( "SIMPLIFY(a-b+c-(c+a-b))", "0" );
+  Check( "SIMPLIFY(a-(b-c))", "a-b+c" );
+  Check( "SIMPLIFY(a-b-c)", "a-b-c" );
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
   //Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
@@ -118,24 +162,34 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a*b*c/(a*b*c))", "1" );
   Check( "SIMPLIFY(4*a*b*c/(4*a*b*c)-1)", "0" );
   Check( "SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))", "0" );
-  //Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1/(a*b*c)+1" );
+  Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "4/(3*c)" );
+  Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "4/(3*a)" );
+  //FAIL!!Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1/(a*b*c)+1" );
   Check( "SIMPLIFY(b/a-b/a)", "0" );
   Check( "SIMPLIFY(b*1/a)", "b/a" );
-  Check( "SIMPLIFY(b/a-a/b-(b^2-a^2)/(a*b))", "0" );
-  Check( "SIMPLIFY((a-b)^2-(a^2-2*b*a+b^2))", "0" );
+  Check( "SIMPLIFY(x^(2+2))", "x^4" );
+  Check( "SIMPLIFY((a+b)^2)", "a^2+2*a*b+b^2" );
   Check( "SIMPLIFY(a^2-a^(1+1))", "0" );
+  Check( "SIMPLIFY((a-b)^2-(a^2-2*b*a+b^2))", "0" );
+  Check( "SIMPLIFY(b/a-a/b-(b^2-a^2)/(a*b))", "0" );
   Check( "SIMPLIFY(1/(a+1)-1/(a+1))", "0" );
   Check( "SIMPLIFY(1/(1/(a+1))-a-1)", "0" );
   Check( "SIMPLIFY(1/(2*1/(2*a+2))-a-1)", "0" );
-  Check( "SIMPLIFY(x^(2+2))", "x^4" );
   //Check( "SIMPLIFY(a*(a^b)","a^(b+1)");
   //Check( "SIMPLIFY(x^(a*b)/x^(a*b)","1" );
   Check( "SIMPLIFY(x^(a-a))", "1" );
-  //FAIL!!:Check( "SIMPLIFY(2*x^a-2*x^a)","0");!!!!
+  Check( "SIMPLIFY(x^a)", "x^a" );
+  //FAIL!!Check( "SIMPLIFY(x^(a+a))", "x^(2*a)" );
+  //FAIL!!Check( "SIMPLIFY((x^a)^2", "x^(2*a)" );
+  //FAIL!!Check( "SIMPLIFY(x^2.5)", "x^2.5" );
+  //FAIL!!Check( "SIMPLIFY(2*x^a-2*x^a)","0");!!!!
+  Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
+  Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
   Check( "SIMPLIFY(j^2)", "-1" );
+  Check( "SIMPLIFY(j^-2)", "-1" );
   Check( "SIMPLIFY(1+j-(1+j))", "0" );
   Check( "SIMPLIFY(j*j*j*j*j*j*j)", "-j" );
   Check( "SIMPLIFY(j*j+1)", "0" );
@@ -147,7 +201,9 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(2/(1+j)-(1-j))", "0" );
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
-  Check( "SQRT(-25)", "j*5" );
+  Check( "SIN(PI)", "0" );
+  Check( "COS(PI/2)", "0" );
+  Check( "SQRT(-25)", "5*j" );
   Check( "SIMPLIFY(SQRT(-25)^2+25)", "0" );
 
   Check( "SIMPLIFY(RE(4+j))", "4" );
@@ -161,6 +217,9 @@ void CElementDataBase::Test()
   /****** derival *****/
   Check( "DER(SIN(4*a),a)", "4*COS(4*a)" );
   Check( "DER(COS(a*b),b)", "-((b*DER(a,b)+a)*SIN(a*b))" );
+
+  /****** trigo *********/
+  //Check( "(SIN(PI/2+a))", "COS(a)" );
 
   /****** vector *********/
   Check( "SIMPLIFY({a,b}[c])", "{a,b}[c]" );
@@ -206,6 +265,7 @@ void CElementDataBase::Test()
   /********** solving **********/
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
+  Check( "SOLVE(x^2+4,x)", "{-(j*2),j*2}" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
   /***** system solving *****/
@@ -237,6 +297,8 @@ void CElementDataBase::Test()
   Check( "a+b-c+2", CValue( 5 ) );
   Check( "a>b?2:3", CValue( 3 ) );
 
+  DisplayStats();
+
 }
 
 #endif
@@ -255,3 +317,4 @@ void CElementDataBase::Test()
 //add mul 2a
 //enlever TODOS
 //résoudre pbm x^a
+//-créer lib quand compil ss linux

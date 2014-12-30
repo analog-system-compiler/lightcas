@@ -233,46 +233,41 @@ bool CMathExpression::MatchOperator( CParser& IC, const CString& s, const CMathE
     sp = ParseExpression( sp, pos_array, priority, IC, false );
 
   }
-  // try to match prefix operator
 
+  // try to match prefix operator
   while( *sp )
   {
     if( !CParser::IsWord( *sp ) )
     {
       if( !IC.TryMatchSymbol( sp ) )
       {
-        break;
+        return false;;
       }
     }
 
-    if( *sp == '\0' )
+    if( *sp != '\0' )  // case [a]
     {
-      break;  // case [a]
+      sp = ParseExpression( sp, pos_array, priority, IC, true );
     }
-
-    sp = ParseExpression( sp, pos_array, priority, IC, true );
-
   }
 
-  if( *sp == '\0' )
+
+  if( rule_equ.GetSize() )
   {
+    CMathExpression equ( m_ElementDB );
+    equ.Copy( *this );
+    Clear();
+    ApplyRule( equ, pos_array, &rule_equ, false );
 
-    if( rule_equ.GetSize() )
-    {
-      CMathExpression equ( m_ElementDB );
-      equ.Copy( *this );
-      Clear();
-      ApplyRule( equ, pos_array, &rule_equ, false );
-
-    }
-#if 0//def _DEBUG
-    CDisplay ds;
-    Display( ds );
-    TRACE( ds.GetBufferPtr() );
-#endif
-    return true;
   }
-  return false;
+
+#if 0//def _DEBUG
+  CDisplay ds;
+  Display( ds );
+  TRACE( ds.GetBufferPtr() );
+#endif
+
+  return true;
 }
 
 bool CMathExpression::ParseElement( CParser& IC )
@@ -291,7 +286,7 @@ bool CMathExpression::ParseElement( CParser& IC )
   i = 0;
   if( IC.TryFind( '(' ) )
   {
-    while( !IC.TryFind( ')' ) )
+    while( IC.GetChar() && !IC.TryFind( ')' ) )
     {
       GetLevel( IC, 0 );
       IC.TryFind( ',' );

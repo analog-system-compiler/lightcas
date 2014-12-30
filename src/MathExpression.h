@@ -111,7 +111,6 @@ class CMathExpression
     OP_CODE		GetLastOperator()	const;
     
     CMathExpression( CElementDataBase* db = NULL );
-    CMathExpression( const CMathExpression& equ );
     virtual ~CMathExpression();
 
 };
