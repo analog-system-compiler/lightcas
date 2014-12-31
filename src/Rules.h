@@ -24,21 +24,22 @@ struct SProperties
 {
   const char*	  m_FunctionName;
   unsigned        m_ParameterNb;
-  CEvaluatorFunct m_FunctionCall;  
+  CEvaluatorFunct m_FunctionCall;
 };
 
 class CRules
 {
   public:
-    static   const char m_AlgebraRulePolynom[];
-    static   const char m_AlgebraRuleMisc[];
-    static   const char m_AlgebraRuleDerivals[];
-    static   const char m_AlgebraRuleSystems[];
-    static   const char m_AlgebraRuleLogic[];
-    static   const char m_AlgebraRuleVectors[];
-    static   const char m_AlgebraRuleTaylorSeries[];
-    static   const SProperties m_FunctionProperties[];
-    static   const char m_Functions[];
-    static   const char m_FunctionSymbol[];
-    static   const unsigned m_FunctionPropertiesSize;
+    static const char m_AlgebraRulePolynom[];
+    static const char m_AlgebraRuleAcrossFunct[];
+    static const char m_AlgebraRuleMisc[];
+    static const char m_AlgebraRuleDerivals[];
+    static const char m_AlgebraRuleSystems[];
+    static const char m_AlgebraRuleLogic[];
+    static const char m_AlgebraRuleVectors[];
+    static const char m_AlgebraRuleTaylorSeries[];
+    static const SProperties m_FunctionProperties[];
+    static const char m_Functions[];
+    static const char m_FunctionSymbol[];
+    static const unsigned m_FunctionPropertiesSize;
 };

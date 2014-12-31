@@ -52,6 +52,7 @@ void CElementDataBase::Initialize()
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
     AddOperandTable     ( CRules::m_Functions           );
     AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct);
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleMisc     );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleSystems  );

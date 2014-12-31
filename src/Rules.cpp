@@ -68,11 +68,11 @@ const SProperties CRules::m_FunctionProperties[] =
   { "ABS",   1, &CEvaluator::Abs           },
   { "FLOOR", 1, &CEvaluator::Floor         },
   { "CEIL",  1, &CEvaluator::Ceil          },
-  { "SQUARE",1, &CEvaluator::Square        },
+  { "SQUARE", 1, &CEvaluator::Square        },
   { "RAND",  0, &CEvaluator::Rand          },
   { "IF2",   2, &CEvaluator::If            },
   { "IF",    2, &CEvaluator::If            },
-  { "CONCAT",2, &CEvaluator::Concat        },
+  { "CONCAT", 2, &CEvaluator::Concat        },
   { "SET",   2, NULL                       },
   { "AT",    2, NULL                       },
   { "VECT",  1, NULL                       }
@@ -83,7 +83,7 @@ const unsigned CRules::m_FunctionPropertiesSize = sizeof( CRules::m_FunctionProp
 
 const char CRules::m_Functions[] =
 {
-  
+
   "ADD(a,b)"
   "SUB(a,b)"
   "MUL(a,b)"
@@ -116,6 +116,8 @@ const char CRules::m_Functions[] =
   "IPOLY(a,b)"
   "IPOLY2(a,b)"
   "IPOLY3(a,b)"
+  "POLY_TED(a,b)"
+  "IPOLY_TED(a,b)"
   "AT(a,b)"
   "CHOOSEVAR(a,b)"
   "CHOOSEVARDIV(a,b)"
@@ -130,14 +132,14 @@ const char CRules::m_Functions[] =
   "IF(a,b)"
   "IF2(a,b)"
 #if 1
-"MON(a,b)"
-"MONADD(a,b)"
-"POLYSTORE(a,b)"
-"MONMUL(a,b)"
-"MONDIV(a,b)"
-"MONPOW(a,b)"
-"REDUCE_COMPLEX(a)"
-"MONNEG(a)"
+  "MON(a,b)"
+  "MONADD(a,b)"
+  "POLYSTORE(a,b)"
+  "MONMUL(a,b)"
+  "MONDIV(a,b)"
+  "MONPOW(a,b)"
+  "REDUCE_COMPLEX(a)"
+  "MONNEG(a)"
 #endif
 
   //Unary
@@ -183,7 +185,7 @@ const char CRules::m_Functions[] =
   "SYSTEM_SOLVE2(a)"
   "SYSTEM_SOLVE3(a)"
   "SYSTEM_SOLVE4(a)"
-  "SYSTEM_SOLVE5(a)"
+  //"SYSTEM_SOLVE5(a)"
   "SYSTEM_AUTO_SOLVE(a)"
   "SYSTEM_AUTO_SOLVE2(a)"
   "SYSTEM_AUTO_SOLVE3(a)"
@@ -195,7 +197,7 @@ const char CRules::m_Functions[] =
   "TAYLOR(a)"
   "DERN(a)"
 
-   //void
+  //void
   "RAND()"
 
 };
@@ -203,7 +205,7 @@ const char CRules::m_Functions[] =
 const char CRules::m_FunctionSymbol[] = // precedence is defined here
 {
   // lowercase: new precedence = precedence + 1
-  // uppercase: new precedence = 0  
+  // uppercase: new precedence = 0
   "a,b       =>  a b CONCAT;"
   "a:=b      =>  a b SET;"
   "a?B:C     =>  a b c CONCAT IF;"
@@ -236,90 +238,123 @@ const char CRules::m_FunctionSymbol[] = // precedence is defined here
 
 const char CRules::m_AlgebraRulePolynom[] =
 
-//Mult
-"MONMUL( MON(a,b),MON(c,d))                      := MON(a*c,b+d);"
-//"MONMUL( MON(b,c),POLYSTORE(d,MON(e,f)))            := POLYSTORE(MONMUL(MON(b,c),MON(e,f)),MONMUL(d,MON(b,c)));"
-//"MONMUL( POLYSTORE(a,MON(b,c)),MON(e,f))            := POLYSTORE(MONMUL(MON(b,c),MON(e,f)),MONMUL(a,MON(e,f)));"
-"MONMUL( a,POLYSTORE(b,MON(c,d)) )                  := MONADD(MONMUL(a,b),MONMUL(a,MON(c,d)));"
-"MONMUL( POLYSTORE(a,MON(b,c)),d )                  := MONADD(MONMUL(a,d),MONMUL(d,MON(b,c)));"
-//"MONMUL( POLYSTORE(a,b),POLYSTORE(c,d))                := POLYSTORE(POLYSTORE(MONMUL(a,c),MONMUL(a,d)),MONMUL(b,c)),MONMUL(b,d));"
+  //Mult
+  "MONMUL( MON(a,b),MON(c,d))                      := MON(a*c,b+d);"
+  "MONMUL( a,POLYSTORE(b,MON(c,d)) )               := MONADD(MONMUL(a,b),MONMUL(a,MON(c,d)));"
+  "MONMUL( POLYSTORE(a,MON(b,c)),d )               := MONADD(MONMUL(a,d),MONMUL(d,MON(b,c)));"
 
-//Add
-"MONADD( MON(a,b),MON(c,b)      )                := MON(a+c,b);"
-"MONADD( MON(a,b),MON(c,d)      )                := POLYSTORE(MON(a,b),MON(c,d));"
-//"POLYSTORE( MON(b,c),POLYSTORE(d,MON(e,c))  )          := POLYSTORE(d,MON(b+e,c));"
-"MONADD( POLYSTORE(a,MON(b,c)),MON(d,c)  )          := POLYSTORE( a,MON(d+b,c));"
-"MONADD( POLYSTORE(a,b),MON(d,e)  )                 := POLYSTORE( MONADD(a,MON(d,e)), b);"
-//"POLYSTORE( a,POLYSTORE(b,MON(c,d))  )                 := POLYSTORE( POLYSTORE(a,b), MON(c,d) );"
-"MONADD( a,POLYSTORE(b,c)  )                        := MONADD( MONADD(a,b), c );"
-//"POLYSTORE( a,POLYSTORE(b,c)  )                        := POLYSTORE( POLYSTORE(a,b), c );"
-//"POLYSTORE( POLYSTORE(a,b),c  )                        := POLYSTORE( POLYSTORE(a,c), b);"
-//"POLYSTORE( POLYSTORE(a,b),POLYSTORE(c,d ) )              := POLYSTORE(POLYSTORE(a,d),c );"
+  //Add
+  "MONADD( MON(a,b),MON(0,c)      )                := MON(a,b);"
+  "MONADD( MON(0,c),MON(a,b)      )                := MON(a,b);"
+  "MONADD( MON(a,b),MON(c,b)      )                := MON(a+c,b);"
+  "MONADD( MON(a,b),MON(c,d)      )                := POLYSTORE(MON(a,b),MON(c,d));"
+  "MONADD( POLYSTORE(a,MON(b,c)),MON(d,c)  )       := POLYSTORE( a,MON(d+b,c));"
+  "MONADD( POLYSTORE(a,b),MON(d,e)  )              := POLYSTORE( MONADD(a,MON(d,e)), b);"
+  "MONADD( a,POLYSTORE(b,c)  )                     := MONADD( MONADD(a,b), c );"
 
-//"MONRANK(MON(a,b),MON(c,d))  := RANK(b,d)==b ? POLYSTORE(MON(c,d),MON(a,b)) : POLYSTORE(MON(a,b),MON(c,d));"
+  //"MONRANK(MON(a,b),MON(c,d))  := RANK(b,d)==b ? POLYSTORE(MON(c,d),MON(a,b)) : POLYSTORE(MON(a,b),MON(c,d));"
 
-//Neg
-"MONNEG( MON(a,b))             := MON(-a,b);"
-"MONNEG( POLYSTORE(a,b))          := POLYSTORE(MONNEG(a),MONNEG(b));"
-//"MONNEG( MONMUL(a,b))          := MONMUL(MONNEG(a),b);"
-"MONNEG( MONDIV(a,b))          := MONDIV(MONNEG(a),b);"
+  //Neg
+  "MONNEG( MON(a,b))             := MON(-a,b);"
+  "MONNEG( POLYSTORE(a,b))       := POLYSTORE(MONNEG(a),MONNEG(b));"
+  "MONNEG( MONDIV(a,b))          := MONDIV(MONNEG(a),b);"
 
-//Div                            
-"MONDIV( a,MON(b,0))           := NONE;" 
-//"MONDIV( a,MON(b,c))           := MONDIV( MONMUL(a,MON(1,-c)), MON(b,0) );"
-"MONDIV( a,MON(b,c))           := MONMUL(a,MON(1/b,-c));"
+  //Div
+  "MONDIV( a,MON(b,0))           := NONE;"
+  //"MONDIV( a,MON(b,c))           := MONDIV( MONMUL(a,MON(1,-c)), MON(b,0) );"
+  "MONDIV( a,MON(b,c))           := MONMUL(a,MON(1/b,-c));"
 
-//Pow
-//"MONPOW( MON(a,b),1 )          := MON(a,b);"
-"MONPOW( MON(a,b),CONST(c) )   := MON(a^c,b*c);"
-"MONPOW( MON(a,b),-CONST(c) )  := MON(a^-c,b/c);"
-"MONPOW( MON(a,b),ELEM(c) )    := MON(a^c,b*c);"
-"MONPOW( MON(a,b),-ELEM(c) )   := MON(a^-c,b/c);"
-"MONPOW( a, 1 )                := a;"
-"MONPOW( a,CONST(e) )          := MONMUL( MONPOW(a,e-1), a );"
-"MONPOW( a,-CONST(e) )         := MONDIV( MON(1,0), MONMUL(a,MONPOW(a,e-1)) );"
+  //Pow
+  //"MONPOW( MON(a,b),1 )          := MON(a,b);"
+  "MONPOW( MON(a,b),CONST(c) )   := MON(a^c,b*c);"
+  "MONPOW( MON(a,b),-CONST(c) )  := MON(a^-c,b/c);"
+  "MONPOW( MON(a,b),ELEM(c) )    := MON(a^c,b*c);"
+  "MONPOW( MON(a,b),-ELEM(c) )   := MON(a^-c,b/c);"
+  "MONPOW( a, 1 )                := a;"
+  "MONPOW( a,CONST(e) )          := MONMUL( MONPOW(a,e-1), a );"
+  "MONPOW( a,-CONST(e) )         := MONDIV( MON(1,0), MONMUL(a,MONPOW(a,e-1)) );"
 
-//Fract
-"MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );"                        //a+b/c   := (a*c+b)/c;"
-"MONADD(MONDIV(a,c),b)            := MONDIV( MONADD( MONMUL(b,c) ,a ), c );"                        //"a/c+b   := (a+b*c)/c;"
-"MONADD(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONADD( MONMUL(a,c) , MONMUL(b,d) ), MONMUL( c,d ) );" //"a/d+b/c := (a*c+b*d)/(c*d);"
-"MONMUL(a,MONDIV(b,c))            := MONDIV( MONMUL(a,b) ,c );"                                     //"a*b/c   := (a*b)/c;"
-"MONMUL(MONDIV(a,c),b)            := MONDIV( MONMUL(a,b) ,c );"                                     //"a/c*b   := (a*b)/c;"
-"MONMUL(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONMUL(a,c) , MONMUL(b,d) );"                          //"a/b*c/d := (a*c)/(b*d);"
-"MONDIV(MONDIV(a,b),c)            := MONDIV( a,MONMUL(c,b ) );"                                     //"(a/b)/c := a/(c*b);"
+  //Fract
+  "MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );"                        //a+b/c   := (a*c+b)/c;"
+  "MONADD(MONDIV(a,c),b)            := MONDIV( MONADD( MONMUL(b,c) ,a ), c );"                        //"a/c+b   := (a+b*c)/c;"
+  "MONADD(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONADD( MONMUL(a,d) , MONMUL(b,c) ), MONMUL( b,d ) );" //"a/b+c/d := (a*d+b*c)/(b*d);"
+  "MONMUL(a,MONDIV(b,c))            := MONDIV( MONMUL(a,b) ,c );"                                     //"a*b/c   := (a*b)/c;"
+  "MONMUL(MONDIV(a,c),b)            := MONDIV( MONMUL(a,b) ,c );"                                     //"a/c*b   := (a*b)/c;"
+  "MONMUL(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONMUL(a,c) , MONMUL(b,d) );"                          //"a/b*c/d := (a*c)/(b*d);"
+  "MONDIV(MONDIV(a,b),c)            := MONDIV( a,MONMUL(c,b ) );"                                     //"(a/b)/c := a/(c*b);"
 
-//Poly
-//"POLY(a[b],v)          := MON(SIMPLIFY(a)[SIMPLIFY(b)],0);"
-"POLY(v,v)             := MON(1,1);"
-"POLY(a,v)             := MON(a,0);"
-"POLY(-a,v)            := MONNEG(POLY(a,v));"
-"POLY(/a,v)            := MONDIV( MON(1,0)  , POLY(a,v)    );"
-"POLY(a+b,v)           := MONADD( POLY(a,v) , POLY(b,v)    );"
-"POLY(a-b,v)           := MONADD( POLY(a,v) , MONNEG(POLY(b,v)));"
-"POLY(a*b,v)           := MONMUL( POLY(a,v) , POLY(b,v)    );"
-"POLY(a/b,v)           := MONDIV( POLY(a,v) , POLY(b,v)    );"
-"POLY(a^b,v)           := MONPOW( POLY(a,v) , SIMPLIFY(b)  );"
+  //Poly
+  //"POLY(a[b],v)          := MON(SIMPLIFY(a)[SIMPLIFY(b)],0);"
+  "POLY(v,v)             := MON(1,1);"
+  "POLY(a,v)             := MON(a,0);"
+  "POLY(-a,v)            := MONNEG(POLY(a,v));"
+  "POLY(/a,v)            := MONDIV( MON(1,0)  , POLY(a,v)    );"
+  "POLY(a+b,v)           := MONADD( POLY(a,v) , POLY(b,v)    );"
+  "POLY(a-b,v)           := MONADD( POLY(a,v) , MONNEG(POLY(b,v)));"
+  "POLY(a*b,v)           := MONMUL( POLY(a,v) , POLY(b,v)    );"
+  "POLY(a/b,v)           := MONDIV( POLY(a,v) , POLY(b,v)    );"
+  "POLY(a^b,v)           := MONPOW( POLY(a,v) , SIMPLIFY(b)  );"
 
-//IPoly
-"IPOLY2(MON(a,b),v)             := a*v^b;"
-"IPOLY2(POLYSTORE(a,b),v)       := IPOLY2(a,v)+IPOLY2(b,v);"
-"IPOLY(a,j)                     := IPOLY2(REDUCE_COMPLEX(a),j);"
-"IPOLY(a,v)                     := IPOLY2(a,v);"
-"IPOLY(MONDIV(a,b),v)           := IPOLY(a,v)/IPOLY(b,v);"
+  //IPoly
+  "IPOLY2(MON(a,b),v)             := a*v^b;"
+  "IPOLY2(POLYSTORE(a,b),v)       := IPOLY2(a,v)+IPOLY2(b,v);"
+  "IPOLY(a,j)                     := IPOLY2(REDUCE_COMPLEX(a),j);"
+  "IPOLY(a,v)                     := IPOLY2(a,v);"
+  "IPOLY(MONDIV(a,b),v)           := IPOLY(a,v)/IPOLY(b,v);"
 
-"REDUCE_COMPLEX(MON(a,0))         := MON(a,0);"
-"REDUCE_COMPLEX(MON(a,1))         := MON(a,1);"
-"REDUCE_COMPLEX(MON(a,CONST(b)))  := REDUCE_COMPLEX(MON(-a,b-2));"
-"REDUCE_COMPLEX(MON(a,-CONST(b))) := REDUCE_COMPLEX(MON(-a,b+2));"
-"REDUCE_COMPLEX(POLYSTORE(a,b))   := MONADD(REDUCE_COMPLEX(a),REDUCE_COMPLEX(b));"
+  "REDUCE_COMPLEX(MON(a,0))         := MON(a,0);"
+  "REDUCE_COMPLEX(MON(a,1))         := MON(a,1);"
+  "REDUCE_COMPLEX(MON(a,CONST(b)))  := REDUCE_COMPLEX(MON(-a,b-2));"
+  "REDUCE_COMPLEX(MON(a,-CONST(b))) := REDUCE_COMPLEX(MON(-a,b+2));"
+  "REDUCE_COMPLEX(POLYSTORE(a,b))   := MONADD(REDUCE_COMPLEX(a),REDUCE_COMPLEX(b));"
 
-"SIMPLIFY(MON(a,b))               := MON(SIMPLIFY(a),b);"
-"SIMPLIFY(POLYSTORE(a,b))         := POLYSTORE(SIMPLIFY(a),SIMPLIFY(b));"
-;
+  "SIMPLIFY(MON(a,b))               := MON(SIMPLIFY(a),b);"
+  "SIMPLIFY(POLYSTORE(a,b))         := POLYSTORE(SIMPLIFY(a),SIMPLIFY(b));"
+
+  "RE(POLYSTORE(MON(a,1),MON(b,0)))    := b;"
+  "RE(MON(a,1))                        := 0;"
+  "RE(MON(b,0))                        := b;"
+
+  "IM(POLYSTORE(MON(a,1),MON(b,0)))    := a;" //IM((a+bj)/(c+dj))
+  "IM(MON(a,1))                        := a;"
+  "IM(MON(b,0))                        := 0;"
+  ;
+
+const char CRules::m_AlgebraRuleAcrossFunct[] =
+  "POLY(COS(a),1)           := MON(COS( SIMPLIFY(a)),0);"
+  "POLY(SIN(a),1)           := MON(SIN( SIMPLIFY(a)),0);"
+  "POLY(TAN(a),1)           := MON(TAN( SIMPLIFY(a)),0);"
+  "POLY(ACOS(a),1)           := MON(ACOS( SIMPLIFY(a)),0);"
+  "POLY(ASIN(a),1)           := MON(ASIN( SIMPLIFY(a)),0);"
+  "POLY(ATAN(a),1)           := MON(ATAN( SIMPLIFY(a)),0);"
+
+  "POLY(COSH(a),1)           := MON(COSH( SIMPLIFY(a)),0);"
+  "POLY(SINH(a),1)           := MON(SINH( SIMPLIFY(a)),0);"
+  "POLY(TANH(a),1)           := MON(TANH( SIMPLIFY(a)),0);"
+  "POLY(ACOSH(a),1)           := MON(ACOSH( SIMPLIFY(a)),0);"
+  "POLY(ASINH(a),1)           := MON(ASINH( SIMPLIFY(a)),0);"
+  "POLY(ATANH(a),1)           := MON(ATANH( SIMPLIFY(a)),0);"
+
+  "POLY(EXP(a),1)           := MON(EXP( SIMPLIFY(a) ),0);"
+  "POLY(FACT(a),1)          := MON(FACT(SIMPLIFY(a) ),0);"
+  "POLY(LOG(a),1)           := MON(LOG( SIMPLIFY(a) ),0);"
+  "POLY(LOG10(a),1)           := MON(LOG10( SIMPLIFY(a)),0);"
+  "POLY(VECT(a),1)           := MON(VECT( SIMPLIFY(a) ),0);"
+
+  "POLY(EQ(a,b),1)           := MON(EQ( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(NEQ(a,b),1)           := MON(NEQ( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(GT(a,b),1)           := MON(GT( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(GTE(a,b),1)           := MON(GTE( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(LT(a,b),1)           := MON(LT( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(LTE(a,b),1)           := MON(LTE( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(SHL(a,b),1)           := MON(SHL( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(SHR(a,b),1)           := MON(SHR( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  "POLY(CONCAT(a,b),1)          := MON(CONCAT( SIMPLIFY(a), SIMPLIFY(b)),0);"
+  ;
 
 const char CRules::m_AlgebraRuleMisc[] =
   //"SOLVE2(a,b,v)                      := SOLVE2(a,v),SOLVE2(b,v);"
-  "SOLVE(a,v)                         := SOLVE2(POLY(a,v),v);"
+  //"SOLVE(a,v)                         := SOLVE2(POLY(a,v),v);"
   //"SOLVE(a)                           := SOLVE(a,GETVAR(a));"
 
   "CONCAT(CONST(a),CONST(b)) := NONE;" // no simplification for concatenation op
@@ -360,7 +395,7 @@ const char CRules::m_AlgebraRuleMisc[] =
   "LOG10(a)+LOG10(b)  := LOG10(a*b)  ;"
 
   "0-b        := -b  ;"
- // "a-a        := 0  ;" pbm with vector
+  // "a-a        := 0  ;" pbm with vector
   "a-0        := a  ;"
   "(-a--b)        := b-a  ;"
   "(-a-b)        := -(a+b)  ;"
@@ -428,7 +463,6 @@ const char CRules::m_AlgebraRuleMisc[] =
   "BOOL(a)    := !(a==0);"
 
   "RE(a)                     := RE(POLY(a,j));"
-
   "IM(a)                     := IM(POLY(a,j));"
 
   "IF2(0,(a,b)) := b;"
@@ -440,7 +474,7 @@ const char CRules::m_AlgebraRuleMisc[] =
 
   "IPOLY((a,b),v)                         := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
   "IPOLY({a},v)                           := {IPOLY(a,v)};"
-  
+
   "NORM2(a,q)                          := NORM2(POLY(a,q),q);"
 
   "SIMPLIFY(ELEM(a))                   := a ;"
@@ -448,6 +482,7 @@ const char CRules::m_AlgebraRuleMisc[] =
   "SIMPLIFY(CONST(a))                  := a ;"
   "SIMPLIFY(-CONST(a))                 := -a ;"
   "SIMPLIFY(a)                         := SIMPLIFY2(a,GETVAR(a));"
+  //"SIMPLIFY(a/b)                       := SIMPLIFY(a)/SIMPLIFY(b);"
 
   "SIMPLIFY2(a,1)                      := IPOLY(POLY(a,1),1);"
   "SIMPLIFY2(a,v)                      := IPOLY(SIMPLIFY(POLY(a,v)),v);"
@@ -457,7 +492,7 @@ const char CRules::m_AlgebraRuleMisc[] =
   "GETVAR(a*b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a/b)                         := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );"
 #if 0
-"GETVAR(a^b)                  := GETVAR(a);"
+  "GETVAR(a^b)                  := GETVAR(a);"
 #else
   "GETVAR(a^CONST(b))                  := GETVAR(a);"
   "GETVAR(a^-CONST(b))                 := GETVAR(a);"
@@ -500,26 +535,47 @@ const char CRules::m_AlgebraRuleDerivals[] =
 
 const char CRules::m_AlgebraRuleSystems[] =
 
-  "REDUCE(    TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := (TED(a,b),TED(0,d));"
-  "REDUCE(    TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := (TED(c,d),TED(0,c*b-d*a));"
-  "REDUCE( e, TED(a,b)/TED(0,1),TED(0,d)/TED(0,1))    := (REDUCE( e, TED(a,b)/TED(0,1)) , TED(0,d));"
-  "REDUCE( e, TED(a,b)/TED(0,1),TED(c,d)/TED(0,1))    := (REDUCE( e, TED(c,d)/TED(0,1)) , TED(0,c*b-d*a));"
+    "POLY_TED({a},v)         := {POLY_TED(a,v)};"
+    "POLY_TED((a,b),v)       := (POLY_TED(a,v),POLY_TED(b,v));" //parenthesis are important there!!!
+    "POLY_TED(v,v)           := TED(1,0);"
+    "POLY_TED(a,v)           := TED(0,a);"
 
-  "SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY(REDUCE(POLY(a,y)),y)},{x});"
-  "SYSTEM_SOLVE3({a},{x})            := IPOLY(REDUCE(POLY(a,x)),x);"
-     
+    "IPOLY_TED({a},v)        := {IPOLY_TED(a,v)};"
+    "IPOLY_TED((a,b),v)      := (IPOLY_TED(a,v),IPOLY_TED(b,v));" //parenthesis are important there!!!
+    "IPOLY_TED(TED(a,b),v)   := a*v+b;"
+
+    "REDUCE(    TED(a,b),TED(0,d))    := (TED(a,b),TED(0,d));"
+    "REDUCE(    TED(a,b),TED(c,d))    := (TED(c,d),TED(0,c*b-d*a));"
+    "REDUCE( e, TED(a,b),TED(0,d))    := (REDUCE( e, TED(a,b)) , TED(0,d));"
+    "REDUCE( e, TED(a,b),TED(c,d))    := (REDUCE( e, TED(c,d)) , TED(0,c*b-d*a));"
+
+  /*"REDUCE(  a , MON(d,0) )                                                     := ( a , MON(d,0));"
+  "REDUCE(  POLYSTORE(MON(a,1),MON(b,0)), MON(c,1) )                           := ( MON(c,1) , MON(c*b,0));"
+  "REDUCE(  POLYSTORE(MON(a,1),MON(b,0)), POLYSTORE(MON(c,1),MON(d,0)) )       := ( POLYSTORE(MON(c,1),MON(d,0)) , MON(c*b-d*a,0));"
+
+  "REDUCE( ( e, a ), MON(d,0) )                                                := (REDUCE( e, a) , MON(d,0));"
+  "REDUCE( ( e, POLYSTORE(MON(a,1),MON(b,0))), MON(c,1) )                      := (REDUCE( e, MON(c,1)) , MON(c*b,0));"
+  "REDUCE( ( e, POLYSTORE(MON(a,1),MON(b,0))), POLYSTORE(MON(c,1),MON(d,0)) )  := (REDUCE( e, POLYSTORE(MON(c,1),MON(d,0))) , MON(c*b-d*a,0));"*/
+
+  "SOLVE2(TED(TED(a,b),c)/e)         := SOLVE2(TED(TED(a,b),c));"
+  "SOLVE2(TED(TED(a,b),c))           := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };"
+  "SOLVE2(TED(a,b)/e)                := SOLVE2(TED(a,b));"
+  "SOLVE2(TED(a,b))                  := SIMPLIFY((-b)/a);"  
+
+  "SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(POLY_TED(a,y)),y)},{x});"
+  "SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(POLY_TED(a,x)),x);"
   "SYSTEM_SOLVE4({a,b},{x,y})        := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));"
-  "SYSTEM_SOLVE4({a},{x})            := SYSTEM_SOLVE5(POLY(a,x));"
-
-  "SYSTEM_SOLVE5(TED(a,b)/TED(0,1))  := -b/a;"
-
-  "SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};"
+  "SYSTEM_SOLVE4({a},{x})            := SOLVE(a,x);"
 
   "SYSTEM_AUTO_SOLVE4({a,b})         := (SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b}));"
   "SYSTEM_AUTO_SOLVE4({a})           := NORM2(a,GETVAR(a));"
   "SYSTEM_AUTO_SOLVE3({a,b})         := SYSTEM_SOLVE3({a,b},{GETVAR(b)});"
   "SYSTEM_AUTO_SOLVE2({a},{c,d})     := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{c});"
   "SYSTEM_AUTO_SOLVE2({a},{c})       := SYSTEM_AUTO_SOLVE3({a});"
+
+  //entry points
+  "SOLVE(a,v)                        := SOLVE2(POLY_TED(a,v));"
+  "SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};"
   "SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_AUTO_SOLVE4({SYSTEM_AUTO_SOLVE2({a},{a})})};"
   ;
 
@@ -561,7 +617,7 @@ const char CRules::m_AlgebraRuleVectors[] =
   "INVAT({a},-CONST(b))      := ERROR(0);"
   ;
 
-const char CRules::m_AlgebraRuleTaylorSeries[] =  
+const char CRules::m_AlgebraRuleTaylorSeries[] =
   "TAYLOR(a,x,xo,0) := SUBST(a,x,xo);"
   "TAYLOR(a,x,xo,n) := TAYLOR(a,x,xo,n-1)+SUBST(DERN(a,x,n),x,xo)*(x-xo)^n/n!;"
   ;
