@@ -57,6 +57,7 @@ class CElementDataBase : public CElementArray
       OP_SET,
       OP_NONE,
       OP_CONST,
+      OP_CONSTINT,
       OP_ELEM,
       OP_NEG,
       OP_CPLX,

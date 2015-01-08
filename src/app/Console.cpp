@@ -43,9 +43,9 @@ int main()
 {
 
   setlocale( LC_NUMERIC, "C" );
-  std::cout << "************************************\n";
-  std::cout << "*** LighCAS Console ("__DATE__")***\n";
-  std::cout << "************************************\n";
+  std::cout << "*************************************\n";
+  std::cout << "*** LighCAS Console ("__DATE__") ***\n";
+  std::cout << "*************************************\n";
 
 #ifdef _WIN32
   CDisplay ds;

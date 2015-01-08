@@ -34,6 +34,7 @@ public:
     void   operator =  ( double v )              { m_Value = v;}
     double GetValue( )   const                   { return m_Value;    }
     bool   IsNegative()  const                   { return m_Value<0.; }
+    bool   IsInt()       const                   { return floor(m_Value) == m_Value; }
     const char *  GetFromString( const char *s1 );
     void   Display( CDisplay& s ) const;
     void   Negate() { m_Value = -m_Value; }

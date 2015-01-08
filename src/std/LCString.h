@@ -38,7 +38,7 @@ class CString: public std::string
     void Append( const CString& s )                  { append( s ); }
     void SetLength( size_t n )                       { resize( n ); }
     int  Compare(  const CString& s ) const          { return compare(s); }
-    CString Right( unsigned n ) const                { CString s; (n>length())? s.assign(*this): s.append( *this, length()-n, n ); return s;  }
+    //CString Right( unsigned n ) const                { CString s; (n>length())? s.assign(*this): s.append( *this, length()-n, n ); return s;  }
     size_t Search( char c ) const                    { return find(c); }    
     operator const char * () const                   { return GetBufferPtr();  }
     bool IsEmpty() const                             { return empty(); }
@@ -50,14 +50,12 @@ class CString: public std::string
 #else
         { char buffer[32];  snprintf( buffer, sizeof(buffer), (base==16?"%x":(base==10?"%d":"%o")), i ); Copy(buffer); }
 #endif
-    void Set( double v )
-        { char buffer[32];  snprintf( buffer, sizeof(buffer), "%.12g", v );  Copy( buffer );  }
     
     //Constructors
     CString(const char*s):std::string(s)             {}
     CString(const std::string &s):std::string(s)     {} //implicit
     CString():std::string()                          {}
     CString(int i, unsigned base=10)    { Set(i,base); }
-    CString(double v)                    { Set(v); }
+  //  CString(double v)                    { Set(v); }
 };
 

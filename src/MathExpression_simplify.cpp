@@ -181,7 +181,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
   {
     op1 = equ.Pop( pos1 );
 
-    if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_ELEM )
+    if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_CONSTINT || op1 == CElementDataBase::OP_ELEM )
     {
       op3 = op1;
       op1 = equ.Pop( pos1 );
@@ -201,9 +201,13 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
         {
           match = RefToElement( op2 )->IsVar();
         }
-        else // CElementDataBase::OP_CONST
+        else if( op3 == CElementDataBase::OP_CONST )
         {
           match = RefToElement( op2 )->IsConst();
+        }
+        else if( op3 == CElementDataBase::OP_CONSTINT )
+        {
+          match = RefToElement( op2 )->IsConst() && m_ElementDB->GetEvaluator()->GetElementValue(op2).IsInt();
         }
       }
     }

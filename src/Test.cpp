@@ -164,7 +164,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))", "0" );
   Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "4/(3*c)" );
   Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "4/(3*a)" );
-  //FAIL!!Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1/(a*b*c)+1" );
+  Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(a*b*c)" );
   Check( "SIMPLIFY(-b/a)", "-(b/a)" );
   Check( "SIMPLIFY(b/a+b/a)", "2*b/a" );
   Check( "SIMPLIFY(b/a-b/a)", "0" );
@@ -182,8 +182,11 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(x^(a-a))", "1" );
   Check( "SIMPLIFY(x^a)", "x^a" );
   Check( "SIMPLIFY(x^(a+a))", "x^(2*a)" );
+  Check( "SIMPLIFY((x+y)^(a+a))", "(x+y)^(2*a)" );
+  Check( "SIMPLIFY(1+(x+y)^(a+a))", "1+(x+y)^(2*a)" );
   Check( "SIMPLIFY((x^a)^2", "x^(2*a)" );
-  //FAIL!!Check( "SIMPLIFY(x^2.5)", "x^2.5" );
+  Check( "SIMPLIFY(x^2.5)", "x^2.5" );
+  Check( "SIMPLIFY((x+a)^2.5)", "(x+a)^2.5" );
   Check( "SIMPLIFY(2*x^a-2*x^a)","0");
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
@@ -210,6 +213,8 @@ void CElementDataBase::Test()
 
   Check( "SIMPLIFY(RE(4+j))", "4" );
   Check( "SIMPLIFY(-IM(1-5*j))", "5" );
+  Check( "SIMPLIFY(RE(4*j^6+j))", "-4" );
+  Check( "SIMPLIFY(-IM(1-5*j*(5*j^4))", "25" );
 
   /******* In function reduction ******/
   Check( "SIMPLIFY((a+a)*COS(a+a))", "2*COS(2*a)*a" );
@@ -225,6 +230,7 @@ void CElementDataBase::Test()
 
   /****** vector *********/
   Check( "SIMPLIFY({a,b}[c])", "{a,b}[c]" );
+  Check( "SIMPLIFY({a+a,b-b}[c+c])", "{2*a,0}[2*c]" );
   Check( "VSIZE({a})", "1" );
   Check( "VSIZE({a,b})", "2" );
   Check( "VSIZE({a,b,c})", "3" );
@@ -254,7 +260,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
   /********** transform **********/
-  Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
+  //Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
   /*********** assignment ***/
   CMathExpression equ0( this );
@@ -267,7 +273,7 @@ void CElementDataBase::Test()
   /********** solving **********/
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
-  Check( "SOLVE(x^2+4,x)", "{-(j*2),j*2}" );
+  Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
   /***** system solving *****/
@@ -319,4 +325,5 @@ void CElementDataBase::Test()
 //add mul 2a
 //enlever TODOS
 //résoudre pbm x^a
-//-créer lib quand compil ss linux
+//OK créer lib quand compil ss linux
+//- utiliser nostd pour réduire conso mémoire
