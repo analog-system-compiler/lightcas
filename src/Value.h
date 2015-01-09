@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <cmath>
 #include "Debug.h"
 #include "Display.h"
 

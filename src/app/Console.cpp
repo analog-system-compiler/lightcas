@@ -30,11 +30,11 @@ class CDisplayEx : public CDisplay
 {
     void AddString( const CString& str )
     {
-      *this += COLOR_CYAN + str + COLOR_OFF;
+      *this += CString(COLOR_CYAN) + str + CString(COLOR_OFF);
     }
     void AddValue( const CString& str )
     {
-      *this += COLOR_BLUE + str + COLOR_OFF;
+      *this += CString(COLOR_BLUE) + str + CString(COLOR_OFF);
     }
 };
 #endif

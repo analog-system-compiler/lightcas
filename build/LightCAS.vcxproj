@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugNoStd|Win32">
+      <Configuration>DebugNoStd</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
@@ -18,10 +22,20 @@
     <ClInclude Include="..\src\MathExpression.h" />
     <ClInclude Include="..\src\Evaluator.h" />
     <ClInclude Include="..\src\Function.h" />
+    <ClInclude Include="..\src\nostd\LCString.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\src\nostd\LCVector.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\src\Parser.h" />
     <ClInclude Include="..\src\Rules.h" />
-    <ClInclude Include="..\src\std\LCString.h" />
-    <ClInclude Include="..\src\std\LCVector.h" />
+    <ClInclude Include="..\src\std\LCString.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\src\std\LCVector.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\src\Value.h" />
   </ItemGroup>
   <ItemGroup>
@@ -34,6 +48,9 @@
     <ClCompile Include="..\src\MathExpression_transform.cpp" />
     <ClCompile Include="..\src\Evaluator.cpp" />
     <ClCompile Include="..\src\Function.cpp" />
+    <ClCompile Include="..\src\nostd\LCString.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\src\Parser.cpp" />
     <ClCompile Include="..\src\Rules.cpp" />
     <ClCompile Include="..\src\Test.cpp" />
@@ -45,6 +62,12 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v110</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v110</PlatformToolset>
@@ -63,6 +86,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -71,11 +97,26 @@
     <IntDir>c:\tmp\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>c:\tmp\$(ProjectName)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
+    <IntDir>c:\tmp\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>c:\tmp\$(ProjectName)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>..\src\std;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <Profile>true</Profile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\src\nostd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

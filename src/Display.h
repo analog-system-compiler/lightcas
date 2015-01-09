@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <cstdio>
 #include "LCString.h"
 
 class CDisplay : public CString

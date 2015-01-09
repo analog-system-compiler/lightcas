@@ -198,6 +198,7 @@ const char CRules::m_Functions[] =
   "REDUCE(a)"
   "TAYLOR(a)"
   "DERN(a)"
+  "NORM3(a)"
 
   //void
   "RAND()"
@@ -270,8 +271,9 @@ const char CRules::m_AlgebraRulePolynom[] =
 #endif
 
   //Pow
-  "MONPOW( MON(a,b), c )         := MON(a^c,b*c);"
-  "MONPOW( a, 1 )                := a;"
+  "MONPOW( MON(a,b), c )            := MON(a^c,b*c);"
+  "MONPOW( MON(1,0), b )            := MON(1,0);"
+  "MONPOW( a, 1 )                   := a;"
   "MONPOW( a,CONSTINT(e) )          := MONMUL( MONPOW(a,e-1), a );"
   "MONPOW( a,-CONSTINT(e) )         := MONDIV( MON(1,0), MONPOW(a,e) );"
 
@@ -333,8 +335,8 @@ const char CRules::m_AlgebraRulePolynom[] =
   "GET_POWER(MON(a,b),b)                  := a;"       
   "GET_POWER(a,b)                         := 0;"       
 
-  //"IPOLY4(MON(a,b),q)                  := q+b/a;"
-  "NORM2(a,q)                          := IPOLY(POLY(a,q),q);"
+  "NORM3(a)                            := MONDIV(a,MON(GET_POWER(a,1),0));"
+  "NORM2(a,q)                          := IPOLY(NORM3(POLY(a,q)),q);"
 
   "NORM(a,q)                           := IPOLY3(POLY(a,q),q);"
   "IPOLY3(MON(a,b),v)                  := (a^(1/b)*v)^b;"
@@ -375,9 +377,6 @@ const char CRules::m_AlgebraRuleAcrossFunct[] =
   ;
 
 const char CRules::m_AlgebraRuleMisc[] =
-  //"SOLVE2(a,b,v)                      := SOLVE2(a,v),SOLVE2(b,v);"
-  //"SOLVE(a,v)                         := SOLVE2(POLY(a,v),v);"
-  //"SOLVE(a)                           := SOLVE(a,GETVAR(a));"
 
   "CONCAT(CONST(a),CONST(b)) := NONE;" // no simplification for concatenation op
 
@@ -466,9 +465,9 @@ const char CRules::m_AlgebraRuleMisc[] =
   "1^b              := 1  ;"
   "a^1              := a  ;"
   "a^-b             := 1/(a^b)  ;"
-  "x^a*x^b          := x^(a+b);"
-  "x^a/x^b          := x^(a-b);"
-  "(x^a)^b          := x^(a*b);"
+//  "x^a*x^b          := x^(a+b);"
+//  "x^a/x^b          := x^(a-b);"
+//  "(x^a)^b          := x^(a*b);"
 
   //"a*(a^b)              := a^(b+1)  ;"
   //"(a^b)*a              := a^(b+1)  ;"
@@ -502,7 +501,6 @@ const char CRules::m_AlgebraRuleMisc[] =
   "SIMPLIFY(CONST(a))                  := a ;"
   "SIMPLIFY(-CONST(a))                 := -a ;"
   "SIMPLIFY(a)                         := SIMPLIFY2(a,GETVAR(a));"
-  //"SIMPLIFY(a/b)                       := SIMPLIFY(a)/SIMPLIFY(b);"
 
   "SIMPLIFY2(a,1)                      := IPOLY(POLY(a,1),1);"
   "SIMPLIFY2(a,v)                      := IPOLY(SIMPLIFY(POLY(a,v)),v);"
@@ -511,14 +509,7 @@ const char CRules::m_AlgebraRuleMisc[] =
   "GETVAR(a-b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a*b)                         := CHOOSEVAR( GETVAR(a), GETVAR(b) );"
   "GETVAR(a/b)                         := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );"
-#if 1
-  "GETVAR(a^b)                  := GETVAR(a);"
-#else
-  "GETVAR(a^CONST(b))                  := GETVAR(a);"
-  "GETVAR(a^-CONST(b))                 := GETVAR(a);"
-  //"GETVAR(a^b)                         := GETVAR(a^SIMPLIFY(b));"
-
-#endif
+  "GETVAR(a^b)                         := GETVAR(a);"
   "GETVAR(-a)                          := GETVAR(a);"
   "GETVAR(ELEM(a))                     := a;"
   "GETVAR(a)                           := 1;"
@@ -555,14 +546,6 @@ const char CRules::m_AlgebraRuleDerivals[] =
 
 const char CRules::m_AlgebraRuleSystems[] =
 
-   /* "POLY_TED(MON(a,0))                     := a;"
-    "POLY_TED(MON(a,1))                     := TED(a,0);"
-    "POLY_TED(MON(a,2))                     := TED(a,TED(0,0));"
-    "POLY_TED(POLYSTORE(MON(a,1),MON(b,0))) := TED(a,b);"
-    "POLY_TED(POLYSTORE(MON(a,2),b)         := TED(a,POLY_TED(b));"
-    "POLY_TED(POLYSTORE(b,MON(a,2))         := POLY_TED(POLYSTORE(MON(a,2),b);"
-    "POLY_TED(POLYSTORE(b,MON(a,1))         := POLY_TED(POLYSTORE(MON(a,1),b);"
-    "POLY_TED(a)                            := ERROR(1);" //power > 1*/  
     "TED(TED(0,a),b)                        := TED(a,b);"
     "POLY_TED(a)                            := TED(TED(GET_POWER(a,2),GET_POWER(a,1)),GET_POWER(a,0));"
 
@@ -580,7 +563,7 @@ const char CRules::m_AlgebraRuleSystems[] =
   "SOLVE2(TED(TED(a,b),c)/e)         := SOLVE2(TED(TED(a,b),c));"
   "SOLVE2(TED(TED(a,b),c))           := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };"
   "SOLVE2(TED(a,b)/e)                := SOLVE2(TED(a,b));"
-  "SOLVE2(TED(a,b))                  := SIMPLIFY((-b)/a);"  
+  "SOLVE2(TED(a,b))                  := -b/a;" //SIMPLIFY((-b)/a);"  
 
   "SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(TO_POLY_TED(a,y)),y)},{x});"
   "SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(TO_POLY_TED(a,x)),x);"

@@ -82,7 +82,8 @@ void CEvaluator::Evaluate( unsigned index )
   }
   else
   {
-    Push( GetElementValue( index ).GetValue() );
+    const CValue& v=GetElementValue( index );
+    Push( v.GetValue() );
   }
 }
 

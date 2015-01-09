@@ -16,9 +16,8 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#include "String.h"
+#include "LCString.h"
 
-char CString::m_Buffer[ 256 ];
 char const CString::m_NullString[ 1 ] = "";
 
 void CString::SetLength( unsigned len )
@@ -35,43 +34,47 @@ void CString::Append( const char* s, unsigned i )
   SetLength( m_Length + i );
 
   if( i == 1 )	// char
+  {
     m_Data[ m_Length - 1 ] = *s;
-
+  }
   else	// string;
+  {
     memcpy( &m_Data[ m_Length - i ], s, i * sizeof( char ) );
+  }
 
   m_Data[ m_Length ] = '\0';
 
 }
-#if 0
+
 int CString::Compare( const char* s1, const char* s2 )
 {
   int bcomp;
-
-  if( s1 != NULL )
+  
+  if( ( s1 == NULL ) && ( s2 == NULL ) )
   {
-    if( s2 != NULL )
-      bcomp = strcmp( s1, s2 );
-
-    else // s2 == NULL
-      bcomp = ( *s1 == '\0' ) ? 0 : 1;
+    bcomp = 0;
   }
-
-  else  // s1 == NULL
+  else if( s1 == NULL )
   {
-    if( s2 != NULL )
-      bcomp = ( *s2 == '\0' ) ? 0 : -1;
-
-    else // s2 == NULL
-      bcomp = 0;
+    bcomp = ( *s2 == '\0' ) ? 0 : -1;
+  }
+  else  if( s2 == NULL )
+  {
+    bcomp = ( *s1 == '\0' ) ? 0 : 1;
+  }
+  else
+  {
+    bcomp = strcmp( s1, s2 );
   }
 
   return bcomp;
 }
-#endif
-#if !OPT24 || defined( __GNUG__ )
-const char* CString::Convert( unsigned i, unsigned base )
+
+
+void CString::Set( unsigned i, unsigned base )
 {
+  char m_Buffer[ 256 ];
+#if defined( __GNUG__ )
   unsigned j;
   unsigned k;
   unsigned val;
@@ -87,10 +90,14 @@ const char* CString::Convert( unsigned i, unsigned base )
     i = k;
 
     if( val < 10 )
+    {
       val += '0';
+    }
 
     else
+    {
       val += 'A' - 10;
+    }
 
     j--;
     m_Buffer[ j ] = val;
@@ -98,7 +105,11 @@ const char* CString::Convert( unsigned i, unsigned base )
   }
   while( i && j );
 
-  return &m_Buffer[ j ];
+  Copy( m_Buffer + j );
+#else
+  _itoa_s( i, m_Buffer, base );
+  Copy( m_Buffer );
+#endif
 
 }
-#endif
+
