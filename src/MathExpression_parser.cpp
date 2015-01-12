@@ -69,16 +69,19 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
     if( n || e->IsNumeric() ) // For Rand(), n=0
     {
       ds += '(' ;
+      ds2.Copy(ds);
       for( i = 0; i < n; i++ )
-      {
-        ds2.Clear();
-        pos = DisplayBranch( pos, 0, ds2 );
+      {        
+        ds.Clear();
+        pos = DisplayBranch( pos, 0, ds );
         if( i != 0 )
         {
-          ds2 += ',' ;
+          ds += ',' ;
         }
-        ds3.Prepend( ds2 );
+        ds3.Prepend( ds );
+        
       }
+      ds.Copy(ds2);
       ds += ds3 ;
       ds += ')' ;
     }
@@ -297,9 +300,10 @@ bool CMathExpression::ParseElement( CParser& IC )
   if( e )
   {
     f = e->GetFunction();
-    if ( element_creation )
+    if ( element_creation && ( i > 0 ) )
     {
       f->SetParameterNb( i );
+      e->SetFunct();
     }
     else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
     {

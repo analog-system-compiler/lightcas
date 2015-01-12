@@ -23,18 +23,18 @@
 #include "ElementDataBase.h"
 
 #ifndef _WIN32
-#define COLOR_CYAN "\e[35;m"
-#define COLOR_BLUE "\e[36;m"
-#define COLOR_OFF  "\e[0;m"
+#define COLOR_CYAN "\e[35m"
+#define COLOR_BLUE "\e[36m"
+#define COLOR_OFF  "\e[0m"
 class CDisplayEx : public CDisplay
 {
-    void AddString( const CString& str )
+    void Add( const CString& str )
     {
-      *this += CString(COLOR_CYAN) + str + CString(COLOR_OFF);
+      *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
     }
     void AddValue( const CString& str )
     {
-      *this += CString(COLOR_BLUE) + str + CString(COLOR_OFF);
+      *this += CString( COLOR_BLUE ) + str + CString( COLOR_OFF );
     }
 };
 #endif
@@ -54,7 +54,7 @@ int main()
 #endif
 
   CEvaluator eval;
-  CElementDataBase db_root("Root",NULL,&eval);
+  CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
 
 #ifdef _DEBUG
@@ -73,12 +73,16 @@ int main()
   {
     std::cout << '>';
     std::getline ( std::cin, expression_str );
-    if( expression_str == "exit" ) exit(0);
+    if( expression_str == "exit" )
+    {
+      exit( 0 );
+    }
     IC.SetPos( expression_str.c_str() );
+
     try
     {
       equ.GetFromString( IC );
-      equ.UnaryOperation( simplify_op );   
+      equ.UnaryOperation( simplify_op );
       ans->SetEquation( equ );
       ds.Clear();
       equ.Display( ds );
@@ -86,9 +90,9 @@ int main()
     }
     catch( CParserException e )
     {
-     std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
+      std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
     }
-    
+
   }
 
   return 0;

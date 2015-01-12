@@ -186,13 +186,14 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(x^(a+a))", "x^(2*a)" );
   Check( "SIMPLIFY((x+y)^(a+a))", "(x+y)^(2*a)" );
   Check( "SIMPLIFY(1+(x+y)^(a+a))", "1+(x+y)^(2*a)" );
-  Check( "SIMPLIFY((x^a)^2", "x^(a*2)" );
+  Check( "SIMPLIFY((x^a)^2", "x^(2*a)" );
   Check( "SIMPLIFY(x^2.5)", "x^2.5" );
   Check( "SIMPLIFY((x+a)^2.5)", "(x+a)^2.5" );
   Check( "SIMPLIFY(2*x^a-2*x^a)","0");
-  Check( "SIMPLIFY(x^(1+a)*x^(1-a))","0");
+  Check( "SIMPLIFY(x^(1+a)*x^(1-a))","x^2");
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
+  Check( "SIMPLIFY(a*cos(b)", "a*cos(b)" );
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
@@ -263,7 +264,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
   /********** transform **********/
-  //Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
+  Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
   /*********** assignment ***/
   CMathExpression equ0( this );

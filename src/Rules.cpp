@@ -20,62 +20,62 @@
 
 const SProperties CRules::m_FunctionProperties[] =
 {
-  { "ADD",   2, &CEvaluator::Add           },
-  { "SUB",   2, &CEvaluator::Sub           },
-  { "OR",    2, &CEvaluator::Or            },
-  { "LOR",   2, &CEvaluator::LOr           },
-  { "XOR",   2, &CEvaluator::Xor           },
-  { "MUL",   2, &CEvaluator::Mul           },
-  { "DIV",   2, &CEvaluator::Div           },
-  { "AND",   2, &CEvaluator::And           },
-  { "LAND",  2, &CEvaluator::LAnd          },
-  { "EQ",    2, &CEvaluator::Equal         },
-  { "NEQ",   2, &CEvaluator::NotEqual      },
-  { "LTE",   2, &CEvaluator::LowerOrEqual  },
-  { "SHL",   2, &CEvaluator::ShiftLeft     },
-  { "LT",    2, &CEvaluator::Lower         },
-  { "GTE",   2, &CEvaluator::GreaterOrEqual},
-  { "SHR",   2, &CEvaluator::ShiftRight    },
-  { "GT",    2, &CEvaluator::Greater       },
-  { "MIN",   2, &CEvaluator::Min           },
-  { "MAX",   2, &CEvaluator::Max           },
-  { "MOD",   2, &CEvaluator::Mod           },
-  { "POW",   2, &CEvaluator::Pow           },
-  { "NEG",   1, &CEvaluator::Neg           },
-  { "INV",   1, &CEvaluator::Inv           },
-  { "NOT",   1, &CEvaluator::Not           },
-  { "ID",    1, &CEvaluator::Id            },
-  { "BOOL",  1, &CEvaluator::Bool          },
-  { "LNOT",  1, &CEvaluator::LNot          },
-  { "SIN",   1, &CEvaluator::Sin           },
-  { "COS",   1, &CEvaluator::Cos           },
-  { "TAN",   1, &CEvaluator::Tan           },
-  { "ASIN",  1, &CEvaluator::Asin          },
-  { "ACOS",  1, &CEvaluator::Acos          },
-  { "ATAN",  1, &CEvaluator::Atan          },
-  { "SINH",  1, &CEvaluator::SinH          },
-  { "COSH",  1, &CEvaluator::CosH          },
-  { "TANH",  1, &CEvaluator::TanH          },
-  { "ASINH", 1, &CEvaluator::AsinH         },
-  { "ACOSH", 1, &CEvaluator::AcosH         },
-  { "ATANH", 1, &CEvaluator::AtanH         },
-  { "EXP",   1, &CEvaluator::Exp           },
-  { "LOG",   1, &CEvaluator::Ln            },
-  { "LOG10", 1, &CEvaluator::Log           },
-  { "SQRT",  1, &CEvaluator::Sqrt          },
-  { "SQR",   1, &CEvaluator::Sqr           },
-  { "FACT",  1, &CEvaluator::Fact          },
-  { "ABS",   1, &CEvaluator::Abs           },
-  { "FLOOR", 1, &CEvaluator::Floor         },
-  { "CEIL",  1, &CEvaluator::Ceil          },
+  { "ADD",    2, &CEvaluator::Add           },
+  { "SUB",    2, &CEvaluator::Sub           },
+  { "OR",     2, &CEvaluator::Or            },
+  { "LOR",    2, &CEvaluator::LOr           },
+  { "XOR",    2, &CEvaluator::Xor           },
+  { "MUL",    2, &CEvaluator::Mul           },
+  { "DIV",    2, &CEvaluator::Div           },
+  { "AND",    2, &CEvaluator::And           },
+  { "LAND",   2, &CEvaluator::LAnd          },
+  { "EQ",     2, &CEvaluator::Equal         },
+  { "NEQ",    2, &CEvaluator::NotEqual      },
+  { "LTE",    2, &CEvaluator::LowerOrEqual  },
+  { "SHL",    2, &CEvaluator::ShiftLeft     },
+  { "LT",     2, &CEvaluator::Lower         },
+  { "GTE",    2, &CEvaluator::GreaterOrEqual},
+  { "SHR",    2, &CEvaluator::ShiftRight    },
+  { "GT",     2, &CEvaluator::Greater       },
+  { "MIN",    2, &CEvaluator::Min           },
+  { "MAX",    2, &CEvaluator::Max           },
+  { "MOD",    2, &CEvaluator::Mod           },
+  { "POW",    2, &CEvaluator::Pow           },
+  { "NEG",    1, &CEvaluator::Neg           },
+  { "INV",    1, &CEvaluator::Inv           },
+  { "NOT",    1, &CEvaluator::Not           },
+  { "ID",     1, &CEvaluator::Id            },
+  { "BOOL",   1, &CEvaluator::Bool          },
+  { "LNOT",   1, &CEvaluator::LNot          },
+  { "SIN",    1, &CEvaluator::Sin           },
+  { "COS",    1, &CEvaluator::Cos           },
+  { "TAN",    1, &CEvaluator::Tan           },
+  { "ASIN",   1, &CEvaluator::Asin          },
+  { "ACOS",   1, &CEvaluator::Acos          },
+  { "ATAN",   1, &CEvaluator::Atan          },
+  { "SINH",   1, &CEvaluator::SinH          },
+  { "COSH",   1, &CEvaluator::CosH          },
+  { "TANH",   1, &CEvaluator::TanH          },
+  { "ASINH",  1, &CEvaluator::AsinH         },
+  { "ACOSH",  1, &CEvaluator::AcosH         },
+  { "ATANH",  1, &CEvaluator::AtanH         },
+  { "EXP",    1, &CEvaluator::Exp           },
+  { "LOG",    1, &CEvaluator::Ln            },
+  { "LOG10",  1, &CEvaluator::Log           },
+  { "SQRT",   1, &CEvaluator::Sqrt          },
+  { "SQR",    1, &CEvaluator::Sqr           },
+  { "FACT",   1, &CEvaluator::Fact          },
+  { "ABS",    1, &CEvaluator::Abs           },
+  { "FLOOR",  1, &CEvaluator::Floor         },
+  { "CEIL",   1, &CEvaluator::Ceil          },
   { "SQUARE", 1, &CEvaluator::Square        },
-  { "RAND",  0, &CEvaluator::Rand          },
-  { "IF2",   2, &CEvaluator::If            },
-  { "IF",    2, &CEvaluator::If            },
+  { "RAND",   0, &CEvaluator::Rand          },
+  { "IF2",    2, &CEvaluator::If            },
+  { "IF",     2, &CEvaluator::If            },
   { "CONCAT", 2, &CEvaluator::Concat        },
-  { "SET",   2, NULL                       },
-  { "AT",    2, NULL                       },
-  { "VECT",  1, NULL                       }
+  { "SET",    2, NULL                       },
+  { "AT",     2, NULL                       },
+  { "VECT",   1, NULL                       }
 
 };
 
@@ -117,6 +117,7 @@ const char CRules::m_Functions[] =
   "IPOLY2(a,b)"
   "IPOLY3(a,b)"
   "IPOLY4(a,b)"
+  "IPOLY5(a,b)"
   "TO_POLY_TED(a,b)"
   "IPOLY_TED(a,b)"
   "AT(a,b)"
@@ -320,7 +321,7 @@ const char CRules::m_AlgebraRulePolynom[] =
   "REDUCE_COMPLEX(POLYSTORE(a,b))   := MONADD(REDUCE_COMPLEX(a),REDUCE_COMPLEX(b));"
   "REDUCE_COMPLEX(MONDIV(a,b))      := MONDIV(REDUCE_COMPLEX(a),REDUCE_COMPLEX(b));"
 
-  "SIMPLIFY(MON(a,b))               := MON(SIMPLIFY(a),b);"
+  "SIMPLIFY(MON(a,b))               := MON(SIMPLIFY(a),SIMPLIFY(b));"
   "SIMPLIFY(POLYSTORE(a,b))         := POLYSTORE(SIMPLIFY(a),SIMPLIFY(b));"
 
   "RE(POLYSTORE(a,b))                  := RE(a)+RE(b);"
@@ -332,16 +333,21 @@ const char CRules::m_AlgebraRulePolynom[] =
   "IM(MON(b,0))                        := 0;"
 
   "GET_POWER(POLYSTORE(a,b),c)            := GET_POWER(a,c)+GET_POWER(b,c);"
-  "GET_POWER(MON(a,b),b)                  := a;"       
-  "GET_POWER(a,b)                         := 0;"       
+  "GET_POWER(MON(a,b),b)                  := a;"
+  "GET_POWER(a,b)                         := 0;"
 
   "NORM3(a)                            := MONDIV(a,MON(GET_POWER(a,1),0));"
   "NORM2(a,q)                          := IPOLY(NORM3(POLY(a,q)),q);"
 
-  "NORM(a,q)                           := IPOLY3(POLY(a,q),q);"
+  "NORM(a,q)                           := IPOLY4(POLY(a,q),q);"
+  "IPOLY3(MON(a,0),v)                  := a;"
   "IPOLY3(MON(a,b),v)                  := (a^(1/b)*v)^b;"
   "IPOLY3(POLYSTORE(a,b),v)            := IPOLY3(a,v)+IPOLY3(b,v);"
-  "IPOLY3(MONDIV(a,b),v)               := IPOLY3(MONDIV(a,GET_POWER(b,0)),v)/IPOLY3(MONDIV(b,GET_POWER(b,0)),v);"
+  "IPOLY3(MONDIV(a,b),v)               := IPOLY3(a,v)/IPOLY3(b,v);"
+  "IPOLY5(((a,b),c),v)                 := IPOLY3(MONDIV(a,MON(c,0)),v)/IPOLY3(MONDIV(b,MON(c,0)),v);"
+
+  "IPOLY4(MONDIV(a,b),v)               := IPOLY5(((a,b),GET_POWER(b,0)),v);"
+  "IPOLY4(a,v)                         := IPOLY3(a,v);"
   ;
 
 const char CRules::m_AlgebraRuleAcrossFunct[] =
@@ -435,9 +441,6 @@ const char CRules::m_AlgebraRuleMisc[] =
   "/a*b            := (b/a);"
   "/a*/b            := /(b*a);"
 
-  // "(b/c)*a            := (b*a)/c  ;"
-  // "a*(b/c)            := (a*b)/c  ;"
-  //  "1/a*1/b      := 1/(a*b)  ;"
   "a*1/b            := a/b  ;"
   "1/a*b            := b/a  ;"
   "EXP(a)*EXP(b)    := EXP(a+b)  ;"
@@ -445,13 +448,9 @@ const char CRules::m_AlgebraRuleMisc[] =
   "SQR(a)*SQR(b)    := SQR(a*b)  ;"
 
   "0/b        := 0  ;"
-  //"/b            := 1/b  ;"
   "a/1        := a  ;"
-  //"-a/-b        := a/b  ;"
   "-a/b        := -(a/b)  ;"
   "a/-b        := -(a/b)  ;"
-  //"1/a/1/b      := a/b  ;"
-  //"a/1/b        := a*b  ;"
   "(a/b)/c        := a/(b*c)  ;"
 
   "LOG(EXP(1))      := 1;"
@@ -465,14 +464,6 @@ const char CRules::m_AlgebraRuleMisc[] =
   "1^b              := 1  ;"
   "a^1              := a  ;"
   "a^-b             := 1/(a^b)  ;"
-//  "x^a*x^b          := x^(a+b);"
-//  "x^a/x^b          := x^(a-b);"
-//  "(x^a)^b          := x^(a*b);"
-
-  //"a*(a^b)              := a^(b+1)  ;"
-  //"(a^b)*a              := a^(b+1)  ;"
-  //"a*(a^b)              := a^(b+1)  ;"
-  //"(a*b)^c          := (a^c)*(b^c)  ;"
 
   "BOOL(a==b) := (a==b);"
   "BOOL(a<>b) := (a<>b);"
@@ -491,7 +482,7 @@ const char CRules::m_AlgebraRuleMisc[] =
   "IF(c,(a,b))  := IF2(BOOL(c),(a,b));"
 
   "POLY((a,b),v)         := (POLY(a,v),POLY(b,v));" //parenthesis are important there!!!
-  "POLY({a},v)           := {POLY(a,v)};"  
+  "POLY({a},v)           := {POLY(a,v)};"
 
   "IPOLY((a,b),v)                         := (IPOLY(a,v),IPOLY(b,v));" //parenthesis are important there!!!
   "IPOLY({a},v)                           := {IPOLY(a,v)};"
@@ -546,31 +537,31 @@ const char CRules::m_AlgebraRuleDerivals[] =
 
 const char CRules::m_AlgebraRuleSystems[] =
 
-    "TED(TED(0,a),b)                        := TED(a,b);"
-    "POLY_TED(a)                            := TED(TED(GET_POWER(a,2),GET_POWER(a,1)),GET_POWER(a,0));"
+  "TED(TED(0,a),b)                        := TED(a,b);"
+  "POLY_TED(a)                            := TED(TED(GET_POWER(a,2),GET_POWER(a,1)),GET_POWER(a,0));"
 
-    "TO_POLY_TED((a,b),v)                   := (TO_POLY_TED(a,v),TO_POLY_TED(b,v));"
-    "TO_POLY_TED(a,v)                       := POLY_TED(POLY(a,v));"
+  "TO_POLY_TED((a,b),v)                   := (TO_POLY_TED(a,v),TO_POLY_TED(b,v));"
+  "TO_POLY_TED(a,v)                       := POLY_TED(POLY(a,v));"
 
-    "IPOLY_TED((a,b),v)                     := (IPOLY_TED(a,v),IPOLY_TED(b,v));" //parenthesis are important there!!!
-    "IPOLY_TED(TED(a,b),v)                  := a*v+b;"
+  "IPOLY_TED((a,b),v)                     := (IPOLY_TED(a,v),IPOLY_TED(b,v));" //parenthesis are important there!!!
+  "IPOLY_TED(TED(a,b),v)                  := a*v+b;"
 
-    "REDUCE(    TED(a,b),TED(0,d))    := (TED(a,b),TED(0,d));"
-    "REDUCE(    TED(a,b),TED(c,d))    := (TED(c,d),TED(0,c*b-d*a));"
-    "REDUCE( e, TED(a,b),TED(0,d))    := (REDUCE( e, TED(a,b)) , TED(0,d));"
-    "REDUCE( e, TED(a,b),TED(c,d))    := (REDUCE( e, TED(c,d)) , TED(0,c*b-d*a));"
+  "REDUCE(    TED(a,b),TED(0,d))    := (TED(a,b),TED(0,d));"
+  "REDUCE(    TED(a,b),TED(c,d))    := (TED(c,d),TED(0,c*b-d*a));"
+  "REDUCE( e, TED(a,b),TED(0,d))    := (REDUCE( e, TED(a,b)) , TED(0,d));"
+  "REDUCE( e, TED(a,b),TED(c,d))    := (REDUCE( e, TED(c,d)) , TED(0,c*b-d*a));"
 
   "SOLVE2(TED(TED(a,b),c)/e)         := SOLVE2(TED(TED(a,b),c));"
   "SOLVE2(TED(TED(a,b),c))           := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };"
   "SOLVE2(TED(a,b)/e)                := SOLVE2(TED(a,b));"
-  "SOLVE2(TED(a,b))                  := -b/a;" //SIMPLIFY((-b)/a);"  
+  "SOLVE2(TED(a,b))                  := -b/a;"
 
   "SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(TO_POLY_TED(a,y)),y)},{x});"
   "SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(TO_POLY_TED(a,x)),x);"
   "SYSTEM_SOLVE4({a,b},{x,y})        := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));"
   "SYSTEM_SOLVE4({a},{x})            := SOLVE(a,x);"
 
-  "SYSTEM_AUTO_SOLVE4({a,b})         := (SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b}));"  
+  "SYSTEM_AUTO_SOLVE4({a,b})         := (SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b}));"
   "SYSTEM_AUTO_SOLVE4({a})           := NORM2(a,GETVAR(a));"
   "SYSTEM_AUTO_SOLVE3({a,b})         := SYSTEM_SOLVE3({a,b},{GETVAR(b)});"
   "SYSTEM_AUTO_SOLVE2({a},{c,d})     := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{c});"
@@ -591,19 +582,20 @@ const char CRules::m_AlgebraRuleLogic[] =
   "a&0    := 0  ;"
   "a&~0     := a    ;"
   "~0&b     := b    ;"
+  "~a |  a  := ~0;"
+  " a | ~a  := ~0;"
+  "~a &  a  := 0;"
+  " a & ~a  := 0;"
 
   "POLY(a&b,v)        := POLY(a,v)&POLY(b,v);"
   "POLY(a|b,v)        := POLY(a,v)|POLY(b,v);"
   "POLY(~a,v)         := ~POLY(a,v);"
-  " TED(1,0)/TED(0,1) |  TED(1,0)/TED(0,1)  := TED(1,0)/TED(0,1);"
-  " TED(0,a)/TED(0,1) |  TED(0,b)/TED(0,1)  := TED(0,a|b)/TED(0,1);"
-  " TED(1,0)/TED(0,1) &  TED(1,0)/TED(0,1)  := TED(1,0)/TED(0,1);"
-  " TED(0,a)/TED(0,1) &  TED(0,b)/TED(0,1)  := TED(0,a&b)/TED(0,1);"
-  "~TED(0,a)/TED(0,1)                       := TED(0,~a)/TED(0,1);"
-  "~TED(1,0)/TED(0,1) |  TED(1,0)/TED(0,1)  := TED(0,1)/TED(0,1);"
-  " TED(1,0)/TED(0,1) | ~TED(1,0)/TED(0,1)  := TED(0,1)/TED(0,1);"
-  "~TED(1,0)/TED(0,1) &  TED(1,0)/TED(0,1)  := TED(0,0)/TED(0,1);"
-  " TED(1,0)/TED(0,1) & ~TED(1,0)/TED(0,1)  := TED(0,0)/TED(0,1);"
+
+  " MON(1,1) |  MON(1,1)  := MON(1,1);"
+  " MON(a,0) |  MON(b,0)  := MON(a|b,0);"
+  " MON(1,1) &  MON(1,1)  := MON(1,1);"
+  " MON(a,0) &  MON(b,0)  := MON(a&b,0);"
+  "~MON(a,0)              := MON(~a,0);"
   ;
 
 const char CRules::m_AlgebraRuleVectors[] =

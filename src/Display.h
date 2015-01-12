@@ -24,10 +24,10 @@
 class CDisplay : public CString
 {
 public:
-    virtual void Add( char c )              { *this += c; }
-    virtual void Add( const CString& str )  { *this += str; }
-//    virtual void Add( double v )            { *this += CString( v );  }
-    virtual void Add( int i )               { *this += CString( i );  }
-    virtual void Print(const char *s)       { puts( s ); }
-    void Print()                            { Print( GetBufferPtr() ); }
+    virtual void Add( char c )                   { *this += c; }
+    virtual void Add( const CString& str )       { *this += str; }
+    virtual void AddValue( const CString& str )  { *this += str; }
+    virtual void Add( int i )                    { *this += CString( i );  }
+    virtual void Print(const char *s)            { puts( s ); }
+    void Print()                                 { Print( GetBufferPtr() ); }
 };

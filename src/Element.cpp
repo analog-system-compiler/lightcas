@@ -57,7 +57,7 @@ void CElement::Display( CDisplay& ds ) const
   {
     if( m_Name.GetLength() )
     {
-      ds.Add( m_Name );
+      ds.AddValue( m_Name );
     }
     else
     {
