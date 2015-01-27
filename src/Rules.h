@@ -31,6 +31,7 @@ class CRules
 {
   public:
     static const char m_AlgebraRulePolynom[];
+    static const char m_AlgebraRulePolynomCommon[];
     static const char m_AlgebraRuleAcrossFunct[];
     static const char m_AlgebraRuleMisc[];
     static const char m_AlgebraRuleDerivals[];
@@ -38,6 +39,7 @@ class CRules
     static const char m_AlgebraRuleLogic[];
     static const char m_AlgebraRuleVectors[];
     static const char m_AlgebraRuleTaylorSeries[];
+    static const char m_AlgebraRuleConst[];
     static const SProperties m_FunctionProperties[];
     static const char m_Functions[];
     static const char m_FunctionSymbol[];

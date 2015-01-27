@@ -36,23 +36,24 @@ class CEvaluator
 
   protected:
     CDoubleArray    m_ValueStack;
-    unsigned   m_ValPos;
-    CValue     m_Value;
-    CValueArray m_ElementValueArray;
-    CFunctArray m_FunctionArray;
+    unsigned        m_ValPos;
+    CValue          m_Value;
+    CValueArray     m_ElementValueArray;
+    CFunctArray     m_FunctionArray;
 
   public:
     void GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n );    
     void SetElementValue( unsigned index, const CValue& v );
     void SetFunction( unsigned index, const CEvaluatorFunct funct );
-    const CValue& GetElementValue( unsigned index ) const;    
+    virtual const CValue& GetElementValue( unsigned index ) const;    
+    virtual CValue GetValueFromString( const char **pos ) const;
 
   protected:
     virtual void AllocateStack( unsigned size );
-    void         Evaluate( unsigned index );
+    void    Evaluate( unsigned index );
     const CValue& GetValue();    
-    double       Pop()           { return m_ValueStack[ --m_ValPos ]; }
-    void         Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
+    double  Pop()           { return m_ValueStack[ --m_ValPos ]; }
+    void    Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
 
   public:
     void VectorStart();

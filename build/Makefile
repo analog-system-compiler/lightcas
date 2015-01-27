@@ -23,15 +23,14 @@ endif
 LIB_OBJS       = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 -include $(LIB_OBJS:.o=.d)
 
-ifeq ($(DEBUG),1)
-  DEBUG_FLAGS = -g -D_DEBUG
-endif
-
-GPROF_FLAGS = -pg
-
+GPROF_FLAGS   = -pg
 BUILD_CFLAGS  = $(CFLAGS) -MD -Wall $(INCDIR)
-BUILD_CFLAGS += $(GPROF_FLAGS)
-BUILD_CFLAGS += $(DEBUG_FLAGS)
+
+ifeq ($(DEBUG),1)
+  BUILD_CFLAGS += -g -D_DEBUG $(GPROF_FLAGS)
+else
+  BUILD_CFLAGS += -s -Os
+endif
 
 all:$(EXE)
 

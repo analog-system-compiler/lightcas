@@ -153,11 +153,11 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
   {
     c = s[k];
 
-    if( c >= 'a' && c <= 'h' )
+    if( c >= 'a' && c <= 'z' )
     {
       DisplayBranch( reserved_pos[--j], i, ds );
     }
-    else if ( c >= 'A' && c <= 'H' )
+    else if ( c >= 'A' && c <= 'Z' )
     {
       DisplayBranch( reserved_pos[--j], 0, ds );
     }

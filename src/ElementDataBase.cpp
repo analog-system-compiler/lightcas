@@ -52,13 +52,15 @@ void CElementDataBase::Initialize()
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
     AddOperandTable     ( CRules::m_Functions           );
     AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct);
+    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynomCommon );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct   );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleMisc     );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleSystems  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleLogic    );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleVectors  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleTaylorSeries );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRuleConst    );
   }
   else
   {
@@ -68,7 +70,6 @@ void CElementDataBase::Initialize()
 
 void CElementDataBase::AddReservedElements()
 {
-  const double PI = 3.14159265358979323846264338327950288;
   GetElement( CValue( 0. ) );
   GetElement()->SetPseudoName(  "a"  );
   GetElement()->SetPseudoName(  "b"  );
@@ -82,14 +83,12 @@ void CElementDataBase::AddReservedElements()
   GetElement( "SET"        )->SetOperandNb( 2 );
   GetElement( "NONE"       );//->SetOperandNb( 0 );
   GetElement( "CONST"      )->SetOperandNb( 1 );
-  GetElement( "CONSTINT"   )->SetOperandNb( 1 );
   GetElement( "ELEM"       )->SetOperandNb( 1 );
   GetElement( "NEG"        )->SetOperandNb( 1 );
   GetElement( "j"          );//->SetOperandNb( 0 );
   GetElement( "RANK"       )->SetOperandNb( 2 );
   GetElement( "SUBST"      )->SetOperandNb( 2 );
   GetElement( "ERROR_SIZE" );//->SetOperandNb( 0 );
-  SetConstValue( GetElement( "PI" ), CValue( PI ) );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO       ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1       ] ) == OP_EXP1   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2       ] ) == OP_EXP2   );
@@ -103,7 +102,6 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SET        ] ) == OP_SET    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE       ] ) == OP_NONE   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST      ] ) == OP_CONST  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONSTINT   ] ) == OP_CONSTINT  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM       ] ) == OP_ELEM   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG        ] ) == OP_NEG    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX       ] ) == OP_CPLX   );
@@ -234,7 +232,8 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
 
   if( IC.GetChar() != '-' )
   {
-    const char* pos = v.GetFromString( IC.GetPos() );
+    const char* pos = IC.GetPos();
+    v = GetEvaluator()->GetValueFromString( &pos );
     if( pos != IC.GetPos() )
     {
       IC.SetPos( pos );

@@ -55,14 +55,8 @@ void CElement::Display( CDisplay& ds ) const
 
   if( IsConst() )
   {
-    if( m_Name.GetLength() )
-    {
+      ASSERT(m_Name.GetLength());
       ds.AddValue( m_Name );
-    }
-    else
-    {
-      ASSERT( false );
-    }
   }
   else if( m_PseudoName.GetLength() )
   {

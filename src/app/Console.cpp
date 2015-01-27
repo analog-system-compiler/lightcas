@@ -22,22 +22,98 @@
 #include "Element.h"
 #include "ElementDataBase.h"
 
+
+class CDisplayEx : public CDisplay
+{
+  public:
+    unsigned m_DisplayBase;
+
 #ifndef _WIN32
 #define COLOR_CYAN "\e[35m"
 #define COLOR_BLUE "\e[36m"
 #define COLOR_OFF  "\e[0m"
-class CDisplayEx : public CDisplay
-{
     void Add( const CString& str )
     {
       *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
     }
     void AddValue( const CString& str )
     {
-      *this += CString( COLOR_BLUE ) + str + CString( COLOR_OFF );
+      *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
+    }
+#else
+    void AddValue( const CString& str )
+    {
+      *this += ConValue( str );
+    }
+#endif
+    CString ConValue( const CString& str )
+    {
+      CString s;
+      if( str == "1.#INF" )
+      {
+        s = "INF";
+      }      
+      else
+      {
+        double v = strtod( str.GetBufferPtr(), NULL );
+        if( isdigit( str[0] ) && ( v == floor( v ) ) ) // if integer
+        {
+          if ( m_DisplayBase == 2 )
+          {
+            s = '#';
+          }
+          else if ( m_DisplayBase == 16 )
+          {
+            s = '$';
+          }
+          s += CString( ( int )v, m_DisplayBase );
+        }
+        else // else display as is
+        {
+          s = str;
+        }
+      }
+      return s;
+    }
+
+    CDisplayEx(): CDisplay()
+    {
+      m_DisplayBase = 10;
     }
 };
-#endif
+
+class CValueEx : public CValue
+{
+  public:
+    const char* GetFromString( const char* s1 )
+    {
+      char* s2;
+      if( *s1 == '#' )
+      {
+        m_Value = strtol( s1 + 1, &s2, 2 );
+      }
+      else if( *s1 == '$' )
+      {
+        m_Value = strtol( s1 + 1, &s2, 16 );
+      }
+      else
+      {
+        m_Value = strtod( s1, &s2 );
+      }
+      return s2;
+    }
+};
+
+class CEvaluatorEx : public CEvaluator
+{
+  public:
+    CValue GetValueFromString( const char** pos ) const
+    {
+      CValueEx v;
+      *pos = v.GetFromString( *pos );
+      return v;
+    }
+};
 
 int main()
 {
@@ -47,13 +123,8 @@ int main()
   std::cout << "*** LighCAS Console ("__DATE__") ***\n";
   std::cout << "*************************************\n";
 
-#ifdef _WIN32
-  CDisplay ds;
-#else
   CDisplayEx ds;
-#endif
-
-  CEvaluator eval;
+  CEvaluatorEx eval;
   CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
 
@@ -75,24 +146,42 @@ int main()
     std::getline ( std::cin, expression_str );
     if( expression_str == "exit" )
     {
+      std::cout << "Exiting." << "\n";
       exit( 0 );
     }
-    IC.SetPos( expression_str.c_str() );
-
-    try
+    else if ( expression_str == "hex" )
     {
-      equ.GetFromString( IC );
-      equ.UnaryOperation( simplify_op );
-      ans->SetEquation( equ );
-      ds.Clear();
-      equ.Display( ds );
-      std::cout << ds << "\n";
+      ds.m_DisplayBase = 16;
+      std::cout << "Switched to hex mode." << "\n";
     }
-    catch( CParserException e )
+    else if ( expression_str == "bin" )
     {
-      std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
+      ds.m_DisplayBase = 2;
+      std::cout << "Switched to bin mode." << "\n";
     }
+    else if ( expression_str == "dec" )
+    {
+      ds.m_DisplayBase = 10;
+      std::cout << "Switched to dec mode." << "\n";
+    }
+    else
+    {
+      IC.SetPos( expression_str.c_str() );
 
+      try
+      {
+        equ.GetFromString( IC );
+        equ.UnaryOperation( simplify_op );
+        ans->SetEquation( equ );
+        ds.Clear();
+        equ.Display( ds );
+        std::cout << ds << "\n";
+      }
+      catch( CParserException e )
+      {
+        std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
+      }
+    }
   }
 
   return 0;

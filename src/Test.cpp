@@ -159,6 +159,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(b*(a+2)-b*a-2*b)", "0" );
   Check( "SIMPLIFY(-(a-b)-(b-a))", "0" );
   Check( "SIMPLIFY(a/a-1)", "0" );
+  Check( "SIMPLIFY(-b/a)", "-(b/a)" );
   Check( "SIMPLIFY(a*b/(a*b)-1)", "0" );
   Check( "SIMPLIFY(a*b/(a*b))", "1" );
   Check( "SIMPLIFY(a*b*c/(a*b*c))", "1" );
@@ -167,7 +168,6 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "4/(3*c)" );
   Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "4/(3*a)" );
   Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(a*b*c)" );
-  Check( "SIMPLIFY(-b/a)", "-(b/a)" );
   Check( "SIMPLIFY(b/a+b/a)", "2/a*b" );
   Check( "SIMPLIFY(b/a-b/a)", "0" );
   Check( "SIMPLIFY(b*1/a)", "b/a" );
@@ -193,7 +193,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(x^(1+a)*x^(1-a))","x^2");
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
-  Check( "SIMPLIFY(a*cos(b)", "a*cos(b)" );
+  Check( "SIMPLIFY(a*cos(b)", "cos(b)*a" );
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
@@ -247,6 +247,7 @@ void CElementDataBase::Test()
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
   Check( "SIMPLIFY({-2,2})", "{-2,2}" );
+  //Check( "{a,b}:={2,3};{a,b}", "{2,3}" );
 
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
@@ -332,4 +333,5 @@ void CElementDataBase::Test()
 //enlever TODOS
 //résoudre pbm x^a
 //OK créer lib quand compil ss linux
-//- utiliser nostd pour réduire conso mémoire
+//OK utiliser nostd pour réduire conso mémoire
+//clean IsWord() && (>='a' && <= 'z')

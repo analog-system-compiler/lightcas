@@ -29,6 +29,13 @@ CEvaluator::~CEvaluator(  )
 {
 }
 
+CValue CEvaluator::GetValueFromString( const char **pos ) const
+{
+    CValue v;
+    *pos = v.GetFromString( *pos );
+    return v;
+}
+
 const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
   unsigned pos;
@@ -57,7 +64,7 @@ void CEvaluator::SetElementValue( unsigned index, const CValue& v )
 
 const CValue& CEvaluator::GetElementValue( unsigned index ) const
 {
-  ASSERT( index <= m_ElementValueArray.GetSize() );
+  ASSERT( index < m_ElementValueArray.GetSize() );
   return m_ElementValueArray.GetAt( index );
 }
 

@@ -58,7 +58,7 @@ public:
   /* In-Line functions */
   bool	   IsEmpty() const    {    return( m_Length == 0 );  }
   unsigned GetLength() const  {    return m_Length;  }
-  unsigned Search( char c )   {    const char* s = strchr( m_Data, c );    return s ? s - m_Data : -1;  }
+  unsigned Search( char c ) const   {    const char* s = strchr( m_Data, c );    return s ? s - m_Data : -1;  }
 
   int		Compare( const CString& s ) const {    return Compare( m_Data, s.m_Data );  }
   //bool		Compare( const char* s1 )    {    return Compare( m_Data, s1 );  }

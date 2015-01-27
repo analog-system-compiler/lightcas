@@ -77,7 +77,7 @@ void CMathExpression::OptimizeTree()
 }
 
 void CMathExpression::OptimizeTree3()
-{  
+{
   if( !OptimizeTree2() )
   {
     OptimizeConst();
@@ -112,7 +112,7 @@ bool CMathExpression::OptimizeTree2()
       if( match )
       {
 #ifdef _DEBUG
-       rule->m_AccessNb++;
+        rule->m_AccessNb++;
 #endif
 #ifdef DEBUG_OPTIMIZE
         CDisplay ds;
@@ -131,10 +131,10 @@ bool CMathExpression::OptimizeTree2()
         if( rule->m_bHasRule )
         {
 #if 1
-          CMathExpression equ2(m_ElementDB);
+          CMathExpression equ2( m_ElementDB );
           equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           SetSize( pos );
-          Push(equ2);
+          Push( equ2 );
 #else
           unsigned pos2 = m_StackSize;
           ApplyRule( *this, pos_array, &rule->m_DstEquation );
@@ -181,7 +181,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
   {
     op1 = equ.Pop( pos1 );
 
-    if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_CONSTINT || op1 == CElementDataBase::OP_ELEM )
+    if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_ELEM )
     {
       op3 = op1;
       op1 = equ.Pop( pos1 );
@@ -205,10 +205,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
         {
           match = RefToElement( op2 )->IsConst();
         }
-        else if( op3 == CElementDataBase::OP_CONSTINT )
-        {
-          match = RefToElement( op2 )->IsConst() && m_ElementDB->GetEvaluator()->GetElementValue(op2).IsInt();
-        }
+
       }
     }
     else if( IsReserved( op1 ) ) //a,b or c
@@ -258,6 +255,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
     }
     else if( !ExecuteCommand( op3 ) )
     {
+      ASSERT( RefToElement( op3 ) != NULL );
       Push( op3 );
     }
 
@@ -278,16 +276,16 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
 {
   CElement* e;
   bool bOK = false;
-  
+
   if( op3 == CElementDataBase::OP_SET )
   {
-    CMathExpression equ(m_ElementDB);
+    CMathExpression equ( m_ElementDB );
     equ.PushBranch( *this, m_StackSize );
     op3 = GetLastOperator();
     e = RefToElement( op3 );
-    e->AddFunction( *this, equ );
-    //Copy( *this );
-    bOK = true;
+      e->AddFunction( *this, equ );
+      //Copy( *this );
+      bOK = true;
   }
   else if ( op3 == CElementDataBase::OP_RANK )
   {
@@ -298,7 +296,7 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
   }
   else if ( op3 == CElementDataBase::OP_SUBST )
   {
-    CMathExpression equ(m_ElementDB);
+    CMathExpression equ( m_ElementDB );
     OP_CODE opd = Pop( m_StackSize );
     OP_CODE op1 = Pop( m_StackSize );
     ASSERT( op1 == CElementDataBase::OP_CONCAT );
