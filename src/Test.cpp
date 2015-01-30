@@ -335,3 +335,6 @@ void CElementDataBase::Test()
 //OK créer lib quand compil ss linux
 //OK utiliser nostd pour réduire conso mémoire
 //clean IsWord() && (>='a' && <= 'z')
+//Use quadratic solving x^8+x^4+5=23
+//revoir résolution de système pour éviter les x^2
+//enlever les ';' et continuer de parser tant qu'il y des caractères

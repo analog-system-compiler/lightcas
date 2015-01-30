@@ -24,7 +24,7 @@
 class CElement;
 class CEvaluator;
 
-typedef void (CEvaluator::*CEvaluatorFunct)();
+typedef void (*CEvaluatorFunct)( CEvaluator& );
 typedef CVector< class CValue > CValueArray;
 typedef CVector< double > CDoubleArray;
 typedef CVector< CEvaluatorFunct > CFunctArray;
@@ -47,72 +47,73 @@ class CEvaluator
     void SetFunction( unsigned index, const CEvaluatorFunct funct );
     virtual const CValue& GetElementValue( unsigned index ) const;    
     virtual CValue GetValueFromString( const char **pos ) const;
+    double  Pop()           { return m_ValueStack[ --m_ValPos ]; }
+    void    Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
+    //double  Get( unsigned index ) { return m_ValueStack[ --m_ValPos ]; }
 
   protected:
     virtual void AllocateStack( unsigned size );
     void    Evaluate( unsigned index );
-    const CValue& GetValue();    
-    double  Pop()           { return m_ValueStack[ --m_ValPos ]; }
-    void    Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
+    const CValue& GetValue();        
 
   public:
-    void VectorStart();
-    void VectorNext();
-    void At();
-    void PI();
-    void Rand();
-    void Sin();
-    void Cos();
-    void Tan();
-    void Asin();
-    void Acos();
-    void Atan();
-    void SinH();
-    void CosH();
-    void TanH();
-    void AsinH();
-    void AcosH();
-    void AtanH();
-    void Exp();
-    void Ln();
-    void Log();
-    void Sqrt();
-    void Floor();
-    void Ceil();
-    void Abs();
-    void Sqr();
-    void Neg();
-    void Inv();
-    void Id();
-    void Bool();
-    void LNot();
-    void Fact();
-    void Not();
-    void Square();
-    void Add();
-    void Sub();
-    void Mul();
-    void Div();
-    void Lower();
-    void LowerOrEqual();
-    void Greater();
-    void GreaterOrEqual();
-    void Equal();
-    void NotEqual();
-    void Min();
-    void Max();
-    void LAnd();
-    void LOr();
-    void Pow();
-    void Par();
-    void Mod();
-    void And();
-    void Or();
-    void Xor();
-    void ShiftRight();
-    void ShiftLeft();
-    void If();
-    void Concat() {}
+    static void VectorStart( CEvaluator& );
+    static void VectorNext( CEvaluator& );
+    static void At( CEvaluator& );
+    static void PI( CEvaluator& );
+    static void Rand( CEvaluator& );
+    static void Sin( CEvaluator& );
+    static void Cos( CEvaluator& );
+    static void Tan( CEvaluator& );
+    static void Asin( CEvaluator& );
+    static void Acos( CEvaluator& );
+    static void Atan( CEvaluator& );
+    static void SinH( CEvaluator& );
+    static void CosH( CEvaluator& );
+    static void TanH( CEvaluator& );
+    static void AsinH( CEvaluator& );
+    static void AcosH( CEvaluator& );
+    static void AtanH( CEvaluator& );
+    static void Exp( CEvaluator& );
+    static void Ln( CEvaluator& );
+    static void Log( CEvaluator& );
+    static void Sqrt( CEvaluator& );
+    static void Floor( CEvaluator& );
+    static void Ceil( CEvaluator& );
+    static void Abs( CEvaluator& );
+    static void Sqr( CEvaluator& );
+    static void Neg( CEvaluator& );
+    static void Inv( CEvaluator& );
+    static void Id( CEvaluator& );
+    static void Bool( CEvaluator& );
+    static void LNot( CEvaluator& );
+    static void Fact( CEvaluator& );
+    static void Not( CEvaluator& );
+    static void Square( CEvaluator& );
+    static void Add( CEvaluator& );
+    static void Sub( CEvaluator& );
+    static void Mul( CEvaluator& );
+    static void Div( CEvaluator& );
+    static void Lower( CEvaluator& );
+    static void LowerOrEqual( CEvaluator& );
+    static void Greater( CEvaluator& );
+    static void GreaterOrEqual( CEvaluator& );
+    static void Equal( CEvaluator& );
+    static void NotEqual( CEvaluator& );
+    static void Min( CEvaluator& );
+    static void Max( CEvaluator& );
+    static void LAnd( CEvaluator& );
+    static void LOr( CEvaluator& );
+    static void Pow( CEvaluator& );
+    static void Par( CEvaluator& );
+    static void Mod( CEvaluator& );
+    static void And( CEvaluator& );
+    static void Or( CEvaluator& );
+    static void Xor( CEvaluator& );
+    static void ShiftRight( CEvaluator& );
+    static void ShiftLeft( CEvaluator& );
+    static void If( CEvaluator& );
+    static void Concat( CEvaluator& ) {}
     const CValue& Evaluate( unsigned size, const OP_CODE *p );
 
   public:

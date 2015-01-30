@@ -51,8 +51,8 @@ void CElementDataBase::Initialize()
     AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
     AddOperandTable     ( CRules::m_Functions           );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynomCommon );
+    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct   );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleMisc     );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );

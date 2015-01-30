@@ -29,11 +29,11 @@ CEvaluator::~CEvaluator(  )
 {
 }
 
-CValue CEvaluator::GetValueFromString( const char **pos ) const
+CValue CEvaluator::GetValueFromString( const char** pos ) const
 {
-    CValue v;
-    *pos = v.GetFromString( *pos );
-    return v;
+  CValue v;
+  *pos = v.GetFromString( *pos );
+  return v;
 }
 
 const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
@@ -85,11 +85,11 @@ void CEvaluator::Evaluate( unsigned index )
 
   if( funct_ptr )
   {
-    ( this->*funct_ptr ) ();
+    ( *funct_ptr ) ( *this );
   }
   else
   {
-    const CValue& v=GetElementValue( index );
+    const CValue& v = GetElementValue( index );
     Push( v.GetValue() );
   }
 }
@@ -137,142 +137,142 @@ void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
 }
 
 /***** void ****/
-void CEvaluator::Rand( void )
+void CEvaluator::Rand( CEvaluator& eval )
 {
-  Push( ( double )rand() / ( double )RAND_MAX ) ;
+  eval.Push( ( double )rand() / ( double )RAND_MAX ) ;
 }
 
 /***** Unitary ****/
-void CEvaluator::Sin()
+void CEvaluator::Sin( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( sin(  v  ) );
+  double v = eval.Pop();
+  eval.Push( sin(  v  ) );
 }
 
-void CEvaluator::Cos()
+void CEvaluator::Cos( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( cos(  v  ) );
+  double v = eval.Pop();
+  eval.Push( cos(  v  ) );
 }
-void CEvaluator::Tan()
+void CEvaluator::Tan( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( tan(  v  ) );
+  double v = eval.Pop();
+  eval.Push( tan(  v  ) );
 }
-void CEvaluator::Asin()
+void CEvaluator::Asin( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( asin(  v  ) );
+  double v = eval.Pop();
+  eval.Push( asin(  v  ) );
 }
-void CEvaluator::Acos()
+void CEvaluator::Acos( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( acos(  v  ) );
+  double v = eval.Pop();
+  eval.Push( acos(  v  ) );
 }
-void CEvaluator::Atan()
+void CEvaluator::Atan( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( atan(  v  ) );
+  double v = eval.Pop();
+  eval.Push( atan(  v  ) );
 }
-void CEvaluator::SinH()
+void CEvaluator::SinH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( sinh(  v  ) );
+  double v = eval.Pop();
+  eval.Push( sinh(  v  ) );
 }
-void CEvaluator::CosH()
+void CEvaluator::CosH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( cosh(  v  ) );
+  double v = eval.Pop();
+  eval.Push( cosh(  v  ) );
 }
-void CEvaluator::TanH()
+void CEvaluator::TanH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( tanh(  v  ) );
+  double v = eval.Pop();
+  eval.Push( tanh(  v  ) );
 }
-void CEvaluator::AsinH()
+void CEvaluator::AsinH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( log( v + sqrt( v * v + 1. ) ) );
+  double v = eval.Pop();
+  eval.Push( log( v + sqrt( v * v + 1. ) ) );
 }
-void CEvaluator::AcosH()
+void CEvaluator::AcosH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) ) );
+  double v = eval.Pop();
+  eval.Push( log( v + sqrt( ( v + 1. ) * ( v - 1. ) ) ) );
 }
-void CEvaluator::AtanH()
+void CEvaluator::AtanH( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( 0.5 * log( ( 1 + v ) / ( 1 - v ) ) );
+  double v = eval.Pop();
+  eval.Push( 0.5 * log( ( 1 + v ) / ( 1 - v ) ) );
 }
-void CEvaluator::Exp()
+void CEvaluator::Exp( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( exp(  v  ) );
+  double v = eval.Pop();
+  eval.Push( exp(  v  ) );
 }
-void CEvaluator::Ln()
+void CEvaluator::Ln( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( log(  v  ) );
+  double v = eval.Pop();
+  eval.Push( log(  v  ) );
 }
-void CEvaluator::Log()
+void CEvaluator::Log( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( log10(  v  ) );
+  double v = eval.Pop();
+  eval.Push( log10(  v  ) );
 }
-void CEvaluator::Sqrt()
+void CEvaluator::Sqrt( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( sqrt(  v  ) );
+  double v = eval.Pop();
+  eval.Push( sqrt(  v  ) );
 }
-void CEvaluator::Floor()
+void CEvaluator::Floor( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( floor(  v  ) );
+  double v = eval.Pop();
+  eval.Push( floor(  v  ) );
 }
-void CEvaluator::Ceil()
+void CEvaluator::Ceil( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( ceil(  v  ) );
+  double v = eval.Pop();
+  eval.Push( ceil(  v  ) );
 }
-void CEvaluator::Abs()
+void CEvaluator::Abs( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( fabs(  v  ) );
+  double v = eval.Pop();
+  eval.Push( fabs(  v  ) );
 }
 
-void CEvaluator::Sqr()
+void CEvaluator::Sqr( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( v * v );
+  double v = eval.Pop();
+  eval.Push( v * v );
 }
-void CEvaluator::Neg()
+void CEvaluator::Neg( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( -v );
+  double v = eval.Pop();
+  eval.Push( -v );
 }
-void CEvaluator::Inv()
+void CEvaluator::Inv( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( ( double )1. / v );
+  double v = eval.Pop();
+  eval.Push( ( double )1. / v );
 }
-void CEvaluator::Id()
+void CEvaluator::Id( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( v );
+  double v = eval.Pop();
+  eval.Push( v );
 }
-void CEvaluator::Bool()
+void CEvaluator::Bool( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( ( double )( v == 0. ) );
+  double v = eval.Pop();
+  eval.Push( ( double )( v == 0. ) );
 }
-void CEvaluator::LNot()
+void CEvaluator::LNot( CEvaluator& eval )
 {
-  double v = Pop();
-  Push( ( double )( v != 0. ) );
+  double v = eval.Pop();
+  eval.Push( ( double )( v != 0. ) );
 }
-void CEvaluator::Fact()
+void CEvaluator::Fact( CEvaluator& eval )
 {
-  double v = Pop();
+  double v = eval.Pop();
   int a = 1;
   int b = ( int ) v ;
 
@@ -281,23 +281,23 @@ void CEvaluator::Fact()
     a *= i;
   }
 
-  Push( ( double )a );
+  eval.Push( ( double )a );
 }
 
-void CEvaluator::Not()
+void CEvaluator::Not( CEvaluator& eval )
 {
   // int n, m;
   //  double x;
-  double v = Pop();
+  double v = eval.Pop();
   /*x = frexp( v, &n ) * ( double )( 1 << 30 );
   m = ~( int )x;
-  Push(ldexp( ( double )m, n - 30 );*/
-  Push( -v - 1 );
+  eval.Push(ldexp( ( double )m, n - 30 );*/
+  eval.Push( -v - 1 );
 }
 
-void CEvaluator::Square()
+void CEvaluator::Square( CEvaluator& eval )
 {
-  double v = Pop();
+  double v = eval.Pop();
   double	v2;
 
   v2 = floor(  v  );
@@ -311,197 +311,194 @@ void CEvaluator::Square()
   {
     v = ( double ) - 0.5;
   }
-  Push( v );
+  eval.Push( v );
 }
 
 /******* Binary *******/
-void CEvaluator::Add()
+void CEvaluator::Add( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( v1 + v2 );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( v1 + v2 );
 }
 
-void CEvaluator::Sub()
+void CEvaluator::Sub( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( v1 - v2 );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( v1 - v2 );
 }
 
-void CEvaluator::Mul()
+void CEvaluator::Mul( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( v1 * v2 );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( v1 * v2 );
 }
 
-void CEvaluator::Div()
+void CEvaluator::Div( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
   /*ASSERT(v2!=0.);*/
-  Push( v1 / v2 );
+  eval.Push( v1 / v2 );
 }
 
-void CEvaluator::Lower()
+void CEvaluator::Lower( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 < v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 < v2 ) );
 }
 
-void CEvaluator::LowerOrEqual()
+void CEvaluator::LowerOrEqual( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 <= v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 <= v2 ) );
 }
 
-void CEvaluator::Greater()
+void CEvaluator::Greater( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 > v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 > v2 ) );
 }
 
-void CEvaluator::GreaterOrEqual()
+void CEvaluator::GreaterOrEqual( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 >= v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 >= v2 ) );
 }
 
-void CEvaluator::Equal()
+void CEvaluator::Equal( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 == v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 == v2 ) );
 }
 
-void CEvaluator::NotEqual()
+void CEvaluator::NotEqual( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( double )( v1 != v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( double )( v1 != v2 ) );
 }
 
-void CEvaluator::Min()
+void CEvaluator::Min( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( v1 < v2 ) ? v1 : v2 );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( v1 < v2 ) ? v1 : v2 );
 }
 
-void CEvaluator::Max()
+void CEvaluator::Max( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( v1 > v2 ) ? v1 : v2 );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( v1 > v2 ) ? v1 : v2 );
 }
 
-void CEvaluator::LAnd()
+void CEvaluator::LAnd( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( ( v1 != 0. ) && ( v2 != 0. ) ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( ( v1 != 0. ) && ( v2 != 0. ) ) );
 }
 
-void CEvaluator::LOr()
+void CEvaluator::LOr( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( ( v1 != 0. ) || ( v2 != 0. ) ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( ( v1 != 0. ) || ( v2 != 0. ) ) );
 }
 
-void CEvaluator::Pow()
+void CEvaluator::Pow( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( pow(  v1  ,  v2  ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( pow(  v1  ,  v2  ) );
 }
 
-void CEvaluator::Par()
+void CEvaluator::Par( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( ( v1 * v2 ) / ( v1 + v2 ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( ( v1 * v2 ) / ( v1 + v2 ) );
 }
 
-void CEvaluator::Mod()
+void CEvaluator::Mod( CEvaluator& eval )
 {
-  double v2 = Pop();
-  double v1 = Pop();
-  Push( fmod(  v1 ,  v2   ) );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.Push( fmod(  v1 ,  v2   ) );
 }
 
-void CEvaluator::And()
+void CEvaluator::And( CEvaluator& eval )
 {
   int m1, m2, n;
-  double v2 = Pop();
-  double v1 = Pop();
-  GetMantAndExp( v1, v2, m1, m2, n );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 & m2;
-  Push( ldexp( ( double )m1, n ) );
-
+  eval.Push( ldexp( ( double )m1, n ) );
 }
 
-void CEvaluator::Or()
+void CEvaluator::Or( CEvaluator& eval )
 {
   int m1, m2, n;
-  double v2 = Pop();
-  double v1 = Pop();
-  GetMantAndExp( v1, v2, m1, m2, n );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 | m2;
-  Push( ldexp( ( double )m1, n ) );
-
+  eval.Push( ldexp( ( double )m1, n ) );
 }
 
-void CEvaluator::Xor()
+void CEvaluator::Xor( CEvaluator& eval )
 {
   int m1, m2, n;
-  double v2 = Pop();
-  double v1 = Pop();
-  GetMantAndExp( v1, v2, m1, m2, n );
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
+  eval.GetMantAndExp( v1, v2, m1, m2, n );
   m1 = m1 ^ m2;
-  Push( ldexp( ( double )m1, n ) );
-
+  eval.Push( ldexp( ( double )m1, n ) );
 }
 
-void CEvaluator::ShiftRight()
+void CEvaluator::ShiftRight( CEvaluator& eval )
 {
   int		n;
   double	x;
-  double v2 = Pop();
-  double v1 = Pop();
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
   x = frexp(  v1 , &n );
   n -= ( int ) v2 ;
-  Push( ldexp( x, n ) );
+  eval.Push( ldexp( x, n ) );
 }
 
-void CEvaluator::ShiftLeft()
+void CEvaluator::ShiftLeft( CEvaluator& eval )
 {
   int		n;
   double	x;
-  double v2 = Pop();
-  double v1 = Pop();
+  double v2 = eval.Pop();
+  double v1 = eval.Pop();
   x = frexp(  v1 , &n );
   n += ( int ) v2;
-  Push( ldexp( x, n ) );
+  eval.Push( ldexp( x, n ) );
 }
 
-void CEvaluator::If()
+void CEvaluator::If( CEvaluator& eval )
 {
-  double v1 = Pop();
-  double v2 = Pop();
-  double v3 = Pop();
+  double v1 = eval.Pop();
+  double v2 = eval.Pop();
+  double v3 = eval.Pop();
   if( v3 != 0 )
   {
-    Push( v2 );
+    eval.Push( v2 );
   }
   else
   {
-    Push( v1 );
+    eval.Push( v1 );
   }
 }
 

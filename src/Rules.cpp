@@ -213,6 +213,7 @@ const char CRules::m_FunctionSymbol[] = // precedence is defined here
 {
   // lowercase: new precedence = precedence + 1
   // uppercase: new precedence = 0
+  "a=b       =>  a b SUB 0 EQ;"
   "a,b       =>  a b CONCAT;"
   "a:=b      =>  a b SET;"
   "a?B:C     =>  a b c CONCAT IF;"
@@ -243,7 +244,7 @@ const char CRules::m_FunctionSymbol[] = // precedence is defined here
   "{A}       =>  a VECT;"
 };
 
-#if 0
+#if 1
 const char CRules::m_AlgebraRulePolynom[] =
 
   "TED( TED(0,a),b )    := TED(a,b);"
@@ -275,10 +276,12 @@ const char CRules::m_AlgebraRulePolynom[] =
   "MONDIV( TED( a,0)           , TED( TED(b,c),0)     )     := MONDIV( TED(0,a)   , TED(b,c));"
   "MONDIV( TED( TED(a,b),0)    , TED(c,0)             )     := MONDIV( TED(a,b)   , TED(0,c));"
   "MONDIV( TED(a,0)            , TED(b,0)             )     := MONDIV( TED(0,a)   , TED(0,b));"
-  "MONDIV( TED(a,b)            , TED(0,c)             )     := TED(a/c,b/c);" // recursion*/
-  "MONDIV( TED(a,b)            , TED(c,0)             )     := MONDIV( TED(a/c,b/c),TED(1,0));"
-  "MONDIV( TED(a,b)            , TED(1,0)             )     := NONE;"
-  "MONDIV( TED(a,0)            , TED(1,0)             )     := TED(0,a);"
+  //"MONDIV( TED(a,b)            , TED(c,0)             )     := MONDIV(MONDIV(TED(a,b), TED(0,c)),TED(1,0));"
+  //"MONDIV( TED(a,b)            , TED(1,0)             )     := NONE;"
+  //"MONDIV( TED(a,0)            , TED(1,0)             )     := TED(0,a);"
+  //"MONDIV( TED(TED(a,b),0)     , TED(1,0)             )     := TED(a,b);"
+  "MONDIV( TED(a,b)            , TED(0,c)             )     := TED(MONDIV(a,TED(0,c)),b/c);" // recursion*/
+  "MONDIV( a                   , TED(0,c)             )     := TED(0,a/c);"
   
   // Euclidean division                               )
   //"(TED(a,b) / TED(0,1)) + (TED(0,f) / TED(g,h))    )   := NONE;"
@@ -286,10 +289,12 @@ const char CRules::m_AlgebraRulePolynom[] =
   //"MONDIV( TED(a,b)             , CONST(c)            )     := TED(a/c,b/c);"
 
   //Pow
-  "MONPOW( TED(a,b) , 1            ) := TED(a,b);"
-  "MONPOWCONST( a,e,1 )        := MONMUL( MONPOW(a,e-1), a );"
-  "MONPOWCONST( a,-e,1)        := MONDIV( TED(0,1), MONPOW(a,e) );"
-  "MONPOW(a,b)                 := MONPOWCONST(a,b,FLOOR(b)==b);"
+  //"MONPOWCONST( TED(a,b), 1,1 ) := TED(a,b);"
+  "MONPOWCONST( a,0,1 )        := TED(0,1);"
+  "MONPOWCONST( a,e,1 )        := MONMUL( MONPOWCONST(a,e-1,1), a );"
+  "MONPOWCONST( a,-e,1)        := MONDIV( TED(0,1), MONPOWCONST(a,e,1) );"
+  //"MONMUL(MONPOWCONST( a,b,0),c) := MONPOWCONST((a,b);"
+  "MONPOW(TED(0,a),b)          := TED(0,a^b);"
 
   //Poly
   "POLY(v,v)             := TED(1,0);"
@@ -374,7 +379,6 @@ const char CRules::m_AlgebraRulePolynom[] =
 
   "MONPOWCONST( a,e,1 )        := MONMUL( MONPOW(a,e-1), a );"
   "MONPOWCONST( a,-e,1)        := MONDIV( MON(1,0), MONPOW(a,e) );"
-  "MONPOW(a,b)                 := MONPOWCONST(a,b,FLOOR(b)==b);"
 
   //"MONPOW( a,CONSTINT(e) )          := MONMUL( MONPOW(a,e-1), a );"
   //"MONPOW( a,-CONSTINT(e) )         := MONDIV( MON(1,0), MONPOW(a,e) );"
@@ -438,6 +442,7 @@ const char CRules::m_AlgebraRulePolynomCommon[] =
     "MONMUL(MONDIV(a,c),b)            := MONDIV( MONMUL(a,b), c );"                                     //"a/c*b   := (a*b)/c;"
     "MONMUL(MONDIV(a,b),MONDIV(c,d))  := MONDIV( MONMUL(a,c), MONMUL(b,d) );"                          //"a/b*c/d := (a*c)/(b*d);"
     "MONDIV(MONDIV(a,b),c)            := MONDIV( a,MONMUL(c,b ) );"                                     //"(a/b)/c := a/(c*b);"
+    "MONPOW(a,b)                      := MONPOWCONST(a,b,FLOOR(b)==b);"
 
     "POLY(-a,v)                       := MONNEG( POLY(a,v) );"
     "POLY(/a,v)                       := MONDIV( POLY(1,v) , POLY(a,v)    );"
@@ -467,33 +472,34 @@ const char CRules::m_AlgebraRuleAcrossFunct[] =
   "POLY(COS(a),1)           := POLYF(COS( SIMPLIFY(a)));"
   "POLY(SIN(a),1)           := POLYF(SIN( SIMPLIFY(a)));"
   "POLY(TAN(a),1)           := POLYF(TAN( SIMPLIFY(a)));"
-  "POLY(ACOS(a),1)           := POLYF(ACOS( SIMPLIFY(a)));"
-  "POLY(ASIN(a),1)           := POLYF(ASIN( SIMPLIFY(a)));"
-  "POLY(ATAN(a),1)           := POLYF(ATAN( SIMPLIFY(a)));"
+  "POLY(ACOS(a),1)          := POLYF(ACOS( SIMPLIFY(a)));"
+  "POLY(ASIN(a),1)          := POLYF(ASIN( SIMPLIFY(a)));"
+  "POLY(ATAN(a),1)          := POLYF(ATAN( SIMPLIFY(a)));"
 
-  "POLY(COSH(a),1)           := POLYF(COSH( SIMPLIFY(a)));"
-  "POLY(SINH(a),1)           := POLYF(SINH( SIMPLIFY(a)));"
-  "POLY(TANH(a),1)           := POLYF(TANH( SIMPLIFY(a)));"
-  "POLY(ACOSH(a),1)           := POLYF(ACOSH( SIMPLIFY(a)));"
-  "POLY(ASINH(a),1)           := POLYF(ASINH( SIMPLIFY(a)));"
-  "POLY(ATANH(a),1)           := POLYF(ATANH( SIMPLIFY(a)));"
+  "POLY(COSH(a),1)          := POLYF(COSH( SIMPLIFY(a)));"
+  "POLY(SINH(a),1)          := POLYF(SINH( SIMPLIFY(a)));"
+  "POLY(TANH(a),1)          := POLYF(TANH( SIMPLIFY(a)));"
+  "POLY(ACOSH(a),1)         := POLYF(ACOSH( SIMPLIFY(a)));"
+  "POLY(ASINH(a),1)         := POLYF(ASINH( SIMPLIFY(a)));"
+  "POLY(ATANH(a),1)         := POLYF(ATANH( SIMPLIFY(a)));"
 
   "POLY(EXP(a),1)           := POLYF(EXP( SIMPLIFY(a) ));"
   "POLY(FACT(a),1)          := POLYF(FACT(SIMPLIFY(a) ));"
   "POLY(LOG(a),1)           := POLYF(LOG( SIMPLIFY(a) ));"
-  "POLY(LOG10(a),1)           := POLYF(LOG10( SIMPLIFY(a)));"
-  "POLY(VECT(a),1)           := POLYF(VECT( SIMPLIFY(a) ));"
-  "POLY(MOD(a,b),1)           := POLYF(MOD( SIMPLIFY(a),SIMPLIFY(b)));"
+  "POLY(LOG10(a),1)         := POLYF(LOG10( SIMPLIFY(a)));"
+  "POLY(VECT(a),1)          := POLYF(VECT( SIMPLIFY(a) ));"
+  "POLY(FLOOR(a),1)         := POLYF(FLOOR( SIMPLIFY(a),SIMPLIFY(b)));"
+  "POLY(MOD(a,b),1)         := POLYF(MOD( SIMPLIFY(a),SIMPLIFY(b)));"
 
-  "POLY(EQ(a,b),1)           := POLYF(EQ( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(NEQ(a,b),1)           := POLYF(NEQ( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(GT(a,b),1)           := POLYF(GT( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(GTE(a,b),1)           := POLYF(GTE( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(LT(a,b),1)           := POLYF(LT( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(LTE(a,b),1)           := POLYF(LTE( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(SHL(a,b),1)           := POLYF(SHL( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(SHR(a,b),1)           := POLYF(SHR( SIMPLIFY(a), SIMPLIFY(b)));"
-  "POLY(CONCAT(a,b),1)          := POLYF(CONCAT( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(EQ(a,b),1)          := POLYF(EQ( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(NEQ(a,b),1)         := POLYF(NEQ( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(GT(a,b),1)          := POLYF(GT( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(GTE(a,b),1)         := POLYF(GTE( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(LT(a,b),1)          := POLYF(LT( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(LTE(a,b),1)         := POLYF(LTE( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(SHL(a,b),1)         := POLYF(SHL( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(SHR(a,b),1)         := POLYF(SHR( SIMPLIFY(a), SIMPLIFY(b)));"
+  "POLY(CONCAT(a,b),1)      := POLYF(CONCAT( SIMPLIFY(a), SIMPLIFY(b)));"
   ;
 
 const char CRules::m_AlgebraRuleMisc[] =
@@ -527,12 +533,12 @@ const char CRules::m_AlgebraRuleMisc[] =
   //"COS(PI/2+a)  := -SIN(a)  ;"
   "EXP(-a)      := 1/EXP(a)  ;"
 
-  "0+b        := b  ;"
-  "a+0        := a  ;"
-  "(-a+-b)      := -(a+b)  ;"
-  "-a+b        := b-a  ;"
-  "a+-b        := a-b  ;"
-  "SIN(a)+SIN(b)    := COS((a-b)/2)*SIN((a+b)/2)*2  ;"
+  "0+b                := b  ;"
+  "a+0                := a  ;"
+  "(-a+-b)            := -(a+b)  ;"
+  "-a+b               := b-a  ;"
+  "a+-b               := a-b  ;"
+  "SIN(a)+SIN(b)      := COS((a-b)/2)*SIN((a+b)/2)*2  ;"
   "LOG10(a)+LOG10(b)  := LOG10(a*b)  ;"
 
   "0-b        := -b  ;"

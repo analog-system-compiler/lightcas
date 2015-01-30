@@ -283,9 +283,9 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
     equ.PushBranch( *this, m_StackSize );
     op3 = GetLastOperator();
     e = RefToElement( op3 );
-      e->AddFunction( *this, equ );
-      //Copy( *this );
-      bOK = true;
+    e->AddFunction( *this, equ );
+    //Copy( *this );
+    bOK = true;
   }
   else if ( op3 == CElementDataBase::OP_RANK )
   {
@@ -299,12 +299,18 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
     CMathExpression equ( m_ElementDB );
     OP_CODE opd = Pop( m_StackSize );
     OP_CODE op1 = Pop( m_StackSize );
-    ASSERT( op1 == CElementDataBase::OP_CONCAT );
-    OP_CODE ops = Pop( m_StackSize );
-    equ.PushBranch( *this, m_StackSize );
-    equ.Replace( ops, opd );
-    Push( equ );
-    bOK = true;
+    if( op1 == CElementDataBase::OP_CONCAT )
+    {
+      OP_CODE ops = Pop( m_StackSize );
+      equ.PushBranch( *this, m_StackSize );
+      equ.Replace( ops, opd );
+      Push( equ );
+      bOK = true;
+    }
+    else
+    {
+      ASSERT( false );
+    }
   }
   return bOK;
 }

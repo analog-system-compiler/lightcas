@@ -56,9 +56,9 @@ class CMathExpression
     void         GetLevel( CParser& IC, unsigned priority );
     bool         SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
     bool         ParseElement(CParser& IC);
-    bool         MatchOperator( CParser& IC, const CString& s, const CMathExpression& equ, unsigned priority1, bool symbol_first );
+    bool         MatchOperator( CParser& IC, const char * s, const CMathExpression& equ, unsigned priority1 );
                  
-    const char*  ParseExpression( const char* sp, unsigned pos_array[], unsigned priority, CParser& IC, bool allow_recursion );
+    void         StoreStackPointer( char c, unsigned pos_array[] );
 
     bool         OptimizeConst();
     bool         OptimizeTree2();
