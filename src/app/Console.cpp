@@ -22,7 +22,6 @@
 #include "Element.h"
 #include "ElementDataBase.h"
 
-
 class CDisplayEx : public CDisplay
 {
   public:
@@ -152,17 +151,17 @@ int main()
     else if ( expression_str == "hex" )
     {
       ds.m_DisplayBase = 16;
-      std::cout << "Switched to hex mode." << "\n";
+      std::cout << "Switching to hexadecimal mode." << "\n";
     }
     else if ( expression_str == "bin" )
     {
       ds.m_DisplayBase = 2;
-      std::cout << "Switched to bin mode." << "\n";
+      std::cout << "Switching to binary mode." << "\n";
     }
     else if ( expression_str == "dec" )
     {
       ds.m_DisplayBase = 10;
-      std::cout << "Switched to dec mode." << "\n";
+      std::cout << "Switching to decimal mode." << "\n";
     }
     else
     {

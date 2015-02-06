@@ -86,7 +86,6 @@ void CMathExpression::OptimizeTree3()
 
 bool CMathExpression::OptimizeTree2()
 {
-
   unsigned pos;
   unsigned i;
   unsigned n;
@@ -190,9 +189,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
       match = MatchBranch(  pos_array,  op1,  pos2 );
       if( match )
       {
-
         op2 = Pop( pos2 );
-
         if( IsReserved( op2 ) )
         {
           match = false;
@@ -205,12 +202,10 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
         {
           match = RefToElement( op2 )->IsConst();
         }
-
       }
     }
     else if( IsReserved( op1 ) ) //a,b or c
     {
-
       match = MatchBranch(  pos_array,  op1,  pos2 );
       if( match )
       {

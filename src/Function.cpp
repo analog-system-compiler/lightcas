@@ -88,4 +88,3 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
   TRACE( ds.GetBufferPtr() );
 #endif
 }
-

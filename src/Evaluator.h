@@ -29,7 +29,7 @@ typedef CVector< class CValue > CValueArray;
 typedef CVector< double > CDoubleArray;
 typedef CVector< CEvaluatorFunct > CFunctArray;
 
-typedef short OP_CODE;
+typedef unsigned short OP_CODE;
 
 class CEvaluator
 {
@@ -89,7 +89,7 @@ class CEvaluator
     static void LNot( CEvaluator& );
     static void Fact( CEvaluator& );
     static void Not( CEvaluator& );
-    static void Square( CEvaluator& );
+   // static void Square( CEvaluator& );
     static void Add( CEvaluator& );
     static void Sub( CEvaluator& );
     static void Mul( CEvaluator& );
@@ -118,5 +118,5 @@ class CEvaluator
 
   public:
     CEvaluator( void );
-    ~CEvaluator( void );
+    virtual ~CEvaluator( void );
 };

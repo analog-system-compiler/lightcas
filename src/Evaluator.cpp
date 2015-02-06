@@ -294,7 +294,7 @@ void CEvaluator::Not( CEvaluator& eval )
   eval.Push(ldexp( ( double )m, n - 30 );*/
   eval.Push( -v - 1 );
 }
-
+/*
 void CEvaluator::Square( CEvaluator& eval )
 {
   double v = eval.Pop();
@@ -313,7 +313,7 @@ void CEvaluator::Square( CEvaluator& eval )
   }
   eval.Push( v );
 }
-
+*/
 /******* Binary *******/
 void CEvaluator::Add( CEvaluator& eval )
 {
@@ -492,13 +492,13 @@ void CEvaluator::If( CEvaluator& eval )
   double v1 = eval.Pop();
   double v2 = eval.Pop();
   double v3 = eval.Pop();
-  if( v3 != 0 )
+  if( v1 != 0 )
   {
-    eval.Push( v2 );
+    eval.Push( v3 );
   }
   else
   {
-    eval.Push( v1 );
+    eval.Push( v2 );
   }
 }
 

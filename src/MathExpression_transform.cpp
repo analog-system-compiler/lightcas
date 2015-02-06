@@ -32,7 +32,7 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   {
     op = src.Get( pos );
     e=RefToElement( op );
-    if( e->IsVar() && !e->IsGlobal() /*&& !RefToElement( op )->IsLocked()*/ )
+    if( e->IsVar() && ( op >= CElementDataBase::GetSecureLimit() )/*&& !RefToElement( op )->IsLocked()*/ )
     {
       for( i = 0; ( i < index ) && ( i < CElementDataBase::MAX_EXP ); i++ )
       {

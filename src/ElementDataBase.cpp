@@ -24,12 +24,14 @@
 
 CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
+unsigned           CElementDataBase::m_SecureLimit;
 
 CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
   m_Parent = parent;
   m_Name = name;
   m_Evaluator = eval;
+  m_SecureLimit = 0;
   if( bInitialize )
   {
     Initialize();
@@ -43,14 +45,13 @@ CElementDataBase::~CElementDataBase()
 
 void CElementDataBase::Initialize()
 {
-
   Clear();
   if( m_Parent == NULL )
   {
     AddReservedElements();
     AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
+    SetSecureLimit( GetSize() );
     AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
-    AddOperandTable     ( CRules::m_Functions           );
     AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynomCommon );
     AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct   );
@@ -61,6 +62,7 @@ void CElementDataBase::Initialize()
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleVectors  );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleTaylorSeries );
     AddAlgebraRuleTable ( CRules::m_AlgebraRuleConst    );
+    CleanTempElements();
   }
   else
   {
@@ -110,38 +112,13 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR_SIZE ] ) == OP_ERROR_SIZE  );
 }
 
-void CElementDataBase::AddOperandTable( const char* operand_table )
-{
-  CParser IC( operand_table );
-  CElement* e;
-  unsigned operand_nb;
-
-  while( !IC.IsStopChar() )
-  {
-    operand_nb = 0;
-    IC.GetWord();
-    e = GetElement( IC );
-    IC.Find( '(' );
-    while( !IC.TryFind( ')' ) )
-    {
-      IC.GetWord();
-      operand_nb++;
-      IC.TryFind( ',' );
-    }
-    e->SetOperandNb( operand_nb );
-  }
-}
-
-
 void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
 {
   const char* pos1;
   unsigned cnt;
   CSymbolSyntaxStruct* sss;
-  CElementDataBase db( "tmp2", this );
-  CMathExpression equ( &db );
-  CMathExpression dummy_equ( &db );
-
+  CMathExpression dst_equ( this );
+  CMathExpression src_equ( this );
   CParser IC( symbol_table );
 
   while( IC.GetChar() )
@@ -155,12 +132,11 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
     IC.SetPos( pos1 + cnt );
     IC.Find( '=' );
     IC.Find( '>' );
-
-    equ.GetFromTextRPN( IC );
-
-    CMathExpression::ConvertToRule( equ , dummy_equ ); //TODO remove dummy_equ
-
-    sss->m_Equation.Copy( equ );
+    dst_equ.GetFromString( IC );
+    IC.Find( '\0' );
+    src_equ.GetFromString( "a b c" );
+    CMathExpression::ConvertToRule( src_equ , dst_equ ); //TODO remove dummy_equ
+    sss->m_Equation.Copy( dst_equ );
     m_SymbolSyntaxArray.Append( sss );
 
 #ifdef _DEBUG
@@ -174,19 +150,28 @@ void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
     TRACE( ds.GetBufferPtr() );
 #endif
   }
-
 }
 
 void CElementDataBase::AddAlgebraRuleTable( const char* rules_table )
 {
-  CElementDataBase db(  "tmp1", this  );
-  CMathExpression src( &db );
-  CParser IC(  rules_table );
-  do
+  CMathExpression src( this );
+  CParser IC( rules_table );
+  src.GetFromString( IC );
+}
+
+void CElementDataBase::CleanTempElements()
+{
+  CElement* e;
+  for( unsigned i = 0; i < GetSize(); i++ )
   {
-    src.GetFromString( IC );
+    e = GetAt( i );
+    if( ( e->ToRef() > CElementDataBase::GetSecureLimit() ) && !e->IsFunct() && !e->IsConst() )
+    {
+      delete e;
+      RemoveAt( i );
+      i--;
+    }
   }
-  while( IC.TryFind( ';' ) );
 }
 
 void CElementDataBase::AddEvalFunctionTable( const SProperties* property_table, unsigned size )
@@ -318,7 +303,6 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
   if( m_Parent )
   {
     e = m_Parent->SearchElement( string, pos );
-
     if( e )
     {
       return e;
@@ -326,24 +310,17 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
   }
 
   n = GetSize();
-
   for( i = 0; i < n; i++ )
   {
-
     e = GetAt( i );
-    //if( !e->IsConst() )
+    compare = string.Compare( e->GetName() );
+    if( compare == 0 )
     {
-      compare = string.Compare( e->GetName() );
-
-      if( compare == 0 )
-      {
-        return e;
-      }
-
-      if( compare < 0 )
-      {
-        break;
-      }
+      return e;
+    }
+    if( compare < 0 )
+    {
+      break;
     }
   }
 

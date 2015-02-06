@@ -38,6 +38,7 @@ class CElementDataBase : public CElementArray
 
     CElementDataBase*         m_Parent;
     CEvaluator*               m_Evaluator;
+    static unsigned            m_SecureLimit;
     static CElementArray      m_ElementRefArray;
     static CSymbolSyntaxArray m_SymbolSyntaxArray;
 
@@ -57,7 +58,6 @@ class CElementDataBase : public CElementArray
       OP_SET,
       OP_NONE,
       OP_CONST,
-      //OP_CONSTINT,
       OP_ELEM,
       OP_NEG,
       OP_CPLX,
@@ -77,12 +77,13 @@ class CElementDataBase : public CElementArray
     CElement *    CreateElement( const CString& string, unsigned pos );
     virtual void  AddReservedElements();
     virtual void  AddSyntaxSymbolTable(const char *symbol_table);
-    virtual void  AddOperandTable(const char *operand_table);    
     virtual void  AddAlgebraRuleTable(const char *rule_table);
     virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
     virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
     void          SetValue( const CElement* e, const CValue& v );
     void          SetConstValue( CElement* e, const CValue& v );
+    void          CleanTempElements();
+    static void   SetSecureLimit( unsigned i ) { m_SecureLimit=i; }
     CElementDataBase(const CElementDataBase& db );
 
   public:
@@ -101,7 +102,8 @@ class CElementDataBase : public CElementArray
     static void      UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
     static OP_CODE   ElementToRef( const CElement* e );    
     static const CSymbolSyntaxArray& GetSymbolTable()   { return m_SymbolSyntaxArray; }
-    CElementDataBase* GetParent() const                 { return m_Parent;    }
+    static unsigned  GetSecureLimit()                   { return m_SecureLimit;       }
+    CElementDataBase* GetParent() const                 { return m_Parent;            }
 
 #ifdef _DEBUG    
         void Printf( const char* format, ... );

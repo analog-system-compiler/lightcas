@@ -261,7 +261,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a|~0)", "-1" );
   Check( "SIMPLIFY(a&0)", "0" );
   Check( "SIMPLIFY(a&~0)", "a" );
-  Check( "SIMPLIFY(5<<2)", "20" );
+  Check( "SIMPLIFY((5<<2)|32", "52" );
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
   /********** transform **********/
@@ -298,9 +298,9 @@ void CElementDataBase::Test()
   /****** fonction *********/
   Initialize();
   CElementDataBase db( "test_function", this );
-  db.Check( "a:=4;SIMPLIFY(a-3)", "1" );
-  db.Check( "a:=6;SIMPLIFY(a-5)", "1" );
-  db.Check( "f(x):=4*x;SIMPLIFY(f(z)-4*z+1)", "1" );
+  db.Check( "a:=4 SIMPLIFY(a-3)", "1" );
+  db.Check( "a:=6 SIMPLIFY(a-5)", "1" );
+  db.Check( "f(x):=4*x SIMPLIFY(f(z)-4*z+1)", "1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/
@@ -331,10 +331,12 @@ void CElementDataBase::Test()
 //add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
 //add mul 2a
 //enlever TODOS
-//résoudre pbm x^a
+//OK résoudre pbm x^a
 //OK créer lib quand compil ss linux
 //OK utiliser nostd pour réduire conso mémoire
-//clean IsWord() && (>='a' && <= 'z')
+//OK clean IsWord() && (>='a' && <= 'z')
 //Use quadratic solving x^8+x^4+5=23
 //revoir résolution de système pour éviter les x^2
-//enlever les ';' et continuer de parser tant qu'il y des caractères
+//OK enlever les ';' et continuer de parser tant qu'il y des caractères
+// NON ajouter a(b) et (a) dans la table des symboles
+//résoudre inégalités 2<a+3<8 et "="

@@ -56,6 +56,7 @@ class CMathExpression
     void         GetLevel( CParser& IC, unsigned priority );
     bool         SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
     bool         ParseElement(CParser& IC);
+    unsigned     ParseParenthesis( CParser& IC );
     bool         MatchOperator( CParser& IC, const char * s, const CMathExpression& equ, unsigned priority1 );
                  
     void         StoreStackPointer( char c, unsigned pos_array[] );
@@ -95,9 +96,9 @@ class CMathExpression
     bool    Compare( const CMathExpression& equ ) const;   
     void	Copy( const CMathExpression& equ );    
     void	Display( CDisplay& ds ) const;
-    void    GetFromString( const char *text )   { CParser IC( text ); GetFromString( IC ); }
     void	GetFromString( CParser& IC );
-    void    GetFromTextRPN( CParser& IC );
+    void    GetFromString( const char *text )   { CParser IC( text ); GetFromString( IC ); }
+    //void    GetFromTextRPN( CParser& IC );
     void	OptimizeTree();
     bool    Match( const CMathExpression& equ ) const;
     

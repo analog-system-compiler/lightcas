@@ -41,7 +41,6 @@ class CRules
     static const char m_AlgebraRuleTaylorSeries[];
     static const char m_AlgebraRuleConst[];
     static const SProperties m_FunctionProperties[];
-    static const char m_Functions[];
     static const char m_FunctionSymbol[];
     static const unsigned m_FunctionPropertiesSize;
 };

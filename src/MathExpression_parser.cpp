@@ -16,17 +16,17 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
+#include <cctype>
 #include "Element.h"
 #include "MathExpression.h"
 
 void CMathExpression::GetFromString( CParser& IC )
 {
   Clear();
-  do
+  while( !IC.IsStopChar() )
   {
     GetLevel( IC, 0 );
   }
-  while( IC.TryFind( ';' ) );
 }
 
 void CMathExpression::Display( CDisplay& ds ) const
@@ -44,7 +44,7 @@ void CMathExpression::Display( CDisplay& ds ) const
       pos = DisplayBranch( pos, 0, ds );
       if( pos )
       {
-        ds += " ; ";
+        ds += " ";
       }
     }
   }
@@ -76,10 +76,9 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
         pos = DisplayBranch( pos, 0, ds );
         if( i != 0 )
         {
-          ds += ',' ;
+          ds += ' ' ;
         }
         ds3.Prepend( ds );
-
       }
       ds.Copy( ds2 );
       ds += ds3 ;
@@ -125,13 +124,13 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
 unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned precedence, CDisplay& ds ) const
 {
   char c;
-  unsigned k, j;
+  unsigned j;
 
   unsigned pos2, reserved_pos[8];
 
   const CMathExpression& equ =  st.m_Equation;
-  j = 0;
 
+  j = 0;
   pos2 = equ.GetSize();
   while( pos2 )
   {
@@ -147,10 +146,10 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
       Pop( pos );
     }
   }
-
+  ASSERT(j);
   const char* sp = st.m_Syntax;
 
-  while ( c = *sp++ )
+  while (( c = *sp++ ))
   {
     if( CParser::IsWord( c ) )
     {
@@ -180,13 +179,13 @@ void CMathExpression::GetLevel( CParser& IC, unsigned priority )
         IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
       }
     }
+  }
 
-    while( !IC.IsStopChar() )
+  while( !IC.IsStopChar() )
+  {
+    if( !SearchOperator( IC, priority, false ) )
     {
-      if( !SearchOperator( IC, priority, false ) )
-      {
-        break;
-      }
+      break;
     }
   }
 }
@@ -229,7 +228,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
   }
 
   // try to match prefix operator
-  while( c = *sp )
+  while(( c = *sp ))
   {
     if( CParser::IsWord( c ) )
     {
@@ -277,17 +276,7 @@ bool CMathExpression::ParseElement( CParser& IC )
   n = m_ElementDB->GetSize();
   e = m_ElementDB->ParseElement( IC );
   element_creation = ( m_ElementDB->GetSize() - n ) != 0; //put there !!!
-
-  i = 0;
-  if( IC.TryFind( '(' ) )
-  {
-    while( IC.GetChar() && !IC.TryFind( ')' ) )
-    {
-      GetLevel( IC, 0 );
-      IC.TryFind( ',' );
-      i++;
-    }
-  }
+  i = ParseParenthesis( IC );
 
   if( e )
   {
@@ -296,6 +285,14 @@ bool CMathExpression::ParseElement( CParser& IC )
     {
       f->SetParameterNb( i );
       e->SetFunct();
+#ifdef _DEBUG
+      CDisplay ds;
+      ds += "SetParamNb   : ";
+      e->Display(ds);
+      ds +=  ':' ;
+      ds += CString( e->GetFunction()->GetParameterNb() );
+      TRACE(ds.GetBufferPtr());
+#endif
     }
     else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
     {
@@ -306,29 +303,33 @@ bool CMathExpression::ParseElement( CParser& IC )
     {
       ASSERT( f->GetParameterNb() == i );
     }
+
     Push( e );
   }
 
   return pos != IC.GetPos();
 }
 
-void CMathExpression::GetFromTextRPN( CParser& IC )
-{
-  // see GetAtom
-  CElement* e;
-  Clear();
-  while( !IC.TryFind( ';' ) )
-  {
-    e = m_ElementDB->ParseElement( IC );
-    Push( e );
-  }
-}
-
 void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )
 {
   unsigned elem_id;
-  elem_id = toupper(c) - 'A';
+  elem_id = toupper( c ) - 'A';
   ASSERT( elem_id < CElementDataBase::MAX_EXP );
   pos_array[elem_id]  = m_StackSize;
 
+}
+
+unsigned CMathExpression::ParseParenthesis( CParser& IC )
+{
+  unsigned i = 0;
+  if( IC.TryFind( '(' ) )
+  {
+    while( IC.GetChar() && !IC.TryFind( ')' ) )
+    {
+      GetLevel( IC, 0 );
+      IC.TryFind( ',' );
+      i++;
+    }
+  }
+  return i;
 }

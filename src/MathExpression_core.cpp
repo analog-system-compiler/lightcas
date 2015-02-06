@@ -132,7 +132,6 @@ void CMathExpression::Push( const CValue& v )
     Push( e );
     Push( CElementDataBase::OP_NEG );
   }
-
   else
   {
     CElement* e = m_ElementDB->GetElement( v );
@@ -154,7 +153,6 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
   Push( op );
   OptimizeTree();
   RemoveZero();
-
 }
 
 void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )

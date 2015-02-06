@@ -61,8 +61,8 @@ public:
   
   void Clear();
   void AddAlgebraRule( const CMathExpression & src, const CMathExpression & dst, unsigned line_no );
-  void SetParameterNb( unsigned parameter_nb ) { m_ParameterNb=parameter_nb; }
-  unsigned GetParameterNb() const { return m_ParameterNb; }
+  void SetParameterNb( unsigned parameter_nb )          { m_ParameterNb=parameter_nb; }
+  unsigned GetParameterNb() const                       { return m_ParameterNb; }
   const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }
 
   CFunction();

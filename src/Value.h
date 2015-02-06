@@ -42,4 +42,5 @@ public:
     void   Negate() { m_Value = -m_Value; }
     
     CValue( double v=0. ) { m_Value=v;  }    
+    virtual ~CValue() {};
 };
