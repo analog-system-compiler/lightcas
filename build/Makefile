@@ -31,7 +31,7 @@ LIB_OBJS      = $(SRCS:%.cpp=$(OBJDIR)/%.o)
 BUILD_CFLAGS  += $(CPPFLAGS) -MMD -Wall $(INCDIR)
 
 all:$(EXE)
-
+	
 -include $(LIB_OBJS:.o=.d)
 
 $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
@@ -45,6 +45,7 @@ $(LIB): $(LIB_OBJS)
 $(EXE):$(LIB)
 	@echo 'Linking    ... $(notdir $@)'
 	$(CXX) -o $@  $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) $(EXE_SRC) $^
+	cp ../src/Rules.txt .
 
 clean:
 	@echo Cleaning ...

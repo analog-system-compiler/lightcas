@@ -17,6 +17,7 @@
 /*******************************************************************************/
 #define _CRT_SECURE_NO_WARNINGS
 #include <string.h>
+#include <cctype>
 #include "Debug.h"
 #include "Element.h"
 #include "Function.h"
@@ -25,6 +26,66 @@
 CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned           CElementDataBase::m_SecureLimit;
+
+const SProperties CElementDataBase::m_FunctionProperties[] =
+{
+    { "ADD",    2, &CEvaluator::Add           },
+    { "SUB",    2, &CEvaluator::Sub           },
+    { "OR",     2, &CEvaluator::Or            },
+    { "LOR",    2, &CEvaluator::LOr           },
+    { "XOR",    2, &CEvaluator::Xor           },
+    { "MUL",    2, &CEvaluator::Mul           },
+    { "DIV",    2, &CEvaluator::Div           },
+    { "AND",    2, &CEvaluator::And           },
+    { "LAND",   2, &CEvaluator::LAnd          },
+    { "EQ",     2, &CEvaluator::Equal         },
+    { "NEQ",    2, &CEvaluator::NotEqual      },
+    { "LTE",    2, &CEvaluator::LowerOrEqual  },
+    { "SHL",    2, &CEvaluator::ShiftLeft     },
+    { "LT",     2, &CEvaluator::Lower         },
+    { "GTE",    2, &CEvaluator::GreaterOrEqual},
+    { "SHR",    2, &CEvaluator::ShiftRight    },
+    { "GT",     2, &CEvaluator::Greater       },
+    { "MIN",    2, &CEvaluator::Min           },
+    { "MAX",    2, &CEvaluator::Max           },
+    { "MOD",    2, &CEvaluator::Mod           },
+    { "POW",    2, &CEvaluator::Pow           },
+    { "NEG",    1, &CEvaluator::Neg           },
+    { "INV",    1, &CEvaluator::Inv           },
+    { "NOT",    1, &CEvaluator::Not           },
+    { "ID",     1, &CEvaluator::Id            },
+    { "BOOL",   1, &CEvaluator::Bool          },
+    { "LNOT",   1, &CEvaluator::LNot          },
+    { "SIN",    1, &CEvaluator::Sin           },
+    { "COS",    1, &CEvaluator::Cos           },
+    { "TAN",    1, &CEvaluator::Tan           },
+    { "ASIN",   1, &CEvaluator::Asin          },
+    { "ACOS",   1, &CEvaluator::Acos          },
+    { "ATAN",   1, &CEvaluator::Atan          },
+    { "SINH",   1, &CEvaluator::SinH          },
+    { "COSH",   1, &CEvaluator::CosH          },
+    { "TANH",   1, &CEvaluator::TanH          },
+    { "ASINH",  1, &CEvaluator::AsinH         },
+    { "ACOSH",  1, &CEvaluator::AcosH         },
+    { "ATANH",  1, &CEvaluator::AtanH         },
+    { "EXP",    1, &CEvaluator::Exp           },
+    { "LOG",    1, &CEvaluator::Ln            },
+    { "LOG10",  1, &CEvaluator::Log           },
+    { "SQRT",   1, &CEvaluator::Sqrt          },
+    { "SQR",    1, &CEvaluator::Sqr           },
+    { "FACT",   1, &CEvaluator::Fact          },
+    { "ABS",    1, &CEvaluator::Abs           },
+    { "FLOOR",  1, &CEvaluator::Floor         },
+    { "CEIL",   1, &CEvaluator::Ceil          },
+    { "RAND",   0, &CEvaluator::Rand          },
+    { "IF2",    2, &CEvaluator::If            },
+    { "IF",     2, &CEvaluator::If            },
+    { "CONCAT", 2, &CEvaluator::Concat        },
+    { "TED",    2, NULL                       },
+
+};
+
+const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementDataBase::m_FunctionProperties ) / sizeof( SProperties );
 
 CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
@@ -45,23 +106,24 @@ CElementDataBase::~CElementDataBase()
 
 void CElementDataBase::Initialize()
 {
+
   Clear();
   if( m_Parent == NULL )
   {
+    CParser IC;
     AddReservedElements();
-    AddEvalFunctionTable( CRules::m_FunctionProperties, CRules::m_FunctionPropertiesSize );
+    AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
     SetSecureLimit( GetSize() );
-    AddSyntaxSymbolTable( CRules::m_FunctionSymbol      );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynomCommon );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRulePolynom  );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleAcrossFunct   );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleMisc     );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleDerivals );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleSystems  );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleLogic    );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleVectors  );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleTaylorSeries );
-    AddAlgebraRuleTable ( CRules::m_AlgebraRuleConst    );
+    if( IC.LoadFile( CString( "Rules.txt" ) ) )
+    {
+      AddAlgebraRuleTable ( IC );
+      IC.CloseFile();
+    }
+    else
+    {
+      IC.Append( "rules description file not found." );
+      IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
+    }
     CleanTempElements();
   }
   else
@@ -112,50 +174,62 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR_SIZE ] ) == OP_ERROR_SIZE  );
 }
 
-void  CElementDataBase::AddSyntaxSymbolTable( const char* symbol_table )
+void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_equ )
 {
-  const char* pos1;
-  unsigned cnt;
+  char c;
+  unsigned i;
   CSymbolSyntaxStruct* sss;
-  CMathExpression dst_equ( this );
+  CString s;
   CMathExpression src_equ( this );
-  CParser IC( symbol_table );
 
-  while( IC.GetChar() )
+  sss = new CSymbolSyntaxStruct();
+  i = 0;
+  IC.Next();
+  c = IC.GetChar();
+  while( c && c != '\\' && ( i < ( sizeof( sss->m_Syntax ) - 1 ) ) )
   {
-    sss = new CSymbolSyntaxStruct();
-    pos1 = IC.GetPos();
-    cnt = strchr( pos1, ' ' ) - pos1;
-    ASSERT( cnt < sizeof( sss->m_Syntax ) );
-    strncpy( sss->m_Syntax, pos1, cnt );
-    sss->m_Syntax[cnt] = '\0';
-    IC.SetPos( pos1 + cnt );
-    IC.Find( '=' );
-    IC.Find( '>' );
-    dst_equ.GetFromString( IC );
-    IC.Find( '\0' );
-    src_equ.GetFromString( "a b c" );
-    CMathExpression::ConvertToRule( src_equ , dst_equ ); //TODO remove dummy_equ
-    sss->m_Equation.Copy( dst_equ );
-    m_SymbolSyntaxArray.Append( sss );
+    if( CParser::IsWord( c ) )
+    {
+      s.Clear();
+      s.Append( tolower( c ) );
+      CElement* e = GetElement( s );
+      if( e )
+      {
+        src_equ.Push( e );
+      }
+      else
+      {
+        ASSERT( false );
+      }
+    }
+
+    sss->m_Syntax[ i++ ] = c;
+    IC.Next();
+    c = IC.GetChar();
+  }
+
+  IC.Next();
+  sss->m_Syntax[ i++ ] = '\0';
+
+  sss->m_Equation.Copy( dst_equ );
+  CMathExpression::ConvertToRule( src_equ, sss->m_Equation );
+  m_SymbolSyntaxArray.Append( sss );
 
 #ifdef _DEBUG
-    CDisplay ds;
-    ds += "Adding symbol syntax #";
-    ds += CString( ( int )( m_SymbolSyntaxArray.GetSize() - 1 ) );
-    ds += ": ";
-    ds += sss->m_Syntax;
-    ds += " => ";
-    sss->m_Equation.Display( ds );
-    TRACE( ds.GetBufferPtr() );
+  CDisplay ds;
+  ds += "Adding symbol syntax #";
+  ds += CString( ( int )( m_SymbolSyntaxArray.GetSize() - 1 ) );
+  ds += ": ";
+  ds += sss->m_Syntax;
+  ds += " => ";
+  sss->m_Equation.Display( ds );
+  TRACE( ds.GetBufferPtr() );
 #endif
-  }
 }
 
-void CElementDataBase::AddAlgebraRuleTable( const char* rules_table )
+void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 {
   CMathExpression src( this );
-  CParser IC( rules_table );
   src.GetFromString( IC );
 }
 

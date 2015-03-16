@@ -31,6 +31,8 @@ class CAlgebraRule;
 class CMathExpression
 {    
 
+  friend CElementDataBase;
+
   protected:
     OP_CODE*    m_StackArray;
     unsigned	m_StackSize;
@@ -63,7 +65,7 @@ class CMathExpression
 
     bool         OptimizeConst();
     bool         OptimizeTree2();
-    void	     OptimizeTree3();
+    //void	     OptimizeTree();
     void         Replace( OP_CODE op1, OP_CODE op2 );
     void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
     unsigned     Match( const CMathExpression& equ, unsigned pos_array[] ) const;    

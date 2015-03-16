@@ -21,7 +21,6 @@
 #include "LCString.h"
 #include "Parser.h"
 #include "Evaluator.h"
-#include "Rules.h"
 #include "LCVector.h"
 
 class CMathExpression;
@@ -31,6 +30,13 @@ struct CSymbolSyntaxStruct;
 typedef CVector< class CElement* >		            CElementArray;
 typedef CVector< struct CSymbolSyntaxStruct* >		CSymbolSyntaxArray;
 
+struct SProperties
+{
+    const char*	    m_FunctionName;
+    unsigned        m_ParameterNb;
+    CEvaluatorFunct m_FunctionCall;
+};
+
 class CElementDataBase : public CElementArray
 {
     
@@ -38,9 +44,11 @@ class CElementDataBase : public CElementArray
 
     CElementDataBase*         m_Parent;
     CEvaluator*               m_Evaluator;
-    static unsigned            m_SecureLimit;
+    static unsigned           m_SecureLimit;
     static CElementArray      m_ElementRefArray;
     static CSymbolSyntaxArray m_SymbolSyntaxArray;
+    static const SProperties  m_FunctionProperties[];
+    static const unsigned     m_FunctionPropertiesSize;
 
   public :
     
@@ -76,8 +84,7 @@ class CElementDataBase : public CElementArray
     unsigned      Register( CElement* e , unsigned index );
     CElement *    CreateElement( const CString& string, unsigned pos );
     virtual void  AddReservedElements();
-    virtual void  AddSyntaxSymbolTable(const char *symbol_table);
-    virtual void  AddAlgebraRuleTable(const char *rule_table);
+    virtual void  AddAlgebraRuleTable( CParser& IC );
     virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
     virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
     void          SetValue( const CElement* e, const CValue& v );
@@ -97,6 +104,7 @@ class CElementDataBase : public CElementArray
     CElement* 		GetElement( const CValue& value );
     CElement* 		GetElement( const CString& );
     CElement* 		SearchElement( const CString&, unsigned& pos ) const;
+    void            AssociateSymbol(CParser& IC,  const CMathExpression& dst_equ );
     
     static CElement* RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
     static void      UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }

@@ -26,7 +26,8 @@ class CParserException
     enum EXCEPTION_ID
     {
       ID_OK,
-      ID_SYNTAX_ERROR,
+      ID_ERROR_SYNTAX,
+      ID_ERROR_FILE_NOT_FOUND,
       ID_ERROR_OPERATOR_EXPECTED
     };
 
@@ -55,6 +56,8 @@ class CParser : public CString
 
     static	const char	m_CharTab[];
     int		m_LineNb;
+    CString	m_FileName;
+    char    *m_Text;
 
   public:
     const char*	m_Pos;
@@ -65,11 +68,13 @@ class CParser : public CString
     void	SkipSpace();
 
   public:
-    void	Error( unsigned id, const CString* str = NULL ) const;
+    void	Error( unsigned id ) const;
     void	Find( char c );
     bool	TryFind( char c );
     void	Init( const char* pText );
     bool    TryMatchSymbol( const char *& symbol_str );
+    bool    LoadFile( const CString& name );
+    void	CloseFile();
 
     const   CString& GetWord();
     char    GetChar();

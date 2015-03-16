@@ -73,11 +73,6 @@ bool CMathExpression::OptimizeConst()
 
 void CMathExpression::OptimizeTree()
 {
-  OptimizeTree3();
-}
-
-void CMathExpression::OptimizeTree3()
-{
   if( !OptimizeTree2() )
   {
     OptimizeConst();
@@ -256,7 +251,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
 
     if( optimize )
     {
-      OptimizeTree3(); // optimization is only made on the top branch
+      OptimizeTree(); // optimization is only made on the top branch
     }
   }
 

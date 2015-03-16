@@ -146,10 +146,10 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
       Pop( pos );
     }
   }
-  ASSERT(j);
+  ASSERT( j );
   const char* sp = st.m_Syntax;
 
-  while (( c = *sp++ ))
+  while ( ( c = *sp++ ) )
   {
     if( CParser::IsWord( c ) )
     {
@@ -228,7 +228,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
   }
 
   // try to match prefix operator
-  while(( c = *sp ))
+  while( ( c = *sp ) )
   {
     if( CParser::IsWord( c ) )
     {
@@ -288,10 +288,10 @@ bool CMathExpression::ParseElement( CParser& IC )
 #ifdef _DEBUG
       CDisplay ds;
       ds += "SetParamNb   : ";
-      e->Display(ds);
+      e->Display( ds );
       ds +=  ':' ;
       ds += CString( e->GetFunction()->GetParameterNb() );
-      TRACE(ds.GetBufferPtr());
+      TRACE( ds.GetBufferPtr() );
 #endif
     }
     else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
@@ -305,6 +305,12 @@ bool CMathExpression::ParseElement( CParser& IC )
     }
 
     Push( e );
+
+    //Check if symbol definition for this operator
+    if( IC.GetChar() == '\\' )
+    {
+        m_ElementDB->AssociateSymbol( IC, *this );
+    }
   }
 
   return pos != IC.GetPos();

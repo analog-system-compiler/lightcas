@@ -22,7 +22,7 @@
 void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst )
 {
   OP_CODE op;
-  CElement *e;
+  CElement* e;
   unsigned i;
   unsigned pos;
   OP_CODE  elem_array[CElementDataBase::MAX_EXP];
@@ -31,7 +31,7 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   for( pos = 0; pos < src.GetSize();  pos++ )
   {
     op = src.Get( pos );
-    e=RefToElement( op );
+    e = RefToElement( op );
     if( e->IsVar() && ( op >= CElementDataBase::GetSecureLimit() )/*&& !RefToElement( op )->IsLocked()*/ )
     {
       for( i = 0; ( i < index ) && ( i < CElementDataBase::MAX_EXP ); i++ )

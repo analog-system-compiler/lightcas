@@ -33,7 +33,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\src\Parser.h" />
-    <ClInclude Include="..\src\Rules.h" />
     <ClInclude Include="..\src\std\LCString.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">true</ExcludedFromBuild>
     </ClInclude>
@@ -56,9 +55,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\Parser.cpp" />
-    <ClCompile Include="..\src\Rules.cpp" />
     <ClCompile Include="..\src\Test.cpp" />
     <ClCompile Include="..\src\Value.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\src\Rules.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{09035957-A236-47ED-A64D-36C5998A7530}</ProjectGuid>
@@ -114,6 +115,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
     <IntDir>c:\tmp\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>c:\tmp\$(ProjectName)\$(Configuration)\</OutDir>
+    <CustomBuildAfterTargets>
+    </CustomBuildAfterTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,6 +139,18 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>true</Profile>
     </Link>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+      <TreatOutputAsContent>
+      </TreatOutputAsContent>
+    </CustomBuildStep>
+    <PostBuildEvent>
+      <Command>xcopy /Y ..\src\Rules.txt $(OutDir)</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copying rules to executable directory...</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

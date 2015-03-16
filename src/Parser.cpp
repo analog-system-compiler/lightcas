@@ -32,25 +32,28 @@ const char CParser::m_CharTab[] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
 
   /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 0, 0, 1,
 
   /*   a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  {  |  }       */
-    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 0, 0
 };
 
 CParser::CParser()
 {
   m_LineNb = 1;
+  m_Text = NULL;
 }
 
 CParser::CParser( const char* pText )
 {
   m_LineNb = 1;
+  m_Text = NULL;
   SetPos( pText );
 }
 
 CParser::~CParser()
 {
+CloseFile();
 }
 
 const CString& CParser::GetWord()
@@ -76,27 +79,26 @@ void CParser::Find( char c )
 
   if( GetChar() != c )
   {
-    CString error_str;
-
+ 
     if( eof( *m_Pos ) )
     {
-      error_str = "end of file";
+      *this = "end of file";
     }
     else if( eol( *m_Pos ) )
     {
-      error_str = "end of line";
+      *this = "end of line";
     }
     else
     {
-      error_str = "character \'";
-      error_str += *m_Pos;
-      error_str += '\'';
+      *this = "character \'";
+      *this += *m_Pos;
+      *this += '\'';
     }
 
-    error_str += " was found instead of \'";
-    error_str += c;
-    error_str += '\'';
-    Error( CParserException::ID_SYNTAX_ERROR, &error_str );
+    *this += " was found instead of \'";
+    *this += c;
+    *this += '\'';
+    Error( CParserException::ID_ERROR_SYNTAX );
 
   }
 
@@ -213,14 +215,14 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   return true;
 }
 
-void CParser::Error( unsigned id, const CString* str ) const
+void CParser::Error( unsigned id ) const
 {
   CParserException ex;
   ex.SetErrorID( id );
   ex.SetLineNb( m_LineNb );
-  if( str )
+  if( !IsEmpty() )
   {
-    ex.SetErrorString( *str );
+    ex.SetErrorString( *this );
   }
 
 #if _DEBUG
@@ -228,13 +230,47 @@ void CParser::Error( unsigned id, const CString* str ) const
   ds += "Error found line ";
   ds += CString( (int)ex.GetLineNb() );
   ds += " : ";
-  if( str )
+  if( !IsEmpty() )
   {
-    ds += *str;
+    ds += *this;
   }
   PUTS( ds.GetBufferPtr() );
   TRACE( ds.GetBufferPtr() );
 #endif
 
   throw( ex );
+}
+
+bool CParser::LoadFile( const CString& name )
+{
+    int		size;
+    FILE*	file;
+
+    m_FileName = name;
+    file = fopen( name, "r" );
+
+    if( file )
+    {
+        fseek( file, 0, SEEK_END );
+        size = ftell( file );
+        fseek( file, 0, SEEK_SET );
+        m_Text = new char[ size + 1 ];
+        size = fread( ( void* )m_Text, sizeof( char ) , size, file );
+        fclose( file );
+        m_Text[ size ] = '\0';
+        SetPos( m_Text );
+        return true;
+    }
+
+    return false;
+}
+
+void CParser::CloseFile()
+{
+    if( m_Text )
+    {
+
+        delete m_Text;
+        m_Text = NULL;
+    }
 }
