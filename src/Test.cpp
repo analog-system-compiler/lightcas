@@ -318,25 +318,3 @@ void CElementDataBase::Test()
 
 #endif
 
-//TODO :
-//- add binary alias
-//- remove binary declaration
-//- m_Type (ELEM_VAR/FUNCT/CONST). Only IsConst is used. Use m_Numeric but with Eval:m_Function=NULL.
-//- CONST : m_Parameter==0 && m_Numeric && m_Function==NULL;
-//- ELEM: m_Parameter==0 (=IsVoid()) && !Numeric(=rand)
-//- NUMFUNCT: m_Parameter!=0 && m_Numeric
-//OK use static CEquation for temporary buffer
-//OK compil linux
-//add CLEAR()
-//add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
-//add mul 2a
-//enlever TODOS
-//OK résoudre pbm x^a
-//OK créer lib quand compil ss linux
-//OK utiliser nostd pour réduire conso mémoire
-//OK clean IsWord() && (>='a' && <= 'z')
-//Use quadratic solving x^8+x^4+5=23
-//revoir résolution de système pour éviter les x^2
-//OK enlever les ';' et continuer de parser tant qu'il y des caractères
-// NON ajouter a(b) et (a) dans la table des symboles
-//résoudre inégalités 2<a+3<8 et "="
