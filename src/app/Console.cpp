@@ -22,6 +22,8 @@
 #include "Element.h"
 #include "ElementDataBase.h"
 
+void Help();
+
 class CDisplayEx : public CDisplay
 {
   public:
@@ -51,7 +53,7 @@ class CDisplayEx : public CDisplay
       if( str == "1.#INF" )
       {
         s = "INF";
-      }      
+      }
       else
       {
         double v = strtod( str.GetBufferPtr(), NULL );
@@ -121,6 +123,7 @@ int main()
   std::cout << "*************************************\n";
   std::cout << "*** LighCAS Console ("__DATE__") ***\n";
   std::cout << "*************************************\n";
+  std::cout << "Type \"help\" for help.\n";
 
   CDisplayEx ds;
   CEvaluatorEx eval;
@@ -147,6 +150,10 @@ int main()
     {
       std::cout << "Exiting." << "\n";
       exit( 0 );
+    }
+    else if( expression_str == "help" )
+    {
+      Help();
     }
     else if ( expression_str == "hex" )
     {
@@ -184,4 +191,41 @@ int main()
   }
 
   return 0;
+}
+
+void Help()
+{
+  std::cout << \
+            "Help\n" \
+            "----\n" \
+            "Simplifications:\n" \
+            "  a:=5\n" \
+            "  a:=b\n" \
+            "\n" \
+            "Assignments:\n" \
+            "  a:=5\n" \
+            "  a:=b\n" \
+            "\n" \
+            "Fonction definition:\n" \
+            "  f(x):=SIN(x)\n" \
+            "\n" \
+            "Derivatives:\n" \
+            "  DER(SIN(x),x)\n" \
+            "\n" \
+            "Taylor series:\n" \
+            "  TAYLOR(COS(x),x,0,1)\n" \
+            "\n" \
+            "Vectors:\n" \
+            "  Addition       : {a,b}+{5,6}\n" \
+            "  Sunstraction   : {a,b}-{5,6}\n" \
+            "\n" \
+            "Solving:\n" \
+            "  SOLVE(x-2,x)\n" \
+            "  SOLVE(x^2-2*x+4,x)\n" \
+            "  SOLVE({x-y+1,x-y+1},{x,y})\n" \
+            "\n" \
+            "Complex numbers:\n" \
+            "  IM(x+j*y)\n"\
+            "  RE(x+j*y)\n"\
+            ;
 }

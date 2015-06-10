@@ -153,7 +153,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
   //Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
-  Check( "SIMPLIFY(-2*MIN(4,5)*MAX(2,3)+2^4+8)", "0" );
+  Check( "SIMPLIFY(-2*MIN(2+2,5)*MAX(2,3)+2^4+8)", "0" );
   Check( "SIMPLIFY(1-0*a*b)", "1" );
   Check( "SIMPLIFY(2*a-2*a)", "0" );
   Check( "SIMPLIFY(b*(a+2)-b*a-2*b)", "0" );
@@ -206,7 +206,6 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(1+j+j^2+j^3)", "0" );
   Check( "SIMPLIFY(1+2*j+j^2+j^7)", "j" );
 
-  //Check("SIMPLIFY(2/(1+j))","(1-j)"); TODO : do not fix that
   Check( "SIMPLIFY(2/(1+j)-(1-j))", "0" );
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
@@ -229,9 +228,6 @@ void CElementDataBase::Test()
   Check( "DER(SIN(4*a),a)", "4*COS(4*a)" );
   Check( "DER(COS(a*b),b)", "-((b*DER(a,b)+a)*SIN(a*b))" );
 
-  /****** trigo *********/
-  //Check( "(SIN(PI/2+a))", "COS(a)" );
-
   /****** vector *********/
   Check( "SIMPLIFY({a,b}[c])", "{a,b}[c]" );
   Check( "SIMPLIFY({a+a,b-b}[c+c])", "{2*a,0}[2*c]" );
@@ -247,7 +243,6 @@ void CElementDataBase::Test()
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
   Check( "SIMPLIFY({-2,2})", "{-2,2}" );
-  //Check( "{a,b}:={2,3};{a,b}", "{2,3}" );
 
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
@@ -264,7 +259,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((5<<2)|32", "52" );
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
-  /********** transform **********/
+  /********** transforms **********/
   Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
   /*********** assignment ***/
@@ -287,9 +282,8 @@ void CElementDataBase::Test()
   Check( "SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})", "{x-1,y-1,z-1}" );
   Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})", "{1,1,1}" );
   Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})", "{2,1,1}" );
-  //Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{-(((h*f-i*e)*2*c-(i*2+2*f)*(h*c+i*b))/((i*d+g*f)*(h*c+i*b)-(h*f-i*e)*(g*c-i*a))),(((h*f-i*e)*2*c-(i*2+2*f)*(h*c+i*b))*(i*d+g*f)+((i*d+g*f)*(h*c+i*b)-(h*f-i*e)*(g*c-i*a))*(i*2+2*f))/(((i*d+g*f)*(h*c+i*b)-(h*f-i*e)*(g*c-i*a))*(h*f-i*e)),-((((i*d+g*f)*(h*c+i*b)-(h*f-i*e)*(g*c-i*a))*((h*f-i*e)*2-(i*2+2*f)*h)-((h*f-i*e)*2*c-(i*2+2*f)*(h*c+i*b))*((i*d+g*f)*h-(h*f-i*e)*g))/(((i*d+g*f)*(h*c+i*b)-(h*f-i*e)*(g*c-i*a))*(h*f-i*e)*i))}" );
-  //Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{-(((f*h-i*e)*c*2-(i*b+c*h)*(f*2+i*2))/((i*d+g*f)*(i*b+c*h)-(f*h-i*e)*(g*c-i*a))),(((f*h-i*e)*c*2-(i*b+c*h)*(f*2+i*2))*(i*d+g*f)+((i*d+g*f)*(i*b+c*h)-(f*h-i*e)*(g*c-i*a))*(f*2+i*2))/(((i*d+g*f)*(i*b+c*h)-(f*h-i*e)*(g*c-i*a))*(f*h-i*e)),-((((i*d+g*f)*(i*b+c*h)-(f*h-i*e)*(g*c-i*a))*((f*h-i*e)*2-h*(f*2+i*2))-((f*h-i*e)*c*2-(i*b+c*h)*(f*2+i*2))*((i*d+g*f)*h-(f*h-i*e)*g))/(((i*d+g*f)*(i*b+c*h)-(f*h-i*e)*(g*c-i*a))*(f*h-i*e)*i))}" );
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
+
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );
   Check( "TAYLOR(COS(x),x,0,3)", "1-x^2/2" );

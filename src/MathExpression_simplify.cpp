@@ -73,9 +73,12 @@ bool CMathExpression::OptimizeConst()
 
 void CMathExpression::OptimizeTree()
 {
-  if( !OptimizeTree2() )
+  if( !ExecuteCommand() )
   {
-    OptimizeConst();
+    if( !OptimizeTree2() )
+    {
+      OptimizeConst();
+    }
   }
 }
 
@@ -100,7 +103,7 @@ bool CMathExpression::OptimizeTree2()
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
       CMathExpression* equ = &( rule->m_SrcEquation );
 
-      pos = Match( *equ, pos_array );
+      pos = Match( GetSize(), *equ, pos_array );
       match = ( pos != m_StackSize );
 
       if( match )
@@ -137,7 +140,8 @@ bool CMathExpression::OptimizeTree2()
 #endif
           if( m_StackSize >= MAX_STACK_SIZE )
           {
-            Init( RefToElement( CElementDataBase::OP_ERROR_SIZE ) );
+            Init( m_ElementDB->GetElement( CValue( 3 ) ) );
+            Push( CElementDataBase::OP_ERROR );
           }
         }
 
@@ -155,19 +159,15 @@ bool CMathExpression::OptimizeTree2()
 bool CMathExpression::Match( const CMathExpression& equ ) const
 {
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
-  return Match( equ, pos_array ) != m_StackSize;
+  return Match( GetSize(), equ, pos_array ) != m_StackSize;
 }
 
-unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[] ) const
+unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsigned pos_array[] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
   unsigned pos1 = equ.GetSize();
-  unsigned pos2 = GetSize();
-
-  op1 = equ.Pop( pos1 ); // to trash
-  op2 = Pop( pos2 ); // to trash
-  ASSERT( op1 == op2 );
+  unsigned pos2 = pos3;
 
   InitPositionTable( pos_array );
 
@@ -191,7 +191,8 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
         }
         else if( op3 == CElementDataBase::OP_ELEM  )
         {
-          match = RefToElement( op2 )->IsVar();
+          match = RefToElement( op2 )->IsVoid() && !RefToElement( op2 )->IsConst();
+          ASSERT( !match || RefToElement( op2 )->IsVar() );
         }
         else if( op3 == CElementDataBase::OP_CONST )
         {
@@ -214,7 +215,7 @@ unsigned CMathExpression::Match( const CMathExpression& equ, unsigned pos_array[
     }
   }
 
-  return match ? pos2 : m_StackSize;
+  return match ? pos2 : pos3;
 }
 
 void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
@@ -243,15 +244,16 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
       unsigned pos2 = pos_array[ j ];
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
     }
-    else if( !ExecuteCommand( op3 ) )
+    else
     {
       ASSERT( RefToElement( op3 ) != NULL );
       Push( op3 );
-    }
+      //}
 
-    if( optimize )
-    {
-      OptimizeTree(); // optimization is only made on the top branch
+      if( optimize )
+      {
+        OptimizeTree();  // optimization is only made on the top branch
+      }
     }
   }
 
@@ -262,20 +264,28 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
 
 }
 
-bool CMathExpression::ExecuteCommand( OP_CODE op3 )
+bool CMathExpression::ExecuteCommand()
 {
   CElement* e;
   bool bOK = false;
 
+  OP_CODE op3 = Pop( m_StackSize );
   if( op3 == CElementDataBase::OP_SET )
   {
-    CMathExpression equ( m_ElementDB );
-    equ.PushBranch( *this, m_StackSize );
-    op3 = GetLastOperator();
+    CMathExpression equ_dst( m_ElementDB );
+    CMathExpression equ_src( m_ElementDB );
+    equ_dst.PushBranch( *this, m_StackSize );
+    unsigned pos = m_StackSize;
+    equ_src.PushBranch( *this, pos );
+    op3 = equ_src.GetLastOperator();
     e = RefToElement( op3 );
-    e->AddFunction( *this, equ );
+    e->AddFunction( equ_src, equ_dst );
     //Copy( *this );
     bOK = true;
+  }
+  if( op3 == CElementDataBase::OP_GET )
+  {
+    OptimizeTree2(); // for variable replacement
   }
   else if ( op3 == CElementDataBase::OP_RANK )
   {
@@ -289,19 +299,24 @@ bool CMathExpression::ExecuteCommand( OP_CODE op3 )
     CMathExpression equ( m_ElementDB );
     OP_CODE opd = Pop( m_StackSize );
     OP_CODE op1 = Pop( m_StackSize );
-    if( op1 == CElementDataBase::OP_CONCAT )
-    {
-      OP_CODE ops = Pop( m_StackSize );
-      equ.PushBranch( *this, m_StackSize );
-      equ.Replace( ops, opd );
-      Push( equ );
-      bOK = true;
-    }
-    else
-    {
-      ASSERT( false );
-    }
+    //if( op1 == CElementDataBase::OP_CONCAT )
+    //{
+    OP_CODE ops = Pop( m_StackSize );
+    equ.PushBranch( *this, m_StackSize );
+    equ.Replace( ops, opd );
+    Push( equ );
+    bOK = true;
+    //}
+    //else
+    //{
+    //  ASSERT( false );
+    //}
   }
+  else
+  {
+    m_StackSize++;
+  }
+
   return bOK;
 }
 

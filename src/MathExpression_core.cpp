@@ -154,7 +154,7 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
   OptimizeTree();
   RemoveZero();
 }
-
+/*
 void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
 {
   ASSERT( e1 );
@@ -165,7 +165,7 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
   Push( op );
   OptimizeTree();
   RemoveZero();
-}
+}*/
 
 void CMathExpression::UnaryOperation( OP_CODE op )
 {

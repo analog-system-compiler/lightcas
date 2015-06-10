@@ -64,6 +64,7 @@ class CElementDataBase : public CElementArray
       OP_EXP8,  
       OP_CONCAT,
       OP_SET,
+      OP_GET,
       OP_NONE,
       OP_CONST,
       OP_ELEM,
@@ -71,7 +72,8 @@ class CElementDataBase : public CElementArray
       OP_CPLX,
       OP_RANK,
       OP_SUBST,
-      OP_ERROR_SIZE,
+      OP_SYST,
+      OP_ERROR,
       OP_END_RESERVED
     };
 

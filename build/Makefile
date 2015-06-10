@@ -1,18 +1,20 @@
 
+EXE             = LightCAS
 SRC_DIR         = ../src
 CXX             = $(CROSS_COMPILE)g++
 AR              = $(CROSS_COMPILE)ar
+LD              = $(CROSS_COMPILE)ld
 SRCS            = $(notdir $(wildcard $(SRC_DIR)/*.cpp))
 OBJDIR          = $(shell mkdir -p ./objs ./objs/nostd ) ./objs
-INCDIR          = -I$(SRC_DIR)
-GPROF_FLAGS     = -pg
-EXE             = LightCAS
-LIB             = liblightcas.a
+LIB             = lib$(EXE).a
 EXE_SRC         = ../src/app/Console.cpp
+LIB_OBJS        = $(SRCS:%.cpp=$(OBJDIR)/%.o)
+INCDIR          = -I$(SRC_DIR)
 
 #options
 USE_STD         = 0
 DEBUG           = 0
+EMBED_RULES     = 1
 
 ifeq ($(USE_STD),0)
   INCDIR += -I$(SRC_DIR)/nostd 
@@ -21,34 +23,42 @@ else
   INCDIR += -I$(SRC_DIR)/std 
 endif
 
+CPPFLAGS  = -MMD -Wall $(INCDIR)
+
 ifeq ($(DEBUG),1)
-  BUILD_CFLAGS = -g -D_DEBUG $(GPROF_FLAGS)
+  CPPFLAGS += -g -D_DEBUG -pg -Map $(EXE).map
 else
-  BUILD_CFLAGS = -s -Os
+  CPPFLAGS += -s -Os
 endif
 
-LIB_OBJS      = $(SRCS:%.cpp=$(OBJDIR)/%.o)
-BUILD_CFLAGS  += $(CPPFLAGS) -MMD -Wall $(INCDIR)
+ifeq ($(EMBED_RULES),1)
+  CPPFLAGS  += -DEMBED_RULES
+	LIB_OBJS  += $(OBJDIR)/Rules.o
+endif
 
 all:$(EXE)
 	
 -include $(LIB_OBJS:.o=.d)
 
 $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
-	@echo 'Compiling  ... $(notdir $< )'
-	$(CXX) $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) -c $< -o $@
+	@echo 'Compiling   ... $(notdir $< )'
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+	
+$(OBJDIR)/%.o: $(SRC_DIR)/%.txt
+	@echo 'Translating ... $(notdir $< )'
+	$(LD) -r -b binary $< -o $@ 
 
 $(LIB): $(LIB_OBJS)
-	@echo 'Generating ... $(notdir $@)'
+	@echo 'Generating  ... $(notdir $@)'
 	$(AR) -r $@ $^
 
 $(EXE):$(LIB)
-	@echo 'Linking    ... $(notdir $@)'
-	$(CXX) -o $@  $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) $(EXE_SRC) $^
+	@echo 'Linking     ... $(notdir $@)'
+	$(CXX) -o $@  $(CPPFLAGS) $(EXE_SRC) $^
 	cp ../src/Rules.txt .
 
 clean:
-	@echo Cleaning ...
+	@echo 'Cleaning    ...'
 	rm -rf $(OBJDIR)
 
 .PHONY: all

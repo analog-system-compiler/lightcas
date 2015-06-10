@@ -247,7 +247,7 @@ bool CParser::LoadFile( const CString& name )
     FILE*	file;
 
     m_FileName = name;
-    file = fopen( name, "r" );
+    file = fopen( name.GetBufferPtr(), "r" );
 
     if( file )
     {

@@ -68,9 +68,9 @@ class CMathExpression
     //void	     OptimizeTree();
     void         Replace( OP_CODE op1, OP_CODE op2 );
     void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
-    unsigned     Match( const CMathExpression& equ, unsigned pos_array[] ) const;    
+    unsigned     Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;    
     bool         MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
-    virtual bool ExecuteCommand( OP_CODE );
+    virtual bool ExecuteCommand();
     void		 AddZero();
     void		 RemoveZero();
 
@@ -82,7 +82,7 @@ class CMathExpression
     //Display funct
     unsigned    DisplayBranch( unsigned pos , unsigned priority, CDisplay& ds ) const;
     unsigned    DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const;
-    unsigned    DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned priority, CDisplay& ds ) const;
+    void        DisplaySymbolString(  const char *sp, unsigned pos_array[], unsigned precedence, CDisplay& ds ) const;
 
   public:
     void	Initialize( CElementDataBase* db );

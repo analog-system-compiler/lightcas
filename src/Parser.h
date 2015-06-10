@@ -61,7 +61,8 @@ class CParser : public CString
 
   public:
     const char*	m_Pos;
-
+    static const char m_SymbolDelimiter = '\"';
+    
   protected:
     void	SkipComment();
     void	SkipSpaceNL();

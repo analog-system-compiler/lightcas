@@ -58,7 +58,7 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
   CDisplay ds2, ds3;
 
   ASSERT( pos );
-  pos2 = DisplaySymbol(  pos, priority, ds );
+  pos2 = DisplaySymbol( pos, priority, ds );
 
   if( pos == pos2 ) //no symbol displayed
   {
@@ -95,25 +95,27 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
 
 unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CDisplay& ds ) const
 {
-
-  OP_CODE op = Get( pos - 1 );
+  unsigned pos_array[ CElementDataBase::MAX_EXP ];
 
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
   {
-    const CSymbolSyntaxStruct* ss = st[i];
+    const CSymbolSyntaxStruct* ss = st[i];    
     const CMathExpression* equ =  &ss->m_Equation;
-    if( equ->GetLastOperator() == op )
+    const char* sp = ss->m_Syntax;
+    unsigned pos1 = Match( pos, *equ, pos_array );
+    if( pos1 != pos )
     {
       if( i < precedence )
       {
         ds += '(' ;
       }
-      pos = DisplaySymbolString( *ss,  pos,  i,  ds );
+      DisplaySymbolString( sp,  pos_array,  i,  ds );
       if( i < precedence )
       {
         ds += ')' ;
       }
+      pos=pos1;
       break;
     }
   }
@@ -121,33 +123,10 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
   return pos;
 }
 
-unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned precedence, CDisplay& ds ) const
+void  CMathExpression::DisplaySymbolString(  const char *sp, unsigned pos_array[], unsigned precedence, CDisplay& ds ) const
 {
   char c;
-  unsigned j;
-
-  unsigned pos2, reserved_pos[8];
-
-  const CMathExpression& equ =  st.m_Equation;
-
-  j = 0;
-  pos2 = equ.GetSize();
-  while( pos2 )
-  {
-    OP_CODE op = equ.Pop( pos2 );
-    if( IsReserved( op ) )
-    {
-      ASSERT( j < sizeof( reserved_pos ) / sizeof( unsigned ) );
-      reserved_pos[j++] = pos;
-      NextBranch( pos );
-    }
-    else
-    {
-      Pop( pos );
-    }
-  }
-  ASSERT( j );
-  const char* sp = st.m_Syntax;
+  unsigned i;
 
   while ( ( c = *sp++ ) )
   {
@@ -157,15 +136,14 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
       {
         precedence = 0;
       }
-      DisplayBranch( reserved_pos[--j], precedence, ds );
+      i = tolower( c ) - 'a';      
+      DisplayBranch( pos_array[i], precedence, ds );
     }
     else
     {
       ds += c;
     }
   }
-
-  return pos;
 }
 
 void CMathExpression::GetLevel( CParser& IC, unsigned priority )
@@ -296,6 +274,7 @@ bool CMathExpression::ParseElement( CParser& IC )
     }
     else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
     {
+      ASSERT( false );
       m_StackSize--;
       ASSERT( f->GetParameterNb() == i + 1 );
     }
@@ -307,9 +286,11 @@ bool CMathExpression::ParseElement( CParser& IC )
     Push( e );
 
     //Check if symbol definition for this operator
-    if( IC.GetChar() == '\\' )
+    if( IC.GetChar() == CParser::m_SymbolDelimiter )
     {
-        m_ElementDB->AssociateSymbol( IC, *this );
+      m_ElementDB->AssociateSymbol( IC, *this );
+      //Clear(); //clear equation to avoid being executed after being parsed.
+      Init( RefToElement( CElementDataBase::OP_NONE ) );
     }
   }
 
@@ -333,7 +314,7 @@ unsigned CMathExpression::ParseParenthesis( CParser& IC )
     while( IC.GetChar() && !IC.TryFind( ')' ) )
     {
       GetLevel( IC, 0 );
-      IC.TryFind( ',' );
+      // IC.TryFind( ',' );
       i++;
     }
   }

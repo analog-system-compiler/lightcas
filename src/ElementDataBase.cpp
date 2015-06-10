@@ -27,6 +27,10 @@ CElementArray      CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned           CElementDataBase::m_SecureLimit;
 
+#ifdef EMBED_RULES
+extern const char Rules[] asm("_binary____src_Rules_txt_start");
+#endif
+
 const SProperties CElementDataBase::m_FunctionProperties[] =
 {
     { "ADD",    2, &CEvaluator::Add           },
@@ -114,6 +118,10 @@ void CElementDataBase::Initialize()
     AddReservedElements();
     AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
     SetSecureLimit( GetSize() );
+#ifdef EMBED_RULES
+    IC.SetPos( Rules );
+    AddAlgebraRuleTable ( IC );
+#else
     if( IC.LoadFile( CString( "Rules.txt" ) ) )
     {
       AddAlgebraRuleTable ( IC );
@@ -124,6 +132,7 @@ void CElementDataBase::Initialize()
       IC.Append( "rules description file not found." );
       IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
     }
+#endif
     CleanTempElements();
   }
   else
@@ -143,35 +152,39 @@ void CElementDataBase::AddReservedElements()
   GetElement()->SetPseudoName(  "f"  );
   GetElement()->SetPseudoName(  "g"  );
   GetElement()->SetPseudoName(  "h"  );
-  GetElement( "CONCAT"     )->SetOperandNb( 2 );
-  GetElement( "SET"        )->SetOperandNb( 2 );
-  GetElement( "NONE"       );//->SetOperandNb( 0 );
-  GetElement( "CONST"      )->SetOperandNb( 1 );
-  GetElement( "ELEM"       )->SetOperandNb( 1 );
-  GetElement( "NEG"        )->SetOperandNb( 1 );
-  GetElement( "j"          );//->SetOperandNb( 0 );
-  GetElement( "RANK"       )->SetOperandNb( 2 );
-  GetElement( "SUBST"      )->SetOperandNb( 2 );
-  GetElement( "ERROR_SIZE" );//->SetOperandNb( 0 );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO       ] ) == OP_ZERO   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1       ] ) == OP_EXP1   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2       ] ) == OP_EXP2   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP3       ] ) == OP_EXP3   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP4       ] ) == OP_EXP4   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP5       ] ) == OP_EXP5   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP6       ] ) == OP_EXP6   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP7       ] ) == OP_EXP7   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP8       ] ) == OP_EXP8   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONCAT     ] ) == OP_CONCAT );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_SET        ] ) == OP_SET    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE       ] ) == OP_NONE   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST      ] ) == OP_CONST  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM       ] ) == OP_ELEM   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG        ] ) == OP_NEG    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX       ] ) == OP_CPLX   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK       ] ) == OP_RANK   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST      ] ) == OP_SUBST  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR_SIZE ] ) == OP_ERROR_SIZE  );
+  GetElement( "CONCAT" )->SetOperandNb( 2 );
+  GetElement( "SET"    )->SetOperandNb( 2 );
+  GetElement( "GET"    )->SetOperandNb( 1 );
+  GetElement( "NONE"   );//->SetOperandNb( 0 );
+  GetElement( "CONST"  )->SetOperandNb( 1 );
+  GetElement( "ELEM"   )->SetOperandNb( 1 );
+  GetElement( "NEG"    )->SetOperandNb( 1 );
+  GetElement( "j"      );//->SetOperandNb( 0 );
+  GetElement( "RANK"   )->SetOperandNb( 2 );
+  GetElement( "SUBST"  )->SetOperandNb( 3 );
+  GetElement( "SYST"   )->SetOperandNb( 2 );
+  GetElement( "ERROR"  )->SetOperandNb( 1 );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP3   ] ) == OP_EXP3   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP4   ] ) == OP_EXP4   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP5   ] ) == OP_EXP5   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP6   ] ) == OP_EXP6   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP7   ] ) == OP_EXP7   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP8   ] ) == OP_EXP8   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONCAT ] ) == OP_CONCAT );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_SET    ] ) == OP_SET    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_GET    ] ) == OP_GET    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE   ] ) == OP_NONE   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST  ] ) == OP_CONST  );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM   ] ) == OP_ELEM   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG    ] ) == OP_NEG    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_SYST   ] ) == OP_SYST   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR  ] ) == OP_ERROR  );
 }
 
 void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_equ )
@@ -186,7 +199,7 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
   i = 0;
   IC.Next();
   c = IC.GetChar();
-  while( c && c != '\\' && ( i < ( sizeof( sss->m_Syntax ) - 1 ) ) )
+  while( c && c != CParser::m_SymbolDelimiter && ( i < ( sizeof( sss->m_Syntax ) - 1 ) ) )
   {
     if( CParser::IsWord( c ) )
     {
@@ -230,7 +243,19 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
 void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 {
   CMathExpression src( this );
-  src.GetFromString( IC );
+
+  src.GetFromString("SET(  ACTIVATE( SYST( a SET( b c ) ) )  SYST( ACTIVATE( a ) SET( b c )  )  )");
+  src.OptimizeTree();
+
+  src.GetFromString(IC);
+  src.Push( GetElement("ACTIVATE") );
+
+#ifdef _DEBUG
+  CDisplay ds;
+  src.Display(ds);
+#endif
+
+  src.OptimizeTree(); // optimize 'if' if any.    
 }
 
 void CElementDataBase::CleanTempElements()
