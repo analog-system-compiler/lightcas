@@ -23,7 +23,9 @@
 #include "LCVector.h"
 #include "Evaluator.h"
 #include "ElementDataBase.h"
-#define MAX_STACK_SIZE 1024
+
+#define MAX_STACK_SIZE 4096
+#define OPTIMIZATION_LEVEL 2
 
 typedef	CVector< class CMathExpression* > CEquationArray;
 class CAlgebraRule;
@@ -37,13 +39,13 @@ class CMathExpression
     OP_CODE*    m_StackArray;
     unsigned	m_StackSize;
     unsigned	m_AllocSize;
-    CElementDataBase*	m_ElementDB;
+    CElementDataBase*	m_ElementDB;    
 
   protected:
     void		 SetSize( unsigned i );
     void         Set( unsigned pos, OP_CODE op )   {  m_StackArray[ pos ] = op;    }
     OP_CODE      Get( unsigned pos )	const      {  return m_StackArray[ pos ];  }
-    OP_CODE      Pop( unsigned& pos )  const       {  ASSERT( pos > 0 && pos<=m_StackSize ); pos--; return Get( pos );    }
+    OP_CODE      Pop( unsigned& pos )  const       {  ASSERT( pos > 0 && pos<=m_StackSize ); pos--; return Get( pos );  }
     
     void         Push( OP_CODE op )                {  SetSize( m_StackSize + 1  );  Set( m_StackSize-1, op );  }
     void		 Push( const CElement* e )         {  Push( ElementToRef( e ) );    }
@@ -59,12 +61,14 @@ class CMathExpression
     bool         SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
     bool         ParseElement(CParser& IC);
     unsigned     ParseParenthesis( CParser& IC );
+    unsigned     Parse( CParser& IC );
     bool         MatchOperator( CParser& IC, const char * s, const CMathExpression& equ, unsigned priority1 );
                  
     void         StoreStackPointer( char c, unsigned pos_array[] );
 
     bool         OptimizeConst();
-    bool         OptimizeTree2();
+    bool         OptimizeTree2(/*bool& bImpure*/);
+    void         OptimizeTree3();
     //void	     OptimizeTree();
     void         Replace( OP_CODE op1, OP_CODE op2 );
     void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );

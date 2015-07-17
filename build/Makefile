@@ -41,24 +41,24 @@ all:$(EXE)
 -include $(LIB_OBJS:.o=.d)
 
 $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
-	@echo 'Compiling   ... $(notdir $< )'
+	@echo 'Compiling ... $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 	
 $(OBJDIR)/%.o: $(SRC_DIR)/%.txt
-	@echo 'Translating ... $(notdir $< )'
+	@echo 'Packaging ... $(notdir $< )'
 	$(LD) -r -b binary $< -o $@ 
 
 $(LIB): $(LIB_OBJS)
-	@echo 'Generating  ... $(notdir $@)'
+	@echo 'Archiving ... $(notdir $@)'
 	$(AR) -r $@ $^
 
 $(EXE):$(LIB)
-	@echo 'Linking     ... $(notdir $@)'
+	@echo 'Linking   ... $(notdir $@)'
 	$(CXX) -o $@  $(CPPFLAGS) $(EXE_SRC) $^
 	cp ../src/Rules.txt .
 
 clean:
-	@echo 'Cleaning    ...'
+	@echo 'Cleaning  ...'
 	rm -rf $(OBJDIR)
 
 .PHONY: all

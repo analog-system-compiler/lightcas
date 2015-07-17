@@ -253,7 +253,7 @@ void CEvaluator::Neg( CEvaluator& eval )
 void CEvaluator::Inv( CEvaluator& eval )
 {
   double v = eval.Pop();
-  eval.Push( ( double )1. / v );
+  eval.Push( 1. / v );
 }
 void CEvaluator::Id( CEvaluator& eval )
 {
@@ -263,12 +263,12 @@ void CEvaluator::Id( CEvaluator& eval )
 void CEvaluator::Bool( CEvaluator& eval )
 {
   double v = eval.Pop();
-  eval.Push( ( double )( v == 0. ) );
+  eval.Push( v ? 1. : 0. );
 }
 void CEvaluator::LNot( CEvaluator& eval )
 {
   double v = eval.Pop();
-  eval.Push( ( double )( v != 0. ) );
+  eval.Push( v ? 0. : 1. );
 }
 void CEvaluator::Fact( CEvaluator& eval )
 {

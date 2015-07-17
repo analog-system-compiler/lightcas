@@ -133,12 +133,11 @@ POLY(LTE(a b),1)         := POLYF(LTE( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(SHL(a b),1)         := POLYF(SHL( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(SHR(a b),1)         := POLYF(SHR( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(CONCAT(a b),1)      := POLYF(CONCAT( SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SYST(a b),1)        := POLYF(CONCAT( SIMPLIFY(a) SIMPLIFY(b)));
+POLY(SYST(a b),1)        := POLYF(SYST( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(MIN(a b),1)         := POLYF(MIN( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(MAX(a b),1)         := POLYF(MAX( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(POW(a b),1)         := POLYF(POW( SIMPLIFY(a) SIMPLIFY(b)));
-//POLY(IF(a b),1)          := POLYF(IF( SIMPLIFY(a) SIMPLIFY(b)));
-//POLY(IF2(a b),1)         := POLYF(IF2( SIMPLIFY(a) SIMPLIFY(b)));
+POLY(IF(a b),1)          := POLYF(IF( SIMPLIFY(a) SIMPLIFY(b)));
 
 
 //USE_TED := 0;
@@ -314,7 +313,7 @@ POLY(POW(a b),1)         := POLYF(POW( SIMPLIFY(a) SIMPLIFY(b)));
   NORM3(a)                         := MONDIV(a,MON(GET_POWER(a,1),0));
 
   //IPoly
-  IPOLY2(MON(a,b),v)               := a*SIMPLIFY(v)^b;
+  IPOLY2(MON(a,b),v)               := a*GET(v)^b;
   IPOLY2(POLYSTORE(a,b),v)         := IPOLY2(a,v)+IPOLY2(b,v);
   IPOLY2(MONDIV(a,b),v)            := IPOLY2(a,v)/IPOLY2(b,v);
 
@@ -429,6 +428,7 @@ SIMPLIFY(ELEM(a))     := GET(a)  ;
 SIMPLIFY(-ELEM(a))    := -GET(a) ;
 SIMPLIFY(CONST(a))    := a  ;
 SIMPLIFY(-CONST(a))   := -a ;
+SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
 SIMPLIFY(a)           := SIMPLIFY2(a,GETVAR(a));
 
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
@@ -534,26 +534,26 @@ SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_AUTO_SOLVE4({SYSTEM_AUTO_SOLVE2({a}
 
 0|b      := b    ;
 a|0      := a    ;
-~0|b     := ~0  ;
-a|~0     := ~0  ;
+-1|b     := -1  ;
+a|-1     := -1  ;
 0&b      := 0    ;
 a&0      := 0    ;
-a&~0     := a  ;
-~0&b     := b  ;
-~a |  a  := ~0 ;
- a | ~a  := ~0 ;
+a&-1     := a  ;
+-1&b     := b  ;
+~a |  a  := -1 ;
+ a | ~a  := -1 ;
 ~a &  a  := 0  ;
  a & ~a  := 0  ;
 
 POLY(a&b,v)               := POLY(a,v)&POLY(b,v);
 POLY(a|b,v)               := POLY(a,v)|POLY(b,v);
 POLY(~a,v)                := ~POLY(a,v);
-					      
+				
 MON(1,1) |  MON(1,1)      := MON(1,1);
 MON(a,0) |  MON(b,0)      := MON(a|b,0);
 MON(1,1) &  MON(1,1)      := MON(1,1);
 MON(a,0) &  MON(b,0)      := MON(a&b,0);
-(~MON(a,0)                := MON(~a,0));
+~MON(a,0)                 := MON(~a,0);
 
 (a,b)+(c,d)               := (a+c,b+d);
 {a}+{b}                   := {a+b};
@@ -566,6 +566,9 @@ INVAT({a,b},0)            := b;
 INVAT({a,b},CONST(c))     := INVAT({a},c-1);
 INVAT({a},0)              := a;
 INVAT({a},-CONST(b))      := ERROR(0);
+
+//TAYLOR(a,x,xo,0)          := SIMPLIFY(SUBST(a x xo));
+//TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SIMPLIFY(SUBST(DERN(a,x,n) x xo))*(x-xo)^n/n!;
 
 TAYLOR(a,x,xo,0)          := SUBST(a x xo);
 TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SUBST(DERN(a,x,n) x xo)*(x-xo)^n/n!;

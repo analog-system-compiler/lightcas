@@ -146,7 +146,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a+b)", "a+b" );
   Check( "SIMPLIFY(a-b)", "a-b" );
   Check( "SIMPLIFY(a+a+b+b)", "2*a+2*b" );
-  Check( "SIMPLIFY(a+a-(b+b)", "2*a-2*b" );
+  Check( "SIMPLIFY(a+a-(b+b))", "2*a-2*b" );
   Check( "SIMPLIFY(a-b+c-(c+a-b))", "0" );
   Check( "SIMPLIFY(a-(b-c))", "a-b+c" );
   Check( "SIMPLIFY(a-b-c)", "a-b-c" );
@@ -179,21 +179,21 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(1/(a+1)-1/(a+1))", "0" );
   Check( "SIMPLIFY(1/(1/(a+1))-a-1)", "0" );
   Check( "SIMPLIFY(1/(2*1/(2*a+2))-a-1)", "0" );
-  Check( "SIMPLIFY(a*(a^b)","a^(1+b)");
-  Check( "SIMPLIFY(x^(a*b)/x^(a*b)","1" );
+  Check( "SIMPLIFY(a*(a^b))","a^(1+b)");
+  Check( "SIMPLIFY(x^(a*b)/x^(a*b))","1" );
   Check( "SIMPLIFY(x^(a-a))", "1" );
   Check( "SIMPLIFY(x^a)", "x^a" );
   Check( "SIMPLIFY(x^(a+a))", "x^(2*a)" );
   Check( "SIMPLIFY((x+y)^(a+a))", "(x+y)^(2*a)" );
   Check( "SIMPLIFY(1+(x+y)^(a+a))", "1+(x+y)^(2*a)" );
-  Check( "SIMPLIFY((x^a)^2", "x^(2*a)" );
+  Check( "SIMPLIFY((x^a)^2)", "x^(2*a)" );
   Check( "SIMPLIFY(x^2.5)", "x^2.5" );
   Check( "SIMPLIFY((x+a)^2.5)", "(x+a)^2.5" );
   Check( "SIMPLIFY(2*x^a-2*x^a)","0");
   Check( "SIMPLIFY(x^(1+a)*x^(1-a))","x^2");
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
-  Check( "SIMPLIFY(a*cos(b)", "cos(b)*a" );
+  Check( "SIMPLIFY(a*cos(b))", "cos(b)*a" );
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
@@ -217,7 +217,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(RE(4+j))", "4" );
   Check( "SIMPLIFY(-IM(1-5*j))", "5" );
   Check( "SIMPLIFY(RE(4*j^6+j))", "-4" );
-  Check( "SIMPLIFY(-IM(1-5*j*(5*j^4))", "25" );
+  Check( "SIMPLIFY(-IM(1-5*j*(5*j^4)))", "25" );
 
   /******* In function reduction ******/
   Check( "SIMPLIFY((a+a)*COS(a+a))", "2*COS(2*a)*a" );
@@ -256,7 +256,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a|~0)", "-1" );
   Check( "SIMPLIFY(a&0)", "0" );
   Check( "SIMPLIFY(a&~0)", "a" );
-  Check( "SIMPLIFY((5<<2)|32", "52" );
+  Check( "SIMPLIFY((5<<2)|32)", "52" );
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
   /********** transforms **********/
@@ -274,6 +274,7 @@ void CElementDataBase::Test()
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );
+  Check( "SOLVE(x^2-4,x)[1]-2", "0" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
   /***** system solving *****/
@@ -290,11 +291,12 @@ void CElementDataBase::Test()
   Check( "TAYLOR(EXP(x),x,0,5)", "1+x+x^2/2+x^3/6+x^4/24+x^5/120" );
 
   /****** fonction *********/
-  Initialize();
+  //Initialize();
   CElementDataBase db( "test_function", this );
-  db.Check( "a:=4 SIMPLIFY(a-3)", "1" );
-  db.Check( "a:=6 SIMPLIFY(a-5)", "1" );
-  db.Check( "f(x):=4*x SIMPLIFY(f(z)-4*z+1)", "1" );
+  db.Check( "a:=6", "a" );
+  db.Check( "EXECUTE( a:=6 )", "a" );
+  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "a;1" );
+  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f;1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/

@@ -244,13 +244,21 @@ void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 {
   CMathExpression src( this );
 
-  src.GetFromString("SET(  ACTIVATE( SYST( a SET( b c ) ) )  SYST( ACTIVATE( a ) SET( b c )  )  )");
+  src.GetFromString("SET( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )");
+  src.OptimizeTree();
+#if OPTIMIZATION_LEVEL < 2
+  src.GetFromString("SET( EXECUTE( SET( a b ) )  SET( a b ) )");
+  src.OptimizeTree();
+  src.GetFromString("SET( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )");
+  src.OptimizeTree();
+#endif
+  src.GetFromString("SET( EXECUTE( a )  a )");
   src.OptimizeTree();
 
   src.GetFromString(IC);
-  src.Push( GetElement("ACTIVATE") );
+  src.Push( GetElement("EXECUTE") );
 
-#ifdef _DEBUG
+#if 0//def _DEBUG
   CDisplay ds;
   src.Display(ds);
 #endif
