@@ -147,6 +147,7 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
           {
             Init( m_ElementDB->GetElement( CValue( 3 ) ) );
             Push( CElementDataBase::OP_ERROR );
+            ASSERT(false);
           }
         }
 

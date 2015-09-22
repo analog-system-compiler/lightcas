@@ -23,11 +23,18 @@
 void CMathExpression::GetFromString( CParser& IC )
 {
   Clear();
-  while( !IC.IsStopChar() )
-  {
-    GetLevel( IC, 0 );
-  }
+  Parse(IC);
 }
+
+unsigned CMathExpression::Parse( CParser& IC )
+{
+unsigned i=0;
+    while( !IC.IsStopChar() )
+    {
+        GetLevel( IC, 0 );
+        i++;
+    }
+};
 
 void CMathExpression::Display( CDisplay& ds ) const
 {
@@ -95,25 +102,27 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
 
 unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CDisplay& ds ) const
 {
-
-  OP_CODE op = Get( pos - 1 );
+  unsigned pos_array[ CElementDataBase::MAX_EXP ];
 
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
   {
     const CSymbolSyntaxStruct* ss = st[i];
     const CMathExpression* equ =  &ss->m_Equation;
-    if( equ->GetLastOperator() == op )
+    const char* sp = ss->m_Syntax;
+    unsigned pos1 = Match( pos, *equ, pos_array );
+    if( pos1 != pos )
     {
       if( i < precedence )
       {
         ds += '(' ;
       }
-      pos = DisplaySymbolString( *ss,  pos,  i,  ds );
+      DisplaySymbolString( sp,  pos_array,  i,  ds );
       if( i < precedence )
       {
         ds += ')' ;
       }
+      pos = pos1;
       break;
     }
   }
@@ -121,32 +130,10 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
   return pos;
 }
 
-unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, unsigned pos, unsigned precedence, CDisplay& ds ) const
+void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[], unsigned precedence, CDisplay& ds ) const
 {
   char c;
   unsigned i;
-  unsigned pos2;
-  unsigned reserved_pos[CElementDataBase::MAX_EXP];
-
-  const CMathExpression& equ =  st.m_Equation;
-
-  pos2 = equ.GetSize();
-  while( pos2 )
-  {
-    OP_CODE op = equ.Pop( pos2 );
-    if( IsReserved( op ) )
-    {
-      reserved_pos[op-CElementDataBase::OP_EXP1] = pos;
-      NextBranch( pos );
-    }
-    else
-    {
-      OP_CODE op2 = Pop( pos );
-      ASSERT( op == op2 );
-    }
-  }
-  
-  const char* sp = st.m_Syntax;
 
   while ( ( c = *sp++ ) )
   {
@@ -156,17 +143,14 @@ unsigned  CMathExpression::DisplaySymbolString(  const CSymbolSyntaxStruct& st, 
       {
         precedence = 0;
       }
-      i = tolower(c) - 'a';
-      ASSERT(i<j);
-      DisplayBranch( reserved_pos[j-i-1], precedence, ds );
+      i = tolower( c ) - 'a';
+      DisplayBranch( pos_array[i], precedence, ds );
     }
     else
     {
       ds += c;
     }
   }
-
-  return pos;
 }
 
 void CMathExpression::GetLevel( CParser& IC, unsigned priority )
@@ -297,8 +281,8 @@ bool CMathExpression::ParseElement( CParser& IC )
     }
     else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
     {
-      ASSERT(false);
       m_StackSize--;
+      ASSERT( e->IsNumeric() ); // for numeric function, it is allowed to use comma without concatenation op.
       ASSERT( f->GetParameterNb() == i + 1 );
     }
     else
@@ -311,9 +295,9 @@ bool CMathExpression::ParseElement( CParser& IC )
     //Check if symbol definition for this operator
     if( IC.GetChar() == CParser::m_SymbolDelimiter )
     {
-        m_ElementDB->AssociateSymbol( IC, *this );
-        //Clear(); //clear equation to avoid being executed after being parsed.
-        Init(RefToElement(CElementDataBase::OP_NONE));
+      m_ElementDB->AssociateSymbol( IC, *this );
+      //Clear(); //clear equation to avoid being executed after being parsed.
+      Init( RefToElement( CElementDataBase::OP_NONE ) );
     }
   }
 
@@ -331,15 +315,11 @@ void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )
 
 unsigned CMathExpression::ParseParenthesis( CParser& IC )
 {
-  unsigned i = 0;
+  unsigned i=0;
   if( IC.TryFind( '(' ) )
   {
-    while( IC.GetChar() && !IC.TryFind( ')' ) )
-    {
-      GetLevel( IC, 0 );
-     // IC.TryFind( ',' );
-      i++;
-    }
+   i=Parse(IC);
+   IC.Find(')');
   }
   return i;
 }

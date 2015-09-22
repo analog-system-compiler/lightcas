@@ -92,7 +92,7 @@ class CMathExpression
     void	Initialize( CElementDataBase* db );
 
     void	BinaryOperation( OP_CODE op, const CMathExpression& equ );
-    void	BinaryOperation( OP_CODE op, const CElement* e );
+    //void	BinaryOperation( OP_CODE op, const CElement* e );
     void	UnaryOperation( OP_CODE op );
     void	VoidOperation( OP_CODE op );
 

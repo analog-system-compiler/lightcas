@@ -428,7 +428,7 @@ SIMPLIFY(ELEM(a))     := GET(a)  ;
 SIMPLIFY(-ELEM(a))    := -GET(a) ;
 SIMPLIFY(CONST(a))    := a  ;
 SIMPLIFY(-CONST(a))   := -a ;
-SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
+//SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
 SIMPLIFY(a)           := SIMPLIFY2(a,GETVAR(a));
 
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
@@ -455,7 +455,7 @@ CHOOSEVARDIV(a,b)     := a; //Not RANK there !!!
 
 
 DERN(a,b,0)     := a;
-DERN(a,b,n)     := DERN(DER(a,b),b,n-1);
+DERN(a,b,CONST(n))     := DERN(DER(a,b),b,n-1);
 DER(CONST(a),c) := 0;
 DER(c,c)        := 1;
 DER(a+b,c)      := DER(a,c)+DER(b,c);

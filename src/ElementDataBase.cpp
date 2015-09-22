@@ -28,7 +28,7 @@ CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned           CElementDataBase::m_SecureLimit;
 
 #ifdef EMBED_RULES
-extern const char Rules[] asm("_binary____src_Rules_txt_start");
+extern const char Rules[] asm("_binary___objs_Rules_txt_start");
 #endif
 
 const SProperties CElementDataBase::m_FunctionProperties[] =

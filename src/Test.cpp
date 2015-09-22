@@ -295,8 +295,8 @@ void CElementDataBase::Test()
   CElementDataBase db( "test_function", this );
   db.Check( "a:=6", "a" );
   db.Check( "EXECUTE( a:=6 )", "a" );
-  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "a;1" );
-  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f;1" );
+  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "6;1" );
+  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "4*x;1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/

@@ -92,9 +92,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>c:\tmp\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>c:\tmp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoStd|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>c:\tmp\$(ProjectName)\$(Configuration)\</OutDir>
+    <IntDir>c:\tmp\$(ProjectName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
