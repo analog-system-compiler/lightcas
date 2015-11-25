@@ -49,18 +49,19 @@ class CParserException
 };
 
 
-class CParser : public CString
+class CParser 
 {
 
   private:
 
     static	const char	m_CharTab[];
     int		m_LineNb;
-    CString	m_FileName;
+    CString	m_FileName;    
     char    *m_Text;
 
   public:
     const char*	m_Pos;
+    CString m_Buffer;
     static const char m_SymbolDelimiter = '\"';
     
   protected:
@@ -79,6 +80,8 @@ class CParser : public CString
 
     const   CString& GetWord();
     char    GetChar();
+    void    CopyBuffer( const char *s, unsigned len ) { m_Buffer.Copy( s, len ); }
+    void    CopyBuffer( const CString& s )            { m_Buffer = s;            }
 
     bool	IsWord()                       { return IsWord( GetChar() );     }
     bool	IsStopChar()                   { return IsStopChar( GetChar() ); }

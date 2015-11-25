@@ -31,7 +31,7 @@ bool CMathExpression::OptimizeConst()
   CElement* e3;
 
   pos = m_StackSize;
-  if( !pos )
+  if( pos == 0 )
   {
     return true;
   }
@@ -49,14 +49,17 @@ bool CMathExpression::OptimizeConst()
       }
     }
 
+    CEvaluator *eval = m_ElementDB->GetEvaluator();
+    if ( eval ) {
+
 #ifdef DEBUG_OPTIMIZE
     CDisplay ds;
     ds += "OptimizeConst :" ;
     Display( ds );
     ds += " => ";
 #endif
-
-    const CValue& v = m_ElementDB->GetEvaluator()->Evaluate( m_StackSize - pos, m_StackArray + pos );
+    
+    const CValue& v = eval->Evaluate( m_StackSize - pos, m_StackArray + pos );
     m_StackSize = pos;
     Push( v );
 
@@ -65,7 +68,9 @@ bool CMathExpression::OptimizeConst()
     TRACE( ds.GetBufferPtr() );
 #endif
 
-    return true;
+    }
+
+    return true; // even if no evaluator
 
   }
 
@@ -79,13 +84,15 @@ void CMathExpression::OptimizeTree()
 
 void CMathExpression::OptimizeTree3()
 {
+  
   if( !ExecuteCommand() )
   {
     if( !OptimizeTree2( /*bImpure*/ ) )
     {
       OptimizeConst();
-    }
-  }
+        
+    }    
+  }  
 }
 
 bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
@@ -99,7 +106,7 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
   OP_CODE op = GetLastOperator();
   CElement* e = RefToElement( op );
   CFunction* funct = e->GetFunction();
-
+  
   if( funct )
   {
     n = funct->m_AlgebraRuleArray.GetSize();
@@ -111,7 +118,7 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
 
       pos = Match( GetSize(), *equ, pos_array );
       match = ( pos != GetSize() );
-
+      
       if( match )
       {
 #ifdef _DEBUG
@@ -119,13 +126,12 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
 #endif
 #ifdef DEBUG_OPTIMIZE
         CDisplay ds;
-        ds += "OptimizeTree rule #" ;
+        ds += "OptimizeTree rule" ;
         //        ds += CString( rule->m_LineNo );
+        ds += " [";
         e->Display( ds );
-        ds += " : ";
-        rule->m_SrcEquation.Display( ds );
-        ds += " => ";
-        rule->m_DstEquation.Display( ds );
+        ds += "] ";
+        rule->Display( i, ds );
         ds += " : ";
         Display( ds );
         ds += " => ";
@@ -134,9 +140,11 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
         {
 #if 1
           CMathExpression equ2( m_ElementDB );
+          
           /*bImpure = */equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           SetSize( pos );
           Push( equ2 );
+          
 #else
           unsigned pos2 = m_StackSize;
           ApplyRule( *this, pos_array, &rule->m_DstEquation );
@@ -151,10 +159,11 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
           }
         }
 
+        
 #ifdef DEBUG_OPTIMIZE
         Display( ds );
         TRACE( ds.GetBufferPtr() );
-#endif
+#endif        
         return true;
       }
     }
@@ -241,7 +250,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
 
   for( pos = 0; pos < rule_equ->GetSize(); pos++ )
   {
-
+         
     op3 = rule_equ->Get( pos );
 
     if( IsReserved( op3 ) )
@@ -249,15 +258,16 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
       j = ReservedParameterIndex( op3 );
       unsigned pos2 = pos_array[ j ];
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
-
+      
       if( optimize && ( OPTIMIZATION_LEVEL == 2 ) )
       {
           OptimizeTree3();  // optimization is only made on the top branch
       }
-
+      
     }
     else
     {
+    
       ASSERT( RefToElement( op3 ) != NULL );
       Push( op3 );
 
@@ -265,6 +275,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
       {
         OptimizeTree3();  // optimization is only made on the top branch
       }
+      
     }
   }
 
@@ -281,12 +292,14 @@ bool CMathExpression::ExecuteCommand()
   bool bOK = false;
 
   OP_CODE op3 = Pop( m_StackSize );
+   
   switch( op3 )
   {
     case CElementDataBase::OP_SET:
       {
         CMathExpression equ_dst( m_ElementDB );
         CMathExpression equ_src( m_ElementDB );
+        
         equ_dst.PushBranch( *this, m_StackSize );
         unsigned pos = m_StackSize;
         equ_src.PushBranch( *this, pos );

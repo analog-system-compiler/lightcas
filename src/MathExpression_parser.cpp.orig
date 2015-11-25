@@ -23,18 +23,34 @@
 void CMathExpression::GetFromString( CParser& IC )
 {
   Clear();
-  Parse(IC);
+  Parse( IC );
 }
 
 unsigned CMathExpression::Parse( CParser& IC )
 {
-unsigned i=0;
-    while( !IC.IsStopChar() )
-    {
-        GetLevel( IC, 0 );
-        i++;
-    }
-};
+  unsigned i = 0;
+  CMathExpression equ( m_ElementDB );
+
+  while( !IC.IsStopChar() )
+  {
+    equ.GetLevel( IC, 0 );
+    Push( equ );
+    i++;
+  }
+  return i;
+}
+
+unsigned CMathExpression::ParseParenthesis( CParser& IC )
+{
+  unsigned i = 0;
+  if( IC.TryFind( '(' ) )
+  {
+    i = Parse( IC );
+    IC.Find( ')' );
+  }
+  return i;
+}
+
 
 void CMathExpression::Display( CDisplay& ds ) const
 {
@@ -51,7 +67,7 @@ void CMathExpression::Display( CDisplay& ds ) const
       pos = DisplayBranch( pos, 0, ds );
       if( pos )
       {
-        ds += " ";
+        ds += ' ';
       }
     }
   }
@@ -137,7 +153,8 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
 
   while ( ( c = *sp++ ) )
   {
-    if( CParser::IsWord( c ) )
+  if( c == '(' ) {while( *sp++ == ')' );}
+  else if( CParser::IsWord( c ) )
     {
       if( c < 'a' )
       {
@@ -147,7 +164,7 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
       DisplayBranch( pos_array[i], precedence, ds );
     }
     else
-    {
+    {        
       ds += c;
     }
   }
@@ -155,13 +172,18 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
 
 void CMathExpression::GetLevel( CParser& IC, unsigned priority )
 {
+  Clear();
+
   if( !IC.IsStopChar() )
   {
-    if( !ParseElement( IC ) )
+    if( ParseParenthesis( IC ) == 0 )
     {
-      if( !SearchOperator( IC, 0, true ) )
+      if( !ParseElement( IC ) )
       {
-        IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+        if( !SearchOperator( IC, 0, true ) )
+        {
+          IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+        }
       }
     }
   }
@@ -202,7 +224,6 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
   char c;
   unsigned pos_array[ CElementDataBase::MAX_EXP ];
   CMathExpression equ( m_ElementDB );
-
   InitPositionTable( pos_array );
 
   c = *sp;
@@ -215,7 +236,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
   // try to match prefix operator
   while( ( c = *sp ) )
   {
-    if( CParser::IsWord( c ) )
+    if( CParser::IsWord( c )  )
     {
       if( c < 'a' )
       {
@@ -225,6 +246,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
       Push( equ );
       StoreStackPointer( c, pos_array );
       sp++;
+
     }
     else if( !IC.TryMatchSymbol( sp ) )
     {
@@ -232,15 +254,19 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
     }
   }
 
+  if( *sp  ) //check that all characters had matched
+  {
+    return false;
+  }
+
   if( rule_equ.GetSize() )
   {
     equ.Copy( *this );
     Clear();
     ApplyRule( equ, pos_array, &rule_equ, false );
-
   }
 
-#if 0//def _DEBUG
+#if 0 //def _DEBUG
   CDisplay ds;
   Display( ds );
   TRACE( ds.GetBufferPtr() );
@@ -311,15 +337,4 @@ void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )
   ASSERT( elem_id < CElementDataBase::MAX_EXP );
   pos_array[elem_id]  = m_StackSize;
 
-}
-
-unsigned CMathExpression::ParseParenthesis( CParser& IC )
-{
-  unsigned i=0;
-  if( IC.TryFind( '(' ) )
-  {
-   i=Parse(IC);
-   IC.Find(')');
-  }
-  return i;
 }

@@ -30,11 +30,11 @@ unsigned CMathExpression::Parse( CParser& IC )
 {
   unsigned i = 0;
   CMathExpression equ( m_ElementDB );
-  
+
   while( !IC.IsStopChar() )
   {
     equ.GetLevel( IC, 0 );
-    Push(equ);
+    Push( equ );
     i++;
   }
   return i;
@@ -42,13 +42,13 @@ unsigned CMathExpression::Parse( CParser& IC )
 
 unsigned CMathExpression::ParseParenthesis( CParser& IC )
 {
-    unsigned i = 0;
-    if( IC.TryFind( '(' ) )
-    {
-        i = Parse( IC );
-        IC.Find( ')' );
-    }
-    return i;
+  unsigned i = 0;
+  if( IC.TryFind( '(' ) )
+  {
+    i = Parse( IC );
+    IC.Find( ')' );
+  }
+  return i;
 }
 
 
@@ -82,7 +82,7 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
 
   ASSERT( pos );
   pos2 = DisplaySymbol( pos, priority, ds );
-  
+
   if( pos == pos2 ) //no symbol displayed
   {
     OP_CODE op = Pop( pos );
@@ -153,7 +153,14 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
 
   while ( ( c = *sp++ ) )
   {
-    if( CParser::IsWord( c ) )
+    if( c == '(' )
+    {
+      while( *sp != ')' )
+      {
+        sp++;
+      }
+    }
+    else if( CParser::IsWord( c ) )
     {
       if( c < 'a' )
       {
@@ -175,11 +182,14 @@ void CMathExpression::GetLevel( CParser& IC, unsigned priority )
 
   if( !IC.IsStopChar() )
   {
-    if( !ParseElement( IC ) )
+    if( ParseParenthesis( IC ) == 0 )
     {
-      if( !SearchOperator( IC, 0, true ) )
+      if( !ParseElement( IC ) )
       {
-        IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+        if( !SearchOperator( IC, 0, true ) )
+        {
+          IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+        }
       }
     }
   }
@@ -232,16 +242,17 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
   // try to match prefix operator
   while( ( c = *sp ) )
   {
-    if( CParser::IsWord( c ) )
+    if( CParser::IsWord( c )  )
     {
       if( c < 'a' )
       {
         precedence = 0;
       }
       equ.GetLevel( IC, precedence );
-      Push(equ);
+      Push( equ );
       StoreStackPointer( c, pos_array );
       sp++;
+
     }
     else if( !IC.TryMatchSymbol( sp ) )
     {
@@ -249,9 +260,14 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
     }
   }
 
+  if( *sp  ) //check that all characters had matched
+  {
+    return false;
+  }
+
   if( rule_equ.GetSize() )
   {
-    equ.Copy(*this);
+    equ.Copy( *this );
     Clear();
     ApplyRule( equ, pos_array, &rule_equ, false );
   }

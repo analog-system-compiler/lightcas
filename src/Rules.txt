@@ -20,10 +20,11 @@
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
 
-SYST(a b)               " a;b   ";  
+SYST(a b)               " a;b   ";
+EQV( a b )              " a=(=)b";
 IF( CONCAT( b c ) a )   " a?b:c ";  
 CONCAT( a b )           " a,b   ";  
-SET( a b )              " a:=b  ";  
+SET( a b )              " a:=b  ";
 OR( a b )               " a|b   ";  
 XOR( a b )              " a~b   ";  
 ADD( a b )              " a+b   ";  
@@ -138,6 +139,7 @@ POLY(MIN(a b),1)         := POLYF(MIN( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(MAX(a b),1)         := POLYF(MAX( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(POW(a b),1)         := POLYF(POW( SIMPLIFY(a) SIMPLIFY(b)));
 POLY(IF(a b),1)          := POLYF(IF( SIMPLIFY(a) SIMPLIFY(b)));
+POLY(IF2(a b),1)         := POLYF(IF2( SIMPLIFY(a) SIMPLIFY(b)));
 
 
 //USE_TED := 0;
@@ -370,7 +372,7 @@ LOG10(a)+LOG10(b)  := LOG10(a*b) ;
 0-b                := -b  ;
 a-0                := a  ;
 a--b               := a+b ;
--(a-b)            := b-a ;
+-(a-b)             := b-a ;
 SIN(a)-SIN(b)      := COS((a+b)/2)*SIN((a-b)/2)*2;
 LOG10(a)-LOG10(b)  := LOG10(a/b)  ;
 

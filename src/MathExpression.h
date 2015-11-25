@@ -24,7 +24,7 @@
 #include "Evaluator.h"
 #include "ElementDataBase.h"
 
-#define MAX_STACK_SIZE 4096
+#define MAX_STACK_SIZE 65536
 #define OPTIMIZATION_LEVEL 2
 
 typedef	CVector< class CMathExpression* > CEquationArray;

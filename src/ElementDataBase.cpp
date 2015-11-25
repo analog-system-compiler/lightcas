@@ -28,64 +28,64 @@ CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned           CElementDataBase::m_SecureLimit;
 
 #ifdef EMBED_RULES
-extern const char Rules[] asm("_binary___objs_Rules_txt_start");
+extern const char Rules[] asm( "_binary___objs_Rules_txt_start" );
 #endif
 
 const SProperties CElementDataBase::m_FunctionProperties[] =
 {
-    { "ADD",    2, &CEvaluator::Add           },
-    { "SUB",    2, &CEvaluator::Sub           },
-    { "OR",     2, &CEvaluator::Or            },
-    { "LOR",    2, &CEvaluator::LOr           },
-    { "XOR",    2, &CEvaluator::Xor           },
-    { "MUL",    2, &CEvaluator::Mul           },
-    { "DIV",    2, &CEvaluator::Div           },
-    { "AND",    2, &CEvaluator::And           },
-    { "LAND",   2, &CEvaluator::LAnd          },
-    { "EQ",     2, &CEvaluator::Equal         },
-    { "NEQ",    2, &CEvaluator::NotEqual      },
-    { "LTE",    2, &CEvaluator::LowerOrEqual  },
-    { "SHL",    2, &CEvaluator::ShiftLeft     },
-    { "LT",     2, &CEvaluator::Lower         },
-    { "GTE",    2, &CEvaluator::GreaterOrEqual},
-    { "SHR",    2, &CEvaluator::ShiftRight    },
-    { "GT",     2, &CEvaluator::Greater       },
-    { "MIN",    2, &CEvaluator::Min           },
-    { "MAX",    2, &CEvaluator::Max           },
-    { "MOD",    2, &CEvaluator::Mod           },
-    { "POW",    2, &CEvaluator::Pow           },
-    { "NEG",    1, &CEvaluator::Neg           },
-    { "INV",    1, &CEvaluator::Inv           },
-    { "NOT",    1, &CEvaluator::Not           },
-    { "ID",     1, &CEvaluator::Id            },
-    { "BOOL",   1, &CEvaluator::Bool          },
-    { "LNOT",   1, &CEvaluator::LNot          },
-    { "SIN",    1, &CEvaluator::Sin           },
-    { "COS",    1, &CEvaluator::Cos           },
-    { "TAN",    1, &CEvaluator::Tan           },
-    { "ASIN",   1, &CEvaluator::Asin          },
-    { "ACOS",   1, &CEvaluator::Acos          },
-    { "ATAN",   1, &CEvaluator::Atan          },
-    { "SINH",   1, &CEvaluator::SinH          },
-    { "COSH",   1, &CEvaluator::CosH          },
-    { "TANH",   1, &CEvaluator::TanH          },
-    { "ASINH",  1, &CEvaluator::AsinH         },
-    { "ACOSH",  1, &CEvaluator::AcosH         },
-    { "ATANH",  1, &CEvaluator::AtanH         },
-    { "EXP",    1, &CEvaluator::Exp           },
-    { "LOG",    1, &CEvaluator::Ln            },
-    { "LOG10",  1, &CEvaluator::Log           },
-    { "SQRT",   1, &CEvaluator::Sqrt          },
-    { "SQR",    1, &CEvaluator::Sqr           },
-    { "FACT",   1, &CEvaluator::Fact          },
-    { "ABS",    1, &CEvaluator::Abs           },
-    { "FLOOR",  1, &CEvaluator::Floor         },
-    { "CEIL",   1, &CEvaluator::Ceil          },
-    { "RAND",   0, &CEvaluator::Rand          },
-    { "IF2",    2, &CEvaluator::If            },
-    { "IF",     2, &CEvaluator::If            },
-    { "CONCAT", 2, &CEvaluator::Concat        },
-    { "TED",    2, NULL                       },
+  { "ADD",    2, &CEvaluator::Add           },
+  { "SUB",    2, &CEvaluator::Sub           },
+  { "OR",     2, &CEvaluator::Or            },
+  { "LOR",    2, &CEvaluator::LOr           },
+  { "XOR",    2, &CEvaluator::Xor           },
+  { "MUL",    2, &CEvaluator::Mul           },
+  { "DIV",    2, &CEvaluator::Div           },
+  { "AND",    2, &CEvaluator::And           },
+  { "LAND",   2, &CEvaluator::LAnd          },
+  { "EQ",     2, &CEvaluator::Equal         },
+  { "NEQ",    2, &CEvaluator::NotEqual      },
+  { "LTE",    2, &CEvaluator::LowerOrEqual  },
+  { "SHL",    2, &CEvaluator::ShiftLeft     },
+  { "LT",     2, &CEvaluator::Lower         },
+  { "GTE",    2, &CEvaluator::GreaterOrEqual},
+  { "SHR",    2, &CEvaluator::ShiftRight    },
+  { "GT",     2, &CEvaluator::Greater       },
+  { "MIN",    2, &CEvaluator::Min           },
+  { "MAX",    2, &CEvaluator::Max           },
+  { "MOD",    2, &CEvaluator::Mod           },
+  { "POW",    2, &CEvaluator::Pow           },
+  { "NEG",    1, &CEvaluator::Neg           },
+  { "INV",    1, &CEvaluator::Inv           },
+  { "NOT",    1, &CEvaluator::Not           },
+  { "ID",     1, &CEvaluator::Id            },
+  { "BOOL",   1, &CEvaluator::Bool          },
+  { "LNOT",   1, &CEvaluator::LNot          },
+  { "SIN",    1, &CEvaluator::Sin           },
+  { "COS",    1, &CEvaluator::Cos           },
+  { "TAN",    1, &CEvaluator::Tan           },
+  { "ASIN",   1, &CEvaluator::Asin          },
+  { "ACOS",   1, &CEvaluator::Acos          },
+  { "ATAN",   1, &CEvaluator::Atan          },
+  { "SINH",   1, &CEvaluator::SinH          },
+  { "COSH",   1, &CEvaluator::CosH          },
+  { "TANH",   1, &CEvaluator::TanH          },
+  { "ASINH",  1, &CEvaluator::AsinH         },
+  { "ACOSH",  1, &CEvaluator::AcosH         },
+  { "ATANH",  1, &CEvaluator::AtanH         },
+  { "EXP",    1, &CEvaluator::Exp           },
+  { "LOG",    1, &CEvaluator::Ln            },
+  { "LOG10",  1, &CEvaluator::Log           },
+  { "SQRT",   1, &CEvaluator::Sqrt          },
+  { "SQR",    1, &CEvaluator::Sqr           },
+  { "FACT",   1, &CEvaluator::Fact          },
+  { "ABS",    1, &CEvaluator::Abs           },
+  { "FLOOR",  1, &CEvaluator::Floor         },
+  { "CEIL",   1, &CEvaluator::Ceil          },
+  { "RAND",   0, &CEvaluator::Rand          },
+  { "IF2",    2, &CEvaluator::If            },
+  { "IF",     2, &CEvaluator::If            },
+  { "CONCAT", 2, &CEvaluator::Concat        },
+  { "TED",    2, NULL                       },
 
 };
 
@@ -94,7 +94,14 @@ const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementData
 CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
   m_Parent = parent;
-  m_Name = name;
+  if( parent )
+  {
+    m_Name = parent->GetName() + '.' + name;
+  }
+  else
+  {
+    m_Name = name;
+  }
   m_Evaluator = eval;
   m_SecureLimit = 0;
   if( bInitialize )
@@ -116,8 +123,9 @@ void CElementDataBase::Initialize()
   {
     CParser IC;
     AddReservedElements();
-    AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
+    AddReservedFunctions();
     SetSecureLimit( GetSize() );
+    InitAlgebraRuleTable();
 #ifdef EMBED_RULES
     IC.SetPos( Rules );
     AddAlgebraRuleTable ( IC );
@@ -129,7 +137,7 @@ void CElementDataBase::Initialize()
     }
     else
     {
-      IC.Append( "rules description file not found." );
+      IC.CopyBuffer( "rules description file not found." );
       IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
     }
 #endif
@@ -187,6 +195,11 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR  ] ) == OP_ERROR  );
 }
 
+void CElementDataBase::AddReservedFunctions()
+{
+  AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
+}
+
 void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_equ )
 {
   char c;
@@ -230,9 +243,9 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
 
 #ifdef _DEBUG
   CDisplay ds;
-  ds += "Adding symbol syntax #";
+  ds += "Adding symbol syntax [";
   ds += CString( ( int )( m_SymbolSyntaxArray.GetSize() - 1 ) );
-  ds += ": ";
+  ds += "] ";
   ds += sss->m_Syntax;
   ds += " => ";
   sss->m_Equation.Display( ds );
@@ -240,30 +253,35 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
 #endif
 }
 
+void CElementDataBase::InitAlgebraRuleTable()
+{
+  CMathExpression src( this );
+
+  src.GetFromString( "SET( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )" );
+  src.OptimizeTree();
+#if OPTIMIZATION_LEVEL < 2
+  src.GetFromString( "SET( EXECUTE( SET( a b ) )  SET( a b ) )" );
+  src.OptimizeTree();
+  src.GetFromString( "SET( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )" );
+  src.OptimizeTree();
+#endif
+  src.GetFromString( "SET( EXECUTE( a )  a )" );
+  src.OptimizeTree();
+}
+
 void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 {
   CMathExpression src( this );
 
-  src.GetFromString("SET( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )");
-  src.OptimizeTree();
-#if OPTIMIZATION_LEVEL < 2
-  src.GetFromString("SET( EXECUTE( SET( a b ) )  SET( a b ) )");
-  src.OptimizeTree();
-  src.GetFromString("SET( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )");
-  src.OptimizeTree();
-#endif
-  src.GetFromString("SET( EXECUTE( a )  a )");
-  src.OptimizeTree();
-
-  src.GetFromString(IC);
-  src.Push( GetElement("EXECUTE") );
+  src.GetFromString( IC );
+  src.Push( GetElement( "EXECUTE" ) );
 
 #if 0//def _DEBUG
   CDisplay ds;
-  src.Display(ds);
+  src.Display( ds );
 #endif
 
-  src.OptimizeTree(); // optimize 'if' if any.    
+  src.OptimizeTree(); // optimize 'if' if any.
 }
 
 void CElementDataBase::CleanTempElements()
@@ -322,7 +340,7 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
   CElement* e = NULL;
   CValue v;
 
-  if( IC.GetChar() != '-' )
+  if( IC.GetChar() != '-' ) // to fix
   {
     const char* pos = IC.GetPos();
     v = GetEvaluator()->GetValueFromString( &pos );
@@ -333,8 +351,7 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
     }
     else if( IC.IsWord() )
     {
-      IC.GetWord();
-      e = GetElement( IC );
+      e = GetElement( IC.GetWord() );
     }
   }
   return e;

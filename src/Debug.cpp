@@ -28,13 +28,18 @@ static FILE* debug_file = NULL;
 
 void TRACE( const char* format, ... )
 {
-
+  unsigned i;
   static char buffer[ 8192 ];
   va_list args;
   va_start ( args, format );
-
-  vsnprintf ( buffer, sizeof(buffer), format, args );
-  strncat( buffer, "\n", sizeof( buffer ) );
+  vsnprintf( buffer, sizeof(buffer), format, args );
+  i=strlen(buffer);
+  if( (i+1) < sizeof( buffer ) )
+  {
+    buffer[i] = '\n';
+    buffer[i+1] = '\0';
+  }
+  //strncat( buffer, "\n", sizeof( buffer )-(strlen(buffer)+1) );
   va_end ( args );
 
   if( !debug_file )

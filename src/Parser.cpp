@@ -68,10 +68,10 @@ const CString& CParser::GetWord()
     i++;
   }
 
-  Copy( m_Pos, i );
+  m_Buffer.Copy( m_Pos, i );
   m_Pos += i;
 
-  return *this;
+  return m_Buffer;
 }
 
 void CParser::Find( char c )
@@ -82,22 +82,22 @@ void CParser::Find( char c )
  
     if( eof( *m_Pos ) )
     {
-      *this = "end of file";
+      m_Buffer = "end of file";
     }
     else if( eol( *m_Pos ) )
     {
-      *this = "end of line";
+      m_Buffer = "end of line";
     }
     else
     {
-      *this = "character \'";
-      *this += *m_Pos;
-      *this += '\'';
+      m_Buffer = "character \'";
+      m_Buffer += *m_Pos;
+      m_Buffer += '\'';
     }
 
-    *this += " was found instead of \'";
-    *this += c;
-    *this += '\'';
+    m_Buffer += " was found instead of \'";
+    m_Buffer += c;
+    m_Buffer += '\'';
     Error( CParserException::ID_ERROR_SYNTAX );
 
   }
@@ -186,8 +186,6 @@ void CParser::SkipComment()
 
 bool CParser::TryMatchSymbol( const char *& symbol_str )
 {
-  unsigned i = 0;
-
   const char* s1 = symbol_str;
   const char* s2 = m_Pos;
 
@@ -195,14 +193,21 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   {
     if( *s1 == '\\' )
     {
-      s1++;
+      s1++; //Next char is considered as word
     }
-
+    
     if ( *s2 == *s1 )
     {
-      i++;
       s1++;
       s2++;
+    }
+    else if( *s1 == '(' )
+    {
+        s1++; //'('
+        if( *s2 == *s1 ) //Check for forbidden characters
+            return false;       
+        s1++;
+        s1++; //')'
     }
     else
     {
@@ -220,9 +225,9 @@ void CParser::Error( unsigned id ) const
   CParserException ex;
   ex.SetErrorID( id );
   ex.SetLineNb( m_LineNb );
-  if( !IsEmpty() )
+  if( !m_Buffer.IsEmpty() )
   {
-    ex.SetErrorString( *this );
+    ex.SetErrorString( m_Buffer );
   }
 
 #if _DEBUG
@@ -230,9 +235,9 @@ void CParser::Error( unsigned id ) const
   ds += "Error found line ";
   ds += CString( (int)ex.GetLineNb() );
   ds += " : ";
-  if( !IsEmpty() )
+  if( !m_Buffer.IsEmpty() )
   {
-    ds += *this;
+    ds += m_Buffer;
   }
   PUTS( ds.GetBufferPtr() );
   TRACE( ds.GetBufferPtr() );

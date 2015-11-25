@@ -57,7 +57,7 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
         delete rule1;
         m_AlgebraRuleArray.SetAt( i, rule2 );
 #ifdef _DEBUG
-        ds += "Replacing Rule #";
+        ds += "Replacing Rule ";
 #endif
         break;
       }
@@ -65,7 +65,7 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
       {
         m_AlgebraRuleArray.InsertAt( i, rule2 );
 #ifdef _DEBUG
-        ds += "Inserting Rule #";
+        ds += "Inserting Rule ";
 #endif
         break;
       }
@@ -75,16 +75,11 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
   {
     m_AlgebraRuleArray.Append( rule2 );
 #ifdef _DEBUG
-    ds += "Appending Rule #";
+    ds += "Appending Rule ";
 #endif
   }
 #ifdef _DEBUG
-  ds += CString( ( int )i );
-  ds += " ";
-  rule2->m_SrcEquation.Display( ds );
-  ds += "\t:= ";
-  rule2->m_DstEquation.Display( ds );
-  ds += "\t";
+  rule2->Display( i, ds );  
   TRACE( ds.GetBufferPtr() );
 #endif
 }

@@ -42,6 +42,7 @@ class CElementDataBase : public CElementArray
     
   protected:
 
+    CString		              m_Name;
     CElementDataBase*         m_Parent;
     CEvaluator*               m_Evaluator;
     static unsigned           m_SecureLimit;
@@ -79,16 +80,16 @@ class CElementDataBase : public CElementArray
 
     enum { MAX_EXP = OP_EXP8-OP_EXP1+1 };
 
-    CString			m_Name;
-
   protected:
 
     unsigned      Register( CElement* e , unsigned index );
     CElement *    CreateElement( const CString& string, unsigned pos );
-    virtual void  AddReservedElements();
+    virtual void  AddReservedElements();    
+    virtual void  AddReservedFunctions();
     virtual void  AddAlgebraRuleTable( CParser& IC );
     virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
     virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
+    void          InitAlgebraRuleTable();
     void          SetValue( const CElement* e, const CValue& v );
     void          SetConstValue( CElement* e, const CValue& v );
     void          CleanTempElements();
@@ -98,9 +99,11 @@ class CElementDataBase : public CElementArray
   public:
 
     void			Clear();
+    const CString&  GetName() const { return m_Name; }
     void            SetName( const CString& name ) { m_Name=name; }
     void            Initialize();
-    CEvaluator*		GetEvaluator() const  {      return m_Evaluator;    }    
+    CEvaluator*		GetEvaluator() const             { return m_Evaluator; }    
+    void            SetEvaluator( CEvaluator *eval ) { m_Evaluator = eval; }
     CElement*       ParseElement( CParser& IC );
     CElement* 		GetElement();
     CElement* 		GetElement( const CValue& value );
@@ -125,7 +128,7 @@ class CElementDataBase : public CElementArray
         void DisplayStats();
 #endif
 
-    CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator*eval=NULL, bool bInitialize=true);
+    CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator *eval=NULL, bool bInitialize=true);
     virtual ~CElementDataBase();
 
 };

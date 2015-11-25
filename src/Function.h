@@ -43,6 +43,20 @@ public:
         m_DstEquation.Copy( dst );
         CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );        
 	}
+
+#ifdef _DEBUG
+    void Display( unsigned i, CDisplay& ds ) 
+    {   
+        ds += "[";
+        /*CElementDataBase::RefToElement( m_SrcEquation.GetLastOperator() )->Display(ds);
+        ds += "][";*/
+        ds += CString( ( int )i );
+        ds += "] ";
+        m_SrcEquation.Display( ds );
+        ds += " => ";
+        m_DstEquation.Display( ds );    
+    }
+#endif
 };
 
 typedef CVector< CAlgebraRule* > CAlgebraRuleArray;
