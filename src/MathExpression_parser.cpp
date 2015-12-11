@@ -155,10 +155,12 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
   {
     if( c == '(' )
     {
+      sp++;
       while( *sp != ')' )
       {
         sp++;
       }
+      sp++;
     }
     else if( CParser::IsWord( c ) )
     {
@@ -260,7 +262,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExp
     }
   }
 
-  if( *sp  ) //check that all characters had matched
+  if( *sp  ) //check that all characters have matched
   {
     return false;
   }

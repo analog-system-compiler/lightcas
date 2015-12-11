@@ -151,7 +151,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a-(b-c))", "a-b+c" );
   Check( "SIMPLIFY(a-b-c)", "a-b-c" );
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
-  //Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
+//  Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
   Check( "SIMPLIFY(-2*MIN(2+2,5)*MAX(2,3)+2^4+8)", "0" );
   Check( "SIMPLIFY(1-0*a*b)", "1" );
@@ -163,12 +163,13 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a*b/(a*b)-1)", "0" );
   Check( "SIMPLIFY(a*b/(a*b))", "1" );
   Check( "SIMPLIFY(a*b*c/(a*b*c))", "1" );
+  Check( "SIMPLIFY(4*a*b*c/(4*a*b*c))", "1" );
   Check( "SIMPLIFY(4*a*b*c/(4*a*b*c)-1)", "0" );
   Check( "SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))", "0" );
   Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "1.33333333333/c" ); //"4/(3*c)" );
   Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "1.33333333333/a" ); //"4/(3*a)" );
   Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(c*b*a)" ); //"1+1/(a*b*c)" );
-  Check( "SIMPLIFY(b/a+b/a)", "(2*b)/a"); //"2/a*b" );
+  Check( "SIMPLIFY(b/a+b/a)", "(2*b)/a");
   Check( "SIMPLIFY(b/a-b/a)", "0" );
   Check( "SIMPLIFY(b*1/a)", "b/a" );
   Check( "SIMPLIFY(x^(2+2))", "x^4" );
@@ -274,7 +275,7 @@ void CElementDataBase::Test()
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );
-  Check( "SOLVE(x^2-4,x)[1]-2", "0" );
+  //Check( "SOLVE(x^2-4,x)[1]-2", "0" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
   /***** system solving *****/
@@ -291,7 +292,7 @@ void CElementDataBase::Test()
   Check( "TAYLOR(EXP(x),x,0,5)", "1+x+x^2/2+x^3/6+x^4/24+x^5/120" );
 
   /****** fonction *********/
-  //Initialize();
+  Initialize();
   CElementDataBase db( "test_function", this );
   db.Check( "a:=6", "a" );
   db.Check( "EXECUTE( a:=6 )", "a" );
@@ -307,6 +308,7 @@ void CElementDataBase::Test()
 
   Check( "a+b-c+2", CValue( 5 ) );
   Check( "a>b?2:3", CValue( 3 ) );
+  Check( "a<b?a:b", CValue( 4 ) );
 
   DisplayStats();
 

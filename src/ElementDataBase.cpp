@@ -84,8 +84,7 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
   { "RAND",   0, &CEvaluator::Rand          },
   { "IF2",    2, &CEvaluator::If            },
   { "IF",     2, &CEvaluator::If            },
-  { "CONCAT", 2, &CEvaluator::Concat        },
-  { "TED",    2, NULL                       },
+  //{ "CONCAT", 2, &CEvaluator::Concat        }
 
 };
 
@@ -172,6 +171,7 @@ void CElementDataBase::AddReservedElements()
   GetElement( "SUBST"  )->SetOperandNb( 3 );
   GetElement( "SYST"   )->SetOperandNb( 2 );
   GetElement( "ERROR"  )->SetOperandNb( 1 );
+  GetElement( "TED"    )->SetOperandNb( 2 );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
@@ -193,6 +193,7 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SYST   ] ) == OP_SYST   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR  ] ) == OP_ERROR  );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_TED    ] ) == OP_TED  );
 }
 
 void CElementDataBase::AddReservedFunctions()
@@ -210,7 +211,7 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
 
   sss = new CSymbolSyntaxStruct();
   i = 0;
-  IC.Next();
+  IC.Next(); // skip '"'
   c = IC.GetChar();
   while( c && c != CParser::m_SymbolDelimiter && ( i < ( sizeof( sss->m_Syntax ) - 1 ) ) )
   {
@@ -234,9 +235,8 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
     c = IC.GetChar();
   }
 
-  IC.Next();
+  IC.Next(); // skip '"'
   sss->m_Syntax[ i++ ] = '\0';
-
   sss->m_Equation.Copy( dst_equ );
   CMathExpression::ConvertToRule( src_equ, sss->m_Equation );
   m_SymbolSyntaxArray.Append( sss );
@@ -275,12 +275,6 @@ void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 
   src.GetFromString( IC );
   src.Push( GetElement( "EXECUTE" ) );
-
-#if 0//def _DEBUG
-  CDisplay ds;
-  src.Display( ds );
-#endif
-
   src.OptimizeTree(); // optimize 'if' if any.
 }
 

@@ -39,7 +39,6 @@ void TRACE( const char* format, ... )
     buffer[i] = '\n';
     buffer[i+1] = '\0';
   }
-  //strncat( buffer, "\n", sizeof( buffer )-(strlen(buffer)+1) );
   va_end ( args );
 
   if( !debug_file )

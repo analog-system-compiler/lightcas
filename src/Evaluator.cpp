@@ -38,13 +38,30 @@ CValue CEvaluator::GetValueFromString( const char** pos ) const
 
 const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
-  unsigned pos;
+  unsigned pos, index;
+  CEvaluatorFunct funct_ptr;
 
   AllocateStack( size );
 
   for( pos = 0; pos < size; pos ++ )
   {
-    Evaluate( *p++ );
+    index = *p++;
+    funct_ptr = NULL;
+
+    if( index < m_FunctionArray.GetSize() )
+    {
+        funct_ptr = m_FunctionArray.GetAt( index );
+    }
+
+    if( funct_ptr )
+    {
+        ( *funct_ptr ) ( *this );
+    }
+    else
+    {
+        const CValue& v = GetElementValue( index );
+        Push( v.GetValue() );
+    }
   }
 
   return GetValue();
@@ -74,26 +91,6 @@ void CEvaluator::SetFunction( unsigned index, const CEvaluatorFunct funct )
   m_FunctionArray.SetAt( index, funct );
 }
 
-void CEvaluator::Evaluate( unsigned index )
-{
-  CEvaluatorFunct funct_ptr = NULL;
-
-  if( index < m_FunctionArray.GetSize() )
-  {
-    funct_ptr = m_FunctionArray.GetAt( index );
-  }
-
-  if( funct_ptr )
-  {
-    ( *funct_ptr ) ( *this );
-  }
-  else
-  {
-    const CValue& v = GetElementValue( index );
-    Push( v.GetValue() );
-  }
-}
-
 const CValue& CEvaluator::GetValue()
 {
 
@@ -106,6 +103,7 @@ const CValue& CEvaluator::GetValue()
     m_Value = Pop();
   }
 
+  ASSERT(m_ValPos==0);
   return m_Value;
 }
 
@@ -294,26 +292,7 @@ void CEvaluator::Not( CEvaluator& eval )
   eval.Push(ldexp( ( double )m, n - 30 );*/
   eval.Push( -v - 1 );
 }
-/*
-void CEvaluator::Square( CEvaluator& eval )
-{
-  double v = eval.Pop();
-  double	v2;
 
-  v2 = floor(  v  );
-  v = v - v2;
-
-  if( v < 0.5 )
-  {
-    v = ( double )0.5;
-  }
-  else
-  {
-    v = ( double ) - 0.5;
-  }
-  eval.Push( v );
-}
-*/
 /******* Binary *******/
 void CEvaluator::Add( CEvaluator& eval )
 {
@@ -489,8 +468,8 @@ void CEvaluator::ShiftLeft( CEvaluator& eval )
 
 void CEvaluator::If( CEvaluator& eval )
 {
-  double v1 = eval.Pop();
-  double v2 = eval.Pop();
+  double v1 = eval.Pop(); eval.Pop(); //CONCAT
+  double v2 = eval.Pop(); 
   double v3 = eval.Pop();
   if( v1 != 0 )
   {

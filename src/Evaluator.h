@@ -49,11 +49,9 @@ class CEvaluator
     virtual CValue GetValueFromString( const char **pos ) const;
     double  Pop()           { return m_ValueStack[ --m_ValPos ]; }
     void    Push(double v)  { m_ValueStack[ m_ValPos++ ]=v; }
-    //double  Get( unsigned index ) { return m_ValueStack[ --m_ValPos ]; }
 
   protected:
     virtual void AllocateStack( unsigned size );
-    void    Evaluate( unsigned index );
     const CValue& GetValue();        
 
   public:
@@ -89,7 +87,6 @@ class CEvaluator
     static void LNot( CEvaluator& );
     static void Fact( CEvaluator& );
     static void Not( CEvaluator& );
-   // static void Square( CEvaluator& );
     static void Add( CEvaluator& );
     static void Sub( CEvaluator& );
     static void Mul( CEvaluator& );
@@ -113,7 +110,7 @@ class CEvaluator
     static void ShiftRight( CEvaluator& );
     static void ShiftLeft( CEvaluator& );
     static void If( CEvaluator& );
-    static void Concat( CEvaluator& ) {}
+    //static void Concat( CEvaluator& ) {}
     const CValue& Evaluate( unsigned size, const OP_CODE *p );
 
   public:

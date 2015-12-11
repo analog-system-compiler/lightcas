@@ -75,6 +75,7 @@ class CElementDataBase : public CElementArray
       OP_SUBST,
       OP_SYST,
       OP_ERROR,
+      OP_TED,
       OP_END_RESERVED
     };
 
@@ -111,12 +112,12 @@ class CElementDataBase : public CElementArray
     CElement* 		SearchElement( const CString&, unsigned& pos ) const;
     void            AssociateSymbol(CParser& IC,  const CMathExpression& dst_equ );
     
-    static CElement* RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
-    static void      UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
-    static OP_CODE   ElementToRef( const CElement* e );    
-    static const CSymbolSyntaxArray& GetSymbolTable()   { return m_SymbolSyntaxArray; }
-    static unsigned  GetSecureLimit()                   { return m_SecureLimit;       }
-    CElementDataBase* GetParent() const                 { return m_Parent;            }
+    static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
+    static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
+    static OP_CODE    ElementToRef( const CElement* e );    
+    static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
+    static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
+    CElementDataBase* GetParent() const                  { return m_Parent;            }
 
 #ifdef _DEBUG    
         void Printf( const char* format, ... );

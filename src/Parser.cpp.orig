@@ -26,31 +26,34 @@
 const char CParser::m_CharTab[] =
 {
   /*                              \n       \r                                                      */
-  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
   /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
-  0, 0, 1, 1, 0, 1, 0, 0, 0, 2, 4, 4, 4, 4, 4, 4, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 4, 4, 4, 4, 4, 4,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
 
   /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 4, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 0, 0, 1,
 
   /*   a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  {  |  }       */
-  0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 2, 0, 0
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 2, 0, 0
 };
 
 CParser::CParser()
 {
   m_LineNb = 1;
+  m_Text = NULL;
 }
 
 CParser::CParser( const char* pText )
 {
   m_LineNb = 1;
+  m_Text = NULL;
   SetPos( pText );
 }
 
 CParser::~CParser()
 {
+CloseFile();
 }
 
 const CString& CParser::GetWord()
@@ -65,10 +68,10 @@ const CString& CParser::GetWord()
     i++;
   }
 
-  Copy( m_Pos, i );
+  m_Buffer.Copy( m_Pos, i );
   m_Pos += i;
 
-  return *this;
+  return m_Buffer;
 }
 
 void CParser::Find( char c )
@@ -76,27 +79,26 @@ void CParser::Find( char c )
 
   if( GetChar() != c )
   {
-    CString error_str;
-
+ 
     if( eof( *m_Pos ) )
     {
-      error_str = "end of file";
+      m_Buffer = "end of file";
     }
     else if( eol( *m_Pos ) )
     {
-      error_str = "end of line";
+      m_Buffer = "end of line";
     }
     else
     {
-      error_str = "character \'";
-      error_str += *m_Pos;
-      error_str += '\'';
+      m_Buffer = "character \'";
+      m_Buffer += *m_Pos;
+      m_Buffer += '\'';
     }
 
-    error_str += " was found instead of \'";
-    error_str += c;
-    error_str += '\'';
-    Error( CParserException::ID_SYNTAX_ERROR, &error_str );
+    m_Buffer += " was found instead of \'";
+    m_Buffer += c;
+    m_Buffer += '\'';
+    Error( CParserException::ID_ERROR_SYNTAX );
 
   }
 
@@ -184,8 +186,6 @@ void CParser::SkipComment()
 
 bool CParser::TryMatchSymbol( const char *& symbol_str )
 {
-  unsigned i = 0;
-
   const char* s1 = symbol_str;
   const char* s2 = m_Pos;
 
@@ -193,14 +193,21 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   {
     if( *s1 == '\\' )
     {
-      s1++;
+      s1++; //Next char is considered as word
     }
-
+    
     if ( *s2 == *s1 )
     {
-      i++;
       s1++;
       s2++;
+    }
+    else if( *s1 == '(' )
+    {
+        s1++; //'('
+        if( *s2 == *s1 ) //Check for forbidden characters
+            return false;       
+        s1++;
+        s1++; //')'
     }
     else
     {
@@ -213,25 +220,61 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   return true;
 }
 
-void CParser::Error( unsigned id, const CString* str ) const
+void CParser::Error( unsigned id ) const
 {
   CParserException ex;
   ex.SetErrorID( id );
   ex.SetLineNb( m_LineNb );
-  if( str )
+  if( !m_Buffer.IsEmpty() )
   {
-    ex.SetErrorString( *str );
+    ex.SetErrorString( m_Buffer );
   }
 
 #if _DEBUG
-    CDisplay ds;
-    ds = "Error found line %d :";
-    ds += CString(ex.GetLineNb() );
-    if( str )
-    ds+= str;
-  CElementDataBase::m_DisplayFunct( ds.GetBufferPtr(); );
-  TRACE( ds.GetBufferPtr(); );
+  CDisplay ds;
+  ds += "Error found line ";
+  ds += CString( (int)ex.GetLineNb() );
+  ds += " : ";
+  if( !m_Buffer.IsEmpty() )
+  {
+    ds += m_Buffer;
+  }
+  PUTS( ds.GetBufferPtr() );
+  TRACE( ds.GetBufferPtr() );
 #endif
 
   throw( ex );
+}
+
+bool CParser::LoadFile( const CString& name )
+{
+    int		size;
+    FILE*	file;
+
+    m_FileName = name;
+    file = fopen( name.GetBufferPtr(), "r" );
+
+    if( file )
+    {
+        fseek( file, 0, SEEK_END );
+        size = ftell( file );
+        fseek( file, 0, SEEK_SET );
+        m_Text = new char[ size + 1 ];
+        size = fread( ( void* )m_Text, sizeof( char ) , size, file );
+        fclose( file );
+        m_Text[ size ] = '\0';
+        SetPos( m_Text );
+        return true;
+    }
+
+    return false;
+}
+
+void CParser::CloseFile()
+{
+    if( m_Text )
+    {
+        delete m_Text;
+        m_Text = NULL;
+    }
 }

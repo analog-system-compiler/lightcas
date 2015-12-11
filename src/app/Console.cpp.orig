@@ -122,6 +122,7 @@ int main()
   setlocale( LC_NUMERIC, "C" );
   std::cout << "*************************************\n";
   std::cout << "*** LighCAS Console ("__DATE__") ***\n";
+  std::cout << "* © Cyril Collineau 2016            *\n";
   std::cout << "*************************************\n";
   std::cout << "Type \"help\" for help.\n";
 
@@ -196,15 +197,21 @@ int main()
 void Help()
 {
   std::cout << \
-  "Help\n" \
-  "----\n" \
+            "Help\n" \
+            "----\n" \
+            "Assignments:\n" \
+            "  a:=5\n" \
+            "  a:=b\n" \
+            "\n" \
             "Simplifications:\n" \
             "  a:=5\n" \
             "  a:=b\n" \
             "\n" \
-            "Assignments:\n" \
-            "  a:=5\n" \
-            "  a:=b\n" \
+            "Supported operators:\n" \
+            "a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!\n" \
+            "\n" \
+            "Supported functions:\n" \
+            "MIN MAX MOD BOOL LNOT SIN COS TAN ASIN ACOS ATAN SINH COSH TANH ASINH ACOSH ATANH EXP LOG LOG10 SQRT SQR ABS FLOOR CEIL RAND" \
             "\n" \
             "Fonction definition:\n" \
             "  f(x):=SIN(x)\n" \
@@ -227,5 +234,6 @@ void Help()
             "Complex numbers:\n" \
             "  IM(x+j*y)\n"\
             "  RE(x+j*y)\n"\
+            "\n" \
             ;
 }

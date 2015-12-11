@@ -22,85 +22,120 @@
 #include "MathExpression.h"
 #include "Element.h"
 #include "Function.h"
+
 #define DEBUG_OPTIMIZE
 
-bool CMathExpression::OptimizeConst()
+void CMathExpression::OptimizeConst()
 {
-  unsigned pos, i, n;
-  CElement* e3;
+  unsigned pos;
+
+#ifdef DEBUG_OPTIMIZE
+  CDisplay ds;
+  ds += "OptimizeConst :" ;
+  Display( ds );
+  ds += " => ";
+#endif
 
   pos = m_StackSize;
-  if( !pos )
+  optimize_const = OptimizeConstRec( pos );
+
+  if( optimize_const )
   {
-    return true;
+         EvaluateConst( pos, m_StackSize );
+      }
+  ASSERT( pos == 0 );
+
+#ifdef DEBUG_OPTIMIZE
+  Display( ds );
+  TRACE( ds.GetBufferPtr() );
+#endif
+
+}
+
+bool CMathExpression::OptimizeConstRec( unsigned& pos )
+{
+  unsigned pos1, pos2;
+  OP_CODE op = Pop( pos );
+  CElement* e = RefToElement( op );
+  bool optimize_const, optimize_const2, optimize_const1;
+  unsigned n = e->GetFunction()->GetParameterNb();
+
+  ASSERT( n <= 2 );
+
+  if( n == 0 )
+  {
+    optimize_const = e->IsConst();
   }
-
-  e3 = RefToElement( Pop( pos ) );
-
-  if( e3->IsNumeric() && !e3->IsVoid() )
+  else if( n == 1 )
   {
-    n = e3->GetFunction()->GetParameterNb();
-    for( i = 0; i < n; i++ )
+    pos1 = pos;
+    optimize_const = e->IsNumeric() && ( op != CElementDataBase::OP_NEG );
+    optimize_const1 = OptimizeConstRec( pos );
+    optimize_const &= optimize_const1;
+    if( !optimize_const )
     {
-      if( !RefToElement( Pop( pos ) )->IsConst() )
+      if( optimize_const1 )
       {
-        return false;
+        EvaluateConst( pos, pos1 );
       }
     }
-
-#ifdef DEBUG_OPTIMIZE
-    CDisplay ds;
-    ds += "OptimizeConst :" ;
-    Display( ds );
-    ds += " => ";
-#endif
-
-    const CValue& v = m_ElementDB->GetEvaluator()->Evaluate( m_StackSize - pos, m_StackArray + pos );
-    m_StackSize = pos;
-    Push( v );
-
-#ifdef DEBUG_OPTIMIZE
-    Display( ds );
-    TRACE( ds.GetBufferPtr() );
-#endif
-
-    return true;
-
+  }
+  else if( n == 2 )
+  {
+    optimize_const = e->IsNumeric();
+    pos1 = pos;
+    optimize_const1 = OptimizeConstRec( pos );
+    pos2 = pos;
+    optimize_const2 = OptimizeConstRec( pos );
+    optimize_const &= optimize_const1;
+    optimize_const &= optimize_const2;
+    if( !optimize_const )
+    {
+      if( optimize_const1 )
+      {
+        EvaluateConst( pos2, pos1 );
+      }
+      if( optimize_const2 )
+      {
+        EvaluateConst( pos, pos2 );
+      }
+    }
   }
 
-  return false;
+  return optimize_const;
+}
+
+void CMathExpression::EvaluateConst( unsigned start, unsigned end )
+{
+  CEvaluator* eval = m_ElementDB->GetEvaluator();
+  if ( eval && ( end > ( start + 1 ) ) )
+  {
+    CDisplay ds;
+    DisplayBranch( end, 0, ds );
+    const CValue& v = eval->Evaluate( end - start, m_StackArray + start );
+    ReplaceBlockWithValue( start, end, v ); // [pos,pos2[
+  }
 }
 
 void CMathExpression::OptimizeTree()
 {
-  bool bImpure;
-  do
-  {
-    bImpure = OptimizeTree3();
-#ifdef DEBUG_OPTIMIZE
-              if ( bImpure )
-    {
-      TRACE( "Reoptimizing..." );
-    }
-#endif
-  }
-  while( bImpure );
+  OptimizeTree3();
+  OptimizeConst();
 }
 
-bool CMathExpression::OptimizeTree3()
+void CMathExpression::OptimizeTree3()
 {
-  bool bImpure = false;
+
   if( !ExecuteCommand() )
   {
-    if( !OptimizeTree2( bImpure ) )
+    if( !OptimizeTree2( /*bImpure*/ ) )
     {
-      OptimizeConst();
+      //OptimizeConst();
     }
   }
-  return bImpure;
 }
 
-bool CMathExpression::OptimizeTree2( bool& bImpure )
+bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
 {
   unsigned pos;
   unsigned i;
@@ -131,13 +166,12 @@ bool CMathExpression::OptimizeTree2( bool& bImpure )
 #endif
 #ifdef DEBUG_OPTIMIZE
         CDisplay ds;
-        ds += "OptimizeTree rule #" ;
+        ds += "OptimizeTree rule" ;
         //        ds += CString( rule->m_LineNo );
+        ds += " [";
         e->Display( ds );
-        ds += " : ";
-        rule->m_SrcEquation.Display( ds );
-        ds += " => ";
-        rule->m_DstEquation.Display( ds );
+        ds += "] ";
+        rule->Display( i, ds );
         ds += " : ";
         Display( ds );
         ds += " => ";
@@ -146,9 +180,12 @@ bool CMathExpression::OptimizeTree2( bool& bImpure )
         {
 #if 1
           CMathExpression equ2( m_ElementDB );
-          bImpure = equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
+
+          /*bImpure = */
+          equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           SetSize( pos );
           Push( equ2 );
+
 #else
           unsigned pos2 = m_StackSize;
           ApplyRule( *this, pos_array, &rule->m_DstEquation );
@@ -159,8 +196,10 @@ bool CMathExpression::OptimizeTree2( bool& bImpure )
           {
             Init( m_ElementDB->GetElement( CValue( 3 ) ) );
             Push( CElementDataBase::OP_ERROR );
+            ASSERT( false );
           }
         }
+
 
 #ifdef DEBUG_OPTIMIZE
         Display( ds );
@@ -235,7 +274,7 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
   return match ? pos2 : pos3;
 }
 
-bool CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
+void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
 {
   OP_CODE op3;
   unsigned pos;
@@ -250,7 +289,6 @@ bool CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
   ds += " => " ;
 #endif
 
-  bool bImpure = false;
   for( pos = 0; pos < rule_equ->GetSize(); pos++ )
   {
 
@@ -261,21 +299,24 @@ bool CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
       j = ReservedParameterIndex( op3 );
       unsigned pos2 = pos_array[ j ];
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
+
+      if( optimize && ( OPTIMIZATION_LEVEL == 2 ) )
+      {
+        OptimizeTree3();  // optimization is only made on the top branch
+      }
+
     }
     else
     {
+
       ASSERT( RefToElement( op3 ) != NULL );
       Push( op3 );
 
-      if( RefToElement( op3 )->IsVar() )
+      if( optimize )
       {
-        bImpure = true; //inserting a new variable, need a second optimization maybe
+        OptimizeTree3();  // optimization is only made on the top branch
       }
 
-      else if( optimize )
-      {
-        bImpure |= OptimizeTree3();  // optimization is only made on the top branch
-      }
     }
   }
 
@@ -284,7 +325,6 @@ bool CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
   TRACE( ds.GetBufferPtr() );
 #endif
 
-  return bImpure;
 }
 
 bool CMathExpression::ExecuteCommand()
@@ -293,12 +333,14 @@ bool CMathExpression::ExecuteCommand()
   bool bOK = false;
 
   OP_CODE op3 = Pop( m_StackSize );
+
   switch( op3 )
   {
     case CElementDataBase::OP_SET:
       {
         CMathExpression equ_dst( m_ElementDB );
         CMathExpression equ_src( m_ElementDB );
+
         equ_dst.PushBranch( *this, m_StackSize );
         unsigned pos = m_StackSize;
         equ_src.PushBranch( *this, pos );
@@ -312,7 +354,7 @@ bool CMathExpression::ExecuteCommand()
 
     case CElementDataBase::OP_GET:
       {
-        bOK = false;
+        bOK = false; //force a call to OptimizeTree2
       }
       break;
 

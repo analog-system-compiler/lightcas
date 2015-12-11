@@ -23,7 +23,7 @@
 #include "Element.h"
 #include "Function.h"
 
-#define DEBUG_OPTIMIZE
+//#define DEBUG_OPTIMIZE
 
 bool CMathExpression::OptimizeConst()
 {
@@ -139,8 +139,7 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
         if( rule->m_bHasRule )
         {
 #if 1
-          CMathExpression equ2( m_ElementDB );
-          
+          CMathExpression equ2( m_ElementDB );          
           /*bImpure = */equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
           SetSize( pos );
           Push( equ2 );
@@ -334,7 +333,7 @@ bool CMathExpression::ExecuteCommand()
         equ.PushBranch( *this, m_StackSize );
         equ.Replace( ops, opd );
         Push( equ );
-        bOK = true;
+        bOK = false; //force a call to OptimizeTree2
       }
       break;
 
