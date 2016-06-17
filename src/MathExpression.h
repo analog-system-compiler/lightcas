@@ -24,8 +24,8 @@
 #include "Evaluator.h"
 #include "ElementDataBase.h"
 
-#define MAX_STACK_SIZE 65536
-#define OPTIMIZATION_LEVEL 2
+#define MAX_STACK_SIZE     (1<<20)
+#define OPTIMIZATION_LEVEL  2
 
 typedef	CVector< class CMathExpression* > CEquationArray;
 class CAlgebraRule;
@@ -67,9 +67,9 @@ class CMathExpression
     void         StoreStackPointer( char c, unsigned pos_array[] );
 
     bool         OptimizeConst();
-    bool         OptimizeTree2(/*bool& bImpure*/);
+    bool         OptimizeTree2();
     void         OptimizeTree3();
-    //void	     OptimizeTree();
+
     void         Replace( OP_CODE op1, OP_CODE op2 );
     void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
     unsigned     Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;    
@@ -92,19 +92,18 @@ class CMathExpression
     void	Initialize( CElementDataBase* db );
 
     void	BinaryOperation( OP_CODE op, const CMathExpression& equ );
-    //void	BinaryOperation( OP_CODE op, const CElement* e );
     void	UnaryOperation( OP_CODE op );
     void	VoidOperation( OP_CODE op );
 
-    void	Clear()                             { m_StackSize = 0; }
-    void    Init( const CElement *e )           { Clear(); Push(e);                    }
-    bool	IsNull() const                      { return ( m_StackSize == 0 );         }         
+    void	Clear()                             { m_StackSize = 0;  }
+    void    Init( const CElement *e )           { Clear(); Push(e); }
+    bool	IsEmpty() const                     { return ( m_StackSize == 0 );  }    
+    
     bool    Compare( const CMathExpression& equ ) const;   
     void	Copy( const CMathExpression& equ );    
     void	Display( CDisplay& ds ) const;
     void	GetFromString( CParser& IC );
     void    GetFromString( const char *text )   { CParser IC( text ); GetFromString( IC ); }
-    //void    GetFromTextRPN( CParser& IC );
     void	OptimizeTree();
     bool    Match( const CMathExpression& equ ) const;
     

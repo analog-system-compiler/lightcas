@@ -95,10 +95,10 @@ IPOLY2(MONMUL(a,b),v)            := IPOLY(a,v)*IPOLY(b,v);
 IPOLY2(MONPOWCONST((a,b),c),v)   := IPOLY(a,v)^b;
 IPOLY2(a[b],v)                   := IPOLY(a,v)[b];
 
-IPOLY2(AND(a,b),v)            := IPOLY(a,v)&IPOLY(b,v);
-IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
-IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
-IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
+//IPOLY2(AND(a,b),v)            := IPOLY(a,v)&IPOLY(b,v);
+//IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
+//IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
+//IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 
 NORM2(a,q)                       := IPOLY(NORM3(POLY(a,q)),q);
 NORM(a,q)                        := IPOLY_NORM(POLY(a,q),q);
@@ -188,7 +188,7 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
 //
 //  // Euclidean division                               )
 //  //(TED(a,b) / TED(0,1)) + (TED(0,f) / TED(g,h))    )   := NONE
-//  //TED( TED(a,b),c )   / TED( d, e )               :)= TED(a/d,a/d*(b/a-e/d)) / TED(0,1) + TED( 0, c-e*a/d*(b/a-e/d)) / TED(d, e) 
+//  //TED( TED(a,b),c )   / TED( d, e )               :)= TED(a/d,a/d*(b/a-e/d)) / TED(0,1) + TED( 0, c-e*a/d*(b/a-e/d)) / TED(d, e)
 //  //MONDIV( TED(a,b)             , CONST(c)            )     := TED(a/c,b/c);
 //
 //  //Pow
@@ -221,13 +221,13 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
 //
 //  NORM3(TED(a,b),q)                := q+b/a;
 //  NORM3(TED(a,b)/c,q)              := q+b/a;
-//                   
+//
 //  // IPOLY3(MON(a,0),v)            := a;
 //  // IPOLY3(MON(a,b),v)            := (a^(1/b)*v)^b;
 //  // IPOLY3(POLYSTORE(a,b),v)      := IPOLY3(a,v)+IPOLY3(b,v);
 //  // IPOLY3(MONDIV(a,b),v)         := IPOLY3(a,v)/IPOLY3(b,v);
 //  // IPOLY5(((a,b),c),v)           := IPOLY3(MONDIV(a,MON(c,0)),v)/IPOLY3(MONDIV(b,MON(c,0)),v);
-//                   
+//
 //  // IPOLY_NORM(MONDIV(a,b),v)     := IPOLY5(((a,b),GET_POWER(b,0)),v);
 //
 //  //IPoly
@@ -290,11 +290,11 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
   //MONPOW( a,-CONSTINT(e) )       := MONDIV( MON(1,0), MONPOW(a,e) );
 
   //Logic
-  MON(1,1) |  MON(1,1)      := MON(1,1);
+  /*MON(1,1) |  MON(1,1)      := MON(1,1);
   MON(a,0) |  MON(b,0)      := MON(a|b,0);
   MON(1,1) &  MON(1,1)      := MON(1,1);
   MON(a,0) &  MON(b,0)      := MON(a&b,0);
-  ~MON(a,0)                 := MON(~a,0);
+  ~MON(a,0)                 := MON(~a,0);*/
 
   //Poly
   POLY(v,v)             := MON(1,1);
@@ -364,13 +364,13 @@ a<a          :=0     ;
 !(a>=b)      := a<b  ;
 !(a>b)       := a<=b ;
 
-SIN(-a)      := -SIN(a) ; 
-COS(-a)      := COS(a) ; 
-// SIN(a+PI/2)  := COS(a)  
-// COS(a+PI/2)  := -SIN(a)  
-// SIN(PI/2+a)  := COS(a)  
-// COS(PI/2+a)  := -SIN(a)  
-EXP(-a)      := 1/EXP(a) ; 
+SIN(-a)      := -SIN(a) ;
+COS(-a)      := COS(a) ;
+// SIN(a+PI/2)  := COS(a)
+// COS(a+PI/2)  := -SIN(a)
+// SIN(PI/2+a)  := COS(a)
+// COS(PI/2+a)  := -SIN(a)
+EXP(-a)      := 1/EXP(a) ;
 
 0+b                := b       ;
 a+0                := a       ;
@@ -417,8 +417,17 @@ a^0              := 1  ;
 0^b              := 0  ;
 1^b              := 1  ;
 a^1              := a  ;
-a^-b             := 1/(a^b) ; 
+a^-b             := 1/(a^b) ;
 
+//logic
+IPOLY2(REDUCE_LOGIC(MON(a,0)),v)      := IPOLY2(MON(a,0),v);
+IPOLY2(REDUCE_LOGIC(MON(a,CONST(b)))  := IPOLY2(MON(a,1),v);
+IPOLY2(REDUCE_LOGIC(POLYSTORE(a,b)))  := MONADD(REDUCE_LOGIC(a),REDUCE_LOGIC(b));
+POLY( a | b, v )    := REDUCE_LOGIC( POLY( a + b - a * b , v ) );
+POLY( a & b, v )    := REDUCE_LOGIC( POLY( a * b, v ) );
+POLY( a ^ b, v )    := REDUCE_LOGIC( POLY( a + b - 2 * ( a * b ), v ) );
+POLY( ~a   , v )    := POLY( 1 - a, v );
+/*~a       := 1-a;
 ~0       := -1 ;
 ~-1      := 0  ;
 0|b      := b  ;
@@ -432,7 +441,7 @@ a&-1     := a  ;
 ~a |  a  := -1 ;
  a | ~a  := -1 ;
 ~a &  a  := 0  ;
- a & ~a  := 0  ;
+ a & ~a  := 0  ;*/
 
 POLY(a&b,v)               := POLY(a,v)&POLY(b,v);
 POLY(a|b,v)               := POLY(a,v)|POLY(b,v);
@@ -462,7 +471,7 @@ SIMPLIFY(CONST(a))    := a  ;
 SIMPLIFY(-CONST(a))   := -a ;
 //SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
 SIMPLIFY(a)           := SIMPLIFY2(a,GETVAR(a));
-
+SIMPLIFYELEM(a v)     := SIMPLIFY2(a,v);
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
 SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
 
@@ -515,8 +524,8 @@ IPOLY_TED(TED(a b),v)             := a*v+b;
 
 // REDUCE( e, TED(a b),TED(c d))  := (REDUCE( e, TED(c d)) , TED(0 c*b-d*a));
 // REDUCE(    TED(a b),TED(c d))  := (TED(c d),TED(0 c*b-d*a));
-REDUCE(    TED(a b),TED(0 d))     := (TED(a b),TED(0 d));  
-REDUCE(    TED(0 b),TED(c d))     := (TED(c d),TED(0 b));  
+REDUCE(    TED(a b),TED(0 d))     := (TED(a b),TED(0 d));
+REDUCE(    TED(0 b),TED(c d))     := (TED(c d),TED(0 b));
 REDUCE(    TED(a b),TED(c d))     := (TED(c d),TED(0 c*b-d*a));
 REDUCE( e, TED(a b),TED(0 d))     := (REDUCE( e, TED(a b)) , TED(0 d));
 REDUCE( e, TED(0 b),TED(c d))     := (REDUCE( e, TED(c d)) , TED(0 b));
@@ -526,16 +535,16 @@ REDUCE( e, TED(a b),TED(c d))     := (REDUCE( e, TED(c d)) , TED(0 c*b-d*a));
 DET2( e, TED(a,b),TED(c,d))     := c*DET2( e, TED(a,b) )
 */
 
-/* REDUCE(    TED(a,b),TED(0,d))  := (TED(0,d),TED(a,b));  
-REDUCE(    TED(0,b),TED(c,d))     := (TED(0,b),TED(c,d));  
+/* REDUCE(    TED(a,b),TED(0,d))  := (TED(0,d),TED(a,b));
+REDUCE(    TED(0,b),TED(c,d))     := (TED(0,b),TED(c,d));
 REDUCE(    TED(a,b),TED(c,d))     := (TED(0,c*b-d*a), TED(a,b));
 REDUCE( e, TED(a,b),TED(0,d))     := (TED(0,d), REDUCE( e, TED(a,b)) );
 REDUCE( e, TED(0,b),TED(c,d))     := (TED(0,b), REDUCE( e, TED(c,d)) );
 REDUCE( e, TED(a,b),TED(c,d))     := (TED(0,c*b-d*a), REDUCE( e, TED(a,b)) );
 (a,(b,c)) := ((a,b),c);*/
 
-/* REDUCE(    TED(a,b),TED(0,d))     := (TED(a,b),TED(0,d));  
-REDUCE(    TED(0,b),TED(c,d))     := (TED(c,d),TED(0,b));  
+/* REDUCE(    TED(a,b),TED(0,d))     := (TED(a,b),TED(0,d));
+REDUCE(    TED(0,b),TED(c,d))     := (TED(c,d),TED(0,b));
 
 REDUCE(    TED(a,b),TED(c,d))     := (TED(a,b),TED(0,c*b-d*a));
 REDUCE( e, TED(a,b),TED(0,d))     := (REDUCE( e, TED(a,b)) , TED(0,d));
@@ -563,13 +572,44 @@ SOLVE(a,v)                        := SOLVE2(TO_POLY_TED(a,v));
 SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
 SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_AUTO_SOLVE4({SYSTEM_AUTO_SOLVE2({a},{a})})};
 
+//vector add
 (a,b)+(c,d)               := (a+c,b+d);
+(a,b)+c                   := (a+c,b);
+c+(a,b)                   := (c+a,b);
 {a}+{b}                   := {a+b};
+
+//vector sub
 (a,b)-(c,d)               := (a-c,b-d);
+(a,b)-c                   := (a-c,b);
+c-(a,b)                   := (c-a,-b);
 {a}-{b}                   := {a-b};
+
+//vector mul
 (a,b)*(c,d)               := (a*(c,d),b*(c,d));
 a*(c,d)                   := (a*c,a*d);
+(c,d)*a                   := (c*a,d*a);
 {a}*{b}                   := {a*b};
+a*{b}                     := {a*b};
+{a}*b                     := {a*b};
+
+//Vector or
+(a,b)|(c,d)               := (a|c,b|d);
+(a,b)|c                   := (a|c,b);
+c|(a,b)                   := (c|a,b);
+{a}|{b}                   := {a|b};
+
+//Vector xor
+(a,b)^(c,d)               := (a^c,b^d);
+(a,b)^c                   := (a^c,b);
+c^(a,b)                   := (c^a,b);
+{a}^{b}                   := {a^b};
+
+//Vector minus
+-(a,b)                    := (-a,-b);
+
+//Vector not
+~(a,b)                    := (~a,~b);
+
 VSIZE({a,b})              := VSIZE({a})+1;
 VSIZE(a)                  := 1;
 {a}[CONST(c)]             := INVAT({a}, VSIZE({a}) -1 - c );

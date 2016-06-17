@@ -61,11 +61,11 @@ class CDisplayEx : public CDisplay
         {
           if ( m_DisplayBase == 2 )
           {
-            s = '#';
+            s = "#";
           }
           else if ( m_DisplayBase == 16 )
           {
-            s = '$';
+            s = "$";
           }
           s += CString( ( int )v, m_DisplayBase );
         }
@@ -121,7 +121,7 @@ int main()
 
   setlocale( LC_NUMERIC, "C" );
   std::cout << "*************************************\n";
-  std::cout << "*** LighCAS Console ("__DATE__") ***\n";
+  std::cout << "*** LighCAS Console (" __DATE__ ") ***\n";
   std::cout << "*** © Cyril Collineau 2016        ***\n";
   std::cout << "*************************************\n";
   std::cout << "Type \"help\" for help.\n";

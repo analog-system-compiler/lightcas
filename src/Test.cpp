@@ -195,6 +195,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
   Check( "SIMPLIFY(a*cos(b))", "cos(b)*a" );
+  Check( "SIMPLIFY((a*1000*1000)/(b*1000*1000))", "a/b" );
 
   /****** complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
@@ -243,6 +244,8 @@ void CElementDataBase::Test()
   Check( "{0,1,2}+{1,2,3}", "{1,3,5}" );
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
+  Check( "5*{a,b,c}", "{5*a,5*b,5*c}");
+  Check( "{a,b,c}*5", "{a*5,b*5,c*5}");
   Check( "SIMPLIFY({-2,2})", "{-2,2}" );
 
   /****** trinary *********/
@@ -271,7 +274,7 @@ void CElementDataBase::Test()
   GetElement( "z" )->SetEquation( equ0 );
   Check( "SIMPLIFY(y-z)", "2*b" );
 
-  /********** solving **********/
+  /********** solve **********/
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );

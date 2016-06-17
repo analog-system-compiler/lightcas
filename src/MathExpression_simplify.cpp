@@ -348,7 +348,7 @@ OP_CODE CMathExpression::GetLastOperator() const
 {
   OP_CODE op1;
 
-  if( IsNull() )
+  if( IsEmpty() )
   {
     op1 = CElementDataBase::OP_ZERO;
   }

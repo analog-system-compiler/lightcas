@@ -46,7 +46,7 @@ void CMathExpression::Initialize( CElementDataBase* db )
 
 void CMathExpression::Push( const CMathExpression& equ )
 {
-  if( equ.IsNull() )
+  if( equ.IsEmpty() )
   {
     Push( CElementDataBase::OP_ZERO );
   }
@@ -91,9 +91,9 @@ void CMathExpression::Copy( const CMathExpression& equ )
   ASSERT( equ.m_ElementDB );
   Clear();
 
-  if( !equ.IsNull() )
+  if( !equ.IsEmpty() )
   {
-    Push( equ );
+    Push( equ ); //Push adds zero if empty
   }
 }
 
@@ -110,8 +110,8 @@ void CMathExpression::NextBranch( unsigned& pos ) const
   unsigned i = 1;
   OP_CODE op;
   CElement* e;
-  
-  ASSERT(pos);
+
+  ASSERT( pos );
 
   while( pos && i )
   {
@@ -141,7 +141,7 @@ void CMathExpression::Push( const CValue& v )
 
 void CMathExpression::InitPositionTable( unsigned pos_array[] )
 {
-    memset( pos_array, 0, CElementDataBase::MAX_EXP*sizeof(unsigned) ) ;
+  memset( pos_array, 0, CElementDataBase::MAX_EXP * sizeof( unsigned ) ) ;
 }
 
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
@@ -184,7 +184,7 @@ void CMathExpression::VoidOperation( OP_CODE op )
 
 void CMathExpression::AddZero()
 {
-  if( IsNull() )
+  if( IsEmpty() )
   {
     Push( CElementDataBase::OP_ZERO );
   }
@@ -192,7 +192,7 @@ void CMathExpression::AddZero()
 
 void CMathExpression::RemoveZero()
 {
-  if( GetLastOperator() == CElementDataBase::OP_ZERO && ( m_StackSize == 1 ) )
+  if( ( m_StackSize == 1 ) &&  ( Get( 0 ) == CElementDataBase::OP_ZERO ) )
   {
     Clear();
   }
@@ -200,5 +200,5 @@ void CMathExpression::RemoveZero()
 
 const CValue& CMathExpression::Evaluate() const
 {
-    return m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
+  return m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
 }
