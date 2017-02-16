@@ -16,14 +16,14 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
+#ifdef _DEBUG
+
 #include "Debug.h"
 #include "ElementDataBase.h"
 #include "MathExpression.h"
 #include "Element.h"
 #include "Parser.h"
 #include "Display.h"
-
-#ifdef _DEBUG
 
 #include <cstdarg>
 
@@ -139,6 +139,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(-0)", "0" );
   Check( "SIMPLIFY(--2)", "2" );
   Check( "SIMPLIFY(2--2)", "4" );
+  Check( "SIMPLIFY(-4-8)", "-12");
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
   Check( "SIMPLIFY(a-a)", "0" );
   Check( "SIMPLIFY(a+a)", "2*a" );
@@ -256,11 +257,11 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a<=a ? b : c)", "b" );
 
   /****** logic *********/
-  Check( "SIMPLIFY(a|0)", "a" );
+  /*Check( "SIMPLIFY(a|0)", "a" );
   Check( "SIMPLIFY(a|~0)", "-1" );
   Check( "SIMPLIFY(a&0)", "0" );
   Check( "SIMPLIFY(a&~0)", "a" );
-  Check( "SIMPLIFY((5<<2)|32)", "52" );
+  Check( "SIMPLIFY((5<<2)|32)", "52" );*/
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
   /********** transforms **********/
@@ -288,6 +289,13 @@ void CElementDataBase::Test()
   Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})", "{1,1,1}" );
   Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})", "{2,1,1}" );
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
+
+  /***** determinant ******/
+  Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
+  Check("DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16");
+  Check("DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
+  Check("DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
+  Check("DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})", "32");
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );

@@ -95,10 +95,10 @@ IPOLY2(MONMUL(a,b),v)            := IPOLY(a,v)*IPOLY(b,v);
 IPOLY2(MONPOWCONST((a,b),c),v)   := IPOLY(a,v)^b;
 IPOLY2(a[b],v)                   := IPOLY(a,v)[b];
 
-//IPOLY2(AND(a,b),v)            := IPOLY(a,v)&IPOLY(b,v);
-//IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
-//IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
-//IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
+IPOLY2(AND(a,b),v)            := IPOLY(a,v)&IPOLY(b,v);
+IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
+IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
+IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 
 NORM2(a,q)                       := IPOLY(NORM3(POLY(a,q)),q);
 NORM(a,q)                        := IPOLY_NORM(POLY(a,q),q);
@@ -290,11 +290,11 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
   //MONPOW( a,-CONSTINT(e) )       := MONDIV( MON(1,0), MONPOW(a,e) );
 
   //Logic
-  /*MON(1,1) |  MON(1,1)      := MON(1,1);
+  MON(1,1) |  MON(1,1)      := MON(1,1);
   MON(a,0) |  MON(b,0)      := MON(a|b,0);
   MON(1,1) &  MON(1,1)      := MON(1,1);
   MON(a,0) &  MON(b,0)      := MON(a&b,0);
-  ~MON(a,0)                 := MON(~a,0);*/
+  ~MON(a,0)                 := MON(~a,0);
 
   //Poly
   POLY(v,v)             := MON(1,1);
@@ -383,6 +383,8 @@ LOG10(a)+LOG10(b)  := LOG10(a*b) ;
 0-b                := -b  ;
 a-0                := a  ;
 a--b               := a+b ;
+-a-b               := -(a+b) ;
+-a--b              := b-a ;
 -(a-b)             := b-a ;
 SIN(a)-SIN(b)      := COS((a+b)/2)*SIN((a-b)/2)*2;
 LOG10(a)-LOG10(b)  := LOG10(a/b)  ;
@@ -419,15 +421,6 @@ a^0              := 1  ;
 a^1              := a  ;
 a^-b             := 1/(a^b) ;
 
-//logic
-IPOLY2(REDUCE_LOGIC(MON(a,0)),v)      := IPOLY2(MON(a,0),v);
-IPOLY2(REDUCE_LOGIC(MON(a,CONST(b)))  := IPOLY2(MON(a,1),v);
-IPOLY2(REDUCE_LOGIC(POLYSTORE(a,b)))  := MONADD(REDUCE_LOGIC(a),REDUCE_LOGIC(b));
-POLY( a | b, v )    := REDUCE_LOGIC( POLY( a + b - a * b , v ) );
-POLY( a & b, v )    := REDUCE_LOGIC( POLY( a * b, v ) );
-POLY( a ^ b, v )    := REDUCE_LOGIC( POLY( a + b - 2 * ( a * b ), v ) );
-POLY( ~a   , v )    := POLY( 1 - a, v );
-/*~a       := 1-a;
 ~0       := -1 ;
 ~-1      := 0  ;
 0|b      := b  ;
@@ -441,7 +434,7 @@ a&-1     := a  ;
 ~a |  a  := -1 ;
  a | ~a  := -1 ;
 ~a &  a  := 0  ;
- a & ~a  := 0  ;*/
+ a & ~a  := 0  ;
 
 POLY(a&b,v)               := POLY(a,v)&POLY(b,v);
 POLY(a|b,v)               := POLY(a,v)|POLY(b,v);
@@ -478,6 +471,7 @@ SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
 //SET((a,b),(c,d))      := (SET(a,c),SET(b,d));
 //SET({a},{b})          := SET(a,b);
 
+//GETVAR(a,b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
 GETVAR(a+b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
 GETVAR(a-b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
 GETVAR(a*b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
@@ -491,7 +485,7 @@ CHOOSEVAR(1,b)        := b;
 CHOOSEVAR(a,1)        := a;
 CHOOSEVAR(a,b)        := RANK(a b);
 CHOOSEVARDIV(1,b)     := b;
-CHOOSEVARDIV(a,b)     := a; //Not RANK there !!!
+CHOOSEVARDIV(a,b)     := a; //No RANK there !!!
 // FOREACH({a,b},c}      := {FOREACH({a},c),c(b)};
 
 
@@ -561,8 +555,8 @@ SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(TO_POLY_TED(a,x)),x);
 SYSTEM_SOLVE4({a,b},{x,y})        := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));
 SYSTEM_SOLVE4({a},{x})            := SOLVE(a,x);
 
-SYSTEM_AUTO_SOLVE4({a,b})         := (SYSTEM_AUTO_SOLVE4({a}),SYSTEM_AUTO_SOLVE4({b}));
-SYSTEM_AUTO_SOLVE4({a})           := NORM2(a,GETVAR(a));
+SYSTEM_NORM({a,b})                := (SYSTEM_NORM({a}),SYSTEM_NORM({b}));
+SYSTEM_NORM({a})                  := NORM2(a,GETVAR(a));
 SYSTEM_AUTO_SOLVE3({a,b})         := SYSTEM_SOLVE3({a,b},{GETVAR(b)});
 SYSTEM_AUTO_SOLVE2({a},{c,d})     := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{c});
 SYSTEM_AUTO_SOLVE2({a},{c})       := SYSTEM_AUTO_SOLVE3({a});
@@ -570,7 +564,29 @@ SYSTEM_AUTO_SOLVE2({a},{c})       := SYSTEM_AUTO_SOLVE3({a});
 //entry points
 SOLVE(a,v)                        := SOLVE2(TO_POLY_TED(a,v));
 SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
-SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_AUTO_SOLVE4({SYSTEM_AUTO_SOLVE2({a},{a})})};
+SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
+
+//CRAMER
+DET( {a}, { c, d } )              := DET_LINES( MATRIX_RIGHT( TO_POLY_TED( a, d ) ), DET_VAR( c ) );
+DET( {a}, { c    } )              := DET_LINES( MATRIX_RIGHT( TO_POLY_TED( a, c ) ), DET_VAR( 0 ) );
+
+DET_LINES( MATRIX_RIGHT( TED( a b ) )                     , DET_VAR( 0 ) ) := a;
+DET_LINES( MATRIX_RIGHT( TED( a b ) )                     , DET_VAR( c ) ) := ERROR(6);
+DET_LINES( MATRIX_RIGHT( c, TED( a b ) )                  , DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( c )},                  { e } ) - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT(     TED( a b ) ), DET_VAR( e ) );
+DET_LINES( MATRIX_RIGHT( c, TED( a b ) ), MATRIX_LEFT( d ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( c, MATRIX_POP( d ) )}, { e } ) - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT( d , TED( a b ) ), DET_VAR( e ) );
+DET_LINES( MATRIX_RIGHT(    TED( a b ) ), MATRIX_LEFT( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX(    MATRIX_POP( c ) )}, { e } );
+
+//MATRIX HELP FUNCTIONS
+TED_TO_MATRIX( c , TED( a b ) )   := ( TED_TO_MATRIX( c ), b );
+TED_TO_MATRIX(     TED( a b ) )   := b;
+
+MATRIX_POP( a, b ) := ( b, MATRIX_POP( a ) );
+MATRIX_POP( a )    := a;
+
+MATRIX_GETVAR({a,b})   := MATRIX_GETVAR2( (a,b), CHOOSEVAR( GETVAR(a), GETVAR(b) ) );
+MATRIX_GETVAR({a})     := a;
+MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(TO_POLY_TED(a,b))})};
+
 
 //vector add
 (a,b)+(c,d)               := (a+c,b+d);
@@ -593,10 +609,10 @@ a*{b}                     := {a*b};
 {a}*b                     := {a*b};
 
 //Vector or
-(a,b)|(c,d)               := (a|c,b|d);
+/*(a,b)|(c,d)               := (a|c,b|d);
 (a,b)|c                   := (a|c,b);
 c|(a,b)                   := (c|a,b);
-{a}|{b}                   := {a|b};
+{a}|{b}                   := {a|b};*/
 
 //Vector xor
 (a,b)^(c,d)               := (a^c,b^d);

@@ -52,6 +52,13 @@ void TRACE( const char* format, ... )
   }
 
 #if defined( _WIN32 )
+  const unsigned CRT_DEBUG_BUFFER_MAX = 256;
+  buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
+  buffer[CRT_DEBUG_BUFFER_MAX - 5] = '.';
+  buffer[CRT_DEBUG_BUFFER_MAX - 4] = '.';
+  buffer[CRT_DEBUG_BUFFER_MAX - 3] = '\r';
+  buffer[CRT_DEBUG_BUFFER_MAX - 2] = '\n';
+  buffer[CRT_DEBUG_BUFFER_MAX - 1] = '\0';
   _CrtDbgReport( _CRT_WARN, NULL, 0, NULL, buffer );
 #else
   puts( buffer );

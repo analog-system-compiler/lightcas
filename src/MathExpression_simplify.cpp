@@ -23,7 +23,7 @@
 #include "Element.h"
 #include "Function.h"
 
-//#define DEBUG_OPTIMIZE
+#define DEBUG_OPTIMIZE
 
 bool CMathExpression::OptimizeConst()
 {

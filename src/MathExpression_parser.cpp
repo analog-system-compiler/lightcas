@@ -344,5 +344,4 @@ void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )
   elem_id = toupper( c ) - 'A';
   ASSERT( elem_id < CElementDataBase::MAX_EXP );
   pos_array[elem_id]  = m_StackSize;
-
 }

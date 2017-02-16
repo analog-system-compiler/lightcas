@@ -38,20 +38,22 @@ CValue CEvaluator::GetValueFromString( const char** pos ) const
 
 const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
-  unsigned pos, index;
+  unsigned pos, index, n;
   CEvaluatorFunct funct_ptr;
+  n = m_FunctionArray.GetSize();
 
   AllocateStack( size );
 
   for( pos = 0; pos < size; pos ++ )
   {
     index = *p++;
-    funct_ptr = NULL;
 
-    if( index < m_FunctionArray.GetSize() )
+    if( index < n )
     {
         funct_ptr = m_FunctionArray.GetAt( index );
     }
+	else
+		funct_ptr = NULL;
 
     if( funct_ptr )
     {
