@@ -286,16 +286,19 @@ void CElementDataBase::Test()
   Check( "SYSTEM_AUTO_SOLVE({x-y+1,x-y+1})", "{y-(x+1),0}" );
   Check( "SYSTEM_AUTO_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2})", "{x-2,y-1,z-1}" );
   Check( "SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})", "{x-1,y-1,z-1}" );
-  Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})", "{1,1,1}" );
-  Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})", "{2,1,1}" );
+  Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})",    "{1,1,1}" );
+  Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})",    "{2,1,1}" );
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
 
   /***** determinant ******/
-  Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
+  //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
   Check("DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16");
   Check("DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
   Check("DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
   Check("DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})", "32");
+  Check("DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})", "32");
+  Check("DET({ x+y+z+t, y+z+t, z+t, t}, {x,y,z,t})", "1");
+  Check("DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "");
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );

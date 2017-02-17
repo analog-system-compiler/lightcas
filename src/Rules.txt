@@ -568,10 +568,16 @@ SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})
 
 //CRAMER
 DET( {a}, { c, d } )              := DET_LINES( MATRIX_RIGHT( TO_POLY_TED( a, d ) ), DET_VAR( c ) );
-DET( {a}, { c    } )              := DET_LINES( MATRIX_RIGHT( TO_POLY_TED( a, c ) ), DET_VAR( 0 ) );
+DET( {a}, { c    } )              := DET_LINES( MATRIX_RIGHT( TO_POLY_TED( a, c ) ) );
 
-DET_LINES( MATRIX_RIGHT( TED( a b ) )                     , DET_VAR( 0 ) ) := a;
+DET_LINES( MATRIX_RIGHT( TED( a b ) ) )                                    := a;
+DET_LINES( MATRIX_RIGHT( TED( a b ) )                     , DET_VAR( 1 ) ) := b;
 DET_LINES( MATRIX_RIGHT( TED( a b ) )                     , DET_VAR( c ) ) := ERROR(6);
+
+DET_LINES( MATRIX_RIGHT( c, TED( 0 b ) )                  , DET_VAR( e ) ) := 0 - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT(     TED( 0 b ) ), DET_VAR( e ) );
+DET_LINES( MATRIX_RIGHT( c, TED( 0 b ) ), MATRIX_LEFT( d ), DET_VAR( e ) ) := 0 - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT( d , TED( 0 b ) ), DET_VAR( e ) );
+DET_LINES( MATRIX_RIGHT(    TED( 0 b ) ), MATRIX_LEFT( c ), DET_VAR( e ) ) := 0;
+
 DET_LINES( MATRIX_RIGHT( c, TED( a b ) )                  , DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( c )},                  { e } ) - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT(     TED( a b ) ), DET_VAR( e ) );
 DET_LINES( MATRIX_RIGHT( c, TED( a b ) ), MATRIX_LEFT( d ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( c, MATRIX_POP( d ) )}, { e } ) - DET_LINES( MATRIX_RIGHT( c ), MATRIX_LEFT( d , TED( a b ) ), DET_VAR( e ) );
 DET_LINES( MATRIX_RIGHT(    TED( a b ) ), MATRIX_LEFT( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX(    MATRIX_POP( c ) )}, { e } );
@@ -579,13 +585,14 @@ DET_LINES( MATRIX_RIGHT(    TED( a b ) ), MATRIX_LEFT( c ), DET_VAR( e ) ) := a 
 //MATRIX HELP FUNCTIONS
 TED_TO_MATRIX( c , TED( a b ) )   := ( TED_TO_MATRIX( c ), b );
 TED_TO_MATRIX(     TED( a b ) )   := b;
+TED_TO_MATRIX(  a, b    )        := ERROR(7);
 
 MATRIX_POP( a, b ) := ( b, MATRIX_POP( a ) );
 MATRIX_POP( a )    := a;
 
-MATRIX_GETVAR({a,b})   := MATRIX_GETVAR2( (a,b), CHOOSEVAR( GETVAR(a), GETVAR(b) ) );
+/*MATRIX_GETVAR({a,b})   := MATRIX_GETVAR2( (a,b), CHOOSEVAR( GETVAR(a), GETVAR(b) ) );
 MATRIX_GETVAR({a})     := a;
-MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(TO_POLY_TED(a,b))})};
+MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(TO_POLY_TED(a,b))})};*/
 
 
 //vector add
