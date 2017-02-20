@@ -583,9 +583,12 @@ DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a 
 DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( c ) )}   , { e } );
 
 //MATRIX HELP FUNCTIONS
+TED_TO_MATRIX( c , TED( a 0 ) )   := ( TED_TO_NULL_MATRIX( c ), 0 );
 TED_TO_MATRIX( c , TED( a b ) )   := ( TED_TO_MATRIX( c ), b );
 TED_TO_MATRIX(     TED( a b ) )   := b;
 TED_TO_MATRIX(  a, b    )         := ERROR(7);
+TED_TO_NULL_MATRIX( a , b )       := ( TED_TO_NULL_MATRIX( a ), 0 );
+TED_TO_NULL_MATRIX( a )           := 0;
 
 // Vector reversal {x,y,z} -> {z,y,x}
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
