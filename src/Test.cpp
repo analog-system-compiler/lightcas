@@ -133,6 +133,7 @@ void CElementDataBase::Test()
   //CheckCatch( "a b" );
   //CheckCatch( "a.b" );
   /***** Some basic tests *****/
+  Check( "a-(b-c)", "a-(b-c)");
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );
@@ -294,6 +295,8 @@ void CElementDataBase::Test()
   //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
   Check("VECT_REVERSE({ x,y,z,t})", "{t,z,y,x}");
   Check("VECT_REVERSE1( (a,b,c), (x,y,z,t))", "x,y,z,t,c,b,a");
+  Check("VECT_REVERSE1( (a,b,c), x)",   "x,c,b,a");
+  Check("VECT_REVERSE1( a, (x,y,z,t))", "x,y,z,t,a");
   Check("DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16");
   Check("DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
   Check("DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");

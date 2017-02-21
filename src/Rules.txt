@@ -19,6 +19,7 @@
 // precedence is defined here
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
+// TODO : add commutativity info for correct parenthesis display
 
 SYST(a b)               " a;b   ";
 EQV( a b )              " a=(=)b";
@@ -339,8 +340,8 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
   IPOLY_NORM(MONDIV(a,b),v)        := IPOLY5(((a,b),GET_POWER(b,0)),v);
   IPOLY_NORM(a,v)                  := IPOLY3(a,v);
 
-  TED(TED(0 a) b)                  := TED(a b);
-  POLY_TED(a)                      := TED(TED(GET_POWER(a,2) GET_POWER(a,1)) GET_POWER(a,0));
+  //POLY_TED(a)                      := TED(TED(GET_POWER(a,2) GET_POWER(a,1)) GET_POWER(a,0));
+//  POLY(a,v)                       := TED(0,a);
 //);
 
 CONCAT(CONST(a) CONST(b)) := NONE ; // no simplification for concatenation op
@@ -510,8 +511,33 @@ DER(TANH(b),c)  := DER(b,c)*(1-TANH(b)^2);
 DER(EXP(b),c)   := DER(b,c)*EXP(b);
 DER(LOG(a),c)   := DER(a,c)/a;
 
-TO_POLY_TED((a,b),v)              := (TO_POLY_TED(a,v),TO_POLY_TED(b,v));
-TO_POLY_TED(a,v)                  := POLY_TED(POLY(a,v));
+POLY_TED((a,b),v)   := (POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a+b,v)     := TED_ADD(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a-b,v)     := TED_SUB(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a*b,v)     := TED_MUL(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a/b,v)     := TED_DIV(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a^b,v)     := TED_POW(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(-a,v)      := TED_NEG(POLY_TED(a,v));
+POLY_TED(v,v)       := TED(1 0);
+POLY_TED(a,v)       := TED(0 a);
+
+TED_ADD(TED(a b),TED(c d)) := TED( a+c b+d );
+TED_SUB(TED(a b),TED(c d)) := TED( a-c b-d );
+//TED_MUL(TED(a b),TED(0 d)) := TED( a*d b*d ); //only quadratic allowed
+//TED_MUL(TED(0 b),TED(c d)) := TED( b*c b*d ); //only quadratic allowed
+TED_MUL(TED(a b),TED(c d))        := TED( TED(a*c b*c+a*d) b*d ); 
+//TED_MUL(TED(TED(a b) c), TED( TED(d e) f ) := TED( TED_ADD( TED_MUL( TED( a b ), TED( d e ) ), TED( c*d c*e ) );
+//TED_MUL(TED(TED(a b) c), TED(d e))         := TED( TED_ADD( TED_MUL( TED( a b ), TED( d e ) ), TED( c*d c*e ) );
+//TED_MUL(TED(d e), TED(TED(a b) c))         := TED( TED_ADD( TED_MUL( TED( a b ), TED( d e ) ), TED( c*d c*e ) );
+TED_DIV(TED(a b),TED(0 d)) := TED( a/d b/d );
+TED_DIV(TED(a b),TED(c d)) := ERROR(8);
+TED_POW(TED(a b),TED(0 CONST(d))) := TED_MUL(TED(a b),TED_POW(TED(a b),TED(0 d-1)));
+TED_POW(TED(a b),TED(0 1)) := TED(a b);
+TED_POW(TED(a b),TED(0 0)) := TED(0 1);
+TED_POW(TED(a b),TED(c d)) := ERROR(10);
+TED_NEG(TED(a b))          := TED( 0-a 0-b );
+
+TED( TED( 0 a ) b ) := TED( a b );
 
 IPOLY_TED((a,b),v)                := (IPOLY_TED(a,v),IPOLY_TED(b,v)); //parenthesis are important there!!!
 IPOLY_TED(TED(a b),v)             := a*v+b;
@@ -550,8 +576,8 @@ SOLVE2(TED(TED(a b) c))           := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIM
 SOLVE2(TED(a b)/e)                := SOLVE2(TED(a b));
 SOLVE2(TED(a b))                  := -b/a;
 
-SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(TO_POLY_TED(a,y)),y)},{x});
-SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(TO_POLY_TED(a,x)),x);
+SYSTEM_SOLVE3({a},{x,y})          := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(POLY_TED(a,y)),y)},{x});
+SYSTEM_SOLVE3({a},{x})            := IPOLY_TED(REDUCE(POLY_TED(a,x)),x);
 SYSTEM_SOLVE4({a,b},{x,y})        := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));
 SYSTEM_SOLVE4({a},{x})            := SOLVE(a,x);
 
@@ -562,13 +588,14 @@ SYSTEM_AUTO_SOLVE2({a},{c,d})     := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})
 SYSTEM_AUTO_SOLVE2({a},{c})       := SYSTEM_AUTO_SOLVE3({a});
 
 //entry points
-SOLVE(a,v)                        := SOLVE2(TO_POLY_TED(a,v));
+SOLVE(a,v)                        := SOLVE2(POLY_TED(a,v));
 SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
 SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
 
 //CRAMER
-DET( {a}, { c, d } )              := DET_LINES( MATRIX_BOTTOM( TO_POLY_TED( a, d ) ), DET_VAR( c ) );
-DET( {a}, { c    } )              := DET_LINES( MATRIX_BOTTOM( TO_POLY_TED( a, c ) ) );
+DET( {0}, { c    } )              := 0;
+DET( {a}, { c, d } )              := DET_LINES( MATRIX_BOTTOM( POLY_TED( a, d ) ), DET_VAR( c ) );
+DET( {a}, { c    } )              := DET_LINES( MATRIX_BOTTOM( POLY_TED( a, c ) ) );
 
 DET_LINES( MATRIX_BOTTOM( TED( a b ) ) )                                   := a;
 DET_LINES( MATRIX_BOTTOM( TED( a b ) )                    , DET_VAR( 1 ) ) := b;
@@ -583,12 +610,13 @@ DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a 
 DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( c ) )}   , { e } );
 
 //MATRIX HELP FUNCTIONS
-TED_TO_MATRIX( c , TED( a 0 ) )   := ( TED_TO_NULL_MATRIX( c ), 0 );
-TED_TO_MATRIX( c , TED( a b ) )   := ( TED_TO_MATRIX( c ), b );
+TED_TO_MATRIX( c , TED( a b ) )   := CHECK_NULL( TED_TO_MATRIX( c ), b );
 TED_TO_MATRIX(     TED( a b ) )   := b;
 TED_TO_MATRIX(  a, b    )         := ERROR(7);
-TED_TO_NULL_MATRIX( a , b )       := ( TED_TO_NULL_MATRIX( a ), 0 );
-TED_TO_NULL_MATRIX( a )           := 0;
+//CHECK_NULL (a,b) := (a,b);
+CHECK_NULL( a , 0 )               := 0;
+CHECK_NULL( 0 , a )               := 0;
+CHECK_NULL( a , b )               := (a,b);
 
 // Vector reversal {x,y,z} -> {z,y,x}
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
@@ -599,7 +627,7 @@ VECT_REVERSE2( VECT_QUEUE(a),  b     ) := (a,b);
 
 /*MATRIX_GETVAR({a,b})   := MATRIX_GETVAR2( (a,b), CHOOSEVAR( GETVAR(a), GETVAR(b) ) );
 MATRIX_GETVAR({a})     := a;
-MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(TO_POLY_TED(a,b))})};*/
+MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(POLY_TED(a,b))})};*/
 
 //vector add
 (a,b)+(c,d)               := (a+c,b+d);
