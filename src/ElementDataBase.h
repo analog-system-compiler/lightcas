@@ -95,7 +95,6 @@ class CElementDataBase : public CElementArray
     void          SetConstValue( CElement* e, const CValue& v );
     void          CleanTempElements();
     static void   SetSecureLimit( unsigned i ) { m_SecureLimit=i; }
-    CElementDataBase(const CElementDataBase& db );
 
   public:
 
@@ -129,6 +128,7 @@ class CElementDataBase : public CElementArray
         void DisplayStats();
 #endif
 
+	CElementDataBase(const CElementDataBase& db);
     CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator *eval=NULL, bool bInitialize=true);
     virtual ~CElementDataBase();
 

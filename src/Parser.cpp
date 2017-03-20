@@ -15,7 +15,7 @@
 /*  along with this program; if not, write to the Free Software                */
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
-#define _CRT_SECURE_NO_WARNINGS
+
 #include <ctype.h>
 #include "Debug.h"
 #include "Parser.h"
@@ -147,9 +147,8 @@ void CParser::Init( const char* pText )
 
 bool CParser::TryFind( char c )
 {
-  if( GetChar() == c )
+  if( IsChar( c ) )
   {
-
     Next();
     return true;
   }
@@ -195,9 +194,9 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   const char* s1 = symbol_str;
   const char* s2 = m_Pos;
 
-  while( *s1 && !IsWord( *s1 ) )
+  while( *s1 && !( IsWord( *s1 ) || ( *s1 == '(' ) ) )
   {
-    if( *s1 == '\\' )
+    if( *s1 == CParser::m_OperatorAlpha )
     {
       s1++; //Next char is considered as word
     }
@@ -207,15 +206,14 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
       s1++;
       s2++;
     }
-    else if( *s1 == '(' )
+    else if( *s1 == CParser::m_OperatorExclude)
     {
-      s1++; //'('
+      s1++; //'\'
       if( *s2 == *s1 ) //Check for forbidden characters
       {
         return false;
       }
-      s1++;
-      s1++; //')'
+      s1++;      
     }
     else
     {
@@ -247,7 +245,6 @@ void CParser::Error( unsigned id ) const
   {
     ds += m_Buffer;
   }
-  PUTS( ds.GetBufferPtr() );
   TRACE( ds.GetBufferPtr() );
 #endif
 

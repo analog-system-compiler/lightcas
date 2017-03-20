@@ -117,6 +117,7 @@ void CMathExpression::NextBranch( unsigned& pos ) const
   {
     op = Pop( pos );
     e = RefToElement( op );
+	ASSERT(e);
     i += e->GetFunction()->GetParameterNb();
     i--;
   }

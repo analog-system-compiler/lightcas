@@ -21,50 +21,51 @@
 // uppercase: new precedence = 0
 // TODO : add commutativity info for correct parenthesis display
 
-SYST(a b)               " a;b   ";
-EQV( a b )              " a=(=)b";
-IF( CONCAT( b c ) a )   " a?b:c ";
-CONCAT( a b )           " a,b   ";
-SET( a b )              " a:=b  ";
-OR( a b )               " a|(|)b";
-XOR( a b )              " a~b   ";
-ADD( a b )              " a+b   ";
-SUB( a b )              " a-b   ";
-AND( a b )              " a&(&)b";
-MUL( a b )              " a*b   ";
-DIV( a b )              " a/b   ";
-POW( a b )              " a^b   ";
-SHL( a b )              " a<<b  ";
-SHR( a b )              " a>>b  ";
-EQ( a b )               " a==b  ";
-NEQ( a b )              " a<>b  ";
-LTE( a b )              " a<=b  ";
-LT( a b )               " a<b   ";
-GTE( a b )              " a>=b  ";
-GT( a b )               " a>b   ";
-LOR( a b )              " a||b  ";
-LAND( a b )             " a&&b  ";
-AT( a b )               " a[B]  ";
-NEG( a )                " -a    ";
-INV( a )                " /a    ";
-LNOT( a )               " !a    ";
-NOT( a )                " ~a    ";
-FACT( a )               " a!    ";
-VECT( a )               " {A}   ";
+SYST(a b)           " a;b   "
+COL( a b )			" a:\=b   "
+EQV( a b )          " a=\=b   "  
+IF( b a ) 			" a?B   "
+CONCAT( a b )       " a,(b) "  
+SET( a b )          " a:=b  "  
+OR( a b )           " a|\|b   "  
+XOR( a b )          " a~b   "  
+ADD( a b )          " a+b   "  
+SUB( a b )          " a-(b) "  
+AND( a b )          " a&\&b   "  
+MUL( a b )          " a*b   "  
+DIV( a b )          " a/(b) "  
+POW( a b )          " (a)^(b) "  
+SHL( a b )          " a<<(b)"  
+SHR( a b )          " a>>(b)"  
+EQ( a b )           " a==b  "  
+NEQ( a b )          " a<>b  "  
+LTE( a b )          " a<=(b)"  
+LT( a b )           " a<(b) "  
+GTE( a b )          " a>=(b)"  
+GT( a b )           " a>(b) "  
+LOR( a b )          " a||b  "  
+LAND( a b )         " a&&b  "  
+AT( a b )           " a[B]  "  
+NEG( a )            " -a    "  
+INV( a )            " /a    "  
+LNOT( a )           " !a    "  
+NOT( a )            " ~a    "  
+FACT( a )           " a!    "  
+VECT( a )           " {A}   "  
 
 // Uncomment rules below to enable power post-fixing
-// MUL( a 1e-12 )   " a\p";
-// MUL( a 1e-9  )   " a\n";
-// MUL( a 1e-6  )   " a\u";
-// MUL( a 1e-3  )   " a\m";
-// MUL( a 1e3   )   " a\k";
-// MUL( a 1e3   )   " a\K";
-// MUL( a 1e6   )   " a\M";
-// MUL( a 1e9   )   " a\G";
+// MUL( a 1e-12 )   " a@p";
+// MUL( a 1e-9  )   " a@n";
+// MUL( a 1e-6  )   " a@u";
+// MUL( a 1e-3  )   " a@m";
+// MUL( a 1e3   )   " a@k";
+// MUL( a 1e3   )   " a@K";
+// MUL( a 1e6   )   " a@M";
+// MUL( a 1e9   )   " a@G";
 
-IF2( (a,b) 0)          := b;
-IF2( (a,b) 1)          := a;
-IF ( (a,b) c)          := IF2( (a,b) BOOL(c) );
+IF2( (a:b) 0)          := b;
+IF2( (a:b) 1)          := a;
+IF ( (a:b) c)          := IF2( (a:b) BOOL(c) );
 
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
@@ -101,8 +102,8 @@ IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
 IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
 IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 
-NORM2(a,q)                       := IPOLY(NORM3(POLY(a,q)),q);
-NORM(a,q)                        := IPOLY_NORM(POLY(a,q),q);
+NORM2(a,q)                    := IPOLY(NORM3(POLY(a,q)),q);
+NORM(a,q)                     := IPOLY_NORM(POLY(a,q),q);
 
 POLY(COS(a),1)           := POLYF(COS (SIMPLIFY(a)));
 POLY(SIN(a),1)           := POLYF(SIN (SIMPLIFY(a)));

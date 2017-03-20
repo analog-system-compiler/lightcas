@@ -15,7 +15,7 @@
 /*  along with this program; if not, write to the Free Software                */
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
-#define _CRT_SECURE_NO_WARNINGS
+
 #include <string.h>
 #include <cctype>
 #include "Debug.h"
@@ -220,13 +220,10 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
       s.Clear();
       s.Append( tolower( c ) );
       CElement* e = GetElement( s );
+	  ASSERT(e);
       if( e )
       {
         src_equ.Push( e );
-      }
-      else
-      {
-        ASSERT( false );
       }
     }
 
@@ -256,7 +253,6 @@ void CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& dst_
 void CElementDataBase::InitAlgebraRuleTable()
 {
   CMathExpression src( this );
-
   src.GetFromString( "SET( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )" );
   src.OptimizeTree();
 #if OPTIMIZATION_LEVEL < 2
@@ -272,7 +268,6 @@ void CElementDataBase::InitAlgebraRuleTable()
 void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
 {
   CMathExpression src( this );
-
   src.GetFromString( IC );
   src.Push( GetElement( "EXECUTE" ) );
   src.OptimizeTree(); // optimize 'if' if any.
@@ -334,10 +329,9 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
   CElement* e = NULL;
   CValue v;
 
-  if( IC.GetChar() != '-' ) // to fix
-  {
     const char* pos = IC.GetPos();
     v = GetEvaluator()->GetValueFromString( &pos );
+	ASSERT(v.GetValue() >= 0);
     if( pos != IC.GetPos() )
     {
       IC.SetPos( pos );
@@ -347,7 +341,7 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
     {
       e = GetElement( IC.GetWord() );
     }
-  }
+
   return e;
 }
 

@@ -140,7 +140,7 @@ bool CMathExpression::OptimizeTree2( /*bool& bImpure*/ )
         {
 #if 1
           CMathExpression equ2( m_ElementDB );          
-          /*bImpure = */equ2.ApplyRule( *this, pos_array, &rule->m_DstEquation );
+          /*bImpure = */equ2.ApplyRule( *this, pos_array, rule->m_DstEquation );
           SetSize( pos );
           Push( equ2 );
           
@@ -232,7 +232,7 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
   return match ? pos2 : pos3;
 }
 
-void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize )
+void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize )
 {
   OP_CODE op3;
   unsigned pos;
@@ -247,26 +247,25 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
   ds += " => " ;
 #endif
 
-  for( pos = 0; pos < rule_equ->GetSize(); pos++ )
+  for( pos = 0; pos < rule_equ.GetSize(); pos++ )
   {
          
-    op3 = rule_equ->Get( pos );
+    op3 = rule_equ.Get( pos );
 
     if( IsReserved( op3 ) )
     {
       j = ReservedParameterIndex( op3 );
       unsigned pos2 = pos_array[ j ];
+	  ASSERT(pos2 <= equ.m_StackSize);
       PushBranch( equ, pos2 ); // WARNING pos2 is modified
       
       if( optimize && ( OPTIMIZATION_LEVEL == 2 ) )
       {
           OptimizeTree3();  // optimization is only made on the top branch
-      }
-      
+      }  
     }
     else
     {
-    
       ASSERT( RefToElement( op3 ) != NULL );
       Push( op3 );
 

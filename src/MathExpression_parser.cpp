@@ -20,41 +20,28 @@
 #include "Element.h"
 #include "MathExpression.h"
 
-void CMathExpression::GetFromString( CParser& IC )
-{
-  Clear();
-  Parse( IC );
-}
-
 unsigned CMathExpression::Parse( CParser& IC )
 {
-  unsigned i = 0;
-  CMathExpression equ( m_ElementDB );
-
-  while( !IC.IsStopChar() )
-  {
-    equ.GetLevel( IC, 0 );
-    Push( equ );
-    i++;
-  }
-  return i;
+  Clear();	  
+  return GetLevel(IC);
 }
 
-unsigned CMathExpression::ParseParenthesis( CParser& IC )
+/*unsigned CMathExpression::ParseParenthesis( CParser& IC )
 {
-  unsigned i = 0;
+  unsigned i;
   if( IC.TryFind( '(' ) )
   {
-    i = Parse( IC );
+    i = GetLevel(IC);
     IC.Find( ')' );
   }
+  else 
+	  i = GetLevel(IC);
   return i;
-}
-
+}*/
 
 void CMathExpression::Display( CDisplay& ds ) const
 {
-  unsigned pos = m_StackSize;;
+  unsigned pos = m_StackSize;
 
   if( pos == 0 )
   {
@@ -91,19 +78,17 @@ unsigned CMathExpression::DisplayBranch( unsigned pos , unsigned priority, CDisp
     n = e->GetFunction()->GetParameterNb();
     if( n || e->IsNumeric() ) // For Rand(), n=0
     {
-      ds += '(' ;
-      ds2.Copy( ds );
       for( i = 0; i < n; i++ )
       {
-        ds.Clear();
-        pos = DisplayBranch( pos, 0, ds );
+        ds2.Clear();
+        pos = DisplayBranch( pos, 0, ds2 );
         if( i != 0 )
         {
-          ds += ' ' ;
+          ds2 += ' ' ;
         }
-        ds3.Prepend( ds );
+        ds3.Prepend( ds2 );
       }
-      ds.Copy( ds2 );
+	  ds += '(';
       ds += ds3 ;
       ds += ')' ;
     }
@@ -124,19 +109,20 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
   for( unsigned i = 0; i < st.GetSize(); i++ )
   {
     const CSymbolSyntaxStruct* ss = st[i];
-    const CMathExpression* equ =  &ss->m_Equation;
-    const char* sp = ss->m_Syntax;
+    const CMathExpression* equ =  &ss->m_Equation;    
     unsigned pos1 = Match( pos, *equ, pos_array );
     if( pos1 != pos )
     {
+      const char* sp = ss->m_Syntax;
       if( i < precedence )
       {
         ds += '(' ;
+		DisplaySymbolString(sp, pos_array, i, ds);
+		ds += ')';
       }
-      DisplaySymbolString( sp,  pos_array,  i,  ds );
-      if( i < precedence )
+	  else 
       {
-        ds += ')' ;
+        DisplaySymbolString(sp, pos_array, i, ds);
       }
       pos = pos1;
       break;
@@ -150,26 +136,29 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
 {
   char c;
   unsigned i;
+  unsigned precedence2;
 
   while ( ( c = *sp++ ) )
   {
-    if( c == '(' )
+	if (c == '(') {
+		precedence++;
+	}
+	else if (c == ')') {
+		if (precedence) precedence--;		
+	}	 
+    else if( c == CParser::m_OperatorExclude )
     {
-      sp++;
-      while( *sp != ')' )
-      {
-        sp++;
-      }
-      sp++;
+	  sp++; //Exclude operator
     }
     else if( CParser::IsWord( c ) )
     {
+		precedence2 = precedence;
       if( c < 'a' )
       {
-        precedence = 0;
+        precedence2 = 0;
       }
       i = tolower( c ) - 'a';
-      DisplayBranch( pos_array[i], precedence, ds );
+      DisplayBranch( pos_array[i], precedence2, ds );
     }
     else
     {
@@ -178,109 +167,363 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[
   }
 }
 
+unsigned CMathExpression::GetLevel(CParser& IC)
+{
+	unsigned i = 0;
+	while (!IC.IsStopChar())
+	{
+		GetLevel(IC, 0);
+		i++;
+	}
+	return i;
+}
+
 void CMathExpression::GetLevel( CParser& IC, unsigned priority )
 {
-  Clear();
-
-  if( !IC.IsStopChar() )
-  {
-    if( ParseParenthesis( IC ) == 0 )
-    {
-      if( !ParseElement( IC ) )
-      {
-        if( !SearchOperator( IC, 0, true ) )
-        {
-          IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
-        }
-      }
-    }
-  }
+  bool symbol_first = true;
 
   while( !IC.IsStopChar() )
   {
-    if( !SearchOperator( IC, priority, false ) )
-    {
-      break;
-    }
+	  //if (IC.GetChar() == '-') ASSERT(false);
+	  if (!SearchOperator(IC, symbol_first?0:priority, symbol_first))
+	  {	    
+		  if (symbol_first) {
+			  if (IC.TryFind('('))
+			  {
+				  GetLevel(IC);
+				  IC.Find(')');
+			  }
+			  else if (IC.IsWord())
+			  {
+				  ParseElement(IC);
+			  }
+			  else
+				  IC.Error(CParserException::ID_ERROR_OPERATOR_EXPECTED);
+		  }
+	      else break; //exit level
+	  }
+	  symbol_first = false;
   }
 }
+#if 0
+unsigned CMathExpression::GetLevelBis(CParser& IC)
+{
+	CString stack;
+	CMathExpression equ(m_ElementDB);
+
+	//Read the whole string
+	while (IC.GetChar())
+	{
+		if (IC.TryFind(CParser::m_SymbolDelimiter))
+		{			
+			CParser IC2(IC.GetPos());
+			while (!IC.TryFind(CParser::m_SymbolDelimiter)) IC.Next();
+			CMathExpression equ2(m_ElementDB);			
+			equ2.GetLevelBis(IC);			
+			m_ElementDB->AssociateSymbol(IC2, equ2);
+		}
+		else if (IC.IsWord()) {
+			stack.Append('a');
+			equ.Push(m_ElementDB->ParseElement(IC));			
+		}
+		else {
+			stack.Append(IC.GetChar());
+			IC.Next();
+		}
+	}
+	const char *sp = stack.GetBufferPtr();
+	unsigned elem_index = 0;
+	unsigned par_nb = 0;
+	//s = m_StackSize;
+	const char *sp = IC.GetPos();
+	while (!CParser::IsStopChar(*sp)) {
+		if (!Decode(equ, sp, elem_index, 0))
+			IC.Error(CParserException::ID_ERROR_OPERATOR_EXPECTED);		
+		par_nb++;
+	}
+	ASSERT(elem_index == equ.GetSize());
+	ASSERT(*sp=='\0');	
+	return par_nb;
+}
+
+	//Decode 
+bool CMathExpression::Decode( const CMathExpression& equ, const char * &s, unsigned& elem_index, unsigned priority)
+{
+	CElement * e;
+	char c;
+	unsigned i;
+	const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
+	unsigned pos_array[CElementDataBase::MAX_EXP];
+	InitPositionTable(pos_array);
+	
+	for (i = priority; i < st.GetSize(); i++)
+	{
+		const char* sp = st[i]->m_Syntax;
+			
+		while (*sp)
+		{
+			if (CParser::IsWord(*sp) )
+			{
+				c=*sp++;
+				if (c > 'A')
+					priority = 0;
+				
+				if (!Decode(equ,s, elem_index, priority)) return false;
+
+				StoreStackPointer(c, pos_array);
+			}
+			else if (*sp == *s)
+			{
+				sp++;
+				s++;
+			}
+			else
+				break;
+		}
+
+		if (*sp == '\0')
+		{
+			const CMathExpression& rule_equ = st[i]->m_Equation;
+			ApplyRule(equ, pos_array, rule_equ, false);
+			return true;
+		}
+	}
+
+	if (*s == '(') {
+		s++;
+		if (!Decode(equ, s, elem_index, 0)) return false;
+		if (*s == ')')
+			s++;
+		else
+			return false;
+	}
+	else if (CParser::IsWord(*s))
+	{
+		OP_CODE op = equ.m_StackArray[elem_index++];
+		if (*s == '(') // if fonction
+		{
+			s++;
+			i = 0;
+			while (*s && *s != ')') {
+				i++;
+				if (!Decode(equ, s, elem_index, 0)) return false;
+			}
+			s++; //')'
+			e = RefToElement(op);
+			e->SetFunct();
+			CFunction *f = e->GetFunction();
+			f->SetParameterNb(i);
+			if ((f->GetParameterNb() == 2) && (GetLastOperator() == CElementDataBase::OP_CONCAT))
+			{
+				m_StackSize--;
+				ASSERT(e->IsNumeric()); // for numeric function, it is allowed to use comma without concatenation op.
+				ASSERT(f->GetParameterNb() == i + 1);
+			}
+		}		
+		Push(op);
+		return true;
+	}
+	else if (*s != '\0')
+		return false;
+
+	return false;	
+}
+
+unsigned CMathExpression::SymbolMatch(CParser& IC, unsigned par_nb, const char *& pos, unsigned& priority )
+{
+	CElement * e;
+	char c;
+	unsigned i;
+	const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
+
+	priority = i;
+	for (i = 0; i < st.GetSize(); i++)
+	{
+		const char* sp = st[i]->m_Syntax;
+
+		while (*sp)
+		{
+			if (CParser::IsWord(*sp))
+			{
+				c = *sp++;
+				if (c > 'A')
+					priority = 0;
+			}
+			else if (IC.TryFind( *sp ) )
+			{
+				sp++;
+			}
+			else
+				break;
+		}
+
+		if (*sp == '\0')
+		{
+			return i;
+		}
+	}
+}
+
+void CMathExpression::Build(CMathExpression& equ, unsigned i, unsigned pos )
+{
+	unsigned pos_array[CElementDataBase::MAX_EXP];
+	const CMathExpression& rule_equ = st[i]->m_Equation;
+	//InitPositionTable(pos_array);
+	ASSERT(pos <= 2);
+	if(pos==2)
+	{
+		equ.PushBranch(m_StackSize);
+		pos_array[1] = equ.m_StackSize;
+	}
+	equ.PushBranch(m_StackSize);
+	pos_array[0] = equ.m_StackSize;
+	ApplyRule(equ, pos_array, rule_equ, false);
+}
+
+bool CMathExpression::Decode(CMathExpression& equ, CParser& IC, unsigned priority)
+{
+	char c;
+	unsigned i;
+	unsigned n = m_ElementDB->GetSymbolTable()->GetSize();
+
+	i = SymbolMatch( IC, 1, z); //pre
+	if (i != n)
+	{
+		Decode(equ,IC,0);
+		Build(i, 1);
+		//SymbolEOS(i, IC, z);
+	}
+	else {
+
+		if (IC.TryFind('('))
+		{
+			Decode(equ,IC, 0);
+			IC.Find(')');
+		}
+		else
+			ParseElement(IC);
+
+		i = SymbolMatch(IC, 1, z); //post
+		if (i != n)
+		{
+			Build(i, 1);
+			//SymbolEOS(i, IC, z);
+		}
+	}
+
+	i = SymbolMatch(IC, 2, z); //pre
+	if (i != n) {
+
+		if (i < priority)
+		{
+			Decode(equ,IC, i);
+			//Build(i, 2);
+		}
+		else
+		{
+			Build(equ,priority, 2);
+			Decode(IC, 0);
+			Build(i, 2);
+		}
+		//SymbolEOS(i, IC, z);
+	}
+	//a*b+c a b mul c add
+	//a+b*c a b c mul add
+	return true;
+}
+#endif
 
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
-  unsigned i;
+  unsigned i,k,n;
+  unsigned pos_array[CElementDataBase::MAX_EXP];
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
+  const char * init_pos = IC.GetPos();
+  InitPositionTable(pos_array);
+  //a*b+c a b c add mul -> a b mul c add
+  //a+b*c a b c mul add -> a b c mul add
+  //first get start of first parameter
+  n = m_StackSize;
 
-  for( i = priority; i < st.GetSize(); i++ )
+  for(i = priority; i < st.GetSize(); i++ )
   {
-    const char* sp = st[i]->m_Syntax;
-    const CMathExpression& equ =  st[i]->m_Equation;
+    const char* sp = st[i]->m_Syntax;    
+	k = MatchOperator(IC, sp, pos_array, i + 1, symbol_first);
+	if (k!=0)
+	{
+		const CMathExpression& rule_equ = st[i]->m_Equation;
+		ASSERT(rule_equ.GetSize());
 
-    if( CParser::IsWord( sp[0] ) != symbol_first )
-    {
-      if( MatchOperator( IC, sp, equ, i + 1  ) )
-      {
-        return true;
-      }
-    }
+		CMathExpression equ(m_ElementDB); //save current stack
+		equ.Copy(*this);
+		m_StackSize = n;
+		if (!symbol_first) //FIXME
+			NextBranch(m_StackSize); //remove first parameter
+		ApplyRule(equ, pos_array, rule_equ, false);
+
+#if 0 //def _DEBUG
+		CDisplay ds;
+		Display(ds);
+		TRACE(ds.GetBufferPtr());
+#endif
+		return true;
+	}
+	IC.SetPos(init_pos);
+	m_StackSize = n;
   }
-
+  
   return false;
 }
 
-bool CMathExpression::MatchOperator( CParser& IC, const char* sp, const CMathExpression& rule_equ, unsigned precedence )
+unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence, bool symbol_first )
 {
-  char c;
-  unsigned pos_array[ CElementDataBase::MAX_EXP ];
-  CMathExpression equ( m_ElementDB );
-  InitPositionTable( pos_array );
+	unsigned k = 0;
+	char c;
 
   c = *sp;
-  if( CParser::IsWord( c ) )
+  if (c == '(' || c == ')') //Parenthesis not used in parsing stage
   {
-    StoreStackPointer( c, pos_array );
-    sp++;
+	  sp++;
+	  c = *sp;
+  }
+  if (CParser::IsWord(c) == symbol_first)
+	  return 0;
+
+  if (CParser::IsWord(c))
+  {
+	  StoreStackPointer(c, pos_array);
+	  sp++;
+	  k++;
   }
 
   // try to match prefix operator
-  while( ( c = *sp ) )
+  c = *sp;
+  while( c )
   {
+    if ( c == '(' || c == ')' ) //Parenthesis not used in parsing stage
+    {
+		sp++;
+      c=*sp;
+	}
     if( CParser::IsWord( c )  )
     {
       if( c < 'a' )
       {
         precedence = 0;
       }
-      equ.GetLevel( IC, precedence );
-      Push( equ );
+      GetLevel( IC, precedence ); //Push parameters
       StoreStackPointer( c, pos_array );
       sp++;
-
+	  k++;
     }
     else if( !IC.TryMatchSymbol( sp ) )
     {
-      return false;
+      return 0;
     }
+	c = *sp;
   }
 
-  if( *sp  ) //check that all characters have matched
-  {
-    return false;
-  }
-
-  if( rule_equ.GetSize() )
-  {
-    equ.Copy( *this );
-    Clear();
-    ApplyRule( equ, pos_array, &rule_equ, false );
-  }
-
-#if 0 //def _DEBUG
-  CDisplay ds;
-  Display( ds );
-  TRACE( ds.GetBufferPtr() );
-#endif
-
-  return true;
+  return k;
 }
 
 bool CMathExpression::ParseElement( CParser& IC )
@@ -288,17 +531,22 @@ bool CMathExpression::ParseElement( CParser& IC )
   CElement* e;
   CFunction* f;
   bool element_creation;
-  unsigned i, n;
+  unsigned i=0, n;
   const char* pos;
 
   pos = IC.GetPos();
+ // s = m_StackSize;
   n = m_ElementDB->GetSize();
   e = m_ElementDB->ParseElement( IC );
-  element_creation = ( m_ElementDB->GetSize() - n ) != 0; //put there !!!
-  i = ParseParenthesis( IC );
-
+  
   if( e )
   {
+	  if (IC.TryFind('(')) {
+		  i = GetLevel(IC);
+		  IC.Find(')');
+	  }
+	element_creation = (m_ElementDB->GetSize() - n) != 0; 
+
     f = e->GetFunction();
     if ( element_creation && ( i > 0 ) )
     {
@@ -329,13 +577,16 @@ bool CMathExpression::ParseElement( CParser& IC )
     //Check if symbol definition for this operator
     if( IC.GetChar() == CParser::m_SymbolDelimiter )
     {
-      m_ElementDB->AssociateSymbol( IC, *this );
-      //Clear(); //clear equation to avoid being executed after being parsed.
-      Init( RefToElement( CElementDataBase::OP_NONE ) );
+		CMathExpression equ(m_ElementDB);
+		equ.PushBranch(*this,m_StackSize);
+      m_ElementDB->AssociateSymbol( IC, equ);
+      //clear equation to avoid being executed after being parsed.
+	  //m_StackSize = s;
+      Push( RefToElement( CElementDataBase::OP_NONE ) );
     }
   }
 
-  return pos != IC.GetPos();
+  return ( e != NULL );
 }
 
 void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )

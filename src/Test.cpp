@@ -134,6 +134,9 @@ void CElementDataBase::Test()
   //CheckCatch( "a.b" );
   /***** Some basic tests *****/
   Check( "a-(b-c)", "a-(b-c)");
+  Check("a^(b^c)", "a^(b^c)");
+  Check("a/(b/c)", "a/(b/c)");
+  Check("(a^b)^c", "(a^b)^c");
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );
@@ -141,6 +144,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(--2)", "2" );
   Check( "SIMPLIFY(2--2)", "4" );
   Check( "SIMPLIFY(-4-8)", "-12");
+  Check( "SIMPLIFY(3!)", "6");
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
   Check( "SIMPLIFY(a-a)", "0" );
   Check( "SIMPLIFY(a+a)", "2*a" );

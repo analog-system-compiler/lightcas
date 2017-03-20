@@ -15,7 +15,7 @@
 /*  along with this program; if not, write to the Free Software                */
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
-#define _CRT_SECURE_NO_WARNINGS
+
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
@@ -61,7 +61,7 @@ void TRACE( const char* format, ... )
   buffer[CRT_DEBUG_BUFFER_MAX - 1] = '\0';
   _CrtDbgReport( _CRT_WARN, NULL, 0, NULL, buffer );
 #else
-  puts( buffer );
+  PUTS( buffer );
 #endif
 }
 

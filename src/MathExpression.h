@@ -27,7 +27,7 @@
 #define MAX_STACK_SIZE     (1<<20)
 #define OPTIMIZATION_LEVEL  2
 
-typedef	CVector< class CMathExpression* > CEquationArray;
+//typedef	CVector< class CMathExpression* > CMathExpressionArray;
 class CAlgebraRule;
 
 class CMathExpression
@@ -56,22 +56,26 @@ class CMathExpression
     void		 PushBranch( const CMathExpression& equ, unsigned& pos );        
     bool		 CompareBranch( unsigned pos1, unsigned pos2 ) const;    
     void		 NextBranch( unsigned& pos ) const;    
-                 
+           
+	unsigned     GetLevel(CParser& IC);
     void         GetLevel( CParser& IC, unsigned priority );
     bool         SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
     bool         ParseElement(CParser& IC);
-    unsigned     ParseParenthesis( CParser& IC );
+    //unsigned     ParseParenthesis( CParser& IC );
     unsigned     Parse( CParser& IC );
-    bool         MatchOperator( CParser& IC, const char * s, const CMathExpression& equ, unsigned priority1 );
-                 
+	unsigned      MatchOperator(CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence,bool symbol_first);                 
     void         StoreStackPointer( char c, unsigned pos_array[] );
+
+	/*
+	bool     Decode(const CMathExpression& equ, const char * &s, unsigned& elem_index, unsigned priority);
+		*/
 
     bool         OptimizeConst();
     bool         OptimizeTree2();
     void         OptimizeTree3();
 
     void         Replace( OP_CODE op1, OP_CODE op2 );
-    void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression* rule_equ, bool optimize=true );
+    void         ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize=true );
     unsigned     Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;    
     bool         MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
     virtual bool ExecuteCommand();
@@ -102,7 +106,7 @@ class CMathExpression
     bool    Compare( const CMathExpression& equ ) const;   
     void	Copy( const CMathExpression& equ );    
     void	Display( CDisplay& ds ) const;
-    void	GetFromString( CParser& IC );
+    void	GetFromString( CParser& IC )        { Parse(IC); }
     void    GetFromString( const char *text )   { CParser IC( text ); GetFromString( IC ); }
     void	OptimizeTree();
     bool    Match( const CMathExpression& equ ) const;
@@ -116,7 +120,7 @@ class CMathExpression
     CElementDataBase* GetElementDB() const    { return m_ElementDB;    }
     OP_CODE		GetLastOperator()	const;
     
-    CMathExpression( CElementDataBase* db = NULL );
+    CMathExpression( CElementDataBase* db = NULL );	
     virtual ~CMathExpression();
 
 };
