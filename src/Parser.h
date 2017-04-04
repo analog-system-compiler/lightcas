@@ -22,83 +22,89 @@
 
 class CParserException
 {
-  public:
-    enum EXCEPTION_ID
-    {
-      ID_OK,
-      ID_ERROR_SYNTAX,
-      ID_ERROR_FILE_NOT_FOUND,
-      ID_ERROR_OPERATOR_EXPECTED
-    };
+public:
+  enum EXCEPTION_ID
+  {
+    ID_OK,
+    ID_ERROR_SYNTAX,
+    ID_ERROR_FILE_NOT_FOUND,
+    ID_ERROR_OPERATOR_EXPECTED
+  };
 
-  private:
-    unsigned m_ErrorID;
-    unsigned m_LineNb;
-    CString  m_ErrorStr;
+private:
+  unsigned m_ErrorID;
+  unsigned m_LineNb;
+  CString  m_ErrorStr;
 
-  public:
-    void SetErrorID( unsigned id )             { m_ErrorID = id;    }
-    void SetLineNb( unsigned n )               { m_LineNb = n;      }
-    void SetErrorString( const CString& s )    { m_ErrorStr = s;    }
+public:
+  void SetErrorID( unsigned id )             { m_ErrorID = id;    }
+  void SetLineNb( unsigned n )               { m_LineNb = n;      }
+  void SetErrorString( const CString& s )    { m_ErrorStr = s;    }
 
-    unsigned GetLineNb() const                 { return m_LineNb;   }
-    const CString& GetErrorString() const      { return m_ErrorStr; }
-    unsigned GetErrorID() const                { return m_ErrorID;  }
+  unsigned GetLineNb() const                 { return m_LineNb;   }
+  const CString& GetErrorString() const      { return m_ErrorStr; }
+  unsigned GetErrorID() const                { return m_ErrorID;  }
 
-    CParserException()                         { m_ErrorID = ID_OK; m_LineNb = 0;  }
+  CParserException()                         { m_ErrorID = ID_OK; m_LineNb = 0;  }
 };
 
 
-class CParser 
+class CParser
 {
 
-  private:
+private:
 
-    static	const char	m_CharTab[];
-    int		m_LineNb;
-    CString	m_FileName;    
-    char    *m_Text;
+  static  const char  m_CharTab[];
+  int   m_LineNb;
+  CString m_FileName;
+  char*     m_Text;
 
-  public:
-    const char*	m_Pos;
-    CString m_Buffer;
-    static const char m_SymbolDelimiter = '\"';
-	static const char m_OperatorExclude = '\\';
-	static const char m_OperatorAlpha   = '@';
-    
-  protected:
-    void	SkipComment();
-    void	SkipSpaceNL();
-    void	SkipSpace();
+public:
+  const char* m_Pos;
+  CString       m_Buffer;
 
-  public:
-    void	Error( unsigned id ) const;
-    void	Find( char c );
-    bool	TryFind( char c );
-    void	Init( const char* pText );
-    bool    TryMatchSymbol( const char *& symbol_str );
-    bool    LoadFile( const CString& name );
-    void	CloseFile();
+  static const char m_StringDelimiter = '"';
+  static const char m_SymbolMacro     = '#';
+  static const char m_OperatorExclude = '\\';
+  static const char m_OperatorAlpha   = '$';
 
-    const   CString& GetWord();
-    char    GetChar();
-    void    CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
-    void    CopyBuffer( const CString& s )             { m_Buffer = s;            }
+protected:
+  void  SkipComment();
+  void  SkipSpaceNL();
+  void  SkipSpace();
 
-    bool	IsWord()                       { return IsWord( GetChar() );     }
-    bool	IsStopChar()                   { return IsStopChar( GetChar() ); }
-    bool    IsChar( char c )               { return GetChar() == c;          }
+public:
+  void  Error( unsigned id ) const;
+  void  Find( char c );
+  bool  TryFind( char c );
+  void  Init( const char* pText );
+  bool  TryMatchSymbol( const char*& symbol_str );
+  bool  LoadFile( const CString& name );
+  void  CloseFile();
 
-    const char* GetPos() const             { return m_Pos;          }
-    void	SetPos( const char* pText )    { m_Pos = pText;         }
-    void	Next()                         { if( *m_Pos )  m_Pos++; }
+  unsigned GetFixPoint( unsigned& point_pos );
+  const CString& GetWord();
+  const CString& GetQuote();
+  char  GetChar();
+  void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
+  void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
 
-    static	bool	IsWord( char c )       { return ( m_CharTab[( int )c] & 1 ) != 0; }
-    static	bool	IsStopChar( char c )   { return ( m_CharTab[( int )c] & 2 ) != 0; }
+  static bool IsWord( char c )     { return ( m_CharTab[( int )c] & 1 ) != 0; }
+  static bool IsStopChar( char c ) { return ( m_CharTab[( int )c] & 2 ) != 0; }
+  static bool IsDigit( char c )    { return ( m_CharTab[( int )c] & 4 ) != 0; }
 
-    CParser();
-    CParser( const char* pText );
-    virtual ~CParser();
+  bool  IsWord()                       { return IsWord( GetChar() );     }
+  bool  IsStopChar()                   { return IsStopChar( GetChar() ); }
+  bool  IsDigit()                      { return IsDigit( GetChar() ); }
+  bool  IsChar( char c )               { return GetChar() == c;          }
+
+  const char* GetPos() const           { return m_Pos;          }
+  void  SetPos( const char* pText )    { m_Pos = pText;         }
+  void  Next()                         { if( *m_Pos )  m_Pos++; }
+
+  CParser();
+  CParser( const char* pText );
+  virtual ~CParser();
 
 };
 

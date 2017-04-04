@@ -17,19 +17,25 @@
 /*******************************************************************************/
 
 #include <cstdio>
-#include "Display.h"
 #include "Value.h"
 
-void CValue::Display( CDisplay& ds ) const
+void CValue::Display( CString& ds ) const
 {
-  char buffer[32];  
-  snprintf( buffer, sizeof(buffer), "%.12g", m_Value );  
-  ds.Add( buffer );
+  char buffer[32];
+  snprintf( buffer, sizeof( buffer ), "%.12g", m_Value );
+  ds.Append( buffer );
 }
 
 const char* CValue::GetFromString( const char* s1 )
 {
   char* s2;
-  m_Value = strtod( s1, &s2 );
+  if( s1[0] == '0' && ( s1[1] == 'b' ) || ( s1[1] == 'B' ) )
+  {
+    m_Value = strtol( s1 + 2, &s2, 2 );
+  }
+  else
+  {
+    m_Value = strtod( s1, &s2 );
+  }
   return s2;
 }

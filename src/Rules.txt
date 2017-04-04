@@ -21,51 +21,54 @@
 // uppercase: new precedence = 0
 // TODO : add commutativity info for correct parenthesis display
 
-SYST(a b)           " a;b   "
-COL( a b )			" a:\=b   "
-EQV( a b )          " a=\=b   "  
-IF( b a ) 			" a?B   "
-CONCAT( a b )       " a,(b) "  
-SET( a b )          " a:=b  "  
-OR( a b )           " a|\|b   "  
-XOR( a b )          " a~b   "  
-ADD( a b )          " a+b   "  
-SUB( a b )          " a-(b) "  
-AND( a b )          " a&\&b   "  
-MUL( a b )          " a*b   "  
-DIV( a b )          " a/(b) "  
-POW( a b )          " (a)^(b) "  
-SHL( a b )          " a<<(b)"  
-SHR( a b )          " a>>(b)"  
-EQ( a b )           " a==b  "  
-NEQ( a b )          " a<>b  "  
-LTE( a b )          " a<=(b)"  
-LT( a b )           " a<(b) "  
-GTE( a b )          " a>=(b)"  
-GT( a b )           " a>(b) "  
-LOR( a b )          " a||b  "  
-LAND( a b )         " a&&b  "  
-AT( a b )           " a[B]  "  
-NEG( a )            " -a    "  
-INV( a )            " /a    "  
-LNOT( a )           " !a    "  
-NOT( a )            " ~a    "  
-FACT( a )           " a!    "  
-VECT( a )           " {A}   "  
+#sym  SYST(a b)       "a;b    "  
+#sym  COL( a b )      "a:\=b  " 
+#sym  EQV( a b )      "a=\=b  "  
+#sym  IF( b a )       "a?B    "  
+#sym  CONCAT( a b )   "a,(b)  "  
+#sym  SET( a b )      "a:=b   "  
+#sym  OR( a b )       "a|\|b  "  
+#sym  XOR( a b )      "a~b    "  
+#sym  ADD( a b )      "a+b    "  
+#sym  SUB( a b )      "a-(b)  "  
+#sym  AND( a b )      "a&\&b  "  
+#sym  MUL( a b )      "a*b    "  
+#sym  DIV( a b )      "a/(b)  "  
+#sym  POW( a b )      "(a)^(b)"  
+#sym  SHL( a b )      "a<<(b) "  
+#sym  SHR( a b )      "a>>(b) "  
+#sym  EQ( a b )       "a==b   "  
+#sym  NEQ( a b )      "a<>b   "  
+#sym  LTE( a b )      "a<=(b) "  
+#sym  LT( a b )       "a<(b)  "  
+#sym  GTE( a b )      "a>=(b) "  
+#sym  GT( a b )       "a>(b)  "  
+#sym  LOR( a b )      "a||b   "  
+#sym  LAND( a b )     "a&&b   "  
+#sym  AT( a b )       "a[B]   "  
+#sym  NEG( a )        "-a     "  
+#sym  INV( a )        "/a     "  
+#sym  LNOT( a )       "!a     "  
+#sym  NOT( a )        "~a     "  
+#sym  FACT( a )       "a!     "  
+#sym  VECT( a )       "{A}    "  
+
+//#sym  MUL(  a POW(10 b) ) "a$E(B) "
+//#sym  MUL(  a POW(10 b) ) "a$e(B) "
 
 // Uncomment rules below to enable power post-fixing
-// MUL( a 1e-12 )   " a@p";
-// MUL( a 1e-9  )   " a@n";
-// MUL( a 1e-6  )   " a@u";
-// MUL( a 1e-3  )   " a@m";
-// MUL( a 1e3   )   " a@k";
-// MUL( a 1e3   )   " a@K";
-// MUL( a 1e6   )   " a@M";
-// MUL( a 1e9   )   " a@G";
+// #sym MUL( a 1e-12 )   "a$p"
+// #sym MUL( a 1e-9  )   "a$n"
+// #sym MUL( a 1e-6  )   "a$u"
+// #sym MUL( a 1e-3  )   "a$m"
+// #sym MUL( a 1e3   )   "a$k"
+// #sym MUL( a 1e3   )   "a$K"
+// #sym MUL( a 1e6   )   "a$M"
+// #sym MUL( a 1e9   )   "a$G"
 
-IF2( (a:b) 0)          := b;
-IF2( (a:b) 1)          := a;
-IF ( (a:b) c)          := IF2( (a:b) BOOL(c) );
+IF2( (a:b) 0) := b;
+IF2( (a:b) 1) := a;
+IF ( (a:b) c) := IF2( (a:b) BOOL(c) );
 
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
@@ -130,6 +133,8 @@ POLY(LOG10(a),1)         := POLYF(LOG10 (SIMPLIFY(a)));
 POLY(VECT(a),1)          := POLYF(VECT  (SIMPLIFY(a)));
 POLY(FLOOR(a),1)         := POLYF(FLOOR (SIMPLIFY(a),SIMPLIFY(b)));
 POLY(ASSERT(a),1)        := POLYF(ASSERT(SIMPLIFY(a)));
+POLY(RECT(a),1)          := POLYF(RECT  (SIMPLIFY(a)));
+POLY(DER(a),1)           := POLYF(DER   (SIMPLIFY(a)));
 
 POLY(MOD(a b),1)         := POLYF(MOD   (SIMPLIFY(a) SIMPLIFY(b)));
 POLY(EQ(a b),1)          := POLYF(EQ    (SIMPLIFY(a) SIMPLIFY(b)));

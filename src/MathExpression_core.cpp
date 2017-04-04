@@ -102,7 +102,7 @@ void CMathExpression::PushBranch( const CMathExpression& equ, unsigned& pos )
   unsigned pos1 = pos;
   ASSERT( pos );
   equ.NextBranch( pos );
-  Append( &equ.m_StackArray[pos] , pos1 - pos );
+  Append( &equ.m_StackArray[pos], pos1 - pos );
 }
 
 void CMathExpression::NextBranch( unsigned& pos ) const
@@ -117,26 +117,9 @@ void CMathExpression::NextBranch( unsigned& pos ) const
   {
     op = Pop( pos );
     e = RefToElement( op );
-	ASSERT(e);
+    ASSERT( e );
     i += e->GetFunction()->GetParameterNb();
     i--;
-  }
-}
-
-void CMathExpression::Push( const CValue& v )
-{
-  if( v.IsNegative() )
-  {
-    CValue v1 = v;
-    v1.Negate();
-    CElement* e =  m_ElementDB->GetElement( v1 );
-    Push( e );
-    Push( CElementDataBase::OP_NEG );
-  }
-  else
-  {
-    CElement* e = m_ElementDB->GetElement( v );
-    Push( e );
   }
 }
 
@@ -155,18 +138,6 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
   OptimizeTree();
   RemoveZero();
 }
-/*
-void CMathExpression::BinaryOperation( OP_CODE op, const CElement* e1 )
-{
-  ASSERT( e1 );
-  ASSERT( RefToElement( op )->IsBinary() );
-
-  AddZero();
-  Push( e1 );
-  Push( op );
-  OptimizeTree();
-  RemoveZero();
-}*/
 
 void CMathExpression::UnaryOperation( OP_CODE op )
 {
@@ -199,7 +170,7 @@ void CMathExpression::RemoveZero()
   }
 }
 
-const CValue& CMathExpression::Evaluate() const
+void CMathExpression::Evaluate() const
 {
-  return m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
+  m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
 }

@@ -20,16 +20,16 @@
 #include "Debug.h"
 #include "Parser.h"
 #include "Display.h"
-#define eof(x)	((x)=='\0')
-#define eol(x)	((x)=='\n')
+#define eof(x)  ((x)=='\0')
+#define eol(x)  ((x)=='\n')
 
 const char CParser::m_CharTab[] =
 {
   /*                              \n       \r                                                      */
-  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
   /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 4, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0,
 
   /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 0, 0, 1,
@@ -58,7 +58,7 @@ CParser::~CParser()
 
 const CString& CParser::GetWord()
 {
-  int	i;
+  int i;
 
   SkipSpaceNL();
   i = 0;
@@ -73,6 +73,34 @@ const CString& CParser::GetWord()
 
   return m_Buffer;
 }
+/*
+unsigned CParser::GetFixPoint( unsigned& point_pos )
+{
+  unsigned v;
+  bool point_found = false;
+  point_pos = 0;
+  v = 0;
+
+  while( true )
+  {
+    if ( isdigit( *m_Pos ) )
+    {
+      v = ( *m_Pos++ - '0' ) + 10 * v;
+      if( point_found )
+      {
+        point_pos++;
+      }
+    }
+    else if ( *m_Pos == '.' )
+    {
+      point_found = true;
+      m_Pos++;
+    }
+    else { break; }
+  }
+
+  return v;
+}*/
 
 void CParser::Find( char c )
 {
@@ -116,9 +144,9 @@ void CParser::SkipSpaceNL()
     m_Pos++;
 #ifdef _DEBUG
     CDisplay ds;
-    ds.Add("Processing line ");
-    ds.Add(m_LineNb);
-    TRACE(ds.GetBufferPtr());
+    ds.Append( "Processing line " );
+    ds.Append( m_LineNb );
+    TRACE( ds.GetBufferPtr() );
 #endif
     SkipSpace();
   }
@@ -189,7 +217,7 @@ void CParser::SkipComment()
   }
 }
 
-bool CParser::TryMatchSymbol( const char *& symbol_str )
+bool CParser::TryMatchSymbol( const char*& symbol_str )
 {
   const char* s1 = symbol_str;
   const char* s2 = m_Pos;
@@ -206,14 +234,14 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
       s1++;
       s2++;
     }
-    else if( *s1 == CParser::m_OperatorExclude)
+    else if( *s1 == CParser::m_OperatorExclude )
     {
       s1++; //'\'
       if( *s2 == *s1 ) //Check for forbidden characters
       {
         return false;
       }
-      s1++;      
+      s1++;
     }
     else
     {
@@ -224,6 +252,36 @@ bool CParser::TryMatchSymbol( const char *& symbol_str )
   symbol_str = s1;
   m_Pos = s2;
   return true;
+}
+
+const CString& CParser::GetQuote()
+{
+  int i;
+  char c;
+
+  m_Buffer.Clear();
+
+  if ( TryFind( '"' ) )
+  {
+
+    i = 0;
+
+    do
+    {
+      c = m_Pos[i++];
+    }
+
+    while ( c && ( c != '"' ) );
+
+    m_Buffer.Copy( m_Pos, i - 1 );
+    m_Pos += i;
+  }
+  else
+  {
+    GetWord();
+  }
+
+  return m_Buffer;
 }
 
 void CParser::Error( unsigned id ) const
@@ -253,8 +311,8 @@ void CParser::Error( unsigned id ) const
 
 bool CParser::LoadFile( const CString& name )
 {
-  int		size;
-  FILE*	file;
+  int   size;
+  FILE* file;
 
   m_FileName = name;
   file = fopen( name.GetBufferPtr(), "r" );
@@ -265,7 +323,7 @@ bool CParser::LoadFile( const CString& name )
     size = ftell( file );
     fseek( file, 0, SEEK_SET );
     m_Text = new char[ size + 1 ];
-    size = fread( ( void* )m_Text, sizeof( char ) , size, file );
+    size = fread( ( void* )m_Text, sizeof( char ), size, file );
     fclose( file );
     m_Text[ size ] = '\0';
     SetPos( m_Text );

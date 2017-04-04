@@ -27,109 +27,107 @@ class CMathExpression;
 class CElement;
 struct CSymbolSyntaxStruct;
 
-typedef CVector< class CElement* >		            CElementArray;
-typedef CVector< struct CSymbolSyntaxStruct* >		CSymbolSyntaxArray;
+typedef CVector< class CElement* >             CElementArray;
+typedef CVector< struct CSymbolSyntaxStruct* > CSymbolSyntaxArray;
 
 struct SProperties
 {
-    const char*	    m_FunctionName;
-    unsigned        m_ParameterNb;
-    CEvaluatorFunct m_FunctionCall;
+  const char*     m_FunctionName;
+  unsigned        m_ParameterNb;
+  CEvaluatorFunct m_FunctionCall;
 };
 
 class CElementDataBase : public CElementArray
 {
-    
-  protected:
 
-    CString		              m_Name;
-    CElementDataBase*         m_Parent;
-    CEvaluator*               m_Evaluator;
-    static unsigned           m_SecureLimit;
-    static CElementArray      m_ElementRefArray;
-    static CSymbolSyntaxArray m_SymbolSyntaxArray;
-    static const SProperties  m_FunctionProperties[];
-    static const unsigned     m_FunctionPropertiesSize;
+protected:
 
-  public :
-    
-    enum PRIVATE_OPCODE {
-      OP_ZERO=0,
-      OP_EXP1,
-      OP_EXP2,
-      OP_EXP3,
-      OP_EXP4,
-      OP_EXP5,
-      OP_EXP6,
-      OP_EXP7,
-      OP_EXP8,  
-      OP_CONCAT,
-      OP_SET,
-      OP_GET,
-      OP_NONE,
-      OP_CONST,
-      OP_ELEM,
-      OP_NEG,
-      OP_CPLX,
-      OP_RANK,
-      OP_SUBST,
-      OP_SYST,
-      OP_ERROR,
-      OP_TED,
-      OP_END_RESERVED
-    };
+  CString                   m_Name;
+  CElementDataBase*         m_Parent;
+  CEvaluator*               m_Evaluator;
+  static unsigned           m_SecureLimit;
+  static CElementArray      m_ElementRefArray;
+  static CSymbolSyntaxArray m_SymbolSyntaxArray;
+  static const SProperties  m_FunctionProperties[];
+  static const unsigned     m_FunctionPropertiesSize;
 
-    enum { MAX_EXP = OP_EXP8-OP_EXP1+1 };
+public :
 
-  protected:
+  enum PRIVATE_OPCODE
+  {
+    OP_ZERO = 0,
+    OP_EXP1,
+    OP_EXP2,
+    OP_EXP3,
+    OP_EXP4,
+    OP_EXP5,
+    OP_EXP6,
+    OP_EXP7,
+    OP_EXP8,
+    OP_CONCAT,
+    OP_SET,
+    OP_GET,
+    OP_NONE,
+    OP_STACKERR,
+    OP_CONST,
+    OP_ELEM,
+    OP_NEG,
+    OP_CPLX,
+    OP_RANK,
+    OP_SUBST,
+    OP_SYST,
+    OP_ERROR,
+    OP_TED,
+    OP_END_RESERVED
+  };
 
-    unsigned      Register( CElement* e , unsigned index );
-    CElement *    CreateElement( const CString& string, unsigned pos );
-    virtual void  AddReservedElements();    
-    virtual void  AddReservedFunctions();
-    virtual void  AddAlgebraRuleTable( CParser& IC );
-    virtual void  AddEvalFunctionTable( const SProperties *property_table, unsigned size );
-    virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
-    void          InitAlgebraRuleTable();
-    void          SetValue( const CElement* e, const CValue& v );
-    void          SetConstValue( CElement* e, const CValue& v );
-    void          CleanTempElements();
-    static void   SetSecureLimit( unsigned i ) { m_SecureLimit=i; }
+  enum { MAX_EXP = OP_EXP8 - OP_EXP1 + 1 };
 
-  public:
+protected:
 
-    void			Clear();
-    const CString&  GetName() const { return m_Name; }
-    void            SetName( const CString& name ) { m_Name=name; }
-    void            Initialize();
-    CEvaluator*		GetEvaluator() const             { return m_Evaluator; }    
-    void            SetEvaluator( CEvaluator *eval ) { m_Evaluator = eval; }
-    CElement*       ParseElement( CParser& IC );
-    CElement* 		GetElement();
-    CElement* 		GetElement( const CValue& value );
-    CElement* 		GetElement( const CString& );
-    CElement* 		SearchElement( const CString&, unsigned& pos ) const;
-    void            AssociateSymbol(CParser& IC,  const CMathExpression& dst_equ );
-    
-    static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
-    static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
-    static OP_CODE    ElementToRef( const CElement* e );    
-    static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
-    static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
-    CElementDataBase* GetParent() const                  { return m_Parent;            }
+  unsigned      Register( CElement* e, unsigned index );
+  CElement*     CreateElement( const CString& string, unsigned pos );
+  virtual void  AddReservedElements();
+  virtual void  AddReservedFunctions();
+  virtual void  AddAlgebraRuleTable( CParser& IC );
+  virtual void  AddEvalFunctionTable( const SProperties* property_table, unsigned size );
+  virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
+  void          InitAlgebraRuleTable();
+  void          CleanTempElements();
+  static void   SetSecureLimit( unsigned i ) { m_SecureLimit = i; }
 
-#ifdef _DEBUG    
-        void Printf( const char* format, ... );
-        void Test();
-        void CheckPrintf( const char * format, ... );
-        void Check( const char*s1, const char *s2 );
-        void Check( const char* s1, const CValue& v1 );
-        void CheckCatch( const char* s1 );
-        void DisplayStats();
+public:
+
+  void            Clear();
+  const CString&  GetName() const                  { return m_Name; }
+  void            SetName( const CString& name )   { m_Name = name; }
+  void            Initialize();
+  CEvaluator*     GetEvaluator() const             { return m_Evaluator; }
+  void            SetEvaluator( CEvaluator* eval ) { m_Evaluator = eval; }
+  CElement*       ParseElement( CParser& IC );
+  CElement*       GetElement();
+  CElement*       GetElement( const CString& );
+  CElement*       SearchElement( const CString&, unsigned& pos ) const;
+  void            AssociateSymbol( CParser& IC );
+
+  static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
+  static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
+  static OP_CODE    ElementToRef( const CElement* e );
+  static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
+  static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
+  CElementDataBase* GetParent() const                  { return m_Parent;            }
+
+#ifdef _DEBUG
+  void Printf( const char* format, ... );
+  void Test();
+  void Check( const char* s1, const char* s2 );
+  void CheckEval( const char* s1, const CValue& v1 );
+  void CheckCatch( const char* s1 );
+  void DisplayStats();
 #endif
 
-	CElementDataBase(const CElementDataBase& db);
-    CElementDataBase( const CString& name = CString(), CElementDataBase *db=NULL, CEvaluator *eval=NULL, bool bInitialize=true);
-    virtual ~CElementDataBase();
+  CElementDataBase( const CElementDataBase& db ); // avoid simple copy
+  CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true );
+  virtual ~CElementDataBase();
 
 };

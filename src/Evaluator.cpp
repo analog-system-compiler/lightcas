@@ -16,9 +16,11 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#include "Evaluator.h"
 #include <cstdlib>
 #include <cmath>
+#include "Evaluator.h"
+#include "Debug.h"
+
 
 CEvaluator::CEvaluator(  )
 {
@@ -29,14 +31,24 @@ CEvaluator::~CEvaluator(  )
 {
 }
 
-CValue CEvaluator::GetValueFromString( const char** pos ) const
+const char* CEvaluator::GetValueFromString( const char* pos )
 {
-  CValue v;
-  *pos = v.GetFromString( *pos );
-  return v;
+  return m_Value.GetFromString( pos );
 }
 
-const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
+bool CEvaluator::Display( CString& s )
+{
+  bool minus = false;
+  if ( m_Value.IsNegative() )
+  {
+    m_Value.Negate();
+    minus = true;
+  }
+  m_Value.Display( s );
+  return minus;
+}
+
+void CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
   unsigned pos, index, n;
   CEvaluatorFunct funct_ptr;
@@ -44,29 +56,40 @@ const CValue& CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 
   AllocateStack( size );
 
-  for( pos = 0; pos < size; pos ++ )
+  for ( pos = 0; pos < size; pos++ )
   {
     index = *p++;
 
-    if( index < n )
+    if ( index < n )
     {
-        funct_ptr = m_FunctionArray.GetAt( index );
-    }
-	else
-		funct_ptr = NULL;
-
-    if( funct_ptr )
-    {
-        ( *funct_ptr ) ( *this );
+      funct_ptr = m_FunctionArray.GetAt( index );
     }
     else
     {
-        const CValue& v = GetElementValue( index );
-        Push( v.GetValue() );
+      funct_ptr = NULL;
+    }
+
+    if ( funct_ptr )
+    {
+      ( *funct_ptr ) ( *this );
+    }
+    else
+    {
+      const CValue& v = GetElementValue( index );
+      Push( v.GetValue() );
     }
   }
 
-  return GetValue();
+  if ( m_ValPos == 0 )
+  {
+    ASSERT( size == 0 );
+    m_Value = 0.;
+  }
+  else
+  {
+    m_Value = Pop();
+  }
+  ASSERT( m_ValPos == 0 );
 }
 
 void CEvaluator::AllocateStack( unsigned size )
@@ -75,10 +98,22 @@ void CEvaluator::AllocateStack( unsigned size )
   m_ValueStack.SetSize( size );
 }
 
-void CEvaluator::SetElementValue( unsigned index, const CValue& v )
+void CEvaluator::DeclareElement( unsigned index )
 {
   m_ElementValueArray.CheckSize( index );
-  m_ElementValueArray.SetAt( index, v );
+  m_ElementValueArray.SetAt( index, CValue( 0 ) );
+  SetFunction( index, NULL );
+}
+
+void CEvaluator::SetElementValue( unsigned index, const CValue& val )
+{
+  m_ElementValueArray.CheckSize( index );
+  m_ElementValueArray.SetAt( index, val );
+}
+
+void CEvaluator::SetElementValue( unsigned index )
+{
+  SetElementValue( index, m_Value );
 }
 
 const CValue& CEvaluator::GetElementValue( unsigned index ) const
@@ -95,17 +130,6 @@ void CEvaluator::SetFunction( unsigned index, const CEvaluatorFunct funct )
 
 const CValue& CEvaluator::GetValue()
 {
-
-  if( m_ValPos == 0 )
-  {
-    m_Value = 0.;
-  }
-  else
-  {
-    m_Value = Pop();
-  }
-
-  ASSERT(m_ValPos==0);
   return m_Value;
 }
 
@@ -114,8 +138,8 @@ void CEvaluator::GetMantAndExp( double v1, double v2, int& m1, int& m2, int& n )
   int n1, n2;
   double x1, x2;
 
-  x1 = frexp(  v1 , &n1 );
-  x2 = frexp(  v2 , &n2 );
+  x1 = frexp(  v1, &n1 );
+  x2 = frexp(  v2, &n2 );
 
   if( n2 > n1 )
   {
@@ -399,7 +423,7 @@ void CEvaluator::Pow( CEvaluator& eval )
 {
   double v2 = eval.Pop();
   double v1 = eval.Pop();
-  eval.Push( pow(  v1  ,  v2  ) );
+  eval.Push( pow(  v1,  v2  ) );
 }
 
 void CEvaluator::Par( CEvaluator& eval )
@@ -413,7 +437,7 @@ void CEvaluator::Mod( CEvaluator& eval )
 {
   double v2 = eval.Pop();
   double v1 = eval.Pop();
-  eval.Push( fmod(  v1 ,  v2   ) );
+  eval.Push( fmod(  v1,  v2   ) );
 }
 
 void CEvaluator::And( CEvaluator& eval )
@@ -448,30 +472,31 @@ void CEvaluator::Xor( CEvaluator& eval )
 
 void CEvaluator::ShiftRight( CEvaluator& eval )
 {
-  int		n;
-  double	x;
+  int   n;
+  double  x;
   double v2 = eval.Pop();
   double v1 = eval.Pop();
-  x = frexp(  v1 , &n );
+  x = frexp(  v1, &n );
   n -= ( int ) v2 ;
   eval.Push( ldexp( x, n ) );
 }
 
 void CEvaluator::ShiftLeft( CEvaluator& eval )
 {
-  int		n;
-  double	x;
+  int   n;
+  double  x;
   double v2 = eval.Pop();
   double v1 = eval.Pop();
-  x = frexp(  v1 , &n );
+  x = frexp(  v1, &n );
   n += ( int ) v2;
   eval.Push( ldexp( x, n ) );
 }
 
 void CEvaluator::If( CEvaluator& eval )
 {
-  double v1 = eval.Pop(); eval.Pop(); //CONCAT
-  double v2 = eval.Pop(); 
+  double v1 = eval.Pop();
+  eval.Pop(); //CONCAT
+  double v2 = eval.Pop();
   double v3 = eval.Pop();
   if( v1 != 0 )
   {

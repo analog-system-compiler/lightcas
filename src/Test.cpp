@@ -33,12 +33,12 @@
 
 void CElementDataBase::Printf( const char* format, ... )
 {
-    static char buffer[2048];
-    va_list args;
-    va_start ( args, format );
-    vsnprintf ( buffer, sizeof(buffer), format, args );
-    PUTS(buffer);
-    va_end ( args );
+  static char buffer[2048];
+  va_list args;
+  va_start ( args, format );
+  vsnprintf ( buffer, sizeof( buffer ), format, args );
+  PUTS( buffer );
+  va_end ( args );
 }
 
 void CElementDataBase::Check( const char* s1, const char* s2 )
@@ -68,12 +68,13 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   Printf( "OK: %s => %s", s1, s2 );
 }
 
-void CElementDataBase::Check( const char* s1, const CValue& v1 )
+void CElementDataBase::CheckEval( const char* s1, const CValue& v1 )
 {
   CDisplay ds;
   CMathExpression equ( this );
   equ.GetFromString( s1 );
-  CValue v2 = equ.Evaluate();
+  equ.Evaluate();
+  const CValue& v2 = GetEvaluator()->GetValue();
   if( v2.GetValue() != v1.GetValue() )
   {
     ASSERT( false );
@@ -133,18 +134,22 @@ void CElementDataBase::Test()
   //CheckCatch( "a b" );
   //CheckCatch( "a.b" );
   /***** Some basic tests *****/
-  Check( "a-(b-c)", "a-(b-c)");
-  Check("a^(b^c)", "a^(b^c)");
-  Check("a/(b/c)", "a/(b/c)");
-  Check("(a^b)^c", "(a^b)^c");
+  Check( "10.500e-2", "0.105" );
+  Check( "0.5E4", "5000" );
+  Check( "0xAA", "170" );
+  Check( "0b1010", "10" );
+  Check( "a-(b-c)", "a-(b-c)" );
+  Check( "a^(b^c)", "a^(b^c)" );
+  Check( "a/(b/c)", "a/(b/c)" );
+  Check( "(a^b)^c", "(a^b)^c" );
   Check( "SIMPLIFY(0)", "0" );
   Check( "SIMPLIFY(1)", "1" );
   Check( "SIMPLIFY(-1)", "-1" );
   Check( "SIMPLIFY(-0)", "0" );
   Check( "SIMPLIFY(--2)", "2" );
   Check( "SIMPLIFY(2--2)", "4" );
-  Check( "SIMPLIFY(-4-8)", "-12");
-  Check( "SIMPLIFY(3!)", "6");
+  Check( "SIMPLIFY(-4-8)", "-12" );
+  Check( "SIMPLIFY(3!)", "6" );
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
   Check( "SIMPLIFY(a-a)", "0" );
   Check( "SIMPLIFY(a+a)", "2*a" );
@@ -175,7 +180,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "1.33333333333/c" ); //"4/(3*c)" );
   Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "1.33333333333/a" ); //"4/(3*a)" );
   Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(c*b*a)" ); //"1+1/(a*b*c)" );
-  Check( "SIMPLIFY(b/a+b/a)", "(2*b)/a");
+  Check( "SIMPLIFY(b/a+b/a)", "(2*b)/a" );
   Check( "SIMPLIFY(b/a-b/a)", "0" );
   Check( "SIMPLIFY(b*1/a)", "b/a" );
   Check( "SIMPLIFY(x^(2+2))", "x^4" );
@@ -186,8 +191,8 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(1/(a+1)-1/(a+1))", "0" );
   Check( "SIMPLIFY(1/(1/(a+1))-a-1)", "0" );
   Check( "SIMPLIFY(1/(2*1/(2*a+2))-a-1)", "0" );
-  Check( "SIMPLIFY(a*(a^b))","a^(1+b)");
-  Check( "SIMPLIFY(x^(a*b)/x^(a*b))","1" );
+  Check( "SIMPLIFY(a*(a^b))", "a^(1+b)" );
+  Check( "SIMPLIFY(x^(a*b)/x^(a*b))", "1" );
   Check( "SIMPLIFY(x^(a-a))", "1" );
   Check( "SIMPLIFY(x^a)", "x^a" );
   Check( "SIMPLIFY(x^(a+a))", "x^(2*a)" );
@@ -196,8 +201,8 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((x^a)^2)", "x^(2*a)" );
   Check( "SIMPLIFY(x^2.5)", "x^2.5" );
   Check( "SIMPLIFY((x+a)^2.5)", "(x+a)^2.5" );
-  Check( "SIMPLIFY(2*x^a-2*x^a)","0");
-  Check( "SIMPLIFY(x^(1+a)*x^(1-a))","x^2");
+  Check( "SIMPLIFY(2*x^a-2*x^a)", "0" );
+  Check( "SIMPLIFY(x^(1+a)*x^(1-a))", "x^2" );
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
   Check( "SIMPLIFY(a*cos(b))", "cos(b)*a" );
@@ -250,8 +255,8 @@ void CElementDataBase::Test()
   Check( "{0,1,2}+{1,2,3}", "{1,3,5}" );
   Check( "{0,1,-1}-{0,1,-1}", "{0,0,0}" );
   Check( "{{0,1},{2,3}}+{{4,5},{6,7}}", "{{4,6},{8,10}}" );
-  Check( "5*{a,b,c}", "{5*a,5*b,5*c}");
-  Check( "{a,b,c}*5", "{a*5,b*5,c*5}");
+  Check( "5*{a,b,c}", "{5*a,5*b,5*c}" );
+  Check( "{a,b,c}*5", "{a*5,b*5,c*5}" );
   Check( "SIMPLIFY({-2,2})", "{-2,2}" );
 
   /****** trinary *********/
@@ -293,22 +298,22 @@ void CElementDataBase::Test()
   Check( "SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})", "{x-1,y-1,z-1}" );
   Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})",    "{1,1,1}" );
   Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})",    "{2,1,1}" );
-  Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
-
+  //Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
+  Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)*i)}" );
   /***** determinant ******/
   //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
-  Check("VECT_REVERSE({ x,y,z,t})", "{t,z,y,x}");
-  Check("VECT_REVERSE1( (a,b,c), (x,y,z,t))", "x,y,z,t,c,b,a");
-  Check("VECT_REVERSE1( (a,b,c), x)",   "x,c,b,a");
-  Check("VECT_REVERSE1( a, (x,y,z,t))", "x,y,z,t,a");
-  Check("DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16");
-  Check("DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
-  Check("DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4");
-  Check("DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})", "32");
-  Check("DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})", "32");
-  Check("DET({ x+y+z+t, y+z+t, z+t, t}, {x,y,z,t})", "1");
-  Check("DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "0");
-  Check("DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "-C1_I");
+  Check( "VECT_REVERSE({ x,y,z,t})", "{t,z,y,x}" );
+  Check( "VECT_REVERSE1( (a,b,c), (x,y,z,t))", "x,y,z,t,c,b,a" );
+  Check( "VECT_REVERSE1( (a,b,c), x)",   "x,c,b,a" );
+  Check( "VECT_REVERSE1( a, (x,y,z,t))", "x,y,z,t,a" );
+  Check( "DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16" );
+  Check( "DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4" );
+  Check( "DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4" );
+  Check( "DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})", "32" );
+  Check( "DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})", "32" );
+  Check( "DET({ x+y+z+t, y+z+t, z+t, t}, {x,y,z,t})", "1" );
+  Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "0" );
+  Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "-C1_I" );
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );
@@ -326,13 +331,16 @@ void CElementDataBase::Test()
 
   /****** evaluator ******/
   Initialize();
-  SetValue( GetElement( "a" ), CValue( 4 ) );
-  SetValue( GetElement( "b" ), CValue( 8 ) );
-  SetValue( GetElement( "c" ), CValue( 9 ) );
+  GetEvaluator()->GetValueFromString( "4" );
+  GetEvaluator()->SetElementValue( GetElement( "a" )->ToRef() );
+  GetEvaluator()->GetValueFromString( "8" );
+  GetEvaluator()->SetElementValue( GetElement( "b" )->ToRef() );
+  GetEvaluator()->GetValueFromString( "9" );
+  GetEvaluator()->SetElementValue( GetElement( "c" )->ToRef() );
 
-  Check( "a+b-c+2", CValue( 5 ) );
-  Check( "a>b?2:3", CValue( 3 ) );
-  Check( "a<b?a:b", CValue( 4 ) );
+  CheckEval( "a+b-c+2", CValue( 5 ) );
+  CheckEval( "a>b?2:3", CValue( 3 ) );
+  CheckEval( "a<b?a:b", CValue( 4 ) );
 
   DisplayStats();
 

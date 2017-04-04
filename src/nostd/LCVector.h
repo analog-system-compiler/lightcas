@@ -16,7 +16,7 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#ifndef	_VECTOR_H_
+#ifndef _VECTOR_H_
 #define _VECTOR_H_
 
 #include <cstdlib>
@@ -25,26 +25,25 @@ template < class T > class CVector
 {
 
 private:
-  unsigned	m_Size;
-  T*		m_Data;
+  unsigned  m_Size;
+  T*    m_Data;
 
 public:
-  void	SetSize( unsigned size );
-  void	InsertAt( unsigned index, const T e );
-  void	InsertAt( unsigned index, const CVector& v  );
-  void	RemoveAt( unsigned start, unsigned count = 1 );
-  void	Append( const T* data_ptr, unsigned size );
-  void	Append( const T e )                          {    InsertAt( m_Size , e );  }
-  void	RemoveAll()                                  {    m_Size = 0;  }
-  void	DeleteAll()                                  {    for( unsigned i = 0; i < GetSize(); i++ )    { delete m_Data[i];    }    RemoveAll();  }
-  void	Copy( const CVector& v )                     {    m_Size = 0;    Append( v );  }
-  T&	GetAt( unsigned index ) const                {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    return m_Data[ index ];  }
-  void	SetAt( unsigned index, const T e )           {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    m_Data[ index ] = static_cast<T>( e );  }
-  T*	GetData() const                              {    ASSERT( m_Data != NULL );    return m_Data;  }
-  unsigned	GetSize() const                          {    return m_Size;  }
-  void  CheckSize( unsigned index )                  {    if( index >= GetSize() ) SetSize( index+1 ); }
-
-  T&	operator[] ( unsigned index ) const          {    return GetAt( index ); } 
+  void  SetSize( unsigned size );
+  void  InsertAt( unsigned index, const T e );
+  void  InsertAt( unsigned index, const CVector& v  );
+  void  RemoveAt( unsigned start, unsigned count = 1 );
+  void  Append( const T* data_ptr, unsigned size );
+  void  Append( const T e )                          {    InsertAt( m_Size, e );  }
+  void  RemoveAll()                                  {    m_Size = 0;  }
+  void  DeleteAll()                                  {    for( unsigned i = 0; i < GetSize(); i++ )    { delete m_Data[i];    }    RemoveAll();  }
+  void  Copy( const CVector& v )                     {    m_Size = 0;    Append( v );  }
+  T&  GetAt( unsigned index ) const                {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    return m_Data[ index ];  }
+  void  SetAt( unsigned index, const T e )           {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    m_Data[ index ] = static_cast<T>( e );  }
+  T*  GetData() const                              {    ASSERT( m_Data != NULL );    return m_Data;  }
+  unsigned  GetSize() const                          {    return m_Size;  }
+  void  CheckSize( unsigned index )                  {    if( index >= GetSize() ) SetSize( index + 1 ); }
+  T&  operator[] ( unsigned index ) const          {    return GetAt( index ); }
 
 public:
   CVector()
@@ -52,22 +51,24 @@ public:
     m_Data = NULL;
     m_Size = 0;
   }
-  /*CVector( const CVector& v )
+  CVector( const CVector& v )
   {
     m_Data = NULL;
     Copy( v );
-  }*/
+  }
   virtual ~CVector()
   {
-    if( m_Data ) free( ( void* )m_Data );
+    if( m_Data ) { free( ( void* )m_Data ); }
   }
 
 };
 
 template < class T > void CVector< T >::SetSize( unsigned size )
 {
-  if( size ) 
-	m_Data = static_cast<T*>( realloc( m_Data, size * sizeof( T ) ) );
+  if( size )
+  {
+    m_Data = static_cast<T*>( realloc( m_Data, size * sizeof( T ) ) );
+  }
   else
   {
     free( m_Data );
@@ -108,21 +109,5 @@ template < class T > void CVector< T >::Append( const T* data_ptr, unsigned size
   SetSize( m_Size + size );
   memcpy( &( m_Data[old_size] ), data_ptr, size * sizeof( T ) );
 }
-/*
-template < class T > void CVector< T >::SetValue( const T e )
-{
-  for( unsigned i = 0; i < m_Size; i++ )
-    m_Data[ i ] = e;
-}*/
-/*
-template < class T > unsigned CVector< T >::GetIndexOf( const T e ) const
-{
-  unsigned i;
-
-  for( i = 0; i < m_Size; i++ )
-    if( e == m_Data[ i ] ) break;
-
-  return i;
-}*/
 
 #endif

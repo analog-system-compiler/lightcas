@@ -26,94 +26,61 @@ void Help();
 
 class CDisplayEx : public CDisplay
 {
-  public:
-    unsigned m_DisplayBase;
+public:
+  unsigned m_DisplayBase;
 
 #ifndef _WIN32
 #define COLOR_CYAN "\e[35m"
 #define COLOR_BLUE "\e[36m"
 #define COLOR_OFF  "\e[0m"
-    void Add( const CString& str )
-    {
-      *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
-    }
-    void AddValue( const CString& str )
-    {
-      *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
-    }
+  void Add( const CString& str )
+  {
+    *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
+  }
+  void AddValue( const CString& str )
+  {
+    *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
+  }
 #else
-    void AddValue( const CString& str )
-    {
-      *this += ConValue( str );
-    }
+  void AddValue( const CString& str )
+  {
+    *this += ConValue( str );
+  }
 #endif
-    CString ConValue( const CString& str )
+  CString ConValue( const CString& str )
+  {
+    CString s;
+    if( str == "1.#INF" )
     {
-      CString s;
-      if( str == "1.#INF" )
+      s = "INF";
+    }
+    else
+    {
+      double v = strtod( str.GetBufferPtr(), NULL );
+      if( isdigit( str[0] ) && ( v == floor( v ) ) ) // if integer
       {
-        s = "INF";
-      }
-      else
-      {
-        double v = strtod( str.GetBufferPtr(), NULL );
-        if( isdigit( str[0] ) && ( v == floor( v ) ) ) // if integer
+        if ( m_DisplayBase == 2 )
         {
-          if ( m_DisplayBase == 2 )
-          {
-            s = "#";
-          }
-          else if ( m_DisplayBase == 16 )
-          {
-            s = "$";
-          }
-          s += CString( ( int )v, m_DisplayBase );
+          s = "0b";
         }
-        else // else display as is
+        else if ( m_DisplayBase == 16 )
         {
-          s = str;
+          s = "0x";
         }
+        s += CString( ( int )v, m_DisplayBase );
       }
-      return s;
-    }
-
-    CDisplayEx(): CDisplay()
-    {
-      m_DisplayBase = 10;
-    }
-};
-
-class CValueEx : public CValue
-{
-  public:
-    const char* GetFromString( const char* s1 )
-    {
-      char* s2;
-      if( *s1 == '#' )
+      else // else display as is
       {
-        m_Value = strtol( s1 + 1, &s2, 2 );
+        s = str;
       }
-      else if( *s1 == '$' )
-      {
-        m_Value = strtol( s1 + 1, &s2, 16 );
-      }
-      else
-      {
-        m_Value = strtod( s1, &s2 );
-      }
-      return s2;
     }
-};
+    return s;
+  }
 
-class CEvaluatorEx : public CEvaluator
-{
-  public:
-    CValue GetValueFromString( const char** pos ) const
-    {
-      CValueEx v;
-      *pos = v.GetFromString( *pos );
-      return v;
-    }
+  CDisplayEx(): CDisplay()
+  {
+    m_DisplayBase = 10;
+  }
 };
 
 int main()
@@ -122,12 +89,12 @@ int main()
   setlocale( LC_NUMERIC, "C" );
   std::cout << "*************************************\n";
   std::cout << "*** LighCAS Console (" __DATE__ ") ***\n";
-  std::cout << "*** © Cyril Collineau 2016        ***\n";
+  std::cout << "*** © Cyril Collineau 2017        ***\n";
   std::cout << "*************************************\n";
   std::cout << "Type \"help\" for help.\n";
 
   CDisplayEx ds;
-  CEvaluatorEx eval;
+  CEvaluator eval;
   CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
 

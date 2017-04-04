@@ -20,27 +20,27 @@
 
 #include <cstdlib>
 #include <cmath>
-#include "Debug.h"
-#include "Display.h"
+#include "LCString.h"
 
-class CValue 
+class CValue
 {
+
 protected:
-    double m_Value;
+  double m_Value;
+
 public:
-    //bool   operator <  ( const CValue& v ) const { return ( m_Value < v.m_Value );  }
-    //bool   operator >  ( const CValue& v ) const { return ( m_Value > v.m_Value );  }
-    //bool   operator == ( const CValue& v ) const { return ( m_Value == v.m_Value ); }
-    void   operator =  ( const CValue& v )       { m_Value = v.m_Value; }
-    void   operator =  ( double v )              { m_Value = v;}
-    void   SetValue( double v )                  { m_Value = v;}
-    double GetValue( )   const                   { return m_Value;    }
-    bool   IsNegative()  const                   { return m_Value<0.; }
-    //bool   IsInt()       const                   { return floor(m_Value) == m_Value; }
-    virtual const char *  GetFromString( const char *s1 );
-    virtual void   Display( CDisplay& s ) const;
-    void   Negate() { m_Value = -m_Value; }
-    
-    CValue( double v=0. ) { m_Value=v;  }    
-    virtual ~CValue() {};
+  //bool   operator <  ( const CValue& v ) const { return ( m_Value < v.m_Value );  }
+  //bool   operator >  ( const CValue& v ) const { return ( m_Value > v.m_Value );  }
+  //bool   operator == ( const CValue& v ) const { return ( m_Value == v.m_Value ); }
+  void   operator =  ( const CValue& v )       { m_Value = v.m_Value; }
+  void   operator =  ( double v )              { m_Value = v;}
+  void   SetValue( double v )                  { m_Value = v;}
+  double GetValue( )   const                   { return m_Value;    }
+  bool   IsNegative()  const                   { return m_Value < 0.; }
+  void   Negate()                              { m_Value = -m_Value; }
+  virtual const char*   GetFromString( const char* s1 );
+  virtual void   Display( CString& s ) const;
+
+  CValue( double v = 0. ) { m_Value = v;  }
+  virtual ~CValue() {};
 };

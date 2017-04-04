@@ -33,8 +33,8 @@ CElement::~CElement()
 {
 #ifdef _DEBUG
   CDisplay ds;
-  ds.Add( "Unregistering : " );
-  ds.Add( m_Name );
+  ds.Append( "Unregistering : " );
+  ds.Append( m_Name );
   TRACE( ds.GetBufferPtr() );
 #endif
   CElementDataBase::UnRef( ToRef() );
@@ -55,16 +55,16 @@ void CElement::Display( CDisplay& ds ) const
 
   if( IsConst() )
   {
-      ASSERT(m_Name.GetLength());
-      ds.AddValue( m_Name );
+    ASSERT( m_Name.GetLength() );
+    ds.Append( m_Name );
   }
   else if( m_PseudoName.GetLength() )
   {
-    ds.Add( m_PseudoName );
+    ds.Append( m_PseudoName );
   }
   else
   {
-    ds.Add( m_Name );
+    ds.Append( m_Name );
   }
 }
 
