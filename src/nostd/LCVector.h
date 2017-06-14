@@ -29,21 +29,21 @@ private:
   T*    m_Data;
 
 public:
-  void  SetSize( unsigned size );
-  void  InsertAt( unsigned index, const T e );
-  void  InsertAt( unsigned index, const CVector& v  );
-  void  RemoveAt( unsigned start, unsigned count = 1 );
-  void  Append( const T* data_ptr, unsigned size );
-  void  Append( const T e )                          {    InsertAt( m_Size, e );  }
-  void  RemoveAll()                                  {    m_Size = 0;  }
-  void  DeleteAll()                                  {    for( unsigned i = 0; i < GetSize(); i++ )    { delete m_Data[i];    }    RemoveAll();  }
-  void  Copy( const CVector& v )                     {    m_Size = 0;    Append( v );  }
-  T&  GetAt( unsigned index ) const                {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    return m_Data[ index ];  }
-  void  SetAt( unsigned index, const T e )           {    ASSERT( index < m_Size );    ASSERT( m_Data != NULL );    m_Data[ index ] = static_cast<T>( e );  }
-  T*  GetData() const                              {    ASSERT( m_Data != NULL );    return m_Data;  }
-  unsigned  GetSize() const                          {    return m_Size;  }
-  void  CheckSize( unsigned index )                  {    if( index >= GetSize() ) SetSize( index + 1 ); }
-  T&  operator[] ( unsigned index ) const          {    return GetAt( index ); }
+  void      SetSize( unsigned size );
+  void      InsertAt( unsigned index, const T e );
+  void      InsertAt( unsigned index, const CVector& v  );
+  void      RemoveAt( unsigned start, unsigned count = 1 );
+  void      Append( const CVector& v )           {  InsertAt( m_Size, v );  }
+  void      Append( const T e )                  {  InsertAt( m_Size, e );  }
+  void      RemoveAll()                          {  m_Size = 0;  }
+  void      DeleteAll()                          {  for( unsigned i = 0; i < GetSize(); i++ )    { delete m_Data[i];    }    RemoveAll();  }
+  void      Copy( const CVector& v )               { RemoveAll(); Append( v ); }
+  T&        GetAt( unsigned index ) const        {  ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); return m_Data[ index ];  }
+  void      SetAt( unsigned index, const T e )   {  ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); m_Data[ index ] = static_cast<T>( e );  }
+  T*        GetData() const                      {  ASSERT( m_Data != NULL ); return m_Data;  }
+  unsigned  GetSize() const                      {  return m_Size;  }
+  void     CheckSize( unsigned index )           {  if( index >= GetSize() ) SetSize( index + 1 ); }
+  T&       operator[] ( unsigned index ) const   {  return GetAt( index ); }
 
 public:
   CVector()
@@ -86,7 +86,7 @@ template < class T > void CVector< T >::InsertAt( unsigned index, const T e )
   m_Data[ index ] = static_cast<T>( e );
 }
 
-template < class T > void CVector< T >::InsertAt( unsigned index, const CVector& v )
+template < class T > void CVector< T >::InsertAt( unsigned index, const CVector< T >& v )
 {
   ASSERT( index <= m_Size );
   unsigned old_size = m_Size;
@@ -101,13 +101,6 @@ template < class T > void CVector< T >::RemoveAt( unsigned start, unsigned count
   ASSERT( ( int )( m_Size - start - count ) >= 0 );
   memmove( &( m_Data[start] ), &( m_Data[start + count] ), ( m_Size - start - count ) * sizeof( T ) );
   m_Size -= count;
-}
-
-template < class T > void CVector< T >::Append( const T* data_ptr, unsigned size )
-{
-  unsigned old_size = m_Size;
-  SetSize( m_Size + size );
-  memcpy( &( m_Data[old_size] ), data_ptr, size * sizeof( T ) );
 }
 
 #endif
