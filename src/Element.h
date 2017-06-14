@@ -66,12 +66,12 @@ public:
   void SetConst()                           { m_Type = ELEM_CONST;             }
   void SetOperandNb( unsigned operand_nb )  { SetFunct(); ASSERT( m_Function.GetParameterNb() == 0 || m_Function.GetParameterNb() == operand_nb ); m_Function.SetParameterNb( operand_nb ); }
   void SetNumeric()                         { m_Numeric = true;                }
-  void SetGlobal( bool global )             { m_Global = global;                 }
-  void SetTemporary( bool bAux = true )     { m_bAux = bAux;                     }
+  void SetGlobal( bool global )             { m_Global = global;               }
+  void SetTemporary( bool bAux = true )     { m_bAux = bAux;                   }
   void SetRef( OP_CODE op )                 { m_Ref = op;                      }
-  bool IsVar()     const                    { return ( m_Type == ELEM_VAR );    }
-  bool IsConst()   const                    { return ( m_Type == ELEM_CONST );  }
-  bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT );  }
+  bool IsVar()     const                    { return ( m_Type == ELEM_VAR );   }
+  bool IsConst()   const                    { return ( m_Type == ELEM_CONST ); }
+  bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
   bool IsNumeric() const                    { return m_Numeric;                }
   bool IsAux()     const                    { return m_bAux;                   }
   bool IsLocked()  const                    { return m_bLock;                  }

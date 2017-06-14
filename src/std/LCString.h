@@ -28,34 +28,34 @@
 
 class CString: public std::string
 {
-  public:
-    const char * GetBufferPtr() const                { return c_str(); }
-    unsigned GetLength() const                       { return length(); }
-    void Copy( const CString& s )                    { assign( s ); }
-    void Copy( const char * pText, unsigned length ) { assign(pText,length); }
-    void Clear()                                     { clear(); }
-    void Prepend( const CString& s )                 { insert( 0, s ); }
-    void Append( const CString& s )                  { append( s ); }
-    void Append( char c )                            { push_back( c ); }
-    void SetLength( size_t n )                       { resize( n ); }
-    int  Compare(  const CString& s ) const          { return compare(s); }
-    size_t Search( char c ) const                    { return find(c); }    
-    //operator const char * () const                   { return GetBufferPtr();  }
-    bool IsEmpty() const                             { return empty(); }
-    char At( unsigned n ) const                      { return at(n); }
-    void ToLower()                                   { std::for_each(begin(),end(),::tolower); }
-    void Set( int i, unsigned base=10 ) 
+public:
+  const char* GetBufferPtr() const                 { return c_str(); }
+  unsigned GetLength() const                       { return length(); }
+  void Copy( const CString& s )                    { assign( s ); }
+  void Copy( const char* pText, unsigned length )  { assign( pText, length ); }
+  void Clear()                                     { clear(); }
+  void Prepend( const CString& s )                 { insert( 0, s ); }
+  void Append( const CString& s )                  { append( s ); }
+  void Append( char c )                            { push_back( c ); }
+  void SetLength( size_t n )                       { resize( n ); }
+  int  Compare(  const CString& s ) const          { return compare( s ); }
+  size_t Search( char c ) const                    { return find( c ); }
+  //operator const char * () const                   { return GetBufferPtr();  }
+  bool IsEmpty() const                             { return empty(); }
+  char At( unsigned n ) const                      { return at( n ); }
+  void ToLower()                                   { std::for_each( begin(), end(), ::tolower ); }
+  void Set( int i, unsigned base = 10 )
 #ifdef _WIN32
-        { char buffer[32];  _itoa_s( i, buffer, base ); Copy(buffer); }
+  { char buffer[32];  _itoa_s( i, buffer, base ); Copy( buffer ); }
 #else
-        { char buffer[32];  snprintf( buffer, sizeof(buffer), (base==16?"%x":(base==10?"%d":"%o")), i ); Copy(buffer); }
+  { char buffer[32];  snprintf( buffer, sizeof( buffer ), ( base == 16 ? "%x" : ( base == 10 ? "%d" : "%o" ) ), i ); Copy( buffer ); }
 #endif
-    
-    //Constructors
-    CString(const char*s):std::string(s)             {}
-    CString(const std::string &s):std::string(s)     {} //implicit
-    CString():std::string()                          {}
-    CString(int i, unsigned base=10)    { Set(i,base); }
+
+  //Constructors
+  CString( const char* s ): std::string( s )             {}
+  CString( const std::string& s ): std::string( s )     {} //implicit
+  CString(): std::string()                          {}
+  CString( int i, unsigned base = 10 )    { Set( i, base ); }
 
 };
 
