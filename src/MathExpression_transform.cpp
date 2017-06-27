@@ -52,15 +52,14 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   }
 }
 
-void CMathExpression::Replace( OP_CODE op1, OP_CODE op2 )
+void CMathExpression::Replace( OP_CODE op1, OP_CODE op2, unsigned pos )
 {
-  unsigned	pos;
-
-  for( pos = 0; pos < m_StackSize; pos++ )
+  while( pos < m_StackSize )
   {
     if( Get( pos ) == op1  )
     {
       Set( pos, op2 );
     }
+    pos++;
   }
 }

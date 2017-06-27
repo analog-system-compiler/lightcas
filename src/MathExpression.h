@@ -26,7 +26,7 @@
 #include "ElementDataBase.h"
 
 #define MAX_STACK_SIZE     (1<<20)
-#define OPTIMIZATION_LEVEL  2
+#define OPTIMIZATION_LEVEL 0//2
 
 class CAlgebraRule;
 
@@ -71,7 +71,7 @@ protected:
   bool     OptimizeTree2();
   void     OptimizeTree3();
 
-  void     Replace( OP_CODE op1, OP_CODE op2 );
+  void     Replace( OP_CODE op1, OP_CODE op2, unsigned pos = 0 );
   void     ApplyRuleWrapper( unsigned pos, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
   void     ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
   unsigned Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;

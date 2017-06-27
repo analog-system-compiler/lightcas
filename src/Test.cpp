@@ -205,7 +205,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(x^(1+a)*x^(1-a))", "x^2" );
   Check( "SIMPLIFY((a-a+1)>(a-a))", "1" );
   Check( "SIMPLIFY({a+a,b+4*b,c-d})", "{2*a,5*b,c-d}" );
-  Check( "SIMPLIFY(a*cos(b))", "cos(b)*a" );
+  Check( "SIMPLIFY(COS(b-b))", "1" );
   Check( "SIMPLIFY((a*1000*1000)/(b*1000*1000))", "a/b" );
 
   /****** complex *********/
@@ -225,7 +225,7 @@ void CElementDataBase::Test()
   //FAIL!!Check( "SIN(PI)", "0" );
   //FAIL!!Check( "COS(PI/2)", "0" );
   Check( "SQRT(-25)", "5*j" );
-  Check( "SIMPLIFY(SQRT(-25)^2+25)", "0" );
+  Check( "SIMPLIFY(SIMPLIFY(SQRT(-25)^2+25))", "0" );
 
   Check( "SIMPLIFY(RE(4+j))", "4" );
   Check( "SIMPLIFY(-IM(1-5*j))", "5" );
@@ -283,7 +283,7 @@ void CElementDataBase::Test()
   GetElement( "y" )->SetEquation( equ0 );
   equ0.GetFromString( "a-b" );
   GetElement( "z" )->SetEquation( equ0 );
-  Check( "SIMPLIFY(y-z)", "2*b" );
+  Check( "SIMPLIFY(SIMPLIFY(y-z))", "2*b" );
 
   /********** solve **********/
   Initialize();
@@ -302,16 +302,16 @@ void CElementDataBase::Test()
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)*i)}" );
   /***** determinant ******/
   //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
-  Check( "VECT_REVERSE({ x,y,z,t})", "{t,z,y,x}" );
-  Check( "VECT_REVERSE1( (a,b,c), (x,y,z,t))", "x,y,z,t,c,b,a" );
+  Check( "VECT_REVERSE({ x,y,z,w})", "{w,z,y,x}" );
+  Check( "VECT_REVERSE1( (a,b,c), (x,y,z,w))", "x,y,z,w,c,b,a" );
   Check( "VECT_REVERSE1( (a,b,c), x)",   "x,c,b,a" );
-  Check( "VECT_REVERSE1( a, (x,y,z,t))", "x,y,z,t,a" );
+  Check( "VECT_REVERSE1( a, (x,y,z,w))", "x,y,z,w,a" );
   Check( "DET({3*x+4*y, 2*x+8*y},                     {x,y})",   "16" );
   Check( "DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})",  "4" );
   Check( "DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})",  "4" );
   Check( "DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})", "32" );
   Check( "DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})", "32" );
-  Check( "DET({ x+y+z+t, y+z+t, z+t, t}, {x,y,z,t})", "1" );
+  Check( "DET({ x+y+z+w, y+z+w, z+w, w}, {x,y,z,w})", "1" );
   Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "0" );
   Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "-C1_I" );
 
@@ -325,8 +325,9 @@ void CElementDataBase::Test()
   CElementDataBase db( "test_function", this );
   db.Check( "a:=6", "a" );
   db.Check( "EXECUTE( a:=6 )", "a" );
-  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "6;1" );
-  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "4*x;1" );
+  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "a;1" );
+  db.Check( "EXECUTE( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) )", "POLY(f(a),1)" ); //FIXME
+  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(SIMPLIFY(f(z)-4*z+1) ))", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/

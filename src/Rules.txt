@@ -152,6 +152,7 @@ POLY(MAX(a b),1)         := POLYF(MAX   (SIMPLIFY(a) SIMPLIFY(b)));
 POLY(POW(a b),1)         := POLYF(POW   (SIMPLIFY(a) SIMPLIFY(b)));
 POLY(IF(a b),1)          := POLYF(IF    (SIMPLIFY(a) SIMPLIFY(b)));
 POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
+POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
 
 //USE_TED := 0;
 //USE_TED ?
@@ -304,8 +305,9 @@ POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
   ~MON(a,0)                 := MON(~a,0);
 
   //Poly
-  POLY(v,v)             := MON(1,1);
-  POLY(a,v)             := MON(a,0);
+  POLY(v,v)             := MON(1,1);  
+  //POLY(CONST(a),v)      := MON(a,0);
+  POLY(a,v)             := MON(GET(a),0);  
   POLYF(a)              := MON(a,0);
 
   REDUCE_COMPLEX(MON(a,0))         := MON(a,0);
@@ -465,12 +467,13 @@ POLY({a},v)           := {POLY(a,v)};
 IPOLY((a,b),v)        := (IPOLY(a,v),IPOLY(b,v)); //parenthesis are important there!!!
 IPOLY({a},v)          := {IPOLY(a,v)};
 
-SIMPLIFY(ELEM(a))     := GET(a)  ;
-SIMPLIFY(-ELEM(a))    := -GET(a) ;
+//SIMPLIFY(ELEM(a))     := GET(a)  ;
+//SIMPLIFY(-ELEM(a))    := -GET(a) ;
 SIMPLIFY(CONST(a))    := a  ;
 SIMPLIFY(-CONST(a))   := -a ;
 //SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
 SIMPLIFY(a)           := SIMPLIFY2(a,GETVAR(a));
+
 SIMPLIFYELEM(a v)     := SIMPLIFY2(a,v);
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
 SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
@@ -684,8 +687,9 @@ INVAT({a},-CONST(b))      := ERROR(0);
 //TAYLOR(a,x,xo,0)          := SIMPLIFY(SUBST(a x xo));
 //TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SIMPLIFY(SUBST(DERN(a,x,n) x xo))*(x-xo)^n/n!;
 
-TAYLOR(a,x,xo,0)          := SUBST(a x xo);
-TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SUBST(DERN(a,x,n) x xo)*(x-xo)^n/n!;
+SUBST2(a x xo)            := SIMPLIFY(SUBST(a x xo));
+TAYLOR(a,x,xo,0)          := SUBST2(a x xo);
+TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
 
 ASSERT(1)    := 0;
 ASSERT(x)    := ERROR(1);

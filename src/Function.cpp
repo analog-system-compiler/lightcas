@@ -79,7 +79,7 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
 #endif
   }
 #ifdef _DEBUG
-  rule2->Display( i, ds );  
+  rule2->Display( i, ds );
   TRACE( ds.GetBufferPtr() );
 #endif
 }
