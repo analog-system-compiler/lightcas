@@ -19,8 +19,8 @@
 #ifdef _DEBUG
 
 #include "Debug.h"
-#include "ElementDataBase.h"
 #include "MathExpression.h"
+#include "ElementDataBase.h"
 #include "Element.h"
 #include "Parser.h"
 #include "Display.h"

@@ -226,13 +226,24 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
 
 void CMathExpression::ApplyRuleWrapper( unsigned pos, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize )
 {
-  CMathExpression equ2( m_ElementDB );
+#if 1
+  //CMathExpression* equ2 = m_ElementDB->GetMathExprBuffer();
+#else
+  CMathExpression equ3( m_ElementDB );
+  CMathExpression* equ2 = &equ3;
+#endif
   ASSERT( m_StackSize > pos );
-  equ2.SetSize( m_StackSize ); //reserve size
-  equ2.SetSize( 0 );
-  equ2.ApplyRule( *this, pos_array, rule_equ, optimize );
-  SetSize( pos );
-  Push( equ2 );
+  unsigned pos3 = GetSize();
+  ASSERT( pos_array[0] <= pos3 );
+  ASSERT( pos_array[1] <= pos3 );
+  ASSERT( pos_array[2] <= pos3 );
+  ASSERT( pos_array[3] <= pos3 );
+  ApplyRule( *this, pos_array, rule_equ, optimize );
+  unsigned pos2 = GetSize();
+  //Append( &m_StackArray[pos3], pos2 - pos3 );
+  //memcpy(&m_StackArray[old_size], src, size * sizeof(OP_CODE));
+  SetSize( pos + pos2 - pos3 );
+  memmove( &m_StackArray[pos], &m_StackArray[pos3], ( pos2 - pos3 ) * sizeof( OP_CODE ) );
 }
 
 void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize )
@@ -241,7 +252,7 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
   unsigned pos;
   unsigned j;
 
-#if 0 //def DEBUG_OPTIMIZE
+#ifdef DEBUG_OPTIMIZE
   CDisplay ds;
   ds += "Apply rule " ;
   rule_equ.Display( ds );
@@ -258,15 +269,15 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
     if( IsReserved( op3 ) )
     {
       j = ReservedParameterIndex( op3 );
+      ASSERT( j < CElementDataBase::MAX_EXP );
       unsigned pos2 = pos_array[ j ];
       ASSERT( pos2 <= equ.m_StackSize );
-      PushBranch( equ, pos2 ); // WARNING pos2 is modified
-      /*
-            if( optimize && ( OPTIMIZATION_LEVEL == 2 ) )
-            {
-              OptimizeTree3();  // optimization is only made on the top branch
-            }
-          */
+      //PushBranch( equ, pos2 ); // WARNING pos2 is modified
+      unsigned pos1 = pos2;
+      equ.NextBranch( pos1 );
+      unsigned pos3 = GetSize();
+      SetSize( pos3 + pos2 - pos1 ); //force realoc when &equ == this;
+      memmove( &m_StackArray[pos3], &m_StackArray[pos1], ( pos2 - pos1 ) * sizeof( OP_CODE ) );
     }
     else
     {
@@ -277,12 +288,11 @@ void CMathExpression::ApplyRule( const CMathExpression& equ, unsigned const pos_
       {
         OptimizeTree3();  // optimization is only made on the top branch
       }
-
     }
     //ASSERT( GetLastOperator() != m_ElementDB->GetElement( "SIN" )->ToRef() );
   }
 
-#if 0 //def DEBUG_OPTIMIZE
+#ifdef DEBUG_OPTIMIZE
   Display( ds );
   TRACE( ds.GetBufferPtr() );
 #endif

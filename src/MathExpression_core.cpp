@@ -71,8 +71,9 @@ void CMathExpression::SetSize( unsigned i )
   m_StackSize = i;
   if( i > m_AllocSize )
   {
-    m_AllocSize = i + 16;
+    m_AllocSize = ( i / 16 + 1 ) * 16;
     m_StackArray = ( OP_CODE* )realloc( m_StackArray, m_AllocSize * sizeof( OP_CODE ) );
+    ASSERT( m_StackArray );
   }
 }
 
