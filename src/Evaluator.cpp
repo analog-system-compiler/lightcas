@@ -22,12 +22,12 @@
 #include "Debug.h"
 
 
-CEvaluator::CEvaluator(  )
+CEvaluator::CEvaluator()
 {
   m_ValPos = 0;
 }
 
-CEvaluator::~CEvaluator(  )
+CEvaluator::~CEvaluator()
 {
 }
 

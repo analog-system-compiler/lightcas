@@ -90,7 +90,7 @@ unsigned CMathExpression::DisplayBranch( unsigned pos, unsigned priority, CDispl
 
 unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CDisplay& ds ) const
 {
-  unsigned pos_array[ CElementDataBase::MAX_EXP ];
+  unsigned pos_array[CElementDataBase::MAX_EXP] = { 0 };
 
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
@@ -246,11 +246,10 @@ void CMathExpression::GetLevel( CParser& IC, unsigned priority )
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
   unsigned i, k, n;
-  unsigned pos_array[CElementDataBase::MAX_EXP];
+  unsigned pos_array[CElementDataBase::MAX_EXP] = { 0 };
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   const char* init_pos = IC.GetPos();
 
-  InitPositionTable( pos_array );
   n = GetSize();
 
   for( i = priority; i < st.GetSize(); i++ )
@@ -268,7 +267,7 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
       {
         NextBranch( pos );  //remove first parameter
       }
-      ApplyRuleWrapper( pos, pos_array, rule_equ, false );
+      ApplyRule( pos, pos_array, rule_equ, false );
 #if 0 //def _DEBUG
       CDisplay ds;
       Display( ds );
@@ -370,12 +369,6 @@ bool CMathExpression::ParseElement( CParser& IC )
       ds += CString( e->GetFunction()->GetParameterNb() );
       TRACE( ds.GetBufferPtr() );
 #endif
-    }
-    else if( ( f->GetParameterNb() == 2 ) && ( GetLastOperator() == CElementDataBase::OP_CONCAT ) )
-    {
-      m_StackSize--;
-      ASSERT( e->IsNumeric() ); // for numeric function, it is allowed to use comma without concatenation op.
-      ASSERT( f->GetParameterNb() == i + 1 );
     }
     else
     {

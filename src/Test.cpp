@@ -16,7 +16,9 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#ifdef _DEBUG
+#ifdef _TEST
+
+#include <cstdarg>
 
 #include "Debug.h"
 #include "MathExpression.h"
@@ -24,8 +26,6 @@
 #include "Element.h"
 #include "Parser.h"
 #include "Display.h"
-
-#include <cstdarg>
 
 #ifdef _WIN32
 #define vsnprintf _vsnprintf_s
@@ -164,7 +164,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
 //  Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
-  Check( "SIMPLIFY(-2*MIN(2+2,5)*MAX(2,3)+2^4+8)", "0" );
+  Check( "SIMPLIFY(-2*MIN(2+2 5)*MAX(2 3)+2^4+8)", "0" );
   Check( "SIMPLIFY(1-0*a*b)", "1" );
   Check( "SIMPLIFY(2*a-2*a)", "0" );
   Check( "SIMPLIFY(b*(a+2)-b*a-2*b)", "0" );
@@ -225,7 +225,7 @@ void CElementDataBase::Test()
   //FAIL!!Check( "SIN(PI)", "0" );
   //FAIL!!Check( "COS(PI/2)", "0" );
   Check( "SQRT(-25)", "5*j" );
-  Check( "SIMPLIFY(SIMPLIFY(SQRT(-25)^2+25))", "0" );
+  Check( "SIMPLIFY(SQRT(-25)^2+26)", "1" );
 
   Check( "SIMPLIFY(RE(4+j))", "4" );
   Check( "SIMPLIFY(-IM(1-5*j))", "5" );
@@ -240,6 +240,7 @@ void CElementDataBase::Test()
   /****** derival *****/
   Check( "DER(SIN(4*a),a)", "4*COS(4*a)" );
   Check( "DER(COS(a*b),b)", "-((b*DER(a,b)+a)*SIN(a*b))" );
+  Check( "DER(LOG(a*b+c),b)", "(b*DER(a,b)+a+DER(c,b))/(a*b+c)" );
 
   /****** vector *********/
   Check( "SIMPLIFY({a,b}[c])", "{a,b}[c]" );
@@ -283,7 +284,7 @@ void CElementDataBase::Test()
   GetElement( "y" )->SetEquation( equ0 );
   equ0.GetFromString( "a-b" );
   GetElement( "z" )->SetEquation( equ0 );
-  Check( "SIMPLIFY(SIMPLIFY(y-z))", "2*b" );
+  Check( "SIMPLIFY(y-z)", "2*b" );
 
   /********** solve **********/
   Initialize();
@@ -298,7 +299,6 @@ void CElementDataBase::Test()
   Check( "SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})", "{x-1,y-1,z-1}" );
   Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})",    "{1,1,1}" );
   Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})",    "{2,1,1}" );
-  //Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)/((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*(i*d+g*f)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(f*2+i*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)),(((i*b+c*h)*(f*2+i*2)+(i*e-f*h)*c*2)*((i*e-f*h)*g+(i*d+g*f)*h)-((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(h*(f*2+i*2)+(i*e-f*h)*2))/(((i*e-f*h)*(g*c-i*a)+(i*d+g*f)*(i*b+c*h))*(i*e-f*h)*i)}" );
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)*i)}" );
   /***** determinant ******/
   //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
@@ -327,7 +327,7 @@ void CElementDataBase::Test()
   db.Check( "EXECUTE( a:=6 )", "a" );
   db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "a;1" );
   db.Check( "EXECUTE( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) )", "POLY(f(a),1)" ); //FIXME
-  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(SIMPLIFY(f(z)-4*z+1) ))", "f(x);1" );
+  db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
   /****** evaluator ******/
@@ -339,9 +339,9 @@ void CElementDataBase::Test()
   GetEvaluator()->GetValueFromString( "9" );
   GetEvaluator()->SetElementValue( GetElement( "c" )->ToRef() );
 
-  CheckEval( "a+b-c+2", CValue( 5 ) );
-  CheckEval( "a>b?2:3", CValue( 3 ) );
-  CheckEval( "a<b?a:b", CValue( 4 ) );
+  Check( "EVAL(a+b-c+2)", "5" );
+  Check( "EVAL(a>b?2:3)", "3" );
+  Check( "EVAL(a<b?a:b)", "4" );
 
   DisplayStats();
 

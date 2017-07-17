@@ -49,7 +49,9 @@ protected:
   static CElementArray      m_ElementRefArray;
   static CSymbolSyntaxArray m_SymbolSyntaxArray;
   static const SProperties  m_FunctionProperties[];
+  static const SProperties  m_BuiltInProperties[];
   static const unsigned     m_FunctionPropertiesSize;
+  static const unsigned     m_BuiltInPropertiesSize;
 
 public :
 
@@ -78,6 +80,7 @@ public :
     OP_SYST,
     OP_ERROR,
     OP_TED,
+    OP_EVAL,
     OP_END_RESERVED
   };
 
@@ -110,14 +113,16 @@ public:
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
   void            AssociateSymbol( CParser& IC );
 
+  static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
   static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
-  static OP_CODE    ElementToRef( const CElement* e );
   static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
+  static bool IsReserved( OP_CODE op )                   { return ( op >= OP_EXP1 ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
   CElementDataBase* GetParent() const                  { return m_Parent;            }
 
-#ifdef _DEBUG
+
+#ifdef _TEST
   void Printf( const char* format, ... );
   void Test();
   void Check( const char* s1, const char* s2 );

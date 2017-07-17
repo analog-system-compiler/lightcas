@@ -42,13 +42,9 @@ private:
   ELEM_TYPE  m_Type;
   bool       m_Global;
   bool       m_Numeric;
-  bool       m_bLock;            // Prevent recursivity
+  bool       m_bLock;     // Prevents recursivity
   bool       m_bAux;
   unsigned   m_Ref;
-
-private:
-
-  void CommonInit();
 
 public:
 
@@ -57,7 +53,7 @@ public:
   void SetEquation( const CMathExpression& equ );
   void AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb = 0 );
   void Unlock();
-  bool Lock();
+  void Lock();
 
   const CString&  GetName() const           { return m_Name;                   }
   void SetPseudoName( const CString& s )    { m_PseudoName = s;                }

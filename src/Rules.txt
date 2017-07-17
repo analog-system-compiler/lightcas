@@ -100,9 +100,9 @@ IPOLY2(MONMUL(a,b),v)            := IPOLY(a,v)*IPOLY(b,v);
 IPOLY2(MONPOWCONST((a,b),c),v)   := IPOLY(a,v)^b;
 IPOLY2(a[b],v)                   := IPOLY(a,v)[b];
 
-IPOLY2(AND(a,b),v)            := IPOLY(a,v)&IPOLY(b,v);
-IPOLY2(OR(a,b),v)             := IPOLY(a,v)|IPOLY(b,v);
-IPOLY2(XOR(a,b),v)            := IPOLY(a,v)^IPOLY(b,v);
+IPOLY2(AND(a b),v)            := IPOLY(a,v)&IPOLY(b,v);
+IPOLY2(OR(a b),v)             := IPOLY(a,v)|IPOLY(b,v);
+IPOLY2(XOR(a b),v)            := IPOLY(a,v)^IPOLY(b,v);
 IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 
 NORM2(a,q)                    := IPOLY(NORM3(POLY(a,q)),q);
@@ -307,7 +307,7 @@ POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
   //Poly
   POLY(v,v)             := MON(1,1);  
   //POLY(CONST(a),v)      := MON(a,0);
-  POLY(a,v)             := MON(GET(a),0);  
+  POLY(a,v)             := MON(a,0);  
   POLYF(a)              := MON(a,0);
 
   REDUCE_COMPLEX(MON(a,0))         := MON(a,0);
@@ -335,7 +335,7 @@ POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
   NORM3(a)                         := MONDIV(a,MON(GET_POWER(a,1),0));
 
   //IPoly
-  IPOLY2(MON(a,b),v)               := a*GET(v)^b;
+  IPOLY2(MON(a,b),v)               := a*v^b;
   IPOLY2(POLYSTORE(a,b),v)         := IPOLY2(a,v)+IPOLY2(b,v);
   IPOLY2(MONDIV(a,b),v)            := IPOLY2(a,v)/IPOLY2(b,v);
 
@@ -471,9 +471,10 @@ IPOLY({a},v)          := {IPOLY(a,v)};
 //SIMPLIFY(-ELEM(a))    := -GET(a) ;
 SIMPLIFY(CONST(a))    := a  ;
 SIMPLIFY(-CONST(a))   := -a ;
-//SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) );
-SIMPLIFY(a)           := SIMPLIFY2(a,GETVAR(a));
+SIMPLIFY(SET(a b))    := SET( a SIMPLIFY(b) ); //needed for console app
+SIMPLIFY(a)           := SIMPLIFY3(EXPAND2(a));
 
+SIMPLIFY3(a)          := SIMPLIFY2(a,GETVAR(a));
 SIMPLIFYELEM(a v)     := SIMPLIFY2(a,v);
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
 SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
@@ -481,15 +482,26 @@ SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
 //SET((a,b),(c,d))      := (SET(a,c),SET(b,d));
 //SET({a},{b})          := SET(a,b);
 
-//GETVAR(a,b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
-GETVAR(a+b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
-GETVAR(a-b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
-GETVAR(a*b)           := CHOOSEVAR( GETVAR(a), GETVAR(b) );
+//GETVAR(a,b)           := CHOOSEVAR(  GETVAR(a), GETVAR(b) );
+GETVAR(a+b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
+GETVAR(a-b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
+GETVAR(a*b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
 GETVAR(a/b)           := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );
 GETVAR(a^b)           := GETVAR(a);
 GETVAR(-a)            := GETVAR(a);
 GETVAR(ELEM(a))       := a;
 GETVAR(a)             := 1;
+
+EXPAND(a+b)           := EXPAND2(a)+EXPAND2(b);
+EXPAND(a-b)           := EXPAND2(a)-EXPAND2(b);
+EXPAND(a*b)           := EXPAND2(a)*EXPAND2(b);
+EXPAND(a/b)           := EXPAND2(a)/EXPAND2(b);
+EXPAND(a^b)           := EXPAND2(a)^EXPAND2(b);
+EXPAND(-a)            := -EXPAND2(a);
+EXPAND(a)             := a;
+
+EXPAND2( a )          := EXPAND( GET(a) ); // replace element with its equivalent if any
+//EXPAND2( a )           := EXPAND( a );
 
 CHOOSEVAR(1,b)        := b;
 CHOOSEVAR(a,1)        := a;
@@ -694,4 +706,56 @@ TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^
 ASSERT(1)    := 0;
 ASSERT(x)    := ERROR(1);
 
-PI := 3.14159265358979323846264338327950288
+PI := 3.14159265358979323846264338327950288;
+
+ADD( CONST(a) CONST(b))  := EVAL( _add( a b ) );
+SUB( CONST(a) CONST(b))  := EVAL( _sub( a b) );
+OR(  CONST(a) CONST(b))  := EVAL( _or ( a b) );
+LOR( CONST(a) CONST(b))  := EVAL( _lor( a b) );
+XOR( CONST(a) CONST(b))  := EVAL( _xor( a b) );
+MUL( CONST(a) CONST(b))  := EVAL( _mul( a b) );
+DIV( CONST(a) CONST(b))  := EVAL( _div( a b) );
+AND( CONST(a) CONST(b))  := EVAL( _and( a b) );
+LAND(CONST(a) CONST(b))  := EVAL( _land( a b) );
+EQ(  CONST(a) CONST(b))  := EVAL( _eq ( a b)  );
+NEQ( CONST(a) CONST(b))  := EVAL( _neq( a b) );
+LTE( CONST(a) CONST(b))  := EVAL( _lte( a b) );
+SHL( CONST(a) CONST(b))  := EVAL( _shl( a b) );
+LT(  CONST(a) CONST(b))  := EVAL( _lt ( a b)  );
+GTE( CONST(a) CONST(b))  := EVAL( _gte( a b) );
+SHR( CONST(a) CONST(b))  := EVAL( _shr( a b) );
+GT(  CONST(a) CONST(b))  := EVAL( _gt ( a b)  );
+MIN( CONST(a) CONST(b))  := EVAL( _min( a b) );
+MAX( CONST(a) CONST(b))  := EVAL( _max( a b) );
+MOD( CONST(a) CONST(b))  := EVAL( _mod( a b) );
+POW( CONST(a) CONST(b))  := EVAL( _pow( a b) );
+NEG( CONST(a))           := EVAL( _neg( a )  );
+INV( CONST(a))           := EVAL( _inv( a )  );
+NOT(CONST(a))            := EVAL( _not( a )  );
+ID(CONST(a))             := EVAL( _id ( a )   );
+BOOL(CONST(a))           := EVAL( _bool( a ) );
+LNOT(CONST(a))           := EVAL( _lnot( a ) );
+SIN(CONST(a))            := EVAL( _sin( a )  );
+COS(CONST(a))            := EVAL( _cos( a )  );
+TAN(CONST(a))            := EVAL( _tan( a )  );
+ASIN(CONST(a))           := EVAL( _asin( a ) );
+ACOS(CONST(a))           := EVAL( _acos( a ) );
+ATAN(CONST(a))           := EVAL( _atan( a ) );
+SINH(CONST(a))           := EVAL( _sinh( a ) );
+COSH(CONST(a))           := EVAL( _cosh( a ) );
+TANH(CONST(a))           := EVAL( _tanh( a ) );
+ASINH(CONST(a))          := EVAL( _asinh( a ));
+ACOSH(CONST(a))          := EVAL( _acosh( a ));
+ATANH(CONST(a))          := EVAL( _atanh( a ));
+EXP(CONST(a))            := EVAL( _exp( a )  );
+LOG(CONST(a))            := EVAL( _log( a )  );
+LOG10(CONST(a))          := EVAL( _log10( a ) );
+SQRT(CONST(a))           := EVAL( _sqrt( a ) );
+SQR(CONST(a))            := EVAL( _sqr( a )  );
+FACT(CONST(a))           := EVAL( _fact( a ) );
+ABS(CONST(a))            := EVAL( _abs( a )  );
+FLOOR(CONST(a))          := EVAL( _floor( a ));
+CEIL(CONST(a))           := EVAL( _ceil( a ) );
+RAND()                   := EVAL( _rand()   );
+IF2(CONST(a) CONST(b) )  := EVAL( _if( a b ) );
+IF(CONST(a)  CONST(b) )  := EVAL( _if( a b ) )

@@ -16,6 +16,7 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
+#include <string.h>
 #include <ctype.h>
 #include "Debug.h"
 #include "Parser.h"
@@ -73,34 +74,6 @@ const CString& CParser::GetWord()
 
   return m_Buffer;
 }
-/*
-unsigned CParser::GetFixPoint( unsigned& point_pos )
-{
-  unsigned v;
-  bool point_found = false;
-  point_pos = 0;
-  v = 0;
-
-  while( true )
-  {
-    if ( isdigit( *m_Pos ) )
-    {
-      v = ( *m_Pos++ - '0' ) + 10 * v;
-      if( point_found )
-      {
-        point_pos++;
-      }
-    }
-    else if ( *m_Pos == '.' )
-    {
-      point_found = true;
-      m_Pos++;
-    }
-    else { break; }
-  }
-
-  return v;
-}*/
 
 void CParser::Find( char c )
 {
@@ -256,25 +229,22 @@ bool CParser::TryMatchSymbol( const char*& symbol_str )
 
 const CString& CParser::GetQuote()
 {
-  int i;
   char c;
 
   m_Buffer.Clear();
 
   if ( TryFind( '"' ) )
   {
-
-    i = 0;
-
-    do
+    const char* pos = strchr( m_Pos, '"' );
+    if ( pos )
     {
-      c = m_Pos[i++];
+      m_Buffer.Copy( m_Pos, pos - m_Pos );
+      m_Pos = pos + 1;
     }
-
-    while ( c && ( c != '"' ) );
-
-    m_Buffer.Copy( m_Pos, i - 1 );
-    m_Pos += i;
+    else
+    {
+      Error( CParserException::ID_ERROR_SYNTAX );
+    }
   }
   else
   {

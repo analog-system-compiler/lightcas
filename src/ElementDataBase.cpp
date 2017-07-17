@@ -31,62 +31,82 @@ unsigned           CElementDataBase::m_SecureLimit;
 extern const char Rules[] asm( "_binary___objs_Rules_txt_start" );
 #endif
 
+const SProperties CElementDataBase::m_BuiltInProperties[] =
+{
+  { "CONCAT",           2, NULL },
+  { "SET",              2, NULL },
+  { "GET",              1, NULL },
+  { "NONE",             0, NULL },
+  { "STACK_SIZE_ERROR", 0, NULL },
+  { "CONST",            1, NULL },
+  { "ELEM",             1, NULL },
+  { "NEG",              1, NULL },
+  { "j",                0, NULL },
+  { "RANK",             2, NULL },
+  { "SUBST",            3, NULL },
+  { "SYST",             2, NULL },
+  { "ERROR",            1, NULL },
+  { "TED",              2, NULL },
+  { "EVAL",             1, NULL },
+};
+
 const SProperties CElementDataBase::m_FunctionProperties[] =
 {
-  { "ADD",    2, &CEvaluator::Add           },
-  { "SUB",    2, &CEvaluator::Sub           },
-  { "OR",     2, &CEvaluator::Or            },
-  { "LOR",    2, &CEvaluator::LOr           },
-  { "XOR",    2, &CEvaluator::Xor           },
-  { "MUL",    2, &CEvaluator::Mul           },
-  { "DIV",    2, &CEvaluator::Div           },
-  { "AND",    2, &CEvaluator::And           },
-  { "LAND",   2, &CEvaluator::LAnd          },
-  { "EQ",     2, &CEvaluator::Equal         },
-  { "NEQ",    2, &CEvaluator::NotEqual      },
-  { "LTE",    2, &CEvaluator::LowerOrEqual  },
-  { "SHL",    2, &CEvaluator::ShiftLeft     },
-  { "LT",     2, &CEvaluator::Lower         },
-  { "GTE",    2, &CEvaluator::GreaterOrEqual},
-  { "SHR",    2, &CEvaluator::ShiftRight    },
-  { "GT",     2, &CEvaluator::Greater       },
-  { "MIN",    2, &CEvaluator::Min           },
-  { "MAX",    2, &CEvaluator::Max           },
-  { "MOD",    2, &CEvaluator::Mod           },
-  { "POW",    2, &CEvaluator::Pow           },
-  { "NEG",    1, &CEvaluator::Neg           },
-  { "INV",    1, &CEvaluator::Inv           },
-  { "NOT",    1, &CEvaluator::Not           },
-  { "ID",     1, &CEvaluator::Id            },
-  { "BOOL",   1, &CEvaluator::Bool          },
-  { "LNOT",   1, &CEvaluator::LNot          },
-  { "SIN",    1, &CEvaluator::Sin           },
-  { "COS",    1, &CEvaluator::Cos           },
-  { "TAN",    1, &CEvaluator::Tan           },
-  { "ASIN",   1, &CEvaluator::Asin          },
-  { "ACOS",   1, &CEvaluator::Acos          },
-  { "ATAN",   1, &CEvaluator::Atan          },
-  { "SINH",   1, &CEvaluator::SinH          },
-  { "COSH",   1, &CEvaluator::CosH          },
-  { "TANH",   1, &CEvaluator::TanH          },
-  { "ASINH",  1, &CEvaluator::AsinH         },
-  { "ACOSH",  1, &CEvaluator::AcosH         },
-  { "ATANH",  1, &CEvaluator::AtanH         },
-  { "EXP",    1, &CEvaluator::Exp           },
-  { "LOG",    1, &CEvaluator::Ln            },
-  { "LOG10",  1, &CEvaluator::Log           },
-  { "SQRT",   1, &CEvaluator::Sqrt          },
-  { "SQR",    1, &CEvaluator::Sqr           },
-  { "FACT",   1, &CEvaluator::Fact          },
-  { "ABS",    1, &CEvaluator::Abs           },
-  { "FLOOR",  1, &CEvaluator::Floor         },
-  { "CEIL",   1, &CEvaluator::Ceil          },
-  { "RAND",   0, &CEvaluator::Rand          },
-  { "IF2",    2, &CEvaluator::If            },
-  { "IF",     2, &CEvaluator::If            },
+  { "_add",    2, &CEvaluator::Add           },
+  { "_sub",    2, &CEvaluator::Sub           },
+  { "_or",     2, &CEvaluator::Or            },
+  { "_lor",    2, &CEvaluator::LOr           },
+  { "_xor",    2, &CEvaluator::Xor           },
+  { "_mul",    2, &CEvaluator::Mul           },
+  { "_div",    2, &CEvaluator::Div           },
+  { "_and",    2, &CEvaluator::And           },
+  { "_land",   2, &CEvaluator::LAnd          },
+  { "_eq",     2, &CEvaluator::Equal         },
+  { "_neq",    2, &CEvaluator::NotEqual      },
+  { "_lte",    2, &CEvaluator::LowerOrEqual  },
+  { "_shl",    2, &CEvaluator::ShiftLeft     },
+  { "_lt",     2, &CEvaluator::Lower         },
+  { "_gte",    2, &CEvaluator::GreaterOrEqual},
+  { "_shr",    2, &CEvaluator::ShiftRight    },
+  { "_gt",     2, &CEvaluator::Greater       },
+  { "_min",    2, &CEvaluator::Min           },
+  { "_max",    2, &CEvaluator::Max           },
+  { "_mod",    2, &CEvaluator::Mod           },
+  { "_pow",    2, &CEvaluator::Pow           },
+  { "_neg",    1, &CEvaluator::Neg           },
+  { "_inv",    1, &CEvaluator::Inv           },
+  { "_not",    1, &CEvaluator::Not           },
+  { "_id",     1, &CEvaluator::Id            },
+  { "_bool",   1, &CEvaluator::Bool          },
+  { "_lnot",   1, &CEvaluator::LNot          },
+  { "_sin",    1, &CEvaluator::Sin           },
+  { "_cos",    1, &CEvaluator::Cos           },
+  { "_tan",    1, &CEvaluator::Tan           },
+  { "_asin",   1, &CEvaluator::Asin          },
+  { "_acos",   1, &CEvaluator::Acos          },
+  { "_atan",   1, &CEvaluator::Atan          },
+  { "_sinh",   1, &CEvaluator::SinH          },
+  { "_cosh",   1, &CEvaluator::CosH          },
+  { "_tanh",   1, &CEvaluator::TanH          },
+  { "_asinh",  1, &CEvaluator::AsinH         },
+  { "_acosh",  1, &CEvaluator::AcosH         },
+  { "_atanh",  1, &CEvaluator::AtanH         },
+  { "_exp",    1, &CEvaluator::Exp           },
+  { "_log",    1, &CEvaluator::Ln            },
+  { "_log10",  1, &CEvaluator::Log           },
+  { "_sqrt",   1, &CEvaluator::Sqrt          },
+  { "_sqr",    1, &CEvaluator::Sqr           },
+  { "_fact",   1, &CEvaluator::Fact          },
+  { "_abs",    1, &CEvaluator::Abs           },
+  { "_floor",  1, &CEvaluator::Floor         },
+  { "_ceil",   1, &CEvaluator::Ceil          },
+  { "_rand",   0, &CEvaluator::Rand          },
+  { "_if2",    2, &CEvaluator::If            },
+  { "_if",     2, &CEvaluator::If            }
 };
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementDataBase::m_FunctionProperties ) / sizeof( SProperties );
+const unsigned CElementDataBase::m_BuiltInPropertiesSize  = sizeof( CElementDataBase::m_BuiltInProperties )  / sizeof( SProperties );
 
 CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
@@ -148,29 +168,15 @@ void CElementDataBase::Initialize()
 
 void CElementDataBase::AddReservedElements()
 {
+  unsigned i;
+  const char pseudo_name[MAX_EXP][2] = { "a", "b", "c", "d", "e", "f", "g", "h" };
+
   GetElement( "0" )->SetConst();
-  GetElement()->SetPseudoName( "a" );
-  GetElement()->SetPseudoName( "b" );
-  GetElement()->SetPseudoName( "c" );
-  GetElement()->SetPseudoName( "d" );
-  GetElement()->SetPseudoName( "e" );
-  GetElement()->SetPseudoName( "f" );
-  GetElement()->SetPseudoName( "g" );
-  GetElement()->SetPseudoName( "h" );
-  GetElement( "CONCAT" )->SetOperandNb( 2 );
-  GetElement( "SET"    )->SetOperandNb( 2 );
-  GetElement( "GET"    )->SetOperandNb( 1 );
-  GetElement( "NONE"   );//->SetOperandNb( 0 );
-  GetElement( "STACK_SIZE_ERROR" ); //->SetOperandNb( 2 );
-  GetElement( "CONST"  )->SetOperandNb( 1 );
-  GetElement( "ELEM"   )->SetOperandNb( 1 );
-  GetElement( "NEG"    )->SetOperandNb( 1 );
-  GetElement( "j"      );//->SetOperandNb( 0 );
-  GetElement( "RANK"   )->SetOperandNb( 2 );
-  GetElement( "SUBST"  )->SetOperandNb( 3 );
-  GetElement( "SYST"   )->SetOperandNb( 2 );
-  GetElement( "ERROR"  )->SetOperandNb( 1 );
-  GetElement( "TED"    )->SetOperandNb( 2 );
+  for(  i = 0; i < MAX_EXP; i++ )
+  {
+    GetElement()->SetPseudoName( pseudo_name[i] );
+  }
+  AddEvalFunctionTable( m_BuiltInProperties, m_BuiltInPropertiesSize );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
@@ -194,6 +200,7 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SYST   ] ) == OP_SYST   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR  ] ) == OP_ERROR  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_TED    ] ) == OP_TED    );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_EVAL   ] ) == OP_EVAL   );
   ASSERT( GetSize() == OP_END_RESERVED );
 }
 

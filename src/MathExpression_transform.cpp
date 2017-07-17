@@ -23,31 +23,18 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
 {
   OP_CODE op;
   CElement* e;
-  unsigned i;
+  unsigned i = 0;
   unsigned pos;
-  OP_CODE  elem_array[CElementDataBase::MAX_EXP];
-  unsigned index = 0;
 
   for( pos = 0; pos < src.GetSize();  pos++ )
   {
     op = src.Get( pos );
     e = RefToElement( op );
-    if( e->IsVar() && ( op >= CElementDataBase::GetSecureLimit() )/*&& !RefToElement( op )->IsLocked()*/ )
+    if( e->IsVar() && ( op >= CElementDataBase::GetSecureLimit() ) )
     {
-      for( i = 0; ( i < index ) && ( i < CElementDataBase::MAX_EXP ); i++ )
-      {
-        if( elem_array[i] == op )
-        {
-          break;
-        }
-      }
-      ASSERT( i < CElementDataBase::MAX_EXP );
-      if( i == index )
-      {
-        elem_array[index++] = op;
-      }
       src.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
       dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+      i++;
     }
   }
 }

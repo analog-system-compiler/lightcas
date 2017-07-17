@@ -54,14 +54,14 @@ class CParser
 
 private:
 
-  static  const char  m_CharTab[];
-  int   m_LineNb;
-  CString m_FileName;
-  char*     m_Text;
+  static const char  m_CharTab[];
+  int      m_LineNb;
+  CString  m_FileName;
+  char*    m_Text;
 
 public:
   const char* m_Pos;
-  CString       m_Buffer;
+  CString     m_Buffer;
 
   static const char m_StringDelimiter = '"';
   static const char m_SymbolMacro     = '#';
@@ -89,9 +89,9 @@ public:
   void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
   void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
 
-  static bool IsWord( char c )     { return ( m_CharTab[( int )c] & 1 ) != 0; }
-  static bool IsStopChar( char c ) { return ( m_CharTab[( int )c] & 2 ) != 0; }
-  static bool IsDigit( char c )    { return ( m_CharTab[( int )c] & 4 ) != 0; }
+  static bool IsWord( char c )         { return ( m_CharTab[( int )c] & 1 ) != 0; }
+  static bool IsStopChar( char c )     { return ( m_CharTab[( int )c] & 2 ) != 0; }
+  static bool IsDigit( char c )        { return ( m_CharTab[( int )c] & 4 ) != 0; }
 
   bool  IsWord()                       { return IsWord( GetChar() );     }
   bool  IsStopChar()                   { return IsStopChar( GetChar() ); }

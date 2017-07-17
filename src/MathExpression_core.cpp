@@ -66,12 +66,21 @@ void CMathExpression::Append( const OP_CODE* src, unsigned size )
   }
 }
 
+void CMathExpression::InnerCopy( unsigned pos_dest, unsigned pos_source, unsigned size )
+{
+  if ( size != 0 )
+  {
+    SetSize( pos_dest + size );
+    memmove( &m_StackArray[pos_dest], &m_StackArray[pos_source], size * sizeof( OP_CODE ) );
+  }
+}
+
 void CMathExpression::SetSize( unsigned i )
 {
   m_StackSize = i;
   if( i > m_AllocSize )
   {
-    m_AllocSize = ( i / 16 + 1 ) * 16;
+    m_AllocSize = i * 2;
     m_StackArray = ( OP_CODE* )realloc( m_StackArray, m_AllocSize * sizeof( OP_CODE ) );
     ASSERT( m_StackArray );
   }
@@ -113,7 +122,6 @@ void CMathExpression::NextBranch( unsigned& pos ) const
   CElement* e;
 
   ASSERT( pos );
-
   while( pos && i )
   {
     op = Pop( pos );
@@ -124,15 +132,9 @@ void CMathExpression::NextBranch( unsigned& pos ) const
   }
 }
 
-void CMathExpression::InitPositionTable( unsigned pos_array[] )
-{
-  memset( pos_array, 0, CElementDataBase::MAX_EXP * sizeof( unsigned ) ) ;
-}
-
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 {
   ASSERT( RefToElement( op )->IsBinary() );
-
   AddZero();
   Push( equ );
   Push( op );
@@ -174,4 +176,39 @@ void CMathExpression::RemoveZero()
 void CMathExpression::Evaluate() const
 {
   m_ElementDB->GetEvaluator()->Evaluate( m_StackSize, m_StackArray );
+}
+
+void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst )
+{
+  OP_CODE op;
+  CElement* e;
+  unsigned i = 0;
+  unsigned pos;
+
+  for ( pos = 0; pos < src.GetSize(); pos++ )
+  {
+    op = src.Get( pos );
+    if ( op >= CElementDataBase::GetSecureLimit() )
+    {
+      e = RefToElement( op );
+      if ( e->IsVar() )
+      {
+        src.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+        dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+        i++;
+      }
+    }
+  }
+}
+
+void CMathExpression::Replace( OP_CODE op1, OP_CODE op2, unsigned pos )
+{
+  while ( pos < m_StackSize )
+  {
+    if ( Get( pos ) == op1 )
+    {
+      Set( pos, op2 );
+    }
+    pos++;
+  }
 }

@@ -23,39 +23,39 @@
 class CAlgebraRule
 {
 public:
-	unsigned  m_LineNo;
-	bool      m_bHasRule;
-#ifdef _DEBUG
-    unsigned m_AccessNb;
+  unsigned  m_LineNo;
+  bool      m_bHasRule;
+#ifdef _TEST
+  unsigned m_AccessNb;
 #endif
 
-	CMathExpression m_SrcEquation;
-	CMathExpression m_DstEquation;
+  CMathExpression m_SrcEquation;
+  CMathExpression m_DstEquation;
 
-    CAlgebraRule(const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
-	{
-#ifdef _DEBUG
-        m_AccessNb=0;
+  CAlgebraRule( const CMathExpression& src, const CMathExpression& dst, unsigned line_no )
+  {
+#ifdef _TEST
+    m_AccessNb = 0;
 #endif
-		m_LineNo = line_no;
-        m_bHasRule = ( dst.GetLastOperator() != CElementDataBase::OP_NONE ); //no rule
-        m_SrcEquation.Copy( src );
-        m_DstEquation.Copy( dst );
-        CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );        
-	}
+    m_LineNo = line_no;
+    m_bHasRule = ( dst.GetLastOperator() != CElementDataBase::OP_NONE ); //no rule
+    m_SrcEquation.Copy( src );
+    m_DstEquation.Copy( dst );
+    CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );
+  }
 
 #ifdef _DEBUG
-    void Display( unsigned i, CDisplay& ds ) 
-    {   
-        ds += "[";
-        /*CElementDataBase::RefToElement( m_SrcEquation.GetLastOperator() )->Display(ds);
-        ds += "][";*/
-        ds += CString( ( int )i );
-        ds += "] ";
-        m_SrcEquation.Display( ds );
-        ds += " => ";
-        m_DstEquation.Display( ds );    
-    }
+  void Display( unsigned i, CDisplay& ds )
+  {
+    ds += "[";
+    /*CElementDataBase::RefToElement( m_SrcEquation.GetLastOperator() )->Display(ds);
+    ds += "][";*/
+    ds += CString( ( int )i );
+    ds += "] ";
+    m_SrcEquation.Display( ds );
+    ds += " => ";
+    m_DstEquation.Display( ds );
+  }
 #endif
 };
 
@@ -69,13 +69,13 @@ public:
   CAlgebraRuleArray m_AlgebraRuleArray;
 
 private:
-  void AddOrReplaceRule( CAlgebraRule*rule2);
+  void AddOrReplaceRule( CAlgebraRule* rule2 );
 
 public:
-  
+
   void Clear();
-  void AddAlgebraRule( const CMathExpression & src, const CMathExpression & dst, unsigned line_no );
-  void SetParameterNb( unsigned parameter_nb )          { m_ParameterNb=parameter_nb; }
+  void AddAlgebraRule( const CMathExpression& src, const CMathExpression& dst, unsigned line_no );
+  void SetParameterNb( unsigned parameter_nb )          { m_ParameterNb = parameter_nb; }
   unsigned GetParameterNb() const                       { return m_ParameterNb; }
   const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }
 

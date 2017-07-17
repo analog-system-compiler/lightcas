@@ -21,9 +21,10 @@
 #include <cstring>
 #include "Debug.h"
 
+int(*PUTS)(const char*) = puts;
+
 #ifdef _DEBUG
 
-int (*PUTS)( const char *) = puts;
 static FILE* debug_file = NULL;
 
 void TRACE( const char* format, ... )
@@ -32,12 +33,12 @@ void TRACE( const char* format, ... )
   static char buffer[ 8192 ];
   va_list args;
   va_start ( args, format );
-  vsnprintf( buffer, sizeof(buffer), format, args );
-  i=strlen(buffer);
-  if( (i+1) < sizeof( buffer ) )
+  vsnprintf( buffer, sizeof( buffer ), format, args );
+  i = strlen( buffer );
+  if( ( i + 1 ) < sizeof( buffer ) )
   {
     buffer[i] = '\n';
-    buffer[i+1] = '\0';
+    buffer[i + 1] = '\0';
   }
   va_end ( args );
 
@@ -51,7 +52,7 @@ void TRACE( const char* format, ... )
     fwrite( buffer, strlen( buffer ), sizeof( char ), debug_file );
   }
 
-#if defined( _WIN32 )
+#ifdef _WIN32
   const unsigned CRT_DEBUG_BUFFER_MAX = 256;
   buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
   buffer[CRT_DEBUG_BUFFER_MAX - 5] = '.';
@@ -63,6 +64,7 @@ void TRACE( const char* format, ... )
 #else
   PUTS( buffer );
 #endif
+
 }
 
 #endif

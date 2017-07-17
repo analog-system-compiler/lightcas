@@ -67,22 +67,20 @@ protected:
   unsigned MatchOperator( CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence, bool symbol_first );
   void     StoreStackPointer( char c, unsigned pos_array[] );
 
-  bool     OptimizeConst();
   bool     OptimizeTree2();
-  void     OptimizeTree3();
 
   void     Replace( OP_CODE op1, OP_CODE op2, unsigned pos = 0 );
-  void     ApplyRuleWrapper( unsigned pos, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
-  void     ApplyRule( const CMathExpression& equ, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
+  void     ApplyRule( unsigned pos, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
+  void     InnerCopy( unsigned pos_dest, unsigned pos_source, unsigned size );
   unsigned Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;
   bool     MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
   void     AddZero();
   void     RemoveZero();
 
   //virtual
-  virtual bool ExecuteCommand();
+  virtual void ExecuteCommand();
 
-  static void       InitPositionTable( unsigned pos_array[] );
+  //static
   static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
   static OP_CODE    ElementToRef( const CElement* e )       { return CElementDataBase::ElementToRef( e );   }
   static unsigned   ReservedParameterIndex( OP_CODE op )    { return op - CElementDataBase::OP_EXP1;  }
@@ -114,7 +112,6 @@ public:
   void  Evaluate() const;
 
   static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
-  static bool IsReserved( OP_CODE op )      { return ( op >= CElementDataBase::OP_EXP1 ) && ( op < ( CElementDataBase::OP_EXP1 + CElementDataBase::MAX_EXP ) ); }
 
   OP_CODE           GetLastOperator()       const;
   unsigned          GetSize() const         { return m_StackSize;    }

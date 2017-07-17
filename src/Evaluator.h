@@ -25,8 +25,8 @@ class CElement;
 class CEvaluator;
 
 typedef void ( *CEvaluatorFunct )( CEvaluator& );
-typedef CVector< class CValue > CValueArray;
-typedef CVector< double > CDoubleArray;
+typedef CVector< class CValue >    CValueArray;
+typedef CVector< double >          CDoubleArray;
 typedef CVector< CEvaluatorFunct > CFunctArray;
 
 typedef unsigned short OP_CODE;

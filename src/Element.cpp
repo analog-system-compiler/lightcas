@@ -22,11 +22,15 @@
 #include "Function.h"
 #include "Display.h"
 
-CElement::CElement( const CString& name )
+CElement::CElement( const CString& name ) : m_Name( name )
 {
   m_Name = name;
+  m_bLock = false;
+  m_bAux = false;
+  m_Global = false;
+  m_Numeric = false;
+  m_Ref = 0;
   SetVar();
-  CommonInit();
 }
 
 CElement::~CElement()
@@ -38,15 +42,6 @@ CElement::~CElement()
   TRACE( ds.GetBufferPtr() );
 #endif
   CElementDataBase::UnRef( ToRef() );
-}
-
-void CElement::CommonInit()
-{
-  m_bLock     = false;
-  m_bAux      = false;
-  m_Global    = false;
-  m_Numeric   = false;
-  m_Ref       = 0;
 }
 
 void CElement::Display( CDisplay& ds ) const
@@ -68,11 +63,10 @@ void CElement::Display( CDisplay& ds ) const
   }
 }
 
-bool CElement::Lock()
+void CElement::Lock()
 {
   ASSERT( !m_bLock );
   m_bLock = true;
-  return true;
 }
 
 void CElement::Unlock()
@@ -100,4 +94,5 @@ void CElement::AddFunction( const CMathExpression& src, const CMathExpression& d
   SetFunct(); // to avoid function to be replaced by exp in "ConvertToRule"
   m_Function.AddAlgebraRule( src, dst, line_nb );
 }
+
 

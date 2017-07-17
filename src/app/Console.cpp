@@ -98,7 +98,7 @@ int main()
   CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
 
-#ifdef _DEBUG
+#ifdef _TEST
   db.Test();
   db.Initialize();
 #endif

@@ -18,25 +18,24 @@
 
 #pragma once
 
-#if defined( _DEBUG )
+extern int(*PUTS)(const char*);
 
-#define FILE_TRACE
+#ifdef _DEBUG
+
 extern void TRACE( const char* s, ... );
-extern int (*PUTS)( const char *);
 
-#if defined( _WIN32 )
-
+#ifdef _WIN32
 #include <crtdbg.h>
-#define ASSERT(expr)	_ASSERTE(expr)
-#define ASSERT_NAN( x )	_ASSERTE( !_isnan( x ) )
-#define IS_NAN( x )		_isnan( x )
+#define ASSERT(expr)    _ASSERTE(expr)
+#define ASSERT_NAN( x ) _ASSERTE( !_isnan( x ) )
+#define IS_NAN( x )     _isnan( x )
 
 #else // defined( _WIN32 )
 
 #include <assert.h>
 #define ASSERT(expr)    assert(expr)
-#define ASSERT_NAN( x )	assert( !isnan( x ) )
-#define IS_NAN( x )		isnan( x )
+#define ASSERT_NAN( x ) assert( !isnan( x ) )
+#define IS_NAN( x )   isnan( x )
 
 #endif
 

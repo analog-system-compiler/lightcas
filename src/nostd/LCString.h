@@ -22,10 +22,6 @@
 #include <cstdlib>
 #include "../Debug.h"
 
-/*#ifdef _WIN32
-#define snprintf _snprintf_s
-#endif*/
-
 class CString
 {
 
