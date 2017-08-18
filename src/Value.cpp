@@ -29,7 +29,7 @@ void CValue::Display( CString& ds ) const
 const char* CValue::GetFromString( const char* s1 )
 {
   char* s2;
-  if( s1[0] == '0' && ( s1[1] == 'b' ) || ( s1[1] == 'B' ) )
+  if( ( s1[0] == '0' ) && ( ( s1[1] == 'b' ) || ( s1[1] == 'B' ) ) )
   {
     m_Value = strtol( s1 + 2, &s2, 2 );
   }

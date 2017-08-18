@@ -82,7 +82,6 @@ public:
   bool  LoadFile( const CString& name );
   void  CloseFile();
 
-  unsigned GetFixPoint( unsigned& point_pos );
   const CString& GetWord();
   const CString& GetQuote();
   char  GetChar();

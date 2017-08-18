@@ -161,10 +161,11 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a-b+c-(c+a-b))", "0" );
   Check( "SIMPLIFY(a-(b-c))", "a-b+c" );
   Check( "SIMPLIFY(a-b-c)", "a-b-c" );
+  Check( "SIMPLIFY((a+b)*(a-b))", "a^2-b^2" );
   Check( "SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)", "0" );
 //  Check( "SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))", "15+10*x" );
   Check( "SIMPLIFY(2+2-4+0)", "0" );
-  Check( "SIMPLIFY(-2*MIN(2+2 5)*MAX(2 3)+2^4+8)", "0" );
+  Check( "SIMPLIFY(-2*MIN(2+2, 5)*MAX(2, 3)+2^4+8)", "0" );
   Check( "SIMPLIFY(1-0*a*b)", "1" );
   Check( "SIMPLIFY(2*a-2*a)", "0" );
   Check( "SIMPLIFY(b*(a+2)-b*a-2*b)", "0" );
@@ -218,7 +219,6 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(1/j+j)", "0" );
   Check( "SIMPLIFY(1+j+j^2+j^3)", "0" );
   Check( "SIMPLIFY(1+2*j+j^2+j^7)", "j" );
-
   Check( "SIMPLIFY(2/(1+j)-(1-j))", "0" );
   Check( "SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)", "0" );
 
@@ -290,7 +290,6 @@ void CElementDataBase::Test()
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );
-  //Check( "SOLVE(x^2-4,x)[1]-2", "0" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
   /***** system solving *****/
@@ -339,9 +338,9 @@ void CElementDataBase::Test()
   GetEvaluator()->GetValueFromString( "9" );
   GetEvaluator()->SetElementValue( GetElement( "c" )->ToRef() );
 
-  Check( "EVAL(a+b-c+2)", "5" );
-  Check( "EVAL(a>b?2:3)", "3" );
-  Check( "EVAL(a<b?a:b)", "4" );
+  Check( "DO_EVAL(a+b-c+2)", "5" );
+  Check( "DO_EVAL(a>b?2:3)", "3" );
+  Check( "DO_EVAL(a<b?a:b)", "4" );
 
   DisplayStats();
 

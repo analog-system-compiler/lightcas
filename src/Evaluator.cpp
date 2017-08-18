@@ -495,7 +495,6 @@ void CEvaluator::ShiftLeft( CEvaluator& eval )
 void CEvaluator::If( CEvaluator& eval )
 {
   double v1 = eval.Pop();
-  eval.Pop(); //CONCAT
   double v2 = eval.Pop();
   double v3 = eval.Pop();
   if( v1 != 0 )

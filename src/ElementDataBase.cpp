@@ -20,7 +20,6 @@
 #include <cctype>
 #include "Debug.h"
 #include "Element.h"
-#include "Function.h"
 #include "ElementDataBase.h"
 
 CElementArray      CElementDataBase::m_ElementRefArray;
@@ -30,25 +29,6 @@ unsigned           CElementDataBase::m_SecureLimit;
 #ifdef EMBED_RULES
 extern const char Rules[] asm( "_binary___objs_Rules_txt_start" );
 #endif
-
-const SProperties CElementDataBase::m_BuiltInProperties[] =
-{
-  { "CONCAT",           2, NULL },
-  { "SET",              2, NULL },
-  { "GET",              1, NULL },
-  { "NONE",             0, NULL },
-  { "STACK_SIZE_ERROR", 0, NULL },
-  { "CONST",            1, NULL },
-  { "ELEM",             1, NULL },
-  { "NEG",              1, NULL },
-  { "j",                0, NULL },
-  { "RANK",             2, NULL },
-  { "SUBST",            3, NULL },
-  { "SYST",             2, NULL },
-  { "ERROR",            1, NULL },
-  { "TED",              2, NULL },
-  { "EVAL",             1, NULL },
-};
 
 const SProperties CElementDataBase::m_FunctionProperties[] =
 {
@@ -101,12 +81,11 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
   { "_floor",  1, &CEvaluator::Floor         },
   { "_ceil",   1, &CEvaluator::Ceil          },
   { "_rand",   0, &CEvaluator::Rand          },
-  { "_if2",    2, &CEvaluator::If            },
-  { "_if",     2, &CEvaluator::If            }
+  { "_if2",    3, &CEvaluator::If            },
+  { "_if",     3, &CEvaluator::If            }
 };
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementDataBase::m_FunctionProperties ) / sizeof( SProperties );
-const unsigned CElementDataBase::m_BuiltInPropertiesSize  = sizeof( CElementDataBase::m_BuiltInProperties )  / sizeof( SProperties );
 
 CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* parent, CEvaluator* eval, bool bInitialize )
 {
@@ -119,6 +98,7 @@ CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* pare
   {
     m_Name = name;
   }
+  m_SearchStart = 0;
   m_Evaluator = eval;
   m_SecureLimit = 0;
   if( bInitialize )
@@ -168,16 +148,11 @@ void CElementDataBase::Initialize()
 
 void CElementDataBase::AddReservedElements()
 {
-  unsigned i;
-  const char pseudo_name[MAX_EXP][2] = { "a", "b", "c", "d", "e", "f", "g", "h" };
+  CMathExpression exp( this );
+  static const char parameters[] = "a b c d e f g h";
+  static const char built_in[] = "CONCAT(0 0) SET(0 0) GET(0) NONE CONST(0) ELEM(0) NEG(0) j RANK(0 0) SUBST(0 0 0) EVAL(0)";
 
-  GetElement( "0" )->SetConst();
-  for(  i = 0; i < MAX_EXP; i++ )
-  {
-    GetElement()->SetPseudoName( pseudo_name[i] );
-  }
-  AddEvalFunctionTable( m_BuiltInProperties, m_BuiltInPropertiesSize );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ZERO   ] ) == OP_ZERO   );
+  exp.GetFromString( parameters );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP3   ] ) == OP_EXP3   );
@@ -186,20 +161,22 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP6   ] ) == OP_EXP6   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP7   ] ) == OP_EXP7   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP8   ] ) == OP_EXP8   );
+  m_SearchStart = MAX_EXP;
+
+  GetElement( "0" )->SetConst();
+  ASSERT( ElementToRef( m_ElementRefArray[OP_ZERO] ) == OP_ZERO );
+
+  exp.GetFromString( built_in );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CONCAT ] ) == OP_CONCAT );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SET    ] ) == OP_SET    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_GET    ] ) == OP_GET    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE   ] ) == OP_NONE   );
-  ASSERT( ElementToRef( m_ElementRefArray[OP_STACKERR] ) == OP_STACKERR );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST  ] ) == OP_CONST  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM   ] ) == OP_ELEM   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG    ] ) == OP_NEG    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_SYST   ] ) == OP_SYST   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ERROR  ] ) == OP_ERROR  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_TED    ] ) == OP_TED    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EVAL   ] ) == OP_EVAL   );
   ASSERT( GetSize() == OP_END_RESERVED );
 }
@@ -211,7 +188,7 @@ void CElementDataBase::AddReservedFunctions()
 
 void CElementDataBase::AssociateSymbol( CParser& IC )
 {
-  unsigned char c;
+  char c;
   unsigned i;
   CSymbolSyntaxStruct* sss;
   CString s;
@@ -222,7 +199,7 @@ void CElementDataBase::AssociateSymbol( CParser& IC )
   sss = new CSymbolSyntaxStruct();
   const char* sp = IC.GetQuote().GetBufferPtr();
   i = 0;
-  c = ( unsigned char ) * sp++;
+  c = *sp++;
   while( c && !isspace( c ) && ( i < sizeof( sss->m_Syntax ) - 1 ) )
   {
     if( CParser::IsWord( c ) )
@@ -236,7 +213,6 @@ void CElementDataBase::AssociateSymbol( CParser& IC )
         src_equ.Push( e );
       }
     }
-
     sss->m_Syntax[i++] = c;
     c = *sp++;
   }
@@ -353,7 +329,7 @@ CElement* CElementDataBase::GetElement()
   s = "_";
   s += CString( ( int )n );
   e = CreateElement( s, GetSize() );
-  e->SetTemporary();
+  e->SetAux();
   return e;
 }
 
@@ -396,7 +372,7 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
   }
 
   n = GetSize();
-  for( i = 0; i < n; i++ )
+  for( i = m_SearchStart; i < n; i++ )
   {
     e = GetAt( i );
     compare = string.Compare( e->GetName() );

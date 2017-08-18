@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugNoStd|Win32">
+      <Configuration>DebugNoStd</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseNoStd|Win32">
+      <Configuration>ReleaseNoStd</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Profiling|Win32">
+      <Configuration>Profiling</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B478986-F7FC-017C-80F1-FB52ECA5F87F}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>LightCASLib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoStd|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='ReleaseNoStd|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug\</OutDir>
+    <IntDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\obj\Debug\LightCASLib\</IntDir>
+    <TargetName>LightCASLib</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release\</OutDir>
+    <IntDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\obj\Release\LightCASLib\</IntDir>
+    <TargetName>LightCASLib</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
+    <OutDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug_nostd\</OutDir>
+    <IntDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\obj\DebugNoStd\LightCASLib\</IntDir>
+    <TargetName>LightCASLib</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoStd|Win32'">
+    <OutDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release_nostd\</OutDir>
+    <IntDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\obj\ReleaseNoStd\LightCASLib\</IntDir>
+    <TargetName>LightCASLib</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'">
+    <OutDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\profiling\</OutDir>
+    <IntDir>..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\obj\Profiling\LightCASLib\</IntDir>
+    <TargetName>LightCASLib</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_TEST;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\lightcas\src;..\lightcas\src\std;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\.\lightcas\src\Rules.txt\ (xcopy /Q /E /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug &gt; nul) ELSE (xcopy /Q /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug &gt; nul)</Command>
+      <Message>Copying file Rules.txt to target dir.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\lightcas\src;..\lightcas\src\std;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\.\lightcas\src\Rules.txt\ (xcopy /Q /E /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release &gt; nul) ELSE (xcopy /Q /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release &gt; nul)</Command>
+      <Message>Copying file Rules.txt to target dir.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugNoStd|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_DEBUG;_TEST;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\lightcas\src;..\lightcas\src\nostd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\.\lightcas\src\Rules.txt\ (xcopy /Q /E /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug_nostd &gt; nul) ELSE (xcopy /Q /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\debug_nostd &gt; nul)</Command>
+      <Message>Copying file Rules.txt to target dir.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseNoStd|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\lightcas\src;..\lightcas\src\nostd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\.\lightcas\src\Rules.txt\ (xcopy /Q /E /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release_nostd &gt; nul) ELSE (xcopy /Q /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\release_nostd &gt; nul)</Command>
+      <Message>Copying file Rules.txt to target dir.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>_TEST;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\lightcas\src;..\lightcas\src\std;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Command>IF EXIST ..\.\lightcas\src\Rules.txt\ (xcopy /Q /E /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\profiling &gt; nul) ELSE (xcopy /Q /Y /I ..\.\lightcas\src\Rules.txt ..\..\..\..\CCOLLI~1\AppData\Local\Temp\SimCAS\profiling &gt; nul)</Command>
+      <Message>Copying file Rules.txt to target dir.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\lightcas\src\Debug.h" />
+    <ClInclude Include="..\lightcas\src\Display.h" />
+    <ClInclude Include="..\lightcas\src\Element.h" />
+    <ClInclude Include="..\lightcas\src\ElementDataBase.h" />
+    <ClInclude Include="..\lightcas\src\Evaluator.h" />
+    <ClInclude Include="..\lightcas\src\Function.h" />
+    <ClInclude Include="..\lightcas\src\MathExpression.h" />
+    <ClInclude Include="..\lightcas\src\Parser.h" />
+    <ClInclude Include="..\lightcas\src\Value.h" />
+    <ClInclude Include="..\lightcas\src\nostd\LCString.h" />
+    <ClInclude Include="..\lightcas\src\nostd\LCVector.h" />
+    <ClInclude Include="..\lightcas\src\std\LCString.h" />
+    <ClInclude Include="..\lightcas\src\std\LCVector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\lightcas\src\Debug.cpp" />
+    <ClCompile Include="..\lightcas\src\Element.cpp" />
+    <ClCompile Include="..\lightcas\src\ElementDataBase.cpp" />
+    <ClCompile Include="..\lightcas\src\Evaluator.cpp" />
+    <ClCompile Include="..\lightcas\src\Function.cpp" />
+    <ClCompile Include="..\lightcas\src\MathExpression_core.cpp" />
+    <ClCompile Include="..\lightcas\src\MathExpression_parser.cpp" />
+    <ClCompile Include="..\lightcas\src\MathExpression_simplify.cpp" />
+    <ClCompile Include="..\lightcas\src\Parser.cpp" />
+    <ClCompile Include="..\lightcas\src\Test.cpp" />
+    <ClCompile Include="..\lightcas\src\Value.cpp" />
+    <ClCompile Include="..\lightcas\src\nostd\LCString.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Profiling|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\lightcas\src\Rules.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

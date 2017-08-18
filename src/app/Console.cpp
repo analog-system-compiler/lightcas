@@ -15,12 +15,24 @@
 /*  along with this program; if not, write to the Free Software                */
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
+
+#include <cstdio>
 #include <iostream>
 #include <string>
+
+#ifdef __GNUC__
+#define ISATTY 1
+#else
+#define ISATTY 0
+#endif
+
 #include "Display.h"
 #include "MathExpression.h"
 #include "Element.h"
 #include "ElementDataBase.h"
+#define COLOR_CYAN "\x1B[35m"
+#define COLOR_BLUE "\x1B[36m"
+#define COLOR_OFF  "\x1B[0m"
 
 void Help();
 
@@ -29,24 +41,25 @@ class CDisplayEx : public CDisplay
 public:
   unsigned m_DisplayBase;
 
-#ifndef _WIN32
-#define COLOR_CYAN "\e[35m"
-#define COLOR_BLUE "\e[36m"
-#define COLOR_OFF  "\e[0m"
-  void Add( const CString& str )
+  void Append( const CString& str )
   {
-    *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
+    if ( ISATTY )
+    {
+      if ( isdigit( str[0] ) )
+      {
+        *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
+      }
+      else
+      {
+        *this += CString( COLOR_CYAN ) + str + CString( COLOR_OFF );
+      }
+    }
+    else
+    {
+      *this += str;
+    }
   }
-  void AddValue( const CString& str )
-  {
-    *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
-  }
-#else
-  void AddValue( const CString& str )
-  {
-    *this += ConValue( str );
-  }
-#endif
+
   CString ConValue( const CString& str )
   {
     CString s;

@@ -22,14 +22,13 @@
 #include "Function.h"
 #include "Display.h"
 
-CElement::CElement( const CString& name ) : m_Name( name )
+CElement::CElement( const CString& name )
 {
-  m_Name = name;
-  m_bLock = false;
-  m_bAux = false;
+  m_Name   = name;
+  m_bLock  = false;
+  m_bAux   = false;
   m_Global = false;
-  m_Numeric = false;
-  m_Ref = 0;
+  m_Ref    = 0;
   SetVar();
 }
 
@@ -46,21 +45,7 @@ CElement::~CElement()
 
 void CElement::Display( CDisplay& ds ) const
 {
-  CString s1;
-
-  if( IsConst() )
-  {
-    ASSERT( m_Name.GetLength() );
-    ds.Append( m_Name );
-  }
-  else if( m_PseudoName.GetLength() )
-  {
-    ds.Append( m_PseudoName );
-  }
-  else
-  {
-    ds.Append( m_Name );
-  }
+  ds.Append( m_Name );
 }
 
 void CElement::Lock()

@@ -45,19 +45,17 @@ protected:
   CString                   m_Name;
   CElementDataBase*         m_Parent;
   CEvaluator*               m_Evaluator;
+  unsigned                  m_SearchStart;
   static unsigned           m_SecureLimit;
   static CElementArray      m_ElementRefArray;
   static CSymbolSyntaxArray m_SymbolSyntaxArray;
   static const SProperties  m_FunctionProperties[];
-  static const SProperties  m_BuiltInProperties[];
   static const unsigned     m_FunctionPropertiesSize;
-  static const unsigned     m_BuiltInPropertiesSize;
 
 public :
 
   enum PRIVATE_OPCODE
   {
-    OP_ZERO = 0,
     OP_EXP1,
     OP_EXP2,
     OP_EXP3,
@@ -66,20 +64,17 @@ public :
     OP_EXP6,
     OP_EXP7,
     OP_EXP8,
+    OP_ZERO,
     OP_CONCAT,
     OP_SET,
     OP_GET,
     OP_NONE,
-    OP_STACKERR,
     OP_CONST,
     OP_ELEM,
     OP_NEG,
     OP_CPLX,
     OP_RANK,
     OP_SUBST,
-    OP_SYST,
-    OP_ERROR,
-    OP_TED,
     OP_EVAL,
     OP_END_RESERVED
   };
@@ -118,7 +113,7 @@ public:
   static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
   static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
-  static bool IsReserved( OP_CODE op )                   { return ( op >= OP_EXP1 ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
+  static bool IsReserved( OP_CODE op )                 { return ( op >= OP_EXP1 ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
   CElementDataBase* GetParent() const                  { return m_Parent;            }
 
 

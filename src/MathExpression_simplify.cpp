@@ -83,7 +83,7 @@ bool CMathExpression::OptimizeTree2()
 #endif
           if( m_StackSize >= MAX_STACK_SIZE )
           {
-            Init( CElementDataBase::OP_STACKERR );
+            Init( m_ElementDB->GetElement( "STACK_SIZE_ERROR" ) );
             ASSERT( false );
           }
         }
@@ -347,17 +347,6 @@ void CMathExpression::ExecuteCommand()
     }
     break;
   }
-  /* case CElementDataBase::OP_BASE:
-   {
-     CEvaluator* eval = m_ElementDB->GetEvaluator();
-     OP_CODE op1 = Pop( m_StackSize );
-     OP_CODE op2 = Pop( m_StackSize );
-     CElement* e = RefToElement( op2 );
-     CValue v2;
-     v2.GetFromString( e->GetName().GetBufferPtr(), ( unsigned )eval->GetElementValue( op1 ).GetValue() );
-     Push( m_ElementDB->GetElement( v2 ) );
-   }
-   break;*/
 
   default:
     m_StackSize++;
@@ -390,22 +379,32 @@ OP_CODE CMathExpression::GetLastOperator() const
   return op1;
 }
 
-bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
+bool CMathExpression::CompareBranchElement( unsigned pos1, unsigned pos2 ) const
 {
   OP_CODE op3, op4;
-  unsigned pos11, pos22;
   CElement* e;
 
   op4 = Pop( pos2 );
   e = RefToElement( op4 );
 
-  if( e && e->IsVar() )
+  if ( e && e->IsVoid() )
   {
     op3 = Pop( pos1 );
     return ( op3 == op4 );
   }
 
-  pos2++;
+  return false;
+}
+
+bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
+{
+  unsigned pos11, pos22;
+
+  if ( CompareBranchElement( pos1, pos2 ) )
+  {
+    return true;
+  }
+
   pos11 = pos1;
   pos22 = pos2;
   NextBranch( pos11 );

@@ -16,8 +16,8 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#include <string.h>
-#include <ctype.h>
+#include <cstring>
+#include <cctype>
 #include "Debug.h"
 #include "Parser.h"
 #include "Display.h"
@@ -229,8 +229,6 @@ bool CParser::TryMatchSymbol( const char*& symbol_str )
 
 const CString& CParser::GetQuote()
 {
-  char c;
-
   m_Buffer.Clear();
 
   if ( TryFind( '"' ) )

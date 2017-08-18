@@ -54,6 +54,7 @@ protected:
   void     Append( const OP_CODE* array, unsigned size );
 
   void     PushBranch( const CMathExpression& equ, unsigned& pos );
+  bool     CompareBranchElement( unsigned pos1, unsigned pos2 ) const;
   bool     CompareBranch( unsigned pos1, unsigned pos2 ) const;
   void     NextBranch( unsigned& pos ) const;
 
