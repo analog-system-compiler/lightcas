@@ -44,7 +44,7 @@ void CMathExpression::Display( CDisplay& ds ) const
 unsigned CMathExpression::DisplayBranch( unsigned pos, unsigned priority, CDisplay& ds ) const
 {
   unsigned i, n;
-  CElement* e;
+  const CElement* e;
   unsigned pos2;
   CDisplay ds2, ds3;
 

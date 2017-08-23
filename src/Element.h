@@ -78,6 +78,7 @@ public:
   bool IsUnary()   const                    { return ( m_Function.GetParameterNb() == 1 );  }
   bool IsBinary()  const                    { return ( m_Function.GetParameterNb() == 2 );  }
   OP_CODE ToRef()  const                    { return ( OP_CODE )m_Ref;         }
+  const CFunction* GetFunction() const      { return &m_Function;              }
   CFunction* GetFunction()                  { return &m_Function;              }
 
   CElement( const CString& name );

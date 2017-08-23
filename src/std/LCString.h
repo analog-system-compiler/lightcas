@@ -40,7 +40,6 @@ public:
   void SetLength( size_t n )                       { resize( n ); }
   int  Compare(  const CString& s ) const          { return compare( s ); }
   size_t Search( char c ) const                    { return find( c ); }
-  //operator const char * () const                   { return GetBufferPtr();  }
   bool IsEmpty() const                             { return empty(); }
   char At( unsigned n ) const                      { return at( n ); }
   void ToLower()                                   { std::for_each( begin(), end(), ::tolower ); }

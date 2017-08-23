@@ -30,7 +30,7 @@
 #sym  OR( a b )       "a|\|b  "  
 #sym  XOR( a b )      "a~b    "  
 #sym  ADD( a b )      "a+b    "  
-#sym  SUB( a b )      "a-(b)  "  
+#sym  SUB( a b )      "a-\>(b)"  
 #sym  AND( a b )      "a&\&b  "  
 #sym  MUL( a b )      "a*b    "  
 #sym  DIV( a b )      "a/(b)  "  
@@ -44,7 +44,7 @@
 #sym  GTE( a b )      "a>=(b) "  
 #sym  GT( a b )       "a>(b)  "  
 #sym  LOR( a b )      "a||b   "  
-//#sym  RANGE( a b )    "a->b   "
+#sym  RANGE( a b )    "a->b   "
 #sym  LAND( a b )     "a&&b   "  
 #sym  AT( a b )       "a[B]   "  
 #sym  NEG( a )        "-a     "  
@@ -615,7 +615,7 @@ SOLVE(a,v)                        := SOLVE2(POLY_TED(a,v));
 SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
 SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
 
-//CRAMER
+//vector defined matrix determinant { a*x+b*y..., c*x+d*y... }
 DET( {0}, { c    } )              := 0;
 DET( {a}, { c, d } )              := DET_LINES( MATRIX_BOTTOM( POLY_TED( a, d ) ), DET_VAR( c ) );
 DET( {a}, { c    } )              := DET_LINES( MATRIX_BOTTOM( POLY_TED( a, c ) ) );
@@ -632,14 +632,46 @@ DET_LINES( MATRIX_BOTTOM( c, TED( a b ) )                 , DET_VAR( e ) ) := a 
 DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( d, c ) )}, { e } ) - DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP( d , TED( a b ) ), DET_VAR( e ) );
 DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( c ) )}   , { e } );
 
+// pos defined matrix determinant { {a,b,...}, {c,d,...}, ... }
+DET( {0} ) := 0;
+DET( {a} ) := MAT_DET_LINES( MATRIX_BOTTOM( a ) );
+
+MAT_DET_LINES( MATRIX_BOTTOM( { a }    ) ) := a;
+MAT_DET_LINES( MATRIX_BOTTOM( { a, b } ) ) := ERROR(6);
+
+MAT_DET_LINES( MATRIX_BOTTOM( c, { a, 0 } )                  ) := 0 - MAT_DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP(     { a, 0 } ) );
+MAT_DET_LINES( MATRIX_BOTTOM( c, { a, 0 } ), MATRIX_TOP( d ) ) := 0 - MAT_DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP( d , { a, 0 } ) );
+MAT_DET_LINES( MATRIX_BOTTOM(    { a, 0 } ), MATRIX_TOP( c ) ) := 0;
+
+MAT_DET_LINES( MATRIX_BOTTOM( c, { a, b } )                  ) := b * DET( { MAT_REM_HEAD( c                     ) } ) - MAT_DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP(     { a, b } ) );
+MAT_DET_LINES( MATRIX_BOTTOM( c, { a, b } ), MATRIX_TOP( d ) ) := b * DET( { MAT_REM_HEAD( VECT_REVERSE1( d, c ) ) } ) - MAT_DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP( d , { a, b } ) );
+MAT_DET_LINES( MATRIX_BOTTOM(    { a, b } ), MATRIX_TOP( c ) ) := b * DET( { MAT_REM_HEAD( VECT_REVERSE1( c )    ) } );
+
+// { {...,a,b}, {...,c,d}, ... } -> { {...,a}, {...,c}, ... }
+MAT_REM_HEAD( a, {c,d}) := ( MAT_REM_HEAD( a ), {c} );
+MAT_REM_HEAD(    {c,d}) := {c};
+
 //MATRIX HELP FUNCTIONS
 TED_TO_MATRIX( c , TED( a b ) )   := CHECK_NULL( TED_TO_MATRIX( c ), b );
 TED_TO_MATRIX(     TED( a b ) )   := b;
 TED_TO_MATRIX(  a, b    )         := ERROR(7);
-//CHECK_NULL (a,b) := (a,b);
+
 CHECK_NULL( a , 0 )               := 0;
 CHECK_NULL( 0 , a )               := 0;
 CHECK_NULL( a , b )               := (a,b);
+
+//Matrix multiplication
+//MAT_MUL_LINE( {a},   {c} )     := { a*c };
+//MAT_MUL_LINE( {a,b}, {c,d} )   := { MAT_MUL_LINE( a, c ), b*d };
+
+MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM( {a, {b}}, {c} ) } };
+MAT_MUL( {{b}},   {c} )               := { MAT_MUL_ELEM( {{b}}, {c} ) };
+
+MAT_MUL_ELEM( {a,{b,f}} , {c,{d,e}} ) := MAT_MUL_ELEM( {a,{b}} , {c} ) + f * e;
+MAT_MUL_ELEM( {a,{f}}   , {{d,e}}   ) := f * e;
+
+MAT_MUL_ELEM( {{b,f}}   , {c,{d,e}} ) := MAT_MUL_ELEM( {{b}} , {c} ) + f * e;
+MAT_MUL_ELEM( {{f}}     , {{d,e}}   ) := f * e;
 
 // Vector reversal {x,y,z} -> {z,y,x}
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
@@ -690,7 +722,7 @@ c^(a,b)                   := (c^a,b);
 //Vector not
 ~(a,b)                    := (~a,~b);
 
-RANGE( CONST(a) CONST(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ): a);
+RANGE( CONST(a) CONST(b) ):= ( (a < b) ? ( RANGE( a b-1 ), b ): a);
 SIN(a,b)                  := (SIN(a),SIN(b));
 COS(a,b)                  := (COS(a),COS(b));
 TAN(a,b)                  := (TAN(a),TAN(b));

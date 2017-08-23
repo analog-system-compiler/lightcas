@@ -18,7 +18,7 @@
 
 #include "LCString.h"
 
-char const CString::m_NullString[ 1 ] = "";
+char const CString::m_NullString[1] = "";
 
 void CString::SetLength( unsigned len )
 {
@@ -29,27 +29,29 @@ void CString::SetLength( unsigned len )
 
 void CString::Append( const char* s, unsigned i )
 {
-  ASSERT( s != NULL );
-
-  SetLength( m_Length + i );
-
-  if( i == 1 )	// char
+  if ( i != 0 )
   {
-    m_Data[ m_Length - 1 ] = *s;
-  }
-  else	// string;
-  {
-    memcpy( &m_Data[ m_Length - i ], s, i * sizeof( char ) );
-  }
+    ASSERT( s != NULL );
 
-  m_Data[ m_Length ] = '\0';
+    SetLength( m_Length + i );
 
+    if ( i == 1 ) // char
+    {
+      m_Data[m_Length - 1] = *s;
+    }
+    else  // string;
+    {
+      memcpy( &m_Data[m_Length - i], s, i * sizeof( char ) );
+    }
+
+    m_Data[m_Length] = '\0';
+  }
 }
 
 int CString::Compare( const char* s1, const char* s2 )
 {
   int bcomp;
-  
+
   if( ( s1 == NULL ) && ( s2 == NULL ) )
   {
     bcomp = 0;

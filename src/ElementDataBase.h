@@ -109,8 +109,8 @@ public:
   void            AssociateSymbol( CParser& IC );
 
   static OP_CODE    ElementToRef( const CElement* e );
-  static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ];    }
-  static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL;    }
+  static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ]; }
+  static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL; }
   static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
   static bool IsReserved( OP_CODE op )                 { return ( op >= OP_EXP1 ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }

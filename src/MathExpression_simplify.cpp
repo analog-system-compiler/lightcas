@@ -40,8 +40,8 @@ bool CMathExpression::OptimizeTree2()
   unsigned pos_array[CElementDataBase::MAX_EXP];
 
   OP_CODE op = GetLastOperator();
-  CElement* e = RefToElement( op );
-  CFunction* funct = e->GetFunction();
+  const CElement* e = RefToElement( op );
+  const CFunction* funct = e->GetFunction();
 
   if( funct )
   {
@@ -49,14 +49,14 @@ bool CMathExpression::OptimizeTree2()
     for( i = 0; i < n; i++ )
     {
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
-      CMathExpression* equ = &( rule->m_SrcEquation );
+      const CMathExpression* equ = &( rule->m_SrcEquation );
 
       pos = Match( GetSize(), *equ, pos_array );
       match = ( pos != GetSize() );
 
       if( match )
       {
-#ifdef _DEBUG
+#ifdef _TEST
         rule->m_AccessNb++;
 #endif
 #ifdef DEBUG_OPTIMIZE
@@ -277,8 +277,6 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
 
 void CMathExpression::ExecuteCommand()
 {
-  CElement* e;
-
   OP_CODE op3 = Pop( m_StackSize );
 
 #ifdef DEBUG_OPTIMIZE
@@ -296,6 +294,7 @@ void CMathExpression::ExecuteCommand()
 
   switch( op3 )
   {
+
   case CElementDataBase::OP_SET:
   {
     CMathExpression equ_dst( m_ElementDB );
@@ -304,24 +303,22 @@ void CMathExpression::ExecuteCommand()
     unsigned pos = m_StackSize;
     equ_src.PushBranch( *this, pos );
     OP_CODE op1 = equ_src.GetLastOperator();
-    e = RefToElement( op1 );
+    CElement* e = RefToElement( op1 );
     e->AddFunction( equ_src, equ_dst );
+    break;
   }
-  break;
 
   case CElementDataBase::OP_GET:
-  {
     OptimizeTree2();
-  }
-  break;
+    break;
 
   case CElementDataBase::OP_RANK:
   {
     OP_CODE op1 = Pop( m_StackSize );
     OP_CODE op2 = Pop( m_StackSize );
     Push( op1 > op2 ? op1 : op2 );
+    break;
   }
-  break;
 
   case CElementDataBase::OP_SUBST:
   {
@@ -331,8 +328,8 @@ void CMathExpression::ExecuteCommand()
     NextBranch( pos );
     Replace( ops, opd, pos );
     OptimizeTree2();
+    break;
   }
-  break;
 
   case CElementDataBase::OP_EVAL:
   {
@@ -363,26 +360,10 @@ void CMathExpression::ExecuteCommand()
 #endif
 }
 
-OP_CODE CMathExpression::GetLastOperator() const
-{
-  OP_CODE op1;
-
-  if( IsEmpty() )
-  {
-    op1 = CElementDataBase::OP_ZERO;
-  }
-  else
-  {
-    op1 = Get( m_StackSize - 1 );
-  }
-
-  return op1;
-}
-
 bool CMathExpression::CompareBranchElement( unsigned pos1, unsigned pos2 ) const
 {
   OP_CODE op3, op4;
-  CElement* e;
+  const CElement* e;
 
   op4 = Pop( pos2 );
   e = RefToElement( op4 );

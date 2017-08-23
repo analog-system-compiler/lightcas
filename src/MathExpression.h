@@ -33,7 +33,7 @@ class CAlgebraRule;
 class CMathExpression
 {
 
-  friend CElementDataBase;
+  friend class CElementDataBase;
 
 protected:
   OP_CODE*  m_StackArray;
@@ -47,7 +47,7 @@ protected:
   OP_CODE  Get( unsigned pos )  const      { return m_StackArray[ pos ];  }
   OP_CODE  Pop( unsigned& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
   void     Push( OP_CODE op )              { SetSize( m_StackSize + 1  );  Set( m_StackSize - 1, op );  }
-  void     Push( const CElement* e )         { Push( ElementToRef( e ) );    }
+  void     Push( const CElement* e )       { Push( ElementToRef( e ) );    }
 
   void     Push( const CMathExpression& equ );
   void     PushEvalElement();
@@ -114,9 +114,9 @@ public:
 
   static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
 
-  OP_CODE           GetLastOperator()       const;
-  unsigned          GetSize() const         { return m_StackSize;    }
-  CElementDataBase* GetElementDB() const    { return m_ElementDB;    }
+  OP_CODE GetLastOperator() const         { return IsEmpty() ? CElementDataBase::OP_ZERO : Get( m_StackSize - 1 ); }
+  unsigned          GetSize() const       { return m_StackSize;    }
+  CElementDataBase* GetElementDB() const  { return m_ElementDB;    }
 
   CMathExpression( CElementDataBase* db = NULL );
   CMathExpression( const CMathExpression& equ ) { m_ElementDB = NULL; Copy( equ ); }

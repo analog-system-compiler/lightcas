@@ -110,7 +110,7 @@ void CElementDataBase::DisplayStats()
     CElement* e = m_ElementRefArray.GetAt( i );
     if( e )
     {
-      CFunction* funct = e->GetFunction();
+      const CFunction* funct = e->GetFunction();
       for( unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++ )
       {
         if( j == 0 )
@@ -313,6 +313,11 @@ void CElementDataBase::Test()
   Check( "DET({ x+y+z+w, y+z+w, z+w, w}, {x,y,z,w})", "1" );
   Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "0" );
   Check( "DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})", "-C1_I" );
+  Check( "DET({ {3,4} , {2,8} })", "16" );
+  Check( "DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })", "32" );
+
+  /*** Matrixes ***/
+  Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )", "{{26},{69}}" );
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );

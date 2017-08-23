@@ -2,6 +2,7 @@
 EXE             = LightCAS
 SRC_DIR         = ../src
 CXX             = $(CROSS_COMPILE)g++
+#CXX             = $(CROSS_COMPILE)clang++
 AR              = $(CROSS_COMPILE)ar
 LD              = $(CROSS_COMPILE)ld
 SRCS            = $(notdir $(wildcard $(SRC_DIR)/*.cpp))
@@ -14,22 +15,27 @@ INCDIR          = -I$(SRC_DIR)
 #options
 USE_STD         = 0
 DEBUG           = 0
+TEST            = 0
 EMBED_RULES     = 1
 
+CPPFLAGS  = -MMD -Wall -fno-rtti $(INCDIR)
+LDFLAGS   = -s -Wl,-Map=$(EXE).map
+
 ifeq ($(USE_STD),0)
-	INCDIR += -I$(SRC_DIR)/nostd 
+	CPPFLAGS += -I$(SRC_DIR)/nostd 
 	SRCS   += nostd/LCString.cpp  
 else
-	INCDIR += -I$(SRC_DIR)/std 
+	CPPFLAGS += -I$(SRC_DIR)/std
 endif
 
-CPPFLAGS  = -MMD -Wall $(INCDIR)
-
 ifeq ($(DEBUG),1)
-	CPPFLAGS += -g -D_DEBUG -pg 
-	LDFLAGS  += -Wl,-Map=$(EXE).map
+	CPPFLAGS += -g -D_DEBUG
 else
-	CPPFLAGS += -s -Os
+	CPPFLAGS += -Os
+endif
+
+ifeq ($(TEST),1)
+	CPPFLAGS += -D_TEST
 endif
 
 ifeq ($(EMBED_RULES),1)
@@ -53,8 +59,8 @@ $(OBJDIR)/%.o: $(SRC_DIR)/%.txt
 
 $(LIB): $(LIB_OBJS)
 	echo 'Archiving  $(notdir $@)'
-	$(AR) -r $@ $^
-
+	$(AR) rcs $@ $^
+    
 $(EXE):$(LIB)
 	echo 'Linking    $(notdir $@)'
 	$(CXX) -o $@  $(CPPFLAGS) $(LDFLAGS) $(EXE_SRC) $^
@@ -64,7 +70,7 @@ endif
 
 clean:
 	@echo 'Cleaning  ...'
-	rm -rf $(OBJDIR)
+	rm -rf $(LIB) $(EXE) $(OBJDIR)
 
 .PHONY: all
 .SILENT:

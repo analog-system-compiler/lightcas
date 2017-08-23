@@ -37,7 +37,7 @@ public:
   void      Append( const CVector& v )           {  InsertAt( m_Size, v );  }
   void      Append( const T e )                  {  InsertAt( m_Size, e );  }
   void      RemoveAll()                          {  m_Size = 0;  }
-  void      DeleteAll()                          {  for( unsigned i = 0; i < GetSize(); i++ )    { delete m_Data[i];    }    RemoveAll();  }
+  void      DeleteAll()                          {  for( unsigned i = 0; i < GetSize(); i++ ) { delete m_Data[i]; } RemoveAll(); }
   void      Copy( const CVector& v )             { RemoveAll(); Append( v ); }
   T&        GetAt( unsigned index ) const        {  ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); return m_Data[ index ];  }
   void      SetAt( unsigned index, const T e )   {  ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); m_Data[ index ] = static_cast<T>( e );  }

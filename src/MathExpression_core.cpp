@@ -119,7 +119,7 @@ void CMathExpression::NextBranch( unsigned& pos ) const
 {
   unsigned i = 1;
   OP_CODE op;
-  CElement* e;
+  const CElement* e;
 
   ASSERT( pos );
   while( pos && i )
@@ -181,7 +181,7 @@ void CMathExpression::Evaluate() const
 void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst )
 {
   OP_CODE op;
-  CElement* e;
+  const CElement* e;
   unsigned i = 0;
   unsigned pos;
 
