@@ -661,17 +661,15 @@ CHECK_NULL( 0 , a )               := 0;
 CHECK_NULL( a , b )               := (a,b);
 
 //Matrix multiplication
-//MAT_MUL_LINE( {a},   {c} )     := { a*c };
-//MAT_MUL_LINE( {a,b}, {c,d} )   := { MAT_MUL_LINE( a, c ), b*d };
+//MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM1( {b}, {c} ) } };
+//MAT_MUL( {{b}},   {c} )               := { MAT_MUL_ELEM1( {b}, {c} ) };
 
-MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM( {a, {b}}, {c} ) } };
+MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM( {{b}}, {c} ) } };
 MAT_MUL( {{b}},   {c} )               := { MAT_MUL_ELEM( {{b}}, {c} ) };
 
-MAT_MUL_ELEM( {a,{b,f}} , {c,{d,e}} ) := MAT_MUL_ELEM( {a,{b}} , {c} ) + f * e;
-MAT_MUL_ELEM( {a,{f}}   , {{d,e}}   ) := f * e;
-
 MAT_MUL_ELEM( {{b,f}}   , {c,{d,e}} ) := MAT_MUL_ELEM( {{b}} , {c} ) + f * e;
-MAT_MUL_ELEM( {{f}}     , {{d,e}}   ) := f * e;
+MAT_MUL_ELEM( {{f}}     , {{d,e}}   ) := f * e; 
+
 
 // Vector reversal {x,y,z} -> {z,y,x}
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
