@@ -75,7 +75,7 @@ const CString& CParser::GetWord()
   return m_Buffer;
 }
 
-void CParser::Find( char c )
+bool CParser::Find( char c )
 {
 
   if( GetChar() != c )
@@ -99,12 +99,11 @@ void CParser::Find( char c )
     m_Buffer += " was found instead of \'";
     m_Buffer += c;
     m_Buffer += '\'';
-    Error( CParserException::ID_ERROR_SYNTAX );
-
+    return false;
   }
 
   m_Pos++;
-
+  return true;
 }
 
 void CParser::SkipSpaceNL()
@@ -118,7 +117,7 @@ void CParser::SkipSpaceNL()
 #ifdef _DEBUG
     CDisplay ds;
     ds.Append( "Processing line " );
-    ds.Append( m_LineNb );
+    ds.Append( ( int )m_LineNb );
     TRACE( ds.GetBufferPtr() );
 #endif
     SkipSpace();
@@ -132,12 +131,6 @@ void CParser::SkipSpace()
     m_Pos++;
   }
   SkipComment();
-}
-
-char CParser::GetChar()
-{
-  SkipSpaceNL();
-  return( *m_Pos );
 }
 
 void CParser::Init( const char* pText )
@@ -227,7 +220,7 @@ bool CParser::TryMatchSymbol( const char*& symbol_str )
   return true;
 }
 
-const CString& CParser::GetQuote()
+bool CParser::GetQuote()
 {
   m_Buffer.Clear();
 
@@ -241,17 +234,17 @@ const CString& CParser::GetQuote()
     }
     else
     {
-      Error( CParserException::ID_ERROR_SYNTAX );
+      return false; // Error(CParserException::ID_ERROR_SYNTAX);
     }
   }
   else
   {
-    GetWord();
+    return false;//GetWord();
   }
 
-  return m_Buffer;
+  return true;//return m_Buffer;
 }
-
+#if 0
 void CParser::Error( unsigned id ) const
 {
   CParserException ex;
@@ -276,7 +269,7 @@ void CParser::Error( unsigned id ) const
 
   throw( ex );
 }
-
+#endif
 bool CParser::LoadFile( const CString& name )
 {
   int   size;

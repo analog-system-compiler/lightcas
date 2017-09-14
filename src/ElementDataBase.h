@@ -46,6 +46,7 @@ protected:
   CElementDataBase*         m_Parent;
   CEvaluator*               m_Evaluator;
   unsigned                  m_SearchStart;
+  bool                      m_Error;
   static unsigned           m_SecureLimit;
   static CElementArray      m_ElementRefArray;
   static CSymbolSyntaxArray m_SymbolSyntaxArray;
@@ -65,16 +66,17 @@ public :
     OP_EXP7,
     OP_EXP8,
     OP_ZERO,
-    OP_CONCAT,
     OP_SET,
     OP_GET,
     OP_NONE,
     OP_CONST,
     OP_ELEM,
+    OP_FUNCT0,
+    OP_FUNCT1,
+    OP_FUNCT2,
     OP_NEG,
-    OP_CPLX,
     OP_RANK,
-    OP_SUBST,
+    // OP_SUBST,
     OP_EVAL,
     OP_END_RESERVED
   };
@@ -97,23 +99,25 @@ protected:
 public:
 
   void            Clear();
+  bool            IsOK()                           { return !m_Error; }
   const CString&  GetName() const                  { return m_Name; }
   void            SetName( const CString& name )   { m_Name = name; }
-  void            Initialize();
+  bool            Initialize();
   CEvaluator*     GetEvaluator() const             { return m_Evaluator; }
   void            SetEvaluator( CEvaluator* eval ) { m_Evaluator = eval; }
   CElement*       ParseElement( CParser& IC );
   CElement*       GetElement();
   CElement*       GetElement( const CString& );
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
-  void            AssociateSymbol( CParser& IC );
+  bool            AssociateSymbol( CParser& IC );
 
   static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ]; }
   static void       UnRef( OP_CODE op )                { m_ElementRefArray[ ( unsigned )op ] = NULL; }
   static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
-  static bool IsReserved( OP_CODE op )                 { return ( op >= OP_EXP1 ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
+  static bool IsReservedOP( OP_CODE op )               { return ( op >= OP_EXP1   ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
+  static bool IsFunctionOP( OP_CODE op )               { return ( op >= OP_FUNCT0 ) && ( op <= OP_FUNCT2 ); }
   CElementDataBase* GetParent() const                  { return m_Parent;            }
 
 

@@ -25,6 +25,7 @@
 CEvaluator::CEvaluator()
 {
   m_ValPos = 0;
+  m_OpPos = NULL;
 }
 
 CEvaluator::~CEvaluator()
@@ -56,9 +57,11 @@ void CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 
   AllocateStack( size );
 
+  m_OpPos = p;
+
   for ( pos = 0; pos < size; pos++ )
   {
-    index = *p++;
+    index = *m_OpPos++;
 
     if ( index < n )
     {
@@ -507,5 +510,9 @@ void CEvaluator::If( CEvaluator& eval )
   }
 }
 
-
+void CEvaluator::Rank( CEvaluator& eval )
+{
+  eval.Pop();
+  eval.Push( ( double )eval.m_OpPos[-2] );
+}
 

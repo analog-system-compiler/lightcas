@@ -123,28 +123,38 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
   {
     op1 = equ.Pop( pos1 );
 
-    if( op1 == CElementDataBase::OP_CONST || op1 == CElementDataBase::OP_ELEM )
+    if( ( op1 >= CElementDataBase::OP_CONST ) && ( op1 <= CElementDataBase::OP_FUNCT2 ) )
     {
-      op3 = op1;
-      op1 = equ.Pop( pos1 );
-      ASSERT( CElementDataBase::IsReserved( op1 ) );
-
-      match = MatchBranch( pos_array,  op1,  pos2 );
+      op3 = equ.Pop( pos1 );
+      ASSERT( CElementDataBase::IsReservedOP( op3 ) );
+      match = MatchBranch( pos_array,  op3,  pos2 );
       if( match )
       {
         op2 = Pop( pos2 );
-        CElement* e = RefToElement( op2 );
-        if( op3 == CElementDataBase::OP_ELEM  )
+        match = false;
+        if ( !CElementDataBase::IsReservedOP( op2 ) )
         {
-          match = e->IsVoid() && !e->IsConst() && !CElementDataBase::IsReserved( op2 );
-        }
-        else// if( op3 == CElementDataBase::OP_CONST )
-        {
-          match = e->IsConst();
+          CElement* e = RefToElement( op2 );
+          int n = ( int )e->GetFunction()->GetParameterNb();
+          if ( n == 0 )
+          {
+            if( e->IsConst() )
+            {
+              match = ( op1 == CElementDataBase::OP_CONST );
+            }
+            else
+            {
+              match = ( op1 == CElementDataBase::OP_ELEM );
+            }
+          }
+          else
+          {
+            match = ( ( op1 - CElementDataBase::OP_FUNCT0 ) == n );
+          }
         }
       }
     }
-    else if( CElementDataBase::IsReserved( op1 ) ) //a,b or c
+    else if( CElementDataBase::IsReservedOP( op1 ) ) //a,b or c
     {
       match = MatchBranch( pos_array,  op1,  pos2 );
       if( match )
@@ -241,17 +251,29 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
   equ.SetSize( GetSize() );
   equ.Clear();
 
-  for ( pos = 0; pos < rule_equ.GetSize(); pos++ )
+  unsigned n = rule_equ.GetSize();
+  for ( pos = 0; pos < n; pos++ )
   {
 
     op3 = rule_equ.Get( pos );
 
-    if ( CElementDataBase::IsReserved( op3 ) )
+    if ( CElementDataBase::IsReservedOP( op3 ) )
     {
       j = ReservedParameterIndex( op3 );
       unsigned pos2 = pos_array[j];
       ASSERT( pos2 <= GetSize() );
-      equ.PushBranch( *this, pos2 ); // WARNING pos2 is modified
+      unsigned pos3 = pos + 1;
+      if ( pos3 < n ) // if followed by FUNCT1 or FUNCT2
+      {
+        op3 = rule_equ.Get( pos3 );
+        if ( CElementDataBase::IsFunctionOP( op3 ) )
+        {
+          equ.Push( Get( pos_array[j] - 1 ) );
+          pos = pos3;
+          continue;
+        }
+      }
+      equ.PushBranch( *this, pos2 );  // WARNING pos2 is modified
     }
     else
     {
@@ -281,7 +303,7 @@ void CMathExpression::ExecuteCommand()
 
 #ifdef DEBUG_OPTIMIZE
   CDisplay ds;
-  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || ( op3 == CElementDataBase::OP_SUBST ) || ( op3 == CElementDataBase::OP_EVAL ) )
+  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
   {
     ds += "Execute Command ";
     RefToElement( op3 )->Display( ds );
@@ -320,17 +342,6 @@ void CMathExpression::ExecuteCommand()
     break;
   }
 
-  case CElementDataBase::OP_SUBST:
-  {
-    OP_CODE opd = Pop( m_StackSize );
-    OP_CODE ops = Pop( m_StackSize );
-    unsigned pos = m_StackSize;
-    NextBranch( pos );
-    Replace( ops, opd, pos );
-    OptimizeTree2();
-    break;
-  }
-
   case CElementDataBase::OP_EVAL:
   {
     CEvaluator* eval = m_ElementDB->GetEvaluator();
@@ -340,7 +351,7 @@ void CMathExpression::ExecuteCommand()
       NextBranch( pos );
       eval->Evaluate( m_StackSize - pos, m_StackArray + pos );
       m_StackSize = pos;
-      PushEvalElement();
+      PushEvalElement( *eval );
     }
     break;
   }
@@ -352,7 +363,7 @@ void CMathExpression::ExecuteCommand()
   }
 
 #ifdef DEBUG_OPTIMIZE
-  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || ( op3 == CElementDataBase::OP_SUBST ) || ( op3 == CElementDataBase::OP_EVAL ) )
+  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
   {
     Display( ds );
     TRACE( ds.GetBufferPtr() );
@@ -417,14 +428,13 @@ bool CMathExpression::MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned p
   return match;
 }
 
-void CMathExpression::PushEvalElement()
+void CMathExpression::PushEvalElement( CEvaluator& eval )
 {
   bool minus;
   CString s;
-  CEvaluator* eval = m_ElementDB->GetEvaluator();
-  minus = eval->Display( s );
+  minus = eval.Display( s );
   CElement* e = m_ElementDB->GetElement( s );
-  eval->SetElementValue( e->ToRef() );
+  eval.SetElementValue( e->ToRef() );
   e->SetConst();
   Push( e );
   if ( minus )

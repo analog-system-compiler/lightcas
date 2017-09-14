@@ -82,7 +82,8 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
   { "_ceil",   1, &CEvaluator::Ceil          },
   { "_rand",   0, &CEvaluator::Rand          },
   { "_if2",    3, &CEvaluator::If            },
-  { "_if",     3, &CEvaluator::If            }
+  { "_if",     3, &CEvaluator::If            },
+  { "_rank",   1, &CEvaluator::Rank          },
 };
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementDataBase::m_FunctionProperties ) / sizeof( SProperties );
@@ -103,8 +104,12 @@ CElementDataBase::CElementDataBase( const CString& name,  CElementDataBase* pare
   m_SecureLimit = 0;
   if( bInitialize )
   {
-    Initialize();
+    if( !Initialize() )
+    {
+      m_Error = true;//IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
+    }
   }
+  m_Error = false;
 }
 
 CElementDataBase::~CElementDataBase()
@@ -112,7 +117,7 @@ CElementDataBase::~CElementDataBase()
   Clear();
 }
 
-void CElementDataBase::Initialize()
+bool CElementDataBase::Initialize()
 {
 
   Clear();
@@ -135,7 +140,7 @@ void CElementDataBase::Initialize()
     else
     {
       IC.CopyBuffer( "rules description file not found." );
-      IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
+      return false;
     }
 #endif
     CleanTempElements();
@@ -144,13 +149,14 @@ void CElementDataBase::Initialize()
   {
     m_Evaluator = m_Parent->GetEvaluator();
   }
+  return true;
 }
 
 void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp( this );
   static const char parameters[] = "a b c d e f g h";
-  static const char built_in[] = "CONCAT(0 0) SET(0 0) GET(0) NONE CONST(0) ELEM(0) NEG(0) j RANK(0 0) SUBST(0 0 0) EVAL(0)";
+  static const char built_in[] = "SET(0 0) GET(0) NONE CONST(0) ELEM(0) FUNCT0(0) FUNCT1(0 0) FUNCT2(0 0 0) NEG(0) RANK(0 0) EVAL(0)";
 
   exp.GetFromString( parameters );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
@@ -167,18 +173,23 @@ void CElementDataBase::AddReservedElements()
   ASSERT( ElementToRef( m_ElementRefArray[OP_ZERO] ) == OP_ZERO );
 
   exp.GetFromString( built_in );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONCAT ] ) == OP_CONCAT );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_SET    ] ) == OP_SET    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_GET    ] ) == OP_GET    );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE   ] ) == OP_NONE   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST  ] ) == OP_CONST  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM   ] ) == OP_ELEM   );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT0 ] ) == OP_FUNCT0 );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT1 ] ) == OP_FUNCT1 );
+  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT2 ] ) == OP_FUNCT2 );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG    ] ) == OP_NEG    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CPLX   ] ) == OP_CPLX   );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_SUBST  ] ) == OP_SUBST  );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EVAL   ] ) == OP_EVAL   );
   ASSERT( GetSize() == OP_END_RESERVED );
+
+  ASSERT( OP_ELEM   == OP_CONST  + 1 );
+  ASSERT( OP_FUNCT0 == OP_ELEM   + 1 );
+  ASSERT( OP_FUNCT1 == OP_FUNCT0 + 1 );
+  ASSERT( OP_FUNCT2 == OP_FUNCT1 + 1 );
 }
 
 void CElementDataBase::AddReservedFunctions()
@@ -186,7 +197,7 @@ void CElementDataBase::AddReservedFunctions()
   AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
 }
 
-void CElementDataBase::AssociateSymbol( CParser& IC )
+bool CElementDataBase::AssociateSymbol( CParser& IC )
 {
   char c;
   unsigned i;
@@ -197,7 +208,11 @@ void CElementDataBase::AssociateSymbol( CParser& IC )
   dst_equ.GetLevel( IC, 0 );
 
   sss = new CSymbolSyntaxStruct();
-  const char* sp = IC.GetQuote().GetBufferPtr();
+  if ( !IC.GetQuote() )
+  {
+    return false;
+  }
+  const char* sp = IC.GetBuffer().GetBufferPtr();
   i = 0;
   c = *sp++;
   while( c && !isspace( c ) && ( i < sizeof( sss->m_Syntax ) - 1 ) )
@@ -231,6 +246,7 @@ void CElementDataBase::AssociateSymbol( CParser& IC )
   sss->m_Equation.Display( ds );
   TRACE( ds.GetBufferPtr() );
 #endif
+  return true;
 }
 
 void CElementDataBase::InitAlgebraRuleTable()

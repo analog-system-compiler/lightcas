@@ -37,6 +37,7 @@ class CEvaluator
 protected:
   CDoubleArray    m_ValueStack;
   unsigned        m_ValPos;
+  const OP_CODE*  m_OpPos;
   CValue          m_Value;
   CValueArray     m_ElementValueArray;
   CFunctArray     m_FunctionArray;
@@ -113,6 +114,7 @@ public:
   static void ShiftRight( CEvaluator& );
   static void ShiftLeft( CEvaluator& );
   static void If( CEvaluator& );
+  static void Rank( CEvaluator& );
 
 public:
   CEvaluator( void );

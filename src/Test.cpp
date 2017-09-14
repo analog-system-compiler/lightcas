@@ -72,7 +72,8 @@ void CElementDataBase::CheckEval( const char* s1, const CValue& v1 )
 {
   CDisplay ds;
   CMathExpression equ( this );
-  equ.GetFromString( s1 );
+  CParser IC( s1 );
+  equ.GetFromString( IC );
   equ.Evaluate();
   const CValue& v2 = GetEvaluator()->GetValue();
   if( v2.GetValue() != v1.GetValue() )
@@ -317,7 +318,14 @@ void CElementDataBase::Test()
   Check( "DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })", "32" );
 
   /*** Matrixes ***/
-  Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )", "{{26},{69}}" );
+  Check( "MAT_TRANSPOSE( { { 1 },{ 6 } } )", "{{1,6}}" );
+  Check( "MAT_TRANSPOSE( { { 2,3 },{ 4,5 } } )", "{{2,4},{3,5}}" );
+  Check( "MAT_TRANSPOSE( { { 2,3,5 },{ 4,5,6 } } )", "{{2,4},{3,5},{5,6}}" );
+  Check( "MAT_MUL( { { 2 } }, { { 1 } } )", "{{2}}" );
+  Check( "MAT_MUL( { { 2,3 } }, { { 1 },{ 6 } } )", "{{20}}" );
+  Check( "MAT_MUL( { { 2,3 } }, { { 1,6 } ,{ 8,9 } } )", "{{26,39}}" );
+  Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1 } ,{ 8 } } )", "{{26},{44}}" );
+  Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )", "{{26,39},{44,69}}" );
 
   /**** taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );

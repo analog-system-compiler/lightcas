@@ -18,7 +18,7 @@ DEBUG           = 0
 TEST            = 0
 EMBED_RULES     = 1
 
-CPPFLAGS  = -MMD -Wall -fno-rtti $(INCDIR)
+CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -s -Wl,-Map=$(EXE).map
 
 ifeq ($(USE_STD),0)

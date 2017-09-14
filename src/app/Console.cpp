@@ -116,6 +116,8 @@ int main()
   db.Initialize();
 #endif
 
+  if ( !db.IsOK() ) { exit( 0 ); }
+
   CMathExpression equ( &db );
   CParser IC;
   CElement* simplify = db_root.GetElement( "SIMPLIFY" );
@@ -155,18 +157,17 @@ int main()
     {
       IC.SetPos( expression_str.c_str() );
 
-      try
+      if( !equ.GetFromString( IC ) )
       {
-        equ.GetFromString( IC );
+        std::cerr << "ERROR: " << IC.GetBuffer().GetBufferPtr() << " at line " << IC.GetLineNb() << "\n";
+      }
+      else
+      {
         equ.UnaryOperation( simplify_op );
         ans->SetEquation( equ );
         ds.Clear();
         equ.Display( ds );
         std::cout << ds << "\n";
-      }
-      catch( CParserException e )
-      {
-        std::cerr << "ERROR: " << e.GetErrorString() << " at line " << e.GetLineNb() << "\n";
       }
     }
   }

@@ -26,34 +26,47 @@ unsigned CMathExpression::Parse( CParser& IC )
   return GetLevel( IC );
 }
 
-void CMathExpression::ParseMacro( CParser& IC )
+bool CMathExpression::ParseMacro( CParser& IC )
 {
   CString s = IC.GetWord();
   if ( s == "sym" )
   {
-    m_ElementDB->AssociateSymbol( IC );
+    if ( !m_ElementDB->AssociateSymbol( IC ) )
+    {
+      return false;
+    }
   }
   else if ( s == "inc" )
   {
-    CParser IC2;
-    if ( IC2.LoadFile( IC.GetQuote() ) )
+    if ( IC.GetQuote() )
     {
-      Parse( IC2 );
+      CParser IC2;
+      if ( IC2.LoadFile( IC.GetBuffer() ) )
+      {
+        Parse( IC2 );
+      }
+      else
+      {
+        return false;
+      }
     }
     else
     {
-      IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
+      return false;
     }
-
   }
+  return true;
 }
 
-void CMathExpression::ParseAtom( CParser& IC )
+bool CMathExpression::ParseAtom( CParser& IC )
 {
   if ( IC.TryFind( '(' ) )
   {
     GetLevel( IC );
-    IC.Find( ')' );
+    if ( !IC.Find( ')' ) )
+    {
+      return false;
+    }
   }
   else if ( IC.IsDigit() )
   {
@@ -61,37 +74,47 @@ void CMathExpression::ParseAtom( CParser& IC )
     const char* pos = IC.GetPos();
     pos = eval->GetValueFromString( pos );
     IC.SetPos( pos );
-    PushEvalElement();
+    PushEvalElement( *eval );
   }
   else if ( IC.IsWord() )
   {
-    ParseElement( IC );
+    if ( !ParseElement( IC ) )
+    {
+      return false;
+    }
   }
   else
   {
-    IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+    return false;
   }
+  return true;
 }
 
-unsigned CMathExpression::GetLevel( CParser& IC )
+int CMathExpression::GetLevel( CParser& IC )
 {
-  unsigned i = 0;
+  int i = 0;
   while ( !IC.IsStopChar() )
   {
     if ( IC.TryFind( CParser::m_SymbolMacro ) )
     {
-      ParseMacro( IC );
+      if( !ParseMacro( IC ) )
+      {
+        return -1; // IC.Error(CParserException::ID_ERROR_FILE_NOT_FOUND);
+      }
     }
     else
     {
-      GetLevel( IC, 0 );
+      if( !GetLevel( IC, 0 ) )
+      {
+        return -2; //IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
+      }
       i++;
     }
   }
   return i;
 }
 
-void CMathExpression::GetLevel( CParser& IC, unsigned priority )
+bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 {
   bool symbol_first = true;
 
@@ -101,7 +124,10 @@ void CMathExpression::GetLevel( CParser& IC, unsigned priority )
     {
       if ( symbol_first )
       {
-        ParseAtom( IC );
+        if( !ParseAtom( IC ) )
+        {
+          return false;
+        }
       }
       else
       {
@@ -110,6 +136,7 @@ void CMathExpression::GetLevel( CParser& IC, unsigned priority )
     }
     symbol_first = false;
   }
+  return true;
 }
 
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
@@ -213,16 +240,26 @@ bool CMathExpression::ParseElement( CParser& IC )
   eval->ClearValue();
   e = m_ElementDB->GetElement( IC.GetWord() );
 
-  if( e )
+  if( !e )
   {
-    if ( IC.TryFind( '(' ) )
+    return false;
+  }
+
+  if ( IC.IsOpenParenthesis() )
+  {
+    IC.Next();
+    i = GetLevel( IC );
+    if ( i < 0 )
     {
-      i = GetLevel( IC );
-      IC.Find( ')' );
+      return false;
+    }
+    if ( !IC.Find( ')' ) )
+    {
+      return false;
     }
 
     f = e->GetFunction();
-    if ( !e->IsFunct() /*element_creation*/ && ( i > 0 ) )
+    if ( !e->IsFunct() /*element_creation*/ /*&& (i > 0)*/ )
     {
       ASSERT( !e->IsFunct() );
       //f = e->GetFunction();
@@ -232,18 +269,17 @@ bool CMathExpression::ParseElement( CParser& IC )
       CDisplay ds;
       ds += "SetParamNb   : ";
       e->Display( ds );
-      ds +=  ':' ;
+      ds += ':';
       ds += CString( e->GetFunction()->GetParameterNb() );
       TRACE( ds.GetBufferPtr() );
 #endif
     }
-    else
-    {
-      ASSERT( f->GetParameterNb() == i );
-    }
-    Push( e );
+    ASSERT( f->GetParameterNb() == i );
   }
-  return ( e != NULL );
+
+  Push( e );
+
+  return true;
 }
 
 void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )

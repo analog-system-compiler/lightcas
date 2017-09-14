@@ -50,7 +50,7 @@ protected:
   void     Push( const CElement* e )       { Push( ElementToRef( e ) );    }
 
   void     Push( const CMathExpression& equ );
-  void     PushEvalElement();
+  void     PushEvalElement( CEvaluator& eval );
   void     Append( const OP_CODE* array, unsigned size );
 
   void     PushBranch( const CMathExpression& equ, unsigned& pos );
@@ -58,11 +58,11 @@ protected:
   bool     CompareBranch( unsigned pos1, unsigned pos2 ) const;
   void     NextBranch( unsigned& pos ) const;
 
-  unsigned GetLevel( CParser& IC );
-  void     GetLevel( CParser& IC, unsigned priority );
+  int      GetLevel( CParser& IC );
+  bool     GetLevel( CParser& IC, unsigned priority );
   bool     SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
-  void     ParseMacro( CParser& IC );
-  void     ParseAtom( CParser& IC );
+  bool     ParseMacro( CParser& IC );
+  bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   unsigned Parse( CParser& IC );
   unsigned MatchOperator( CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence, bool symbol_first );
@@ -106,8 +106,8 @@ public:
   bool  Compare( const CMathExpression& equ ) const;
   void  Copy( const CMathExpression& equ );
   void  Display( CDisplay& ds ) const;
-  void  GetFromString( CParser& IC )        { Parse( IC ); }
-  void  GetFromString( const char* text )   { CParser IC( text ); GetFromString( IC ); }
+  bool  GetFromString( CParser& IC )        { return ( Parse( IC ) > 0 ); }
+  bool  GetFromString( const char* text )   { CParser IC( text ); return GetFromString( IC ); }
   void  OptimizeTree();
   bool  Match( const CMathExpression& equ ) const;
   void  Evaluate() const;

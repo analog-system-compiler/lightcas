@@ -19,7 +19,6 @@
 // precedence is defined here
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
-// TODO : add commutativity info for correct parenthesis display
 
 #sym  SYST(a b)       "a;b    "  
 #sym  IF( b a )       "a?b    "  
@@ -69,7 +68,7 @@
 
 IF2( (a:b) 0) := b;
 IF2( (a:b) 1) := a;
-IF ( (a:b) c) := IF2( (a:b) BOOL(c) );
+IF( (a:b) c) := IF2( (a:b) BOOL(c) );
 
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
@@ -91,7 +90,7 @@ POLY(a/b,v)                      := MONDIV( POLY(a,v) , POLY(b,v)    );
 POLY(a^b,v)                      := MONPOW( POLY(a,v) , SIMPLIFY(b)  );
 POLY(a[b],v)                     := POLY(a,v)[SIMPLIFY(b)];
 
-IPOLY(a,j)                       := IPOLY2(REDUCE_COMPLEX(a),j);
+IPOLY(a,j())                       := IPOLY2(REDUCE_COMPLEX(a),j);
 IPOLY(a,v)                       := IPOLY2(a,v);
 
 //IPoly if simplication failure
@@ -109,52 +108,56 @@ IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 NORM2(a,q)                    := IPOLY(NORM3(POLY(a,q)),q);
 NORM(a,q)                     := IPOLY_NORM(POLY(a,q),q);
 
-POLY(COS(a),1)           := POLYF(COS (SIMPLIFY(a)));
-POLY(SIN(a),1)           := POLYF(SIN (SIMPLIFY(a)));
-POLY(TAN(a),1)           := POLYF(TAN (SIMPLIFY(a)));
+POLY(COS(a),1)           := POLYF(COS(SIMPLIFY(a)));
+POLY(SIN(a),1)           := POLYF(SIN(SIMPLIFY(a)));
+POLY(TAN(a),1)           := POLYF(TAN(SIMPLIFY(a)));
 POLY(ACOS(a),1)          := POLYF(ACOS(SIMPLIFY(a)));
 POLY(ASIN(a),1)          := POLYF(ASIN(SIMPLIFY(a)));
 POLY(ATAN(a),1)          := POLYF(ATAN(SIMPLIFY(a)));
 
-POLY(COSH(a),1)          := POLYF(COSH (SIMPLIFY(a)));
-POLY(SINH(a),1)          := POLYF(SINH (SIMPLIFY(a)));
-POLY(TANH(a),1)          := POLYF(TANH (SIMPLIFY(a)));
+POLY(COSH(a),1)          := POLYF(COSH(SIMPLIFY(a)));
+POLY(SINH(a),1)          := POLYF(SINH(SIMPLIFY(a)));
+POLY(TANH(a),1)          := POLYF(TANH(SIMPLIFY(a)));
 POLY(ACOSH(a),1)         := POLYF(ACOSH(SIMPLIFY(a)));
 POLY(ASINH(a),1)         := POLYF(ASINH(SIMPLIFY(a)));
 POLY(ATANH(a),1)         := POLYF(ATANH(SIMPLIFY(a)));
 
-POLY(EXP(a),1)           := POLYF(EXP   (SIMPLIFY(a)));
-POLY(FACT(a),1)          := POLYF(FACT  (SIMPLIFY(a)));
-POLY(SQRT(a),1)          := POLYF(SQRT  (SIMPLIFY(a)));
-POLY(SQR(a),1)           := POLYF(SQR   (SIMPLIFY(a)));
-POLY(RE(a),1)            := POLYF(RE    (SIMPLIFY(a)));
-POLY(IM(a),1)            := POLYF(IM    (SIMPLIFY(a)));
-POLY(LOG(a),1)           := POLYF(LOG   (SIMPLIFY(a)));
-POLY(LOG10(a),1)         := POLYF(LOG10 (SIMPLIFY(a)));
-POLY(VECT(a),1)          := POLYF(VECT  (SIMPLIFY(a)));
-POLY(FLOOR(a),1)         := POLYF(FLOOR (SIMPLIFY(a),SIMPLIFY(b)));
+POLY(EXP(a),1)           := POLYF(EXP(SIMPLIFY(a)));
+POLY(FACT(a),1)          := POLYF(FACT(SIMPLIFY(a)));
+POLY(SQRT(a),1)          := POLYF(SQRT(SIMPLIFY(a)));
+POLY(SQR(a),1)           := POLYF(SQR(SIMPLIFY(a)));
+POLY(RE(a),1)            := POLYF(RE(SIMPLIFY(a)));
+POLY(IM(a),1)            := POLYF(IM(SIMPLIFY(a)));
+POLY(LOG(a),1)           := POLYF(LOG(SIMPLIFY(a)));
+POLY(LOG10(a),1)         := POLYF(LOG10(SIMPLIFY(a)));
+POLY(VECT(a),1)          := POLYF(VECT(SIMPLIFY(a)));
+POLY(FLOOR(a),1)         := POLYF(FLOOR(SIMPLIFY(a)));
 POLY(ASSERT(a),1)        := POLYF(ASSERT(SIMPLIFY(a)));
-POLY(RECT(a),1)          := POLYF(RECT  (SIMPLIFY(a)));
-POLY(DER(a),1)           := POLYF(DER   (SIMPLIFY(a)));
+POLY(RECT(a),1)          := POLYF(RECT(SIMPLIFY(a)));
+POLY(DER(a),1)           := POLYF(DER(SIMPLIFY(a)));
 
-POLY(MOD(a,b),1)         := POLYF(MOD   (SIMPLIFY(a),SIMPLIFY(b)));
-POLY(EQ(a b),1)          := POLYF(EQ    (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(NEQ(a b),1)         := POLYF(NEQ   (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(GT(a b),1)          := POLYF(GT    (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(GTE(a b),1)         := POLYF(GTE   (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(LT(a b),1)          := POLYF(LT    (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(LTE(a b),1)         := POLYF(LTE   (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SHL(a b),1)         := POLYF(SHL   (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SHR(a b),1)         := POLYF(SHR   (SIMPLIFY(a) SIMPLIFY(b)));
+POLY(MOD(a,b),1)         := POLYF(MOD(SIMPLIFY(a),SIMPLIFY(b)));
+POLY(EQ(a b),1)          := POLYF(EQ(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(NEQ(a b),1)         := POLYF(NEQ(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(GT(a b),1)          := POLYF(GT(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(GTE(a b),1)         := POLYF(GTE(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(LT(a b),1)          := POLYF(LT(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(LTE(a b),1)         := POLYF(LTE(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(SHL(a b),1)         := POLYF(SHL(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(SHR(a b),1)         := POLYF(SHR(SIMPLIFY(a) SIMPLIFY(b)));
 POLY(CONCAT(a b),1)      := POLYF(CONCAT(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SYST(a b),1)        := POLYF(SYST  (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(POW(a b),1)         := POLYF(POW   (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(IF(a b),1)          := POLYF(IF    (SIMPLIFY(a) SIMPLIFY(b)));
-POLY(IF2(a b),1)         := POLYF(IF2   (SIMPLIFY(a) SIMPLIFY(b)));
+POLY(SYST(a b),1)        := POLYF(SYST(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(POW(a b),1)         := POLYF(POW(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(IF(a b),1)          := POLYF(IF(SIMPLIFY(a) SIMPLIFY(b)));
+POLY(IF2(a b),1)         := POLYF(IF2(SIMPLIFY(a) SIMPLIFY(b)));
 
-POLY(MIN(a,b),1)         := POLYF(MIN   (SIMPLIFY(a),SIMPLIFY(b)));
-POLY(MAX(a,b),1)         := POLYF(MAX   (SIMPLIFY(a),SIMPLIFY(b)));
+POLY(MIN(a,b),1)         := POLYF(MIN(SIMPLIFY(a),SIMPLIFY(b)));
+POLY(MAX(a,b),1)         := POLYF(MAX(SIMPLIFY(a),SIMPLIFY(b)));
+
 POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
+
+//POLY( FUNCT1( a b   ), 1 ) := POLYF( FUNCT1( SIMPLIFY(a) b )));
+//POLY( FUNCT2( a b c ), 1 ) := POLYF( FUNCT2( SIMPLIFY(a) SIMPLIFY(b) c )));
 
 //USE_TED := 0;
 //USE_TED ?
@@ -415,6 +418,7 @@ SQR(a)*SQR(b)    := SQR(a*b)  ;
 
 0/b              := 0  ;
 a/1              := a  ;
+a/0              := DIVISION_ERROR();
 -a/b             := -(a/b)  ; // to simplify consts
 a/-b             := -(a/b)   ; // to simplify consts
 a/-b             := -a/b     ;
@@ -508,6 +512,7 @@ EXPAND2( a )          := EXPAND( GET(a) ); // replace element with its equivalen
 CHOOSEVAR(1,b)        := b;
 CHOOSEVAR(a,1)        := a;
 CHOOSEVAR(a,b)        := RANK(a b);
+//CHOOSEVAR(a,b)        := ( EVAL( _gte( _rank(a) _rank(b) ) ) ? a : b );
 CHOOSEVARDIV(1,b)     := b;
 CHOOSEVARDIV(a,b)     := a; //No RANK there !!!
 // FOREACH({a,b},c}      := {FOREACH({a},c),c(b)};
@@ -612,7 +617,7 @@ SYSTEM_AUTO_SOLVE2({a},{c})       := SYSTEM_AUTO_SOLVE3({a});
 
 //entry points
 SOLVE(a,v)                        := SOLVE2(POLY_TED(a,v));
-SYSTEM_SOLVE ({a},{x})            := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
+SYSTEM_SOLVE({a},{x})             := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
 SYSTEM_AUTO_SOLVE({a})            := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
 
 //vector defined matrix determinant { a*x+b*y..., c*x+d*y... }
@@ -661,15 +666,38 @@ CHECK_NULL( 0 , a )               := 0;
 CHECK_NULL( a , b )               := (a,b);
 
 //Matrix multiplication
-//MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM1( {b}, {c} ) } };
-//MAT_MUL( {{b}},   {c} )               := { MAT_MUL_ELEM1( {b}, {c} ) };
+//MAT_GET_HEAD( a, {c,d}) := ( MAT_GET_HEAD( a ), {d} );
+//MAT_GET_HEAD(    {c,d}) := {d};
+//MAT_GET_HEAD(    {c}  ) := 0;
 
-MAT_MUL( {a,{b}}, {c} )               := { MAT_MUL( {a}, {c} ), { MAT_MUL_ELEM( {{b}}, {c} ) } };
-MAT_MUL( {{b}},   {c} )               := { MAT_MUL_ELEM( {{b}}, {c} ) };
+//MAT_MUL( {{b}},   {c,{d}} )       :=                            {                                          MAT_MUL_VECT( {b}, { MAT_GET_HEAD(c,{d}) } ) };
+//MAT_MUL( {{b}},   {c} )           :=                            { MAT_MUL( {{b}},   { MAT_REM_HEAD(c) } ), MAT_MUL_VECT( {b}, { MAT_GET_HEAD(c)     } ) };
+//MAT_MUL( {a,{b}}, {c,{d}} )       := { MAT_MUL( {a}, {c,{d}} ), {                                          MAT_MUL_VECT( {b}, { MAT_GET_HEAD(c,{d}) } ) } };
+//MAT_MUL( {a,{b}}, {c} )           := { MAT_MUL( {a}, {c} )    , { MAT_MUL( {a,{b}}, { MAT_REM_HEAD(c) } ), MAT_MUL_VECT( {b}, { MAT_GET_HEAD(c)     } ) } };
 
-MAT_MUL_ELEM( {{b,f}}   , {c,{d,e}} ) := MAT_MUL_ELEM( {{b}} , {c} ) + f * e;
-MAT_MUL_ELEM( {{f}}     , {{d,e}}   ) := f * e; 
+//MAT_MUL_VECT( {b,f} , {c,{e}} ) := MAT_MUL_VECT( {b} , {c} ) + f * e;
+//MAT_MUL_VECT( {f}   , {{e}}   ) := f * e; 
 
+VECT_MUL_ADD( {a,b},{c,d} ) := VECT_MUL_ADD( {a},{c} ) + b*d;
+VECT_MUL_ADD( {  b},{  d} ) :=                           b*d;
+
+MAT_MUL(a,b)         := { MAT_MUL3(a,MAT_TRANSPOSE(b)) }; 
+
+MAT_MUL3({a,b},c)  := ( MAT_MUL3({a},c), { MAT_MUL4(b,c) } );
+MAT_MUL3({  b},c)  :=                    { MAT_MUL4(b,c) };
+
+MAT_MUL4(b,{c,d})  := ( MAT_MUL4(b,{c}), VECT_MUL_ADD(b,d) );
+MAT_MUL4(b,{  d})  :=                    VECT_MUL_ADD(b,d) ;
+
+MAT_TRANSPOSE( {a} )        := { MAT_TRANSPOSE1( a ) };
+MAT_TRANSPOSE1( a,{b,c} )   := ( MAT_TRANSPOSE1( MAT_REM_HEAD( a ), {b} ), { MAT_TRANSPOSE_VECT( {a,{b,c}} ) } );
+MAT_TRANSPOSE1( a )         :=                                             { MAT_TRANSPOSE_VECT( {a} )       } ;
+
+MAT_TRANSPOSE_VECT( {a,{b,c}} ) := ( MAT_TRANSPOSE_VECT( {a} ), c );
+MAT_TRANSPOSE_VECT( {{b,c}} )   := c;
+
+MAT_TRANSPOSE_VECT( {a,{c}} ) := ( MAT_TRANSPOSE_VECT( {a} ), c );
+MAT_TRANSPOSE_VECT( {{c}} )   := c;
 
 // Vector reversal {x,y,z} -> {z,y,x}
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
@@ -725,7 +753,6 @@ SIN(a,b)                  := (SIN(a),SIN(b));
 COS(a,b)                  := (COS(a),COS(b));
 TAN(a,b)                  := (TAN(a),TAN(b));
 
-
 VSIZE({a,b})              := VSIZE({a})+1;
 VSIZE(a)                  := 1;
 {a}[CONST(c)]             := INVAT({a}, VSIZE({a}) -1 - c );
@@ -741,112 +768,118 @@ SUBST2(a x xo)            := SIMPLIFY(SUBST(a x xo));
 TAYLOR(a,x,xo,0)          := SUBST2(a x xo);
 TAYLOR(a,x,xo,CONST(n))   := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
 
+//SUBST( ELEM( x )       x xo  )   := xo;
+SUBST( FUNCT1(   b c ) x xo  )   := FUNCT1( SUBST( b x xo ) c );
+SUBST( FUNCT2( a b c ) x xo  )   := FUNCT2( SUBST( a x xo ) SUBST( b x xo ) c );
+SUBST( x               x xo  )   := xo;
+SUBST( a               x xo  )   := a;
+
 ASSERT(1)    := 0;
 ASSERT(x)    := ERROR(1);
 
 PI := 3.14159265358979323846264338327950288;
 
-ADD(   CONST(a)  CONST(b)  )  := EVAL( _add   ( a b ) );
-SUB(   CONST(a)  CONST(b)  )  := EVAL( _sub   ( a b ) );
-OR(    CONST(a)  CONST(b)  )  := EVAL( _or    ( a b ) );
-LOR(   CONST(a)  CONST(b)  )  := EVAL( _lor   ( a b ) );
-XOR(   CONST(a)  CONST(b)  )  := EVAL( _xor   ( a b ) );
-MUL(   CONST(a)  CONST(b)  )  := EVAL( _mul   ( a b ) );
-DIV(   CONST(a)  CONST(b)  )  := EVAL( _div   ( a b ) );
-AND(   CONST(a)  CONST(b)  )  := EVAL( _and   ( a b ) );
-LAND(  CONST(a)  CONST(b)  )  := EVAL( _land  ( a b ) );
-EQ(    CONST(a)  CONST(b)  )  := EVAL( _eq    ( a b ) );
-NEQ(   CONST(a)  CONST(b)  )  := EVAL( _neq   ( a b ) );
-LTE(   CONST(a)  CONST(b)  )  := EVAL( _lte   ( a b ) );
-SHL(   CONST(a)  CONST(b)  )  := EVAL( _shl   ( a b ) );
-LT(    CONST(a)  CONST(b)  )  := EVAL( _lt    ( a b ) );
-GTE(   CONST(a)  CONST(b)  )  := EVAL( _gte   ( a b ) );
-SHR(   CONST(a)  CONST(b)  )  := EVAL( _shr   ( a b ) );
-GT(    CONST(a)  CONST(b)  )  := EVAL( _gt    ( a b ) );
-MIN(   CONST(a), CONST(b)  )  := EVAL( _min   ( a b ) );
-MAX(   CONST(a), CONST(b)  )  := EVAL( _max   ( a b ) );
-MOD(   CONST(a), CONST(b)  )  := EVAL( _mod   ( a b ) );
-POW(   CONST(a)  CONST(b)  )  := EVAL( _pow   ( a b ) );
-NEG(   CONST(a)            )  := EVAL( _neg   ( a )   );
-INV(   CONST(a)            )  := EVAL( _inv   ( a )   );
-NOT(   CONST(a)            )  := EVAL( _not   ( a )   );
-ID(    CONST(a)            )  := EVAL( _id    ( a )   );
-BOOL(  CONST(a)            )  := EVAL( _bool  ( a )   );
-LNOT(  CONST(a)            )  := EVAL( _lnot  ( a )   );
-SIN(   CONST(a)            )  := EVAL( _sin   ( a )   );
-COS(   CONST(a)            )  := EVAL( _cos   ( a )   );
-TAN(   CONST(a)            )  := EVAL( _tan   ( a )   );
-ASIN(  CONST(a)            )  := EVAL( _asin  ( a )   );
-ACOS(  CONST(a)            )  := EVAL( _acos  ( a )   );
-ATAN(  CONST(a)            )  := EVAL( _atan  ( a )   );
-SINH(  CONST(a)            )  := EVAL( _sinh  ( a )   );
-COSH(  CONST(a)            )  := EVAL( _cosh  ( a )   );
-TANH(  CONST(a)            )  := EVAL( _tanh  ( a )   );
-ASINH( CONST(a)            )  := EVAL( _asinh ( a )   );
-ACOSH( CONST(a)            )  := EVAL( _acosh ( a )   );
-ATANH( CONST(a)            )  := EVAL( _atanh ( a )   );
-EXP(   CONST(a)            )  := EVAL( _exp   ( a )   );
-LOG(   CONST(a)            )  := EVAL( _log   ( a )   );
-LOG10( CONST(a)            )  := EVAL( _log10 ( a )   );
-SQRT(  CONST(a)            )  := EVAL( _sqrt  ( a )   );
-SQR(   CONST(a)            )  := EVAL( _sqr   ( a )   );
-FACT(  CONST(a)            )  := EVAL( _fact  ( a )   );
-ABS(   CONST(a)            )  := EVAL( _abs   ( a )   );
-FLOOR( CONST(a)            )  := EVAL( _floor ( a )   );
-CEIL(  CONST(a)            )  := EVAL( _ceil  ( a )   );
-RAND(                      )  := EVAL( _rand  ()      );
+ADD(   CONST(a)  CONST(b)  )  := EVAL( _add( a b ) );
+SUB(   CONST(a)  CONST(b)  )  := EVAL( _sub( a b ) );
+OR(    CONST(a)  CONST(b)  )  := EVAL( _or( a b ) );
+LOR(   CONST(a)  CONST(b)  )  := EVAL( _lor( a b ) );
+XOR(   CONST(a)  CONST(b)  )  := EVAL( _xor( a b ) );
+MUL(   CONST(a)  CONST(b)  )  := EVAL( _mul( a b ) );
+DIV(   CONST(a)  CONST(b)  )  := EVAL( _div( a b ) );
+AND(   CONST(a)  CONST(b)  )  := EVAL( _and( a b ) );
+LAND(  CONST(a)  CONST(b)  )  := EVAL( _land( a b ) );
+EQ(    CONST(a)  CONST(b)  )  := EVAL( _eq( a b ) );
+NEQ(   CONST(a)  CONST(b)  )  := EVAL( _neq( a b ) );
+LTE(   CONST(a)  CONST(b)  )  := EVAL( _lte( a b ) );
+SHL(   CONST(a)  CONST(b)  )  := EVAL( _shl( a b ) );
+LT(    CONST(a)  CONST(b)  )  := EVAL( _lt( a b ) );
+GTE(   CONST(a)  CONST(b)  )  := EVAL( _gte( a b ) );
+SHR(   CONST(a)  CONST(b)  )  := EVAL( _shr( a b ) );
+GT(    CONST(a)  CONST(b)  )  := EVAL( _gt( a b ) );
+MIN(   CONST(a), CONST(b)  )  := EVAL( _min( a b ) );
+MAX(   CONST(a), CONST(b)  )  := EVAL( _max( a b ) );
+MOD(   CONST(a), CONST(b)  )  := EVAL( _mod( a b ) );
+POW(   CONST(a)  CONST(b)  )  := EVAL( _pow( a b ) );
+NEG(   CONST(a)            )  := EVAL( _neg( a )   );
+INV(   CONST(a)            )  := EVAL( _inv( a )   );
+NOT(   CONST(a)            )  := EVAL( _not( a )   );
+ID(    CONST(a)            )  := EVAL( _id( a )   );
+BOOL(  CONST(a)            )  := EVAL( _bool( a )   );
+LNOT(  CONST(a)            )  := EVAL( _lnot( a )   );
+SIN(   CONST(a)            )  := EVAL( _sin( a )   );
+COS(   CONST(a)            )  := EVAL( _cos( a )   );
+TAN(   CONST(a)            )  := EVAL( _tan( a )   );
+ASIN(  CONST(a)            )  := EVAL( _asin( a )   );
+ACOS(  CONST(a)            )  := EVAL( _acos( a )   );
+ATAN(  CONST(a)            )  := EVAL( _atan( a )   );
+SINH(  CONST(a)            )  := EVAL( _sinh( a )   );
+COSH(  CONST(a)            )  := EVAL( _cosh( a )   );
+TANH(  CONST(a)            )  := EVAL( _tanh( a )   );
+ASINH( CONST(a)            )  := EVAL( _asinh( a )   );
+ACOSH( CONST(a)            )  := EVAL( _acosh( a )   );
+ATANH( CONST(a)            )  := EVAL( _atanh( a )   );
+EXP(   CONST(a)            )  := EVAL( _exp( a )   );
+LOG(   CONST(a)            )  := EVAL( _log( a )   );
+LOG10( CONST(a)            )  := EVAL( _log10( a )   );
+SQRT(  CONST(a)            )  := EVAL( _sqrt( a )   );
+SQR(   CONST(a)            )  := EVAL( _sqr( a )   );
+FACT(  CONST(a)            )  := EVAL( _fact( a )   );
+ABS(   CONST(a)            )  := EVAL( _abs( a )   );
+FLOOR( CONST(a)            )  := EVAL( _floor( a )   );
+CEIL(  CONST(a)            )  := EVAL( _ceil( a )   );
+RAND(                      )  := EVAL( _rand()      );
 
-MAKE_EVAL( ADD(   a b ) )  := _add  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( SUB(   a b ) )  := _sub  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( OR(    a b ) )  := _or   ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( LOR(   a b ) )  := _lor  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( XOR(   a b ) )  := _xor  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( MUL(   a b ) )  := _mul  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( DIV(   a b ) )  := _div  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( AND(   a b ) )  := _and  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( LAND(  a b ) )  := _land ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( EQ(    a b ) )  := _eq   ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( NEQ(   a b ) )  := _neq  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( LTE(   a b ) )  := _lte  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( SHL(   a b ) )  := _shl  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( LT(    a b ) )  := _lt   ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( GTE(   a b ) )  := _gte  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( SHR(   a b ) )  := _shr  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( GT(    a b ) )  := _gt   ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( MIN(   a,b ) )  := _min  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( MAX(   a,b ) )  := _max  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( MOD(   a,b ) )  := _mod  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( POW(   a b ) )  := _pow  ( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
-MAKE_EVAL( IF2((a:b) c ) ) := _if   ( MAKE_EVAL( a ) MAKE_EVAL( b ) MAKE_EVAL( c ) ) ;
-MAKE_EVAL( IF( (a:b) c ) ) := _if   ( MAKE_EVAL( a ) MAKE_EVAL( b ) MAKE_EVAL( c ) ) ; 
-MAKE_EVAL( NEG(   a   ) )  := _neg  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( INV(   a   ) )  := _inv  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( NOT(   a   ) )  := _not  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( ID(    a   ) )  := _id   ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( BOOL(  a   ) )  := _bool ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( LNOT(  a   ) )  := _lnot ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( SIN(   a   ) )  := _sin  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( COS(   a   ) )  := _cos  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( TAN(   a   ) )  := _tan  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( ASIN(  a   ) )  := _asin ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( ACOS(  a   ) )  := _acos ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( ATAN(  a   ) )  := _atan ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( SINH(  a   ) )  := _sinh ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( COSH(  a   ) )  := _cosh ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( TANH(  a   ) )  := _tanh ( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ADD(   a b ) )  := _add( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( SUB(   a b ) )  := _sub( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( OR(    a b ) )  := _or( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( LOR(   a b ) )  := _lor( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( XOR(   a b ) )  := _xor( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( MUL(   a b ) )  := _mul( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( DIV(   a b ) )  := _div( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( AND(   a b ) )  := _and( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( LAND(  a b ) )  := _land( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( EQ(    a b ) )  := _eq( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( NEQ(   a b ) )  := _neq( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( LTE(   a b ) )  := _lte( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( SHL(   a b ) )  := _shl( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( LT(    a b ) )  := _lt( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( GTE(   a b ) )  := _gte( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( SHR(   a b ) )  := _shr( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( GT(    a b ) )  := _gt( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( MIN(   a,b ) )  := _min( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( MAX(   a,b ) )  := _max( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( MOD(   a,b ) )  := _mod( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( POW(   a b ) )  := _pow( MAKE_EVAL( a ) MAKE_EVAL( b ) ) ;
+MAKE_EVAL( IF2((a:b) c ) ) := _if( MAKE_EVAL( a ) MAKE_EVAL( b ) MAKE_EVAL( c ) ) ;
+MAKE_EVAL( IF( (a:b) c ) ) := _if( MAKE_EVAL( a ) MAKE_EVAL( b ) MAKE_EVAL( c ) ) ; 
+MAKE_EVAL( NEG(   a   ) )  := _neg( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( INV(   a   ) )  := _inv( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( NOT(   a   ) )  := _not( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ID(    a   ) )  := _id( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( BOOL(  a   ) )  := _bool( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( LNOT(  a   ) )  := _lnot( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( SIN(   a   ) )  := _sin( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( COS(   a   ) )  := _cos( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( TAN(   a   ) )  := _tan( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ASIN(  a   ) )  := _asin( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ACOS(  a   ) )  := _acos( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ATAN(  a   ) )  := _atan( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( SINH(  a   ) )  := _sinh( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( COSH(  a   ) )  := _cosh( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( TANH(  a   ) )  := _tanh( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( ASINH( a   ) )  := _asinh( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( ACOSH( a   ) )  := _acosh( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( ATANH( a   ) )  := _atanh( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( EXP(   a   ) )  := _exp  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( LOG(   a   ) )  := _log  ( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( EXP(   a   ) )  := _exp( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( LOG(   a   ) )  := _log( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( LOG10( a   ) )  := _log10( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( SQRT(  a   ) )  := _sqrt ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( SQR(   a   ) )  := _sqr  ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( FACT(  a   ) )  := _fact ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( ABS(   a   ) )  := _abs  ( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( SQRT(  a   ) )  := _sqrt( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( SQR(   a   ) )  := _sqr( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( FACT(  a   ) )  := _fact( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( ABS(   a   ) )  := _abs( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( FLOOR( a   ) )  := _floor( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( CEIL(  a   ) )  := _ceil ( MAKE_EVAL( a ) ) ;
-MAKE_EVAL( RAND()       )  := _rand ()                 ;
+MAKE_EVAL( CEIL(  a   ) )  := _ceil( MAKE_EVAL( a ) ) ;
+MAKE_EVAL( RAND()       )  := _rand()                 ;
 MAKE_EVAL( CONST( a ) )    := a ;
 MAKE_EVAL( ELEM( a ) )     := a ;
 MAKE_EVAL( a )             := ERROR(2);

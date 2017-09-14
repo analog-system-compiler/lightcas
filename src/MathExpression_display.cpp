@@ -94,7 +94,6 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
     unsigned pos1 = Match( pos, *equ, pos_array );
     if( pos1 != pos )
     {
-      //ASSERT( i != 25 );
       const char* sp = ss->m_Syntax;
       if( i < precedence )
       {

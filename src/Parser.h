@@ -20,6 +20,7 @@
 
 #include "LCString.h"
 
+#if 0
 class CParserException
 {
 public:
@@ -47,21 +48,21 @@ public:
 
   CParserException()                         { m_ErrorID = ID_OK; m_LineNb = 0;  }
 };
-
+#endif
 
 class CParser
 {
 
-private:
+protected:
 
   static const char  m_CharTab[];
-  int      m_LineNb;
-  CString  m_FileName;
-  char*    m_Text;
-
-public:
+  unsigned    m_LineNb;
+  CString     m_FileName;
+  char*       m_Text;
   const char* m_Pos;
   CString     m_Buffer;
+
+public:
 
   static const char m_StringDelimiter = '"';
   static const char m_SymbolMacro     = '#';
@@ -74,19 +75,21 @@ protected:
   void  SkipSpace();
 
 public:
-  void  Error( unsigned id ) const;
-  void  Find( char c );
+  //void  Error( unsigned id ) const;
+  bool  Find( char c );
   bool  TryFind( char c );
   void  Init( const char* pText );
   bool  TryMatchSymbol( const char*& symbol_str );
   bool  LoadFile( const CString& name );
   void  CloseFile();
 
+  bool  GetQuote();
   const CString& GetWord();
-  const CString& GetQuote();
-  char  GetChar();
+  const CString& GetBuffer()                       { return m_Buffer; }
+  char  GetChar()                                  { SkipSpaceNL(); return( *m_Pos ); }
   void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
   void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
+  unsigned  GetLineNb() const                      { return m_LineNb;         }
 
   static bool IsWord( char c )         { return ( m_CharTab[( int )c] & 1 ) != 0; }
   static bool IsStopChar( char c )     { return ( m_CharTab[( int )c] & 2 ) != 0; }
@@ -94,8 +97,9 @@ public:
 
   bool  IsWord()                       { return IsWord( GetChar() );     }
   bool  IsStopChar()                   { return IsStopChar( GetChar() ); }
-  bool  IsDigit()                      { return IsDigit( GetChar() ); }
+  bool  IsDigit()                      { return IsDigit( GetChar() );    }
   bool  IsChar( char c )               { return GetChar() == c;          }
+  bool  IsOpenParenthesis() const      { return *m_Pos == '(';           }
 
   const char* GetPos() const           { return m_Pos;          }
   void  SetPos( const char* pText )    { m_Pos = pText;         }
