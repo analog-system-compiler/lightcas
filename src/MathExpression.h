@@ -25,10 +25,12 @@
 #include "Display.h"
 #include "ElementDataBase.h"
 
-#define MAX_STACK_SIZE     (1<<20)
 #define OPTIMIZATION_LEVEL 0//2
 
 class CAlgebraRule;
+
+typedef unsigned short pos_t;
+//#define MAX_STACK_SIZE (1<<20)
 
 class CMathExpression
 {
@@ -37,26 +39,26 @@ class CMathExpression
 
 protected:
   OP_CODE*  m_StackArray;
-  unsigned  m_StackSize;
-  unsigned  m_AllocSize;
+  pos_t     m_StackSize;
+  pos_t     m_AllocSize;
   CElementDataBase* m_ElementDB;
 
 protected:
-  void     SetSize( unsigned i );
-  void     Set( unsigned pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
-  OP_CODE  Get( unsigned pos )  const      { return m_StackArray[ pos ];  }
-  OP_CODE  Pop( unsigned& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
-  void     Push( OP_CODE op )              { SetSize( m_StackSize + 1  );  Set( m_StackSize - 1, op );  }
-  void     Push( const CElement* e )       { Push( ElementToRef( e ) );    }
+  void     SetSize( pos_t i );
+  void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
+  OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
+  OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
+  void     Push( OP_CODE op )           { SetSize( m_StackSize + 1  );  Set( m_StackSize - 1, op );  }
+  void     Push( const CElement* e )    { Push( ElementToRef( e ) );    }
 
   void     Push( const CMathExpression& equ );
   void     PushEvalElement( CEvaluator& eval );
-  void     Append( const OP_CODE* array, unsigned size );
+  void     Append( const OP_CODE* array, pos_t size );
 
-  void     PushBranch( const CMathExpression& equ, unsigned& pos );
-  bool     CompareBranchElement( unsigned pos1, unsigned pos2 ) const;
-  bool     CompareBranch( unsigned pos1, unsigned pos2 ) const;
-  void     NextBranch( unsigned& pos ) const;
+  void     PushBranch( const CMathExpression& equ, pos_t& pos );
+  bool     CompareBranchElement( pos_t pos1, pos_t pos2 ) const;
+  bool     CompareBranch( pos_t pos1, pos_t pos2 ) const;
+  void     NextBranch( pos_t& pos ) const;
 
   int      GetLevel( CParser& IC );
   bool     GetLevel( CParser& IC, unsigned priority );
@@ -65,16 +67,16 @@ protected:
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   unsigned Parse( CParser& IC );
-  unsigned MatchOperator( CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence, bool symbol_first );
-  void     StoreStackPointer( char c, unsigned pos_array[] );
+  unsigned MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first );
+  void     StoreStackPointer( char c, pos_t pos_array[] );
 
   bool     OptimizeTree2();
 
-  void     Replace( OP_CODE op1, OP_CODE op2, unsigned pos = 0 );
-  void     ApplyRule( unsigned pos, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
-  void     InnerCopy( unsigned pos_dest, unsigned pos_source, unsigned size );
-  unsigned Match( unsigned pos2, const CMathExpression& equ, unsigned pos_array[] ) const;
-  bool     MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const;
+  void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
+  void     ApplyRule( pos_t pos, pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
+  void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
+  pos_t    Match( pos_t pos2, const CMathExpression& equ, pos_t pos_array[] ) const;
+  bool     RegisterBranch( pos_t pos_array[], OP_CODE op1, pos_t pos2 ) const;
   void     AddZero();
   void     RemoveZero();
 
@@ -84,12 +86,12 @@ protected:
   //static
   static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
   static OP_CODE    ElementToRef( const CElement* e )       { return CElementDataBase::ElementToRef( e );   }
-  static unsigned   ReservedParameterIndex( OP_CODE op )    { return op - CElementDataBase::OP_EXP1;  }
+  static unsigned   ReservedParameterIndex( OP_CODE op )    { return ( unsigned )( op - CElementDataBase::OP_EXP1 );  }
 
   //Display funct
-  unsigned    DisplayBranch( unsigned pos, unsigned priority, CDisplay& ds ) const;
-  unsigned    DisplaySymbol(  unsigned pos, unsigned priority, CDisplay& ds ) const;
-  void        DisplaySymbolString(  const char* sp, unsigned pos_array[], unsigned precedence, CDisplay& ds ) const;
+  unsigned    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
+  unsigned    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
+  void        DisplaySymbolString(  const char* sp, pos_t pos_array[], unsigned precedence, CDisplay& ds ) const;
 
 public:
   void  Initialize( CElementDataBase* db );
@@ -115,7 +117,7 @@ public:
   static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
 
   OP_CODE GetLastOperator() const         { return IsEmpty() ? CElementDataBase::OP_ZERO : Get( m_StackSize - 1 ); }
-  unsigned          GetSize() const       { return m_StackSize;    }
+  pos_t             GetSize() const       { return m_StackSize;    }
   CElementDataBase* GetElementDB() const  { return m_ElementDB;    }
 
   CMathExpression( CElementDataBase* db = NULL );

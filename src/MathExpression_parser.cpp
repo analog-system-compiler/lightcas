@@ -142,7 +142,7 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
   unsigned i, k, n;
-  unsigned pos_array[CElementDataBase::MAX_EXP] = { 0 };
+  pos_t pos_array[CElementDataBase::MAX_EXP] = { 0 };
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   const char* init_pos = IC.GetPos();
 
@@ -158,13 +158,13 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
       ASSERT( rule_equ.GetSize() );
 
       CMathExpression equ( m_ElementDB ); //save current stack
-      unsigned pos = n;
+      pos_t pos = n;
       if ( !symbol_first ) //FIXME
       {
         NextBranch( pos );  //remove first parameter
       }
       ApplyRule( pos, pos_array, rule_equ, false );
-#if 0 //def _DEBUG
+#if ( DEBUG_LEVEL >= 3 )
       CDisplay ds;
       Display( ds );
       TRACE( ds.GetBufferPtr() );
@@ -178,7 +178,7 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
   return false;
 }
 
-unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, unsigned pos_array[], unsigned precedence, bool symbol_first )
+unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first )
 {
   unsigned k = 0;
   char c;
@@ -189,6 +189,7 @@ unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, unsigned p
     sp++;
     c = *sp;
   }
+
   if ( CParser::IsWord( c ) == symbol_first )
   {
     return 0;
@@ -209,13 +210,18 @@ unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, unsigned p
       sp++;
       c = *sp;
     }
-    if( CParser::IsWord( c )  )
+
+    if ( CParser::IsWord( c ) )
     {
-      if( c < 'a' )
+      if ( c < 'a' )
       {
         precedence = 0;
       }
       GetLevel( IC, precedence ); //Push parameters
+    }
+
+    if ( CParser::IsWord( c ) )
+    {
       StoreStackPointer( c, pos_array );
       sp++;
       k++;
@@ -233,7 +239,7 @@ bool CMathExpression::ParseElement( CParser& IC )
 {
   CElement* e;
   CFunction* f;
-  unsigned i = 0;
+  int i = 0;
 
   ASSERT( IC.IsWord() );
   CEvaluator* eval = m_ElementDB->GetEvaluator();
@@ -265,7 +271,7 @@ bool CMathExpression::ParseElement( CParser& IC )
       //f = e->GetFunction();
       f->SetParameterNb( i );
       e->SetFunct();
-#ifdef _DEBUG
+#if ( DEBUG_LEVEL >= 1 )
       CDisplay ds;
       ds += "SetParamNb   : ";
       e->Display( ds );
@@ -282,7 +288,7 @@ bool CMathExpression::ParseElement( CParser& IC )
   return true;
 }
 
-void CMathExpression::StoreStackPointer( char c, unsigned pos_array[] )
+void CMathExpression::StoreStackPointer( char c, pos_t pos_array[] )
 {
   unsigned elem_id;
   elem_id = toupper( c ) - 'A';

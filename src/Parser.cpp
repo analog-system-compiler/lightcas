@@ -114,7 +114,7 @@ void CParser::SkipSpaceNL()
   {
     m_LineNb++;
     m_Pos++;
-#ifdef _DEBUG
+#if( DEBUG_LEVEL >= 1 )
     CDisplay ds;
     ds.Append( "Processing line " );
     ds.Append( ( int )m_LineNb );

@@ -41,7 +41,7 @@ void CMathExpression::Display( CDisplay& ds ) const
   }
 }
 
-unsigned CMathExpression::DisplayBranch( unsigned pos, unsigned priority, CDisplay& ds ) const
+unsigned CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const
 {
   unsigned i, n;
   const CElement* e;
@@ -82,16 +82,16 @@ unsigned CMathExpression::DisplayBranch( unsigned pos, unsigned priority, CDispl
   return pos;
 }
 
-unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CDisplay& ds ) const
+unsigned  CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& ds ) const
 {
-  unsigned pos_array[CElementDataBase::MAX_EXP] = { 0 };
+  pos_t pos_array[CElementDataBase::MAX_EXP];
 
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
   {
     const CSymbolSyntaxStruct* ss = st[i];
     const CMathExpression* equ =  &ss->m_Equation;
-    unsigned pos1 = Match( pos, *equ, pos_array );
+    pos_t pos1 = Match( pos, *equ, pos_array );
     if( pos1 != pos )
     {
       const char* sp = ss->m_Syntax;
@@ -113,7 +113,7 @@ unsigned  CMathExpression::DisplaySymbol(  unsigned pos, unsigned precedence, CD
   return pos;
 }
 
-void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_array[], unsigned precedence, CDisplay& ds ) const
+void  CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[], unsigned precedence, CDisplay& ds ) const
 {
   char c;
   unsigned i;

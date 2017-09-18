@@ -1,8 +1,8 @@
 
 EXE             = LightCAS
 SRC_DIR         = ../src
-CXX             = $(CROSS_COMPILE)g++
-#CXX             = $(CROSS_COMPILE)clang++
+#CXX             = $(CROSS_COMPILE)g++
+CXX             = $(CROSS_COMPILE)clang++
 AR              = $(CROSS_COMPILE)ar
 LD              = $(CROSS_COMPILE)ld
 SRCS            = $(notdir $(wildcard $(SRC_DIR)/*.cpp))

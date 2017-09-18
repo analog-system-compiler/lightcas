@@ -18,9 +18,11 @@
 
 #pragma once
 
-extern int(*PUTS)(const char*);
+extern int( *PUTS )( const char* );
 
 #ifdef _DEBUG
+
+#define DEBUG_LEVEL 0
 
 extern void TRACE( const char* s, ... );
 
@@ -41,6 +43,7 @@ extern void TRACE( const char* s, ... );
 
 #else // defined( _DEBUG )
 
+#define DEBUG_LEVEL 0
 #define TRACE( s, ... )
 #define ASSERT(s)
 #define ASSERT_NAN( x )

@@ -23,7 +23,6 @@
 #include "Element.h"
 #include "Function.h"
 
-//#define DEBUG_OPTIMIZE
 //#define OPTIMIZE_PROCESSING
 
 void CMathExpression::OptimizeTree()
@@ -33,11 +32,11 @@ void CMathExpression::OptimizeTree()
 
 bool CMathExpression::OptimizeTree2()
 {
-  unsigned pos;
+  pos_t pos;
   unsigned i;
   unsigned n;
   bool match;
-  unsigned pos_array[CElementDataBase::MAX_EXP];
+  pos_t pos_array[CElementDataBase::MAX_EXP];
 
   OP_CODE op = GetLastOperator();
   const CElement* e = RefToElement( op );
@@ -59,7 +58,7 @@ bool CMathExpression::OptimizeTree2()
 #ifdef _TEST
         rule->m_AccessNb++;
 #endif
-#ifdef DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 1 )
         CDisplay ds;
         ds += "OptimizeTree rule" ;
         //        ds += CString( rule->m_LineNo );
@@ -81,14 +80,14 @@ bool CMathExpression::OptimizeTree2()
           memcpy( m_StackArray + pos, m_StackArray + pos2, ( m_StackSize - pos2 ) * sizeof( OP_CODE ) );
           SetSize( pos + m_StackSize - pos2 );
 #endif
-          if( m_StackSize >= MAX_STACK_SIZE )
+          /*if( m_StackSize >= MAX_STACK_SIZE )
           {
             Init( m_ElementDB->GetElement( "STACK_SIZE_ERROR" ) );
             ASSERT( false );
-          }
+          }*/
         }
 
-#ifdef DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 1 )
         Display( ds );
         TRACE( ds.GetBufferPtr() );
 #endif
@@ -101,16 +100,16 @@ bool CMathExpression::OptimizeTree2()
 
 bool CMathExpression::Match( const CMathExpression& equ ) const
 {
-  unsigned pos_array[CElementDataBase::MAX_EXP];
+  pos_t pos_array[CElementDataBase::MAX_EXP];
   return Match( GetSize(), equ, pos_array ) != GetSize();
 }
 
-unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsigned pos_array[] ) const
+pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_array[] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
-  unsigned pos1 = equ.GetSize();
-  unsigned pos2 = pos3;
+  pos_t pos1 = equ.GetSize();
+  pos_t pos2 = pos3;
 
   //Clear position table
   for ( unsigned i = 0; i < CElementDataBase::MAX_EXP; i++ )
@@ -127,7 +126,7 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
     {
       op3 = equ.Pop( pos1 );
       ASSERT( CElementDataBase::IsReservedOP( op3 ) );
-      match = MatchBranch( pos_array,  op3,  pos2 );
+      match = RegisterBranch( pos_array,  op3,  pos2 );
       if( match )
       {
         op2 = Pop( pos2 );
@@ -156,7 +155,7 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
     }
     else if( CElementDataBase::IsReservedOP( op1 ) ) //a,b or c
     {
-      match = MatchBranch( pos_array,  op1,  pos2 );
+      match = RegisterBranch( pos_array,  op1,  pos2 );
       if( match )
       {
         NextBranch( pos2 );
@@ -173,13 +172,13 @@ unsigned CMathExpression::Match( unsigned pos3, const CMathExpression& equ, unsi
 }
 
 #ifdef OPTIMIZE_PROCESSING
-void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize )
+void CMathExpression::ApplyRule( pos_t pos4, pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize )
 {
   OP_CODE op3;
   unsigned pos, pos3;
   unsigned j;
 
-#if 0 //def DEBUG_OPTIMIZE
+#if ( DEBUG_LEVEL >= 2 )
   CDisplay ds;
   ds += "Apply rule " ;
   rule_equ.Display( ds );
@@ -225,21 +224,21 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
   unsigned pos2 = GetSize();
   InnerCopy( pos4, pos3, pos2 - pos3 );
 
-#if 0 //def DEBUG_OPTIMIZE
+#if ( DEBUG_LEVEL >= 2 )
   Display( ds );
   TRACE( ds.GetBufferPtr() );
 #endif
 
 }
 #else
-void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], const CMathExpression& rule_equ, bool optimize )
+void CMathExpression::ApplyRule( pos_t pos4, pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize )
 {
   CMathExpression equ( m_ElementDB );
   OP_CODE op3;
-  unsigned pos;
+  pos_t pos;
   unsigned j;
 
-#if 0 //def DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 2 )
   CDisplay ds;
   ds += "Apply rule ";
   rule_equ.Display( ds );
@@ -260,7 +259,7 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
     if ( CElementDataBase::IsReservedOP( op3 ) )
     {
       j = ReservedParameterIndex( op3 );
-      unsigned pos2 = pos_array[j];
+      pos_t pos2 = pos_array[j];
       ASSERT( pos2 <= GetSize() );
       unsigned pos3 = pos + 1;
       if ( pos3 < n ) // if followed by FUNCT1 or FUNCT2
@@ -268,15 +267,16 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
         op3 = rule_equ.Get( pos3 );
         if ( CElementDataBase::IsFunctionOP( op3 ) )
         {
-          equ.Push( Get( pos_array[j] - 1 ) );
           pos = pos3;
-          continue;
+          op3 = Get( pos_array[j] - 1 );
+          goto L1;
         }
       }
       equ.PushBranch( *this, pos2 );  // WARNING pos2 is modified
     }
     else
     {
+L1:
       ASSERT( RefToElement( op3 ) != NULL );
       equ.Push( op3 );
       if ( optimize )
@@ -289,7 +289,7 @@ void CMathExpression::ApplyRule( unsigned pos4, unsigned const pos_array[], cons
   SetSize( pos4 );
   Push( equ );
 
-#if 0 //def DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 2 )
   Display( ds );
   TRACE( ds.GetBufferPtr() );
 #endif
@@ -301,7 +301,7 @@ void CMathExpression::ExecuteCommand()
 {
   OP_CODE op3 = Pop( m_StackSize );
 
-#ifdef DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 1 )
   CDisplay ds;
   if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
   {
@@ -322,7 +322,7 @@ void CMathExpression::ExecuteCommand()
     CMathExpression equ_dst( m_ElementDB );
     CMathExpression equ_src( m_ElementDB );
     equ_dst.PushBranch( *this, m_StackSize );
-    unsigned pos = m_StackSize;
+    pos_t pos = m_StackSize;
     equ_src.PushBranch( *this, pos );
     OP_CODE op1 = equ_src.GetLastOperator();
     CElement* e = RefToElement( op1 );
@@ -347,7 +347,7 @@ void CMathExpression::ExecuteCommand()
     CEvaluator* eval = m_ElementDB->GetEvaluator();
     if ( eval )
     {
-      unsigned pos = m_StackSize;
+      pos_t pos = m_StackSize;
       NextBranch( pos );
       eval->Evaluate( m_StackSize - pos, m_StackArray + pos );
       m_StackSize = pos;
@@ -362,7 +362,7 @@ void CMathExpression::ExecuteCommand()
 
   }
 
-#ifdef DEBUG_OPTIMIZE
+#if( DEBUG_LEVEL >= 1 )
   if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
   {
     Display( ds );
@@ -371,7 +371,7 @@ void CMathExpression::ExecuteCommand()
 #endif
 }
 
-bool CMathExpression::CompareBranchElement( unsigned pos1, unsigned pos2 ) const
+bool CMathExpression::CompareBranchElement( pos_t pos1, pos_t pos2 ) const
 {
   OP_CODE op3, op4;
   const CElement* e;
@@ -388,9 +388,9 @@ bool CMathExpression::CompareBranchElement( unsigned pos1, unsigned pos2 ) const
   return false;
 }
 
-bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
+bool CMathExpression::CompareBranch( pos_t pos1, pos_t pos2 ) const
 {
-  unsigned pos11, pos22;
+  pos_t pos11, pos22;
 
   if ( CompareBranchElement( pos1, pos2 ) )
   {
@@ -406,7 +406,7 @@ bool CMathExpression::CompareBranch( unsigned pos1, unsigned pos2 ) const
 
 }
 
-bool CMathExpression::MatchBranch( unsigned pos_array[], OP_CODE op1, unsigned pos2 ) const
+bool CMathExpression::RegisterBranch( pos_t pos_array[], OP_CODE op1, pos_t pos2 ) const
 {
   unsigned j;
   bool match;

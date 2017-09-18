@@ -342,19 +342,6 @@ void CElementDataBase::Test()
   db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 
-  /****** evaluator ******/
-  Initialize();
-  GetEvaluator()->GetValueFromString( "4" );
-  GetEvaluator()->SetElementValue( GetElement( "a" )->ToRef() );
-  GetEvaluator()->GetValueFromString( "8" );
-  GetEvaluator()->SetElementValue( GetElement( "b" )->ToRef() );
-  GetEvaluator()->GetValueFromString( "9" );
-  GetEvaluator()->SetElementValue( GetElement( "c" )->ToRef() );
-
-  Check( "DO_EVAL(a+b-c+2)", "5" );
-  Check( "DO_EVAL(a>b?2:3)", "3" );
-  Check( "DO_EVAL(a<b?a:b)", "4" );
-
   DisplayStats();
 
 }

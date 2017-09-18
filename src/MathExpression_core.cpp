@@ -56,17 +56,17 @@ void CMathExpression::Push( const CMathExpression& equ )
   }
 }
 
-void CMathExpression::Append( const OP_CODE* src, unsigned size )
+void CMathExpression::Append( const OP_CODE* src, pos_t size )
 {
   if( size != 0 )
   {
-    unsigned old_size = m_StackSize;
+    pos_t old_size = m_StackSize;
     SetSize( m_StackSize + size );
     memcpy( &m_StackArray[old_size], src, size * sizeof( OP_CODE ) );
   }
 }
 
-void CMathExpression::InnerCopy( unsigned pos_dest, unsigned pos_source, unsigned size )
+void CMathExpression::InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size )
 {
   if ( size != 0 )
   {
@@ -75,7 +75,7 @@ void CMathExpression::InnerCopy( unsigned pos_dest, unsigned pos_source, unsigne
   }
 }
 
-void CMathExpression::SetSize( unsigned i )
+void CMathExpression::SetSize( pos_t i )
 {
   m_StackSize = i;
   if( i > m_AllocSize )
@@ -107,15 +107,15 @@ void CMathExpression::Copy( const CMathExpression& equ )
   }
 }
 
-void CMathExpression::PushBranch( const CMathExpression& equ, unsigned& pos )
+void CMathExpression::PushBranch( const CMathExpression& equ, pos_t& pos )
 {
-  unsigned pos1 = pos;
+  pos_t pos1 = pos;
   ASSERT( pos );
   equ.NextBranch( pos );
   Append( &equ.m_StackArray[pos], pos1 - pos );
 }
 
-void CMathExpression::NextBranch( unsigned& pos ) const
+void CMathExpression::NextBranch( pos_t& pos ) const
 {
   unsigned i = 1;
   OP_CODE op;
@@ -183,7 +183,7 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   OP_CODE op;
   const CElement* e;
   unsigned i = 0;
-  unsigned pos;
+  pos_t pos;
 
   for ( pos = 0; pos < src.GetSize(); pos++ )
   {
@@ -201,7 +201,7 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
   }
 }
 
-void CMathExpression::Replace( OP_CODE op1, OP_CODE op2, unsigned pos )
+void CMathExpression::Replace( OP_CODE op1, OP_CODE op2, pos_t pos )
 {
   while ( pos < m_StackSize )
   {

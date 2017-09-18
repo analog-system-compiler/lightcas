@@ -108,56 +108,9 @@ IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
 NORM2(a,q)                    := IPOLY(NORM3(POLY(a,q)),q);
 NORM(a,q)                     := IPOLY_NORM(POLY(a,q),q);
 
-POLY(COS(a),1)           := POLYF(COS(SIMPLIFY(a)));
-POLY(SIN(a),1)           := POLYF(SIN(SIMPLIFY(a)));
-POLY(TAN(a),1)           := POLYF(TAN(SIMPLIFY(a)));
-POLY(ACOS(a),1)          := POLYF(ACOS(SIMPLIFY(a)));
-POLY(ASIN(a),1)          := POLYF(ASIN(SIMPLIFY(a)));
-POLY(ATAN(a),1)          := POLYF(ATAN(SIMPLIFY(a)));
-
-POLY(COSH(a),1)          := POLYF(COSH(SIMPLIFY(a)));
-POLY(SINH(a),1)          := POLYF(SINH(SIMPLIFY(a)));
-POLY(TANH(a),1)          := POLYF(TANH(SIMPLIFY(a)));
-POLY(ACOSH(a),1)         := POLYF(ACOSH(SIMPLIFY(a)));
-POLY(ASINH(a),1)         := POLYF(ASINH(SIMPLIFY(a)));
-POLY(ATANH(a),1)         := POLYF(ATANH(SIMPLIFY(a)));
-
-POLY(EXP(a),1)           := POLYF(EXP(SIMPLIFY(a)));
-POLY(FACT(a),1)          := POLYF(FACT(SIMPLIFY(a)));
-POLY(SQRT(a),1)          := POLYF(SQRT(SIMPLIFY(a)));
-POLY(SQR(a),1)           := POLYF(SQR(SIMPLIFY(a)));
-POLY(RE(a),1)            := POLYF(RE(SIMPLIFY(a)));
-POLY(IM(a),1)            := POLYF(IM(SIMPLIFY(a)));
-POLY(LOG(a),1)           := POLYF(LOG(SIMPLIFY(a)));
-POLY(LOG10(a),1)         := POLYF(LOG10(SIMPLIFY(a)));
-POLY(VECT(a),1)          := POLYF(VECT(SIMPLIFY(a)));
-POLY(FLOOR(a),1)         := POLYF(FLOOR(SIMPLIFY(a)));
-POLY(ASSERT(a),1)        := POLYF(ASSERT(SIMPLIFY(a)));
-POLY(RECT(a),1)          := POLYF(RECT(SIMPLIFY(a)));
-POLY(DER(a),1)           := POLYF(DER(SIMPLIFY(a)));
-
-POLY(MOD(a,b),1)         := POLYF(MOD(SIMPLIFY(a),SIMPLIFY(b)));
-POLY(EQ(a b),1)          := POLYF(EQ(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(NEQ(a b),1)         := POLYF(NEQ(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(GT(a b),1)          := POLYF(GT(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(GTE(a b),1)         := POLYF(GTE(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(LT(a b),1)          := POLYF(LT(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(LTE(a b),1)         := POLYF(LTE(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SHL(a b),1)         := POLYF(SHL(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SHR(a b),1)         := POLYF(SHR(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(CONCAT(a b),1)      := POLYF(CONCAT(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(SYST(a b),1)        := POLYF(SYST(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(POW(a b),1)         := POLYF(POW(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(IF(a b),1)          := POLYF(IF(SIMPLIFY(a) SIMPLIFY(b)));
-POLY(IF2(a b),1)         := POLYF(IF2(SIMPLIFY(a) SIMPLIFY(b)));
-
-POLY(MIN(a,b),1)         := POLYF(MIN(SIMPLIFY(a),SIMPLIFY(b)));
-POLY(MAX(a,b),1)         := POLYF(MAX(SIMPLIFY(a),SIMPLIFY(b)));
-
-POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
-
-//POLY( FUNCT1( a b   ), 1 ) := POLYF( FUNCT1( SIMPLIFY(a) b )));
-//POLY( FUNCT2( a b c ), 1 ) := POLYF( FUNCT2( SIMPLIFY(a) SIMPLIFY(b) c )));
+POLY( SOLVE(a,b),1 )         := POLYF( SIMPLIFY(SOLVE(a,b)));
+POLY( FUNCT1( a b   ), 1 )   := POLYF( FUNCT1( SIMPLIFY(a) b ));
+POLY( FUNCT2( a b c ), 1 )   := POLYF( FUNCT2( SIMPLIFY(a) SIMPLIFY(b) c ));
 
 //USE_TED := 0;
 //USE_TED ?
@@ -312,7 +265,8 @@ POLY(SOLVE(a,b),1)       := POLYF(SIMPLIFY(SOLVE(a,b)));
   //Poly
   POLY(v,v)             := MON(1,1);  
   //POLY(CONST(a),v)      := MON(a,0);
-  POLY(a,v)             := MON(a,0);  
+  POLY(a,v)             := MON(a,0);
+
   POLYF(a)              := MON(a,0);
 
   REDUCE_COMPLEX(MON(a,0))         := MON(a,0);

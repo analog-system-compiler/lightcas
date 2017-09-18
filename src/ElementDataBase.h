@@ -117,7 +117,7 @@ public:
   static const CSymbolSyntaxArray& GetSymbolTable()    { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                   { return m_SecureLimit;       }
   static bool IsReservedOP( OP_CODE op )               { return ( op >= OP_EXP1   ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
-  static bool IsFunctionOP( OP_CODE op )               { return ( op >= OP_FUNCT0 ) && ( op <= OP_FUNCT2 ); }
+  static bool IsFunctionOP( OP_CODE op )               { return ( op >= OP_CONST ) && ( op <= OP_FUNCT2 ); }
   CElementDataBase* GetParent() const                  { return m_Parent;            }
 
 
