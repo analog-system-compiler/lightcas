@@ -68,16 +68,16 @@ protected:
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   unsigned Parse( CParser& IC );
-  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
-  void     StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] );
+  bool     MatchOperator( CParser& IC, const char* sp, unsigned pos_index, unsigned precedence, bool symbol_first );
+  void     StoreStackPointer( char c, unsigned pos_index );
 
-  CAlgebraRule* RuleSearch( pos_t pos_array[CElementDataBase::MAX_EXP + 1] );
+  CAlgebraRule* RuleSearch( pos_t& pos, unsigned pos_index );
 
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
-  void     ApplyRule( pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
+  void     ApplyRule( pos_t pos, unsigned pos_index, const CMathExpression& rule_equ, bool optimize = true );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
-  pos_t    Match( pos_t pos2, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
-  bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
+  pos_t    Match( pos_t pos, const CMathExpression& equ, unsigned pos_index ) const;
+  bool     RegisterBranch( unsigned pos_index, OP_CODE op1, pos_t pos2 ) const;
   void     AddZero();
   void     RemoveZero();
   bool     ExecuteCommand();
@@ -90,7 +90,7 @@ protected:
   //Display funct
   unsigned    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
   unsigned    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
-  void        DisplaySymbolString(  const char* sp, pos_t pos_array[], unsigned precedence, CDisplay& ds ) const;
+  void        DisplaySymbolString(  const char* sp, unsigned pos_index, unsigned precedence, CDisplay& ds ) const;
 
 public:
   void  Initialize( CElementDataBase* db );

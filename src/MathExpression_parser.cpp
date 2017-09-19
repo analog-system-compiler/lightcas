@@ -141,17 +141,16 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
-  unsigned i, n;
-  pos_t pos_array[CElementDataBase::MAX_EXP + 1];
+  unsigned i, n, pos_index;
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   const char* init_pos = IC.GetPos();
 
   n = GetSize();
-
+  pos_index = m_PosArray.GetSize();
   for( i = priority; i < st.GetSize(); i++ )
   {
     const char* sp = st[i]->m_Syntax;
-    if ( MatchOperator( IC, sp, pos_array, i + 1, symbol_first ) )
+    if ( MatchOperator( IC, sp, pos_index, i + 1, symbol_first ) )
     {
       const CMathExpression& rule_equ = st[i]->m_Equation;
       ASSERT( rule_equ.GetSize() );
@@ -162,8 +161,8 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
       {
         NextBranch( pos );  //remove first parameter
       }
-      pos_array[CElementDataBase::MAX_EXP] = pos;
-      ApplyRule( pos_array, rule_equ, false );
+
+      ApplyRule( pos, pos_index, rule_equ, false );
 #if ( DEBUG_LEVEL >= 3 )
       CDisplay ds;
       Display( ds );
@@ -178,7 +177,7 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
   return false;
 }
 
-bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first )
+bool CMathExpression::MatchOperator( CParser& IC, const char* sp, unsigned pos_index, unsigned precedence, bool symbol_first )
 {
   char c;
 
@@ -196,7 +195,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_arra
 
   if ( CParser::IsWord( c ) )
   {
-    StoreStackPointer( c, pos_array );
+    StoreStackPointer( c, pos_index );
     sp++;
   }
 
@@ -220,7 +219,7 @@ bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_arra
 
     if ( CParser::IsWord( c ) )
     {
-      StoreStackPointer( c, pos_array );
+      StoreStackPointer( c, pos_index );
       sp++;
     }
     else if( !IC.TryMatchSymbol( sp ) )
@@ -285,10 +284,15 @@ bool CMathExpression::ParseElement( CParser& IC )
   return true;
 }
 
-void CMathExpression::StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] )
+void CMathExpression::StoreStackPointer( char c, unsigned pos_index )
 {
-  unsigned elem_id;
+  unsigned elem_id, n;
   elem_id = toupper( c ) - 'A';
   ASSERT( elem_id < CElementDataBase::MAX_EXP );
-  pos_array[elem_id]  = m_StackSize;
+  n = pos_index + elem_id;
+  if ( n >= m_PosArray.GetSize() )
+  {
+    m_PosArray.SetSize( n + 1 );
+  }
+  m_PosArray[n]  = m_StackSize;
 }
