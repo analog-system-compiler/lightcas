@@ -83,7 +83,7 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
   { "_rand",   0, &CEvaluator::Rand          },
   { "_if2",    3, &CEvaluator::If            },
   { "_if",     3, &CEvaluator::If            },
-  { "_rank",   1, &CEvaluator::Rank          },
+  { "_elemid", 1, &CEvaluator::ElemId        },
 };
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof( CElementDataBase::m_FunctionProperties ) / sizeof( SProperties );
@@ -156,7 +156,7 @@ void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp( this );
   static const char parameters[] = "a b c d e f g h";
-  static const char built_in[] = "SET(0 0) GET(0) NONE CONST(0) ELEM(0) FUNCT0(0) FUNCT1(0 0) FUNCT2(0 0 0) NEG(0) RANK(0 0) EVAL(0)";
+  static const char built_in[] = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0)";
 
   exp.GetFromString( parameters );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
@@ -252,15 +252,15 @@ bool CElementDataBase::AssociateSymbol( CParser& IC )
 void CElementDataBase::InitAlgebraRuleTable()
 {
   CMathExpression src( this );
-  src.GetFromString( "SET( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )" );
+  src.GetFromString( "_set( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )" );
   src.OptimizeTree();
 #if OPTIMIZATION_LEVEL < 2
-  src.GetFromString( "SET( EXECUTE( SET( a b ) )  SET( a b ) )" );
+  src.GetFromString( "_set( EXECUTE( _set( a b ) )  _set( a b ) )" );
   src.OptimizeTree();
-  src.GetFromString( "SET( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )" );
+  src.GetFromString( "_set( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )" );
   src.OptimizeTree();
 #endif
-  src.GetFromString( "SET( EXECUTE( a )  a )" );
+  src.GetFromString( "_set( EXECUTE( a )  a )" );
   src.OptimizeTree();
 }
 

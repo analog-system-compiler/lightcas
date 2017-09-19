@@ -119,7 +119,7 @@ int main()
   if ( !db.IsOK() ) { exit( 0 ); }
 
   CMathExpression equ( &db );
-  CParser IC;
+  CParser   IC;
   CElement* simplify = db_root.GetElement( "SIMPLIFY" );
   CElement* ans      = db.GetElement( "ans" );
   OP_CODE simplify_op = simplify->ToRef();

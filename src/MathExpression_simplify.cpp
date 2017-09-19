@@ -80,11 +80,6 @@ bool CMathExpression::OptimizeTree2()
           memcpy( m_StackArray + pos, m_StackArray + pos2, ( m_StackSize - pos2 ) * sizeof( OP_CODE ) );
           SetSize( pos + m_StackSize - pos2 );
 #endif
-          /*if( m_StackSize >= MAX_STACK_SIZE )
-          {
-            Init( m_ElementDB->GetElement( "STACK_SIZE_ERROR" ) );
-            ASSERT( false );
-          }*/
         }
 
 #if( DEBUG_LEVEL >= 1 )
@@ -303,7 +298,7 @@ void CMathExpression::ExecuteCommand()
 
 #if( DEBUG_LEVEL >= 1 )
   CDisplay ds;
-  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
+  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || ( op3 == CElementDataBase::OP_EVAL ) )
   {
     ds += "Execute Command ";
     RefToElement( op3 )->Display( ds );
@@ -363,7 +358,7 @@ void CMathExpression::ExecuteCommand()
   }
 
 #if( DEBUG_LEVEL >= 1 )
-  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || /*( op3 == CElementDataBase::OP_SUBST ) ||*/ ( op3 == CElementDataBase::OP_EVAL ) )
+  if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || ( op3 == CElementDataBase::OP_EVAL ) )
   {
     Display( ds );
     TRACE( ds.GetBufferPtr() );

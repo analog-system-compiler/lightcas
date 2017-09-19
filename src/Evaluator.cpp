@@ -510,7 +510,7 @@ void CEvaluator::If( CEvaluator& eval )
   }
 }
 
-void CEvaluator::Rank( CEvaluator& eval )
+void CEvaluator::ElemId( CEvaluator& eval )
 {
   eval.Pop();
   eval.Push( ( double )eval.m_OpPos[-2] );

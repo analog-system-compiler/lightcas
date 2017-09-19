@@ -76,7 +76,6 @@ public :
     OP_FUNCT2,
     OP_NEG,
     OP_RANK,
-    // OP_SUBST,
     OP_EVAL,
     OP_END_RESERVED
   };

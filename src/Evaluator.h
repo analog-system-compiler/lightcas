@@ -114,7 +114,7 @@ public:
   static void ShiftRight( CEvaluator& );
   static void ShiftLeft( CEvaluator& );
   static void If( CEvaluator& );
-  static void Rank( CEvaluator& );
+  static void ElemId( CEvaluator& );
 
 public:
   CEvaluator( void );

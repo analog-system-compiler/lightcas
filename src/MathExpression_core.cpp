@@ -203,12 +203,11 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
 
 void CMathExpression::Replace( OP_CODE op1, OP_CODE op2, pos_t pos )
 {
-  while ( pos < m_StackSize )
+  for ( ; pos < m_StackSize; pos++ )
   {
     if ( Get( pos ) == op1 )
     {
       Set( pos, op2 );
     }
-    pos++;
   }
 }

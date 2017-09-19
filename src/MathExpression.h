@@ -67,7 +67,7 @@ protected:
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   unsigned Parse( CParser& IC );
-  unsigned MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first );
+  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first );
   void     StoreStackPointer( char c, pos_t pos_array[] );
 
   bool     OptimizeTree2();

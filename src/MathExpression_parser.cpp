@@ -141,7 +141,7 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
-  unsigned i, k, n;
+  unsigned i, n;
   pos_t pos_array[CElementDataBase::MAX_EXP] = { 0 };
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   const char* init_pos = IC.GetPos();
@@ -151,8 +151,7 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
   for( i = priority; i < st.GetSize(); i++ )
   {
     const char* sp = st[i]->m_Syntax;
-    k = MatchOperator( IC, sp, pos_array, i + 1, symbol_first );
-    if ( k != 0 )
+    if ( MatchOperator( IC, sp, pos_array, i + 1, symbol_first ) )
     {
       const CMathExpression& rule_equ = st[i]->m_Equation;
       ASSERT( rule_equ.GetSize() );
@@ -178,9 +177,8 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
   return false;
 }
 
-unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first )
+bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first )
 {
-  unsigned k = 0;
   char c;
 
   c = *sp;
@@ -192,14 +190,13 @@ unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_
 
   if ( CParser::IsWord( c ) == symbol_first )
   {
-    return 0;
+    return false;
   }
 
   if ( CParser::IsWord( c ) )
   {
     StoreStackPointer( c, pos_array );
     sp++;
-    k++;
   }
 
   // try to match prefix operator
@@ -224,15 +221,14 @@ unsigned CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_
     {
       StoreStackPointer( c, pos_array );
       sp++;
-      k++;
     }
     else if( !IC.TryMatchSymbol( sp ) )
     {
-      return 0;
+      return false;
     }
   }
 
-  return k;
+  return true;
 }
 
 bool CMathExpression::ParseElement( CParser& IC )
