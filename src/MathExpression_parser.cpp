@@ -142,7 +142,7 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbol_first )
 {
   unsigned i, n;
-  pos_t pos_array[CElementDataBase::MAX_EXP+1];
+  pos_t pos_array[CElementDataBase::MAX_EXP + 1];
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   const char* init_pos = IC.GetPos();
 
@@ -178,7 +178,7 @@ bool CMathExpression::SearchOperator( CParser& IC, unsigned priority, bool symbo
   return false;
 }
 
-bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first )
+bool CMathExpression::MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first )
 {
   char c;
 
@@ -285,7 +285,7 @@ bool CMathExpression::ParseElement( CParser& IC )
   return true;
 }
 
-void CMathExpression::StoreStackPointer( char c, pos_t pos_array[] )
+void CMathExpression::StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] )
 {
   unsigned elem_id;
   elem_id = toupper( c ) - 'A';

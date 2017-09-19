@@ -202,20 +202,13 @@ IPOLY2(MONDIV(a,b),v)            := IPOLY2(a,v)/IPOLY2(b,v);
 IPOLY3(MON(a,0),v)               := a;
 IPOLY3(MON(a,b),v)               := (a^(1/b)*v)^b;
 IPOLY3(POLYSTORE(a,b),v)         := IPOLY3(a,v)+IPOLY3(b,v);
-//IPOLY3(MONDIV(a,b),v)          := IPOLY3(a,v)/IPOLY3(b,v);
 IPOLY5(((a,b),c),v)              := IPOLY3(MONDIV(a,MON(c,0)),v)/IPOLY3(MONDIV(b,MON(c,0)),v);
 
 IPOLY_NORM(MONDIV(a,b),v)        := IPOLY5(((a,b),GET_POWER(b,0)),v);
 IPOLY_NORM(a,v)                  := IPOLY3(a,v);
 
-//POLY_TED(a)                    := TED(TED(GET_POWER(a,2) GET_POWER(a,1)) GET_POWER(a,0));
-//POLY(a,v)                      := TED(0,a);
-
-//CONCAT(_const(a) _const(b)) := _none ; // no simplification for concatenation op
-
 --a          := a    ;
 -0           := 0    ;
-//-_const(a)    := _none ;
 
 a==a         :=1     ;
 a>=a         :=1     ;
@@ -327,11 +320,9 @@ POLY({a},v)           := {POLY(a,v)};
 IPOLY((a,b),v)        := (IPOLY(a,v),IPOLY(b,v)); //parenthesis are important there!!!
 IPOLY({a},v)          := {IPOLY(a,v)};
 
-//SIMPLIFY(_elem(a))     := _get(a)  ;
-//SIMPLIFY(-_elem(a))    := -_get(a) ;
-SIMPLIFY(_const(a))    := a  ;
-SIMPLIFY(-_const(a))   := -a ;
-SIMPLIFY(_set(a b))    := _set( a SIMPLIFY(b) ); //needed for console app
+SIMPLIFY(_const(a))   := a  ;
+SIMPLIFY(-_const(a))  := -a ;
+SIMPLIFY(_set(a b))   := _set( a SIMPLIFY(b) ); //needed for console app
 SIMPLIFY(a)           := SIMPLIFY3(EXPAND2(a));
 
 SIMPLIFY3(a)          := SIMPLIFY2(a,GETVAR(a));
@@ -361,7 +352,6 @@ EXPAND(-a)            := -EXPAND2(a);
 EXPAND(a)             := a;
 
 EXPAND2( a )          := EXPAND( _get(a) ); // replace element with its equivalent if any
-//EXPAND2( a )           := EXPAND( a );
 
 CHOOSEVAR(1,b)        := b;
 CHOOSEVAR(a,1)        := a;
@@ -369,8 +359,6 @@ CHOOSEVAR(a,b)        := _rank(a b);
 //CHOOSEVAR(a,b)        := ( _eval( _gte( _rank(a) _rank(b) ) ) ? a : b );
 CHOOSEVARDIV(1,b)     := b;
 CHOOSEVARDIV(a,b)     := a; //No RANK there !!!
-// FOREACH({a,b},c}      := {FOREACH({a},c),c(b)};
-
 
 DERN(a,b,0)     := a;
 DERN(a,b,_const(n))     := DERN(DER(a,b),b,n-1);
@@ -419,34 +407,12 @@ TED( TED( 0 a ) b ) := TED( a b );
 IPOLY_TED((a,b),v)                := (IPOLY_TED(a,v),IPOLY_TED(b,v)); //parenthesis are important there!!!
 IPOLY_TED(TED(a b),v)             := a*v+b;
 
-// REDUCE( e, TED(a b),TED(c d))  := (REDUCE( e, TED(c d)) , TED(0 c*b-d*a));
-// REDUCE(    TED(a b),TED(c d))  := (TED(c d),TED(0 c*b-d*a));
 REDUCE(    TED(a b),TED(0 d))     := (TED(a b),TED(0 d));
 REDUCE(    TED(0 b),TED(c d))     := (TED(c d),TED(0 b));
 REDUCE(    TED(a b),TED(c d))     := (TED(c d),TED(0 c*b-d*a));
 REDUCE( e, TED(a b),TED(0 d))     := (REDUCE( e, TED(a b)) , TED(0 d));
 REDUCE( e, TED(0 b),TED(c d))     := (REDUCE( e, TED(c d)) , TED(0 b));
 REDUCE( e, TED(a b),TED(c d))     := (REDUCE( e, TED(c d)) , TED(0 c*b-d*a));
-
-/*
-DET2( e, TED(a,b),TED(c,d))     := c*DET2( e, TED(a,b) )
-*/
-
-/* REDUCE(    TED(a,b),TED(0,d))  := (TED(0,d),TED(a,b));
-REDUCE(    TED(0,b),TED(c,d))     := (TED(0,b),TED(c,d));
-REDUCE(    TED(a,b),TED(c,d))     := (TED(0,c*b-d*a), TED(a,b));
-REDUCE( e, TED(a,b),TED(0,d))     := (TED(0,d), REDUCE( e, TED(a,b)) );
-REDUCE( e, TED(0,b),TED(c,d))     := (TED(0,b), REDUCE( e, TED(c,d)) );
-REDUCE( e, TED(a,b),TED(c,d))     := (TED(0,c*b-d*a), REDUCE( e, TED(a,b)) );
-(a,(b,c)) := ((a,b),c);*/
-
-/* REDUCE(    TED(a,b),TED(0,d))     := (TED(a,b),TED(0,d));
-REDUCE(    TED(0,b),TED(c,d))     := (TED(c,d),TED(0,b));
-
-REDUCE(    TED(a,b),TED(c,d))     := (TED(a,b),TED(0,c*b-d*a));
-REDUCE( e, TED(a,b),TED(0,d))     := (REDUCE( e, TED(a,b)) , TED(0,d));
-REDUCE( e, TED(0,b),TED(c,d))     := (REDUCE( e, TED(c,d)) , TED(0,b));
-REDUCE( e, TED(a,b),TED(c,d))     := (REDUCE( e, TED(a,b)) , TED(0,c*b-d*a));*/
 
 SOLVE2(TED(TED(a b) c)/e)         := SOLVE2(TED(TED(a b) c));
 SOLVE2(TED(TED(a b) c))           := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };
@@ -543,10 +509,6 @@ VECT_REVERSE1( a )         := a;
 VECT_REVERSE2( VECT_QUEUE(a), (b, c) ) := VECT_REVERSE2( VECT_QUEUE(a,c), b);
 VECT_REVERSE2( VECT_QUEUE(a),  b     ) := (a,b);
 
-/*MATRIX_GETVAR({a,b})   := MATRIX_GETVAR2( (a,b), CHOOSEVAR( GETVAR(a), GETVAR(b) ) );
-MATRIX_GETVAR({a})     := a;
-MATRIX_GETVAR2(a,b)    := {b,MATRIX_GETVAR({TED_TO_MATRIX(POLY_TED(a,b))})};*/
-
 //vector add
 (a,b)+(c,d)               := (a+c,b+d);
 (a,b)+c                   := (a+c,b+c);
@@ -592,20 +554,16 @@ TAN(a,b)                  := (TAN(a),TAN(b));
 
 VSIZE({a,b})              := VSIZE({a})+1;
 VSIZE(a)                  := 1;
-{a}[_const(c)]             := INVAT({a}, VSIZE({a}) -1 - c );
+{a}[_const(c)]            := INVAT({a}, VSIZE({a}) -1 - c );
 INVAT({a,b},0)            := b;
-INVAT({a,b},_const(c))     := INVAT({a},c-1);
+INVAT({a,b},_const(c))    := INVAT({a},c-1);
 INVAT({a},0)              := a;
-INVAT({a},-_const(b))      := ERROR(0);
-
-//TAYLOR(a,x,xo,0)          := SIMPLIFY(SUBST(a x xo));
-//TAYLOR(a,x,xo,_const(n))   := TAYLOR(a,x,xo,n-1)+SIMPLIFY(SUBST(DERN(a,x,n) x xo))*(x-xo)^n/n!;
+INVAT({a},-_const(b))     := ERROR(0);
 
 SUBST2(a x xo)            := SIMPLIFY(SUBST(a x xo));
 TAYLOR(a,x,xo,0)          := SUBST2(a x xo);
-TAYLOR(a,x,xo,_const(n))   := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
+TAYLOR(a,x,xo,_const(n))  := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
 
-//SUBST( _elem( x )       x xo  )   := xo;
 SUBST( _funct1(   b c ) x xo  )   := _funct1( SUBST( b x xo ) c );
 SUBST( _funct2( a b c ) x xo  )   := _funct2( SUBST( a x xo ) SUBST( b x xo ) c );
 SUBST( x               x xo  )   := xo;

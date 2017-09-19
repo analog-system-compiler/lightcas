@@ -23,6 +23,8 @@
 #include "Element.h"
 #include "Function.h"
 
+CPosArray CMathExpression::m_PosArray;
+
 //#define OPTIMIZE_PROCESSING
 
 void CMathExpression::OptimizeTree()
@@ -32,7 +34,7 @@ void CMathExpression::OptimizeTree()
 
   if ( ExecuteCommand() )
   {
-    rule = OptimizeTree2( pos_array );
+    rule = RuleSearch( pos_array );
     if ( rule )
     {
 #ifdef _TEST
@@ -70,7 +72,7 @@ void CMathExpression::OptimizeTree()
   }
 }
 
-CAlgebraRule* CMathExpression::OptimizeTree2( pos_t pos_array[] )
+CAlgebraRule* CMathExpression::RuleSearch( pos_t pos_array[CElementDataBase::MAX_EXP + 1] )
 {
   pos_t pos;
   unsigned i;
@@ -106,7 +108,7 @@ bool CMathExpression::Match( const CMathExpression& equ ) const
   return Match( GetSize(), equ, pos_array ) != GetSize();
 }
 
-pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_array[] ) const
+pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const
 {
   OP_CODE op1, op2, op3;
   bool match = true;
@@ -233,7 +235,7 @@ void CMathExpression::ApplyRule( pos_t pos4, pos_t const pos_array[], const CMat
 
 }
 #else
-void CMathExpression::ApplyRule(  pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize )
+void CMathExpression::ApplyRule(  pos_t const pos_array[CElementDataBase::MAX_EXP + 1], const CMathExpression& rule_equ, bool optimize )
 {
   CMathExpression equ( m_ElementDB );
   OP_CODE op3;
@@ -403,7 +405,7 @@ bool CMathExpression::CompareBranch( pos_t pos1, pos_t pos2 ) const
 
 }
 
-bool CMathExpression::RegisterBranch( pos_t pos_array[], OP_CODE op1, pos_t pos2 ) const
+bool CMathExpression::RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const
 {
   unsigned j;
   bool match;

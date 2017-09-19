@@ -30,6 +30,7 @@
 
 class CAlgebraRule;
 typedef unsigned short pos_t;
+typedef CVector< pos_t > CPosArray;
 
 class CMathExpression
 {
@@ -37,6 +38,7 @@ class CMathExpression
   friend class CElementDataBase;
 
 protected:
+  static CPosArray m_PosArray;
   OP_CODE*  m_StackArray;
   pos_t     m_StackSize;
   pos_t     m_AllocSize;
@@ -66,16 +68,16 @@ protected:
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   unsigned Parse( CParser& IC );
-  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first );
-  void     StoreStackPointer( char c, pos_t pos_array[] );
+  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
+  void     StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] );
 
-  CAlgebraRule* OptimizeTree2( pos_t pos_array[] );
+  CAlgebraRule* RuleSearch( pos_t pos_array[CElementDataBase::MAX_EXP + 1] );
 
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
   void     ApplyRule( pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
-  pos_t    Match( pos_t pos2, const CMathExpression& equ, pos_t pos_array[] ) const;
-  bool     RegisterBranch( pos_t pos_array[], OP_CODE op1, pos_t pos2 ) const;
+  pos_t    Match( pos_t pos2, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
+  bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
   void     AddZero();
   void     RemoveZero();
   bool     ExecuteCommand();
