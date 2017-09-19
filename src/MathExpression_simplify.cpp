@@ -27,19 +27,58 @@
 
 void CMathExpression::OptimizeTree()
 {
-  ExecuteCommand();
+  pos_t pos_array[CElementDataBase::MAX_EXP + 1];
+  CAlgebraRule* rule;
+
+  if ( ExecuteCommand() )
+  {
+    rule = OptimizeTree2( pos_array );
+    if ( rule )
+    {
+#ifdef _TEST
+      rule->m_AccessNb++;
+#endif
+#if( DEBUG_LEVEL >= 1 )
+      CDisplay ds;
+      ds += "OptimizeTree rule";
+      //        ds += CString( rule->m_LineNo );
+      ds += " [";
+      e->Display( ds );
+      ds += "] ";
+      rule->Display( i, ds );
+      ds += " : ";
+      Display( ds );
+      ds += " => ";
+#endif
+      if ( rule->m_bHasRule )
+      {
+#if 1
+        ApplyRule( pos_array, rule->m_DstEquation );
+#else
+        unsigned pos2 = m_StackSize;
+        ApplyRule( *this, pos_array, &rule->m_DstEquation );
+        memcpy( m_StackArray + pos, m_StackArray + pos2, ( m_StackSize - pos2 ) * sizeof( OP_CODE ) );
+        SetSize( pos + m_StackSize - pos2 );
+#endif
+      }
+
+#if( DEBUG_LEVEL >= 1 )
+      Display( ds );
+      TRACE( ds.GetBufferPtr() );
+#endif
+    }
+  }
 }
 
-bool CMathExpression::OptimizeTree2()
+CAlgebraRule* CMathExpression::OptimizeTree2( pos_t pos_array[] )
 {
   pos_t pos;
   unsigned i;
   unsigned n;
-  bool match;
-  pos_t pos_array[CElementDataBase::MAX_EXP];
 
   OP_CODE op = GetLastOperator();
   const CElement* e = RefToElement( op );
+  ASSERT( e );
   const CFunction* funct = e->GetFunction();
 
   if( funct )
@@ -51,46 +90,14 @@ bool CMathExpression::OptimizeTree2()
       const CMathExpression* equ = &( rule->m_SrcEquation );
 
       pos = Match( GetSize(), *equ, pos_array );
-      match = ( pos != GetSize() );
-
-      if( match )
+      if( pos != GetSize() )
       {
-#ifdef _TEST
-        rule->m_AccessNb++;
-#endif
-#if( DEBUG_LEVEL >= 1 )
-        CDisplay ds;
-        ds += "OptimizeTree rule" ;
-        //        ds += CString( rule->m_LineNo );
-        ds += " [";
-        e->Display( ds );
-        ds += "] ";
-        rule->Display( i, ds );
-        ds += " : ";
-        Display( ds );
-        ds += " => ";
-#endif
-        if( rule->m_bHasRule )
-        {
-#if 1
-          ApplyRule( pos, pos_array, rule->m_DstEquation );
-#else
-          unsigned pos2 = m_StackSize;
-          ApplyRule( *this, pos_array, &rule->m_DstEquation );
-          memcpy( m_StackArray + pos, m_StackArray + pos2, ( m_StackSize - pos2 ) * sizeof( OP_CODE ) );
-          SetSize( pos + m_StackSize - pos2 );
-#endif
-        }
-
-#if( DEBUG_LEVEL >= 1 )
-        Display( ds );
-        TRACE( ds.GetBufferPtr() );
-#endif
-        return true;
+        pos_array[CElementDataBase::MAX_EXP] = pos;
+        return rule;
       }
     }
   }
-  return false;
+  return NULL;
 }
 
 bool CMathExpression::Match( const CMathExpression& equ ) const
@@ -226,7 +233,7 @@ void CMathExpression::ApplyRule( pos_t pos4, pos_t const pos_array[], const CMat
 
 }
 #else
-void CMathExpression::ApplyRule( pos_t pos4, pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize )
+void CMathExpression::ApplyRule(  pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize )
 {
   CMathExpression equ( m_ElementDB );
   OP_CODE op3;
@@ -281,7 +288,7 @@ L1:
     }
   }
 
-  SetSize( pos4 );
+  SetSize( pos_array[CElementDataBase::MAX_EXP] );
   Push( equ );
 
 #if( DEBUG_LEVEL >= 2 )
@@ -292,7 +299,7 @@ L1:
 }
 #endif
 
-void CMathExpression::ExecuteCommand()
+bool CMathExpression::ExecuteCommand()
 {
   OP_CODE op3 = Pop( m_StackSize );
 
@@ -309,10 +316,7 @@ void CMathExpression::ExecuteCommand()
   }
 #endif
 
-  switch( op3 )
-  {
-
-  case CElementDataBase::OP_SET:
+  if( op3 == CElementDataBase::OP_SET )
   {
     CMathExpression equ_dst( m_ElementDB );
     CMathExpression equ_src( m_ElementDB );
@@ -322,22 +326,23 @@ void CMathExpression::ExecuteCommand()
     OP_CODE op1 = equ_src.GetLastOperator();
     CElement* e = RefToElement( op1 );
     e->AddFunction( equ_src, equ_dst );
-    break;
+    return false;
   }
 
-  case CElementDataBase::OP_GET:
-    OptimizeTree2();
-    break;
+  if ( op3 == CElementDataBase::OP_GET )
+  {
+    return true;
+  }
 
-  case CElementDataBase::OP_RANK:
+  if ( op3 == CElementDataBase::OP_RANK )
   {
     OP_CODE op1 = Pop( m_StackSize );
     OP_CODE op2 = Pop( m_StackSize );
     Push( op1 > op2 ? op1 : op2 );
-    break;
+    return false;
   }
 
-  case CElementDataBase::OP_EVAL:
+  if ( op3 == CElementDataBase::OP_EVAL )
   {
     CEvaluator* eval = m_ElementDB->GetEvaluator();
     if ( eval )
@@ -348,14 +353,10 @@ void CMathExpression::ExecuteCommand()
       m_StackSize = pos;
       PushEvalElement( *eval );
     }
-    break;
+    return false;
   }
 
-  default:
-    m_StackSize++;
-    OptimizeTree2();
-
-  }
+  m_StackSize++;
 
 #if( DEBUG_LEVEL >= 1 )
   if ( ( op3 == CElementDataBase::OP_SET ) || ( op3 == CElementDataBase::OP_GET ) || ( op3 == CElementDataBase::OP_RANK ) || ( op3 == CElementDataBase::OP_EVAL ) )
@@ -364,6 +365,7 @@ void CMathExpression::ExecuteCommand()
     TRACE( ds.GetBufferPtr() );
   }
 #endif
+  return true;
 }
 
 bool CMathExpression::CompareBranchElement( pos_t pos1, pos_t pos2 ) const

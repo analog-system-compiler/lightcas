@@ -26,11 +26,10 @@
 #include "ElementDataBase.h"
 
 #define OPTIMIZATION_LEVEL 0//2
+#define MAX_STACK_SIZE USHRT_MAX
 
 class CAlgebraRule;
-
 typedef unsigned short pos_t;
-//#define MAX_STACK_SIZE (1<<20)
 
 class CMathExpression
 {
@@ -70,18 +69,16 @@ protected:
   bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[], unsigned precedence, bool symbol_first );
   void     StoreStackPointer( char c, pos_t pos_array[] );
 
-  bool     OptimizeTree2();
+  CAlgebraRule* OptimizeTree2( pos_t pos_array[] );
 
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
-  void     ApplyRule( pos_t pos, pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
+  void     ApplyRule( pos_t const pos_array[], const CMathExpression& rule_equ, bool optimize = true );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
   pos_t    Match( pos_t pos2, const CMathExpression& equ, pos_t pos_array[] ) const;
   bool     RegisterBranch( pos_t pos_array[], OP_CODE op1, pos_t pos2 ) const;
   void     AddZero();
   void     RemoveZero();
-
-  //virtual
-  virtual void ExecuteCommand();
+  bool     ExecuteCommand();
 
   //static
   static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
