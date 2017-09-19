@@ -71,6 +71,7 @@ void CMathExpression::OptimizeTree()
       TRACE( ds.GetBufferPtr() );
 #endif
     }
+    m_PosArray.SetSize( pos_index );
   }
 }
 
