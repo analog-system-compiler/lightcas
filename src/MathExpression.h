@@ -26,11 +26,31 @@
 #include "ElementDataBase.h"
 
 #define OPTIMIZATION_LEVEL 0//2
+
+#if 1
+#define MAX_STACK_SIZE UINT_MAX
+typedef unsigned pos_t;
+#else
 #define MAX_STACK_SIZE USHRT_MAX
+typedef unsigned short pos_t;
+#endif
 
 class CAlgebraRule;
-typedef unsigned short pos_t;
-typedef CVector< pos_t > CPosArray;
+
+typedef struct
+{
+  pos_t      m_Pos;
+  pos_t      m_Size;
+  pos_t      m_RuleDstPos;
+  pos_t      m_PosArray[CElementDataBase::MAX_EXP];
+#ifdef _DEBUG
+  CAlgebraRule* m_Rule;
+#endif
+  const CMathExpression* m_RuleDstExp;
+} context_t;
+
+typedef CVector< context_t >  CContextArray;
+//typedef CVector< pos_t >      CPosArray;
 
 class CMathExpression
 {
@@ -38,7 +58,8 @@ class CMathExpression
   friend class CElementDataBase;
 
 protected:
-  static CPosArray m_PosArray;
+  //static CPosArray     m_PosArray;
+  static CContextArray m_ContextStack;
   OP_CODE*  m_StackArray;
   pos_t     m_StackSize;
   pos_t     m_AllocSize;
@@ -67,17 +88,19 @@ protected:
   bool     ParseMacro( CParser& IC );
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
-  unsigned Parse( CParser& IC );
-  bool     MatchOperator( CParser& IC, const char* sp, unsigned pos_index, unsigned precedence, bool symbol_first );
-  void     StoreStackPointer( char c, unsigned pos_index );
+  int      Parse( CParser& IC );
+  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
+  void     StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] );
 
-  CAlgebraRule* RuleSearch( pos_t& pos, unsigned pos_index );
+  CAlgebraRule* RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] );
 
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
-  void     ApplyRule( pos_t pos, unsigned pos_index, const CMathExpression& rule_equ, bool optimize = true );
+  bool     OptimizeTree2();
+  //unsigned ApplyRule2();
+  void     ApplyRule( pos_t pos, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
-  pos_t    Match( pos_t pos, const CMathExpression& equ, unsigned pos_index ) const;
-  bool     RegisterBranch( unsigned pos_index, OP_CODE op1, pos_t pos2 ) const;
+  pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
+  bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
   void     AddZero();
   void     RemoveZero();
   bool     ExecuteCommand();
@@ -90,7 +113,7 @@ protected:
   //Display funct
   unsigned    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
   unsigned    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
-  void        DisplaySymbolString(  const char* sp, unsigned pos_index, unsigned precedence, CDisplay& ds ) const;
+  void        DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const;
 
 public:
   void  Initialize( CElementDataBase* db );
@@ -106,7 +129,7 @@ public:
 
   bool  Compare( const CMathExpression& equ ) const;
   void  Copy( const CMathExpression& equ );
-  void  Display( CDisplay& ds ) const;
+  void  Display( CDisplay& ds, bool bAll = true ) const;
   bool  GetFromString( CParser& IC )        { return ( Parse( IC ) > 0 ); }
   bool  GetFromString( const char* text )   { CParser IC( text ); return GetFromString( IC ); }
   void  OptimizeTree();

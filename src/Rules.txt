@@ -452,7 +452,7 @@ DET_LINES( MATRIX_BOTTOM( c, TED( a b ) )                 , DET_VAR( e ) ) := a 
 DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( d, c ) )}, { e } ) - DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP( d , TED( a b ) ), DET_VAR( e ) );
 DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( c ) )}   , { e } );
 
-// pos defined matrix determinant { {a,b,...}, {c,d,...}, ... }
+// common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
 DET( {0} ) := 0;
 DET( {a} ) := MAT_DET_LINES( MATRIX_BOTTOM( a ) );
 

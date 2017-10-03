@@ -5,7 +5,6 @@ SRC_DIR         = ../src
 CXX             = $(CROSS_COMPILE)clang++
 AR              = $(CROSS_COMPILE)ar
 LD              = $(CROSS_COMPILE)ld
-SRCS            = $(notdir $(wildcard $(SRC_DIR)/*.cpp))
 OBJDIR          = $(shell mkdir -p ./objs ./objs/nostd ) ./objs
 LIB             = lib$(EXE).a
 EXE_SRC         = ../src/app/Console.cpp
@@ -20,6 +19,20 @@ EMBED_RULES     = 1
 
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -s -Wl,-Map=$(EXE).map
+
+SRCS = \
+    Debug.cpp \
+    Element.cpp \
+    ElementDataBase.cpp \
+    Evaluator.cpp \
+    Function.cpp \
+    MathExpression_core.cpp \
+    MathExpression_display.cpp \
+    MathExpression_parser.cpp \
+    MathExpression_simplify.cpp \
+    Parser.cpp \
+    Test.cpp \
+    Value.cpp
 
 ifeq ($(USE_STD),0)
 	CPPFLAGS += -I$(SRC_DIR)/nostd 

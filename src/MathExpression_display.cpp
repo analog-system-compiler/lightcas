@@ -20,7 +20,7 @@
 #include "Element.h"
 #include "MathExpression.h"
 
-void CMathExpression::Display( CDisplay& ds ) const
+void CMathExpression::Display( CDisplay& ds, bool bAll ) const
 {
   unsigned pos = m_StackSize;
 
@@ -33,6 +33,7 @@ void CMathExpression::Display( CDisplay& ds ) const
     while( pos )
     {
       pos = DisplayBranch( pos, 0, ds );
+      if ( !bAll ) { return; }
       if( pos )
       {
         ds += ' ';
@@ -84,26 +85,26 @@ unsigned CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay&
 
 unsigned  CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& ds ) const
 {
+  pos_t pos_array[CElementDataBase::MAX_EXP];
 
-  unsigned pos_index = m_PosArray.GetSize();
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
   {
     const CSymbolSyntaxStruct* ss = st[i];
     const CMathExpression* equ =  &ss->m_Equation;
-    pos_t pos1 = Match( pos, *equ, pos_index );
+    pos_t pos1 = Match( pos, *equ, pos_array );
     if( pos1 != pos )
     {
       const char* sp = ss->m_Syntax;
       if( i < precedence )
       {
         ds += '(' ;
-        DisplaySymbolString( sp, pos_index, i, ds );
+        DisplaySymbolString( sp, pos_array, i, ds );
         ds += ')';
       }
       else
       {
-        DisplaySymbolString( sp, pos_index, i, ds );
+        DisplaySymbolString( sp, pos_array, i, ds );
       }
       pos = pos1;
       break;
@@ -113,7 +114,7 @@ unsigned  CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDispl
   return pos;
 }
 
-void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_index, unsigned precedence, CDisplay& ds ) const
+void  CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const
 {
   char c;
   unsigned i;
@@ -145,7 +146,7 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, unsigned pos_index,
       }
       ASSERT( c >= 'A' );
       i = tolower( c ) - 'a';
-      DisplayBranch( m_PosArray[pos_index + i], precedence2, ds );
+      DisplayBranch( pos_array[i], precedence2, ds );
     }
     else
     {

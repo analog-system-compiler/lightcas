@@ -125,7 +125,7 @@ public:
   void Test();
   void Check( const char* s1, const char* s2 );
   void CheckEval( const char* s1, const CValue& v1 );
-  void CheckCatch( const char* s1 );
+  void CheckSyntaxError( const char* s1 );
   void DisplayStats();
 #endif
 

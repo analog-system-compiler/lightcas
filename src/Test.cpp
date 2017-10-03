@@ -47,9 +47,8 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   CParser IC( s1 );
   CMathExpression equ( this );
   TRACE( "** Check %s == %s", s1, s2 );
-  try
+  if( equ.GetFromString( IC ) )
   {
-    equ.GetFromString( IC );
     equ.OptimizeTree();
     equ.Display( ds );
     if( ds != s2 )
@@ -59,7 +58,7 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
       return;
     }
   }
-  catch( ... )
+  else
   {
     ASSERT( false );
     Printf( "FAIL: Test exception: %s => %s", s1, s2 );
@@ -85,22 +84,15 @@ void CElementDataBase::CheckEval( const char* s1, const CValue& v1 )
   Printf( "OK: %s => %g", s1, v1.GetValue() );
 }
 
-void CElementDataBase::CheckCatch( const char* s1 )
+void CElementDataBase::CheckSyntaxError( const char* s1 )
 {
-  CDisplay ds;
   CParser IC( s1 );
   CMathExpression equ( this );
-  TRACE( "** CheckCatch %s", s1 );
-  try
+  if ( equ.GetFromString( IC ) )
   {
-    equ.GetFromString( IC );
+    ASSERT( false );
+    Printf( "Syntax check failed: %s", s1 );
   }
-  catch( ... )
-  {
-    return;
-  }
-  ASSERT( false );
-  Printf( "Catch failed: %s", s1 );
 }
 
 void CElementDataBase::DisplayStats()
@@ -135,6 +127,9 @@ void CElementDataBase::Test()
   //CheckCatch( "a b" );
   //CheckCatch( "a.b" );
   /***** Some basic tests *****/
+  CheckSyntaxError( "sin(x" );
+  //CheckSyntaxError( "sin(x))" );
+  CheckSyntaxError( "x+" );
   Check( "10.500e-2", "0.105" );
   Check( "0.5E4", "5000" );
   Check( "0xAA", "170" );

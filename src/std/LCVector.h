@@ -31,6 +31,8 @@ public:
   void      RemoveAt( unsigned start, unsigned count  )   { std::vector < T >::erase(  std::vector < T >::begin() + start, std::vector < T >::begin() + start + count ); }
   void      Append( const CVector& v  )                   { std::vector < T >::insert( std::vector < T >::end(), v.begin(), v.end() );  }
   void      Append( const T e )                           { std::vector < T >::push_back( e );}
+  void      Push( const T e )                             { std::vector < T >::push_back( e ); }
+  T         Pop()                                         { T e = std::vector < T >::back();  std::vector < T >::pop_back(); return e; }
   void      RemoveAll()                                   { std::vector < T >::clear(); }
   void      DeleteAll()                                   { while( !std::vector < T >::empty() ) { delete std::vector < T >::back(); std::vector < T >::pop_back(); } }
   void      Copy( const CVector& v )                      { std::vector < T >::assign( v.begin(), v.end() ); }

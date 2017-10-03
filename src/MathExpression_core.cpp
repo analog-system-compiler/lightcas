@@ -78,7 +78,7 @@ void CMathExpression::InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size )
 
 void CMathExpression::SetSize( pos_t i )
 {
-  if ( i <= MAX_STACK_SIZE )
+  //if ( i <= MAX_STACK_SIZE )
   {
     m_StackSize = i;
     if ( i > m_AllocSize )
@@ -88,7 +88,7 @@ void CMathExpression::SetSize( pos_t i )
       ASSERT( m_StackArray );
     }
   }
-  else { Clear(); }
+  //else { Clear(); }
 }
 
 bool  CMathExpression::Compare( const CMathExpression& equ ) const
