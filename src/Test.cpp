@@ -49,6 +49,8 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   TRACE( "** Check %s == %s", s1, s2 );
   if( equ.GetFromString( IC ) )
   {
+    //equ.Display( ds );
+    //ds.Clear();
     equ.OptimizeTree();
     equ.Display( ds );
     if( ds != s2 )
@@ -123,13 +125,11 @@ void CElementDataBase::Test()
 {
   Printf( "Running tests..." );
 
-  /***** Syntax checking ****/
-  //CheckCatch( "a b" );
-  //CheckCatch( "a.b" );
   /***** Some basic tests *****/
   CheckSyntaxError( "sin(x" );
   //CheckSyntaxError( "sin(x))" );
   CheckSyntaxError( "x+" );
+  CheckSyntaxError( "x-*2" );
   Check( "10.500e-2", "0.105" );
   Check( "0.5E4", "5000" );
   Check( "0xAA", "170" );
@@ -146,6 +146,8 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(2--2)", "4" );
   Check( "SIMPLIFY(-4-8)", "-12" );
   Check( "SIMPLIFY(3!)", "6" );
+  Check( "SIMPLIFY(-3!)", "-6" );
+  Check( "SIMPLIFY(-3!!)", "-720" );
   Check( "SIMPLIFY(2*2^2*2^2-32)", "0" );
   Check( "SIMPLIFY(a-a)", "0" );
   Check( "SIMPLIFY(a+a)", "2*a" );
@@ -205,7 +207,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(COS(b-b))", "1" );
   Check( "SIMPLIFY((a*1000*1000)/(b*1000*1000))", "a/b" );
 
-  /****** complex *********/
+  /****** Complex *********/
   Check( "SIMPLIFY(j*j)", "-1" );
   Check( "SIMPLIFY(j^2)", "-1" );
   Check( "SIMPLIFY(j^-2)", "-1" );
@@ -233,12 +235,12 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(COS(2*(3*y-3*y+1)*x-x*y/y-x+x*y-x*y-1+1)-1)", "0" );
   Check( "SIMPLIFY((1+2+a+a-2*a)!-6)", "0" );
 
-  /****** derival *****/
+  /****** Derival *****/
   Check( "DER(SIN(4*a),a)", "4*COS(4*a)" );
   Check( "DER(COS(a*b),b)", "-((b*DER(a,b)+a)*SIN(a*b))" );
   Check( "DER(LOG(a*b+c),b)", "(b*DER(a,b)+a+DER(c,b))/(a*b+c)" );
 
-  /****** vector *********/
+  /****** Vector *********/
   Check( "SIMPLIFY({a,b}[c])", "{a,b}[c]" );
   Check( "SIMPLIFY({a+a,b-b}[c+c])", "{2*a,0}[2*c]" );
   Check( "VSIZE({a})", "1" );
@@ -264,14 +266,14 @@ void CElementDataBase::Test()
   Check( "MAX({1,5,1,4})", "5" );
   Check( "MAX({4,3,5,1})", "5" );
 
-  /****** trinary *********/
+  /****** Trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );
   Check( "SIMPLIFY(1 ? a : b)", "a" );
   Check( "SIMPLIFY(5 ? a : b)", "a" );
   Check( "SIMPLIFY(2>3 ? a : b)", "b" );
   Check( "SIMPLIFY(a<=a ? b : c)", "b" );
 
-  /****** logic *********/
+  /****** Logic *********/
   /*Check( "SIMPLIFY(a|0)", "a" );
   Check( "SIMPLIFY(a|~0)", "-1" );
   Check( "SIMPLIFY(a&0)", "0" );
@@ -279,10 +281,10 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY((5<<2)|32)", "52" );*/
   Check( "SIMPLIFY(57>>3)", "7.125" );
 
-  /********** transforms **********/
+  /********** Transforms **********/
   Check( "NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)", "(2+3*a+(4*a)^2)/(1+a+(6*a)^2)" );
 
-  /*********** assignment ***/
+  /*********** Assignment ***/
   CMathExpression equ0( this );
   equ0.GetFromString( "a+b" );
   GetElement( "y" )->SetEquation( equ0 );
@@ -290,20 +292,20 @@ void CElementDataBase::Test()
   GetElement( "z" )->SetEquation( equ0 );
   Check( "SIMPLIFY(y-z)", "2*b" );
 
-  /********** solve **********/
+  /********** Solve **********/
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );
   Check( "SIMPLIFY(SOLVE(x^2-4,x)[1]-2)", "0" );
 
-  /***** system solving *****/
+  /***** System solving *****/
   Check( "SYSTEM_AUTO_SOLVE({x-y+1,x-y+1})", "{y-(x+1),0}" );
   Check( "SYSTEM_AUTO_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2})", "{x-2,y-1,z-1}" );
   Check( "SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})", "{x-1,y-1,z-1}" );
   Check( "SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})",    "{1,1,1}" );
   Check( "SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})",    "{2,1,1}" );
   Check( "SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})", "{((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)),(((i*e-h*f)*2*c+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f)*i)}" );
-  /***** determinant ******/
+  /***** Determinant ******/
   //Check("MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})", "{x,y,z}");
   Check( "VECT_REVERSE({ x,y,z,w})", "{w,z,y,x}" );
   Check( "VECT_REVERSE1( (a,b,c), (x,y,z,w))", "x,y,z,w,c,b,a" );
@@ -330,12 +332,12 @@ void CElementDataBase::Test()
   Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1 } ,{ 8 } } )", "{{26},{44}}" );
   Check( "MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )", "{{26,39},{44,69}}" );
 
-  /**** taylor suites ****/
+  /**** Taylor suites ****/
   Check( "TAYLOR(COS(x),x,0,1)", "1" );
   Check( "TAYLOR(COS(x),x,0,3)", "1-x^2/2" );
   Check( "TAYLOR(EXP(x),x,0,5)", "1+x+x^2/2+x^3/6+x^4/24+x^5/120" );
 
-  /****** fonction *********/
+  /****** Fonction *********/
   Initialize();
   CElementDataBase db( "test_function", this );
   db.Check( "a:=6", "a" );

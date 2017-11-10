@@ -43,7 +43,6 @@ void TRACE( const char* format, ... )
     va_end ( args );
   }
 
-#ifdef _WIN32
   unsigned i;
   static char buffer[ 8192 ];
   va_start ( args, format );
@@ -55,6 +54,7 @@ void TRACE( const char* format, ... )
     buffer[i] = '\n';
     buffer[i + 1] = '\0';
   }
+#ifdef _WIN32
   const unsigned CRT_DEBUG_BUFFER_MAX = 256;
   buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
   buffer[CRT_DEBUG_BUFFER_MAX - 5] = '.';

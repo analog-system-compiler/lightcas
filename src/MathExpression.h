@@ -89,8 +89,7 @@ protected:
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   int      Parse( CParser& IC );
-  bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
-  void     StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] );
+// bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
   bool     RuleSearch();
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
   //bool     OptimizeTree2();

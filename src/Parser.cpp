@@ -253,32 +253,7 @@ bool CParser::GetQuote()
 
   return true;//return m_Buffer;
 }
-#if 0
-void CParser::Error( unsigned id ) const
-{
-  CParserException ex;
-  ex.SetErrorID( id );
-  ex.SetLineNb( m_LineNb );
-  if( !m_Buffer.IsEmpty() )
-  {
-    ex.SetErrorString( m_Buffer );
-  }
 
-#if _DEBUG
-  CDisplay ds;
-  ds += "Error found line ";
-  ds += CString( ( int )ex.GetLineNb() );
-  ds += " : ";
-  if( !m_Buffer.IsEmpty() )
-  {
-    ds += m_Buffer;
-  }
-  TRACE( ds.GetBufferPtr() );
-#endif
-
-  throw( ex );
-}
-#endif
 bool CParser::LoadFile( const CString& name )
 {
   int   size;
