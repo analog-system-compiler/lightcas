@@ -374,7 +374,9 @@ CElement* CElementDataBase::CreateElement( const CString& string, unsigned pos )
 
 CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos ) const
 {
-  unsigned  i, n;
+  unsigned start;
+  unsigned stop;
+  unsigned mid;
   int compare;
   CElement* e;
 
@@ -387,22 +389,28 @@ CElement* CElementDataBase::SearchElement( const CString& string, unsigned& pos 
     }
   }
 
-  n = GetSize();
-  for( i = m_SearchStart; i < n; i++ )
+  start = m_SearchStart;
+  stop = GetSize();
+  while ( start < stop )
   {
-    e = GetAt( i );
+    mid = ( start + stop ) / 2;
+    e = GetAt( mid );
+    ASSERT( e );
     compare = string.Compare( e->GetName() );
-    if( compare == 0 )
+    if ( compare == 0 )
     {
       return e;
     }
-    if( compare < 0 )
+    if ( compare < 0 )
     {
-      break;
+      stop = mid;
+    }
+    else
+    {
+      start = mid + 1;
     }
   }
-
-  pos = i;
+  pos = stop;
   return NULL;
 }
 

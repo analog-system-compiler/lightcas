@@ -84,19 +84,18 @@ protected:
 
   int      GetLevel( CParser& IC );
   bool     GetLevel( CParser& IC, unsigned priority );
-  bool     SearchOperator( CParser& IC, unsigned priority, bool symbol_first );
+  CMathExpression* SearchOperator( CParser& IC, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned priority, bool symbol_first );
   bool     ParseMacro( CParser& IC );
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   int      Parse( CParser& IC );
   bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
   void     StoreStackPointer( char c, pos_t pos_array[CElementDataBase::MAX_EXP] );
-
-  CAlgebraRule* RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] );
-
+  bool     RuleSearch();
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
-  bool     OptimizeTree2();
+  //bool     OptimizeTree2();
   //unsigned ApplyRule2();
+  char TryMatchExp( const char*& sp );
   void     ApplyRule( pos_t pos, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
   pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;

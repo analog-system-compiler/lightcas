@@ -255,6 +255,14 @@ void CElementDataBase::Test()
   Check( "5*{a,b,c}", "{5*a,5*b,5*c}" );
   Check( "{a,b,c}*5", "{a*5,b*5,c*5}" );
   Check( "SIMPLIFY({-2,2})", "{-2,2}" );
+  Check( "MIN({1,2,3,4})", "1" );
+  Check( "MIN({5,1,3,4})", "1" );
+  Check( "MIN({5,3,1,4})", "1" );
+  Check( "MIN({5,3,4,1})", "1" );
+  Check( "MAX({1,2,3,4})", "4" );
+  Check( "MAX({5,1,3,4})", "5" );
+  Check( "MAX({1,5,1,4})", "5" );
+  Check( "MAX({4,3,5,1})", "5" );
 
   /****** trinary *********/
   Check( "SIMPLIFY(0 ? a : b)", "b" );

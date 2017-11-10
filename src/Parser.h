@@ -83,6 +83,7 @@ public:
   bool  LoadFile( const CString& name );
   void  CloseFile();
 
+  const char* ParseWord();
   bool  GetQuote();
   const CString& GetWord();
   const CString& GetBuffer()                       { return m_Buffer; }
@@ -99,7 +100,7 @@ public:
   bool  IsStopChar()                   { return IsStopChar( GetChar() ); }
   bool  IsDigit()                      { return IsDigit( GetChar() );    }
   bool  IsChar( char c )               { return GetChar() == c;          }
-  bool  IsOpenParenthesis() const      { return *m_Pos == '(';           }
+// bool  IsOpenParenthesis() const      { return *m_Pos == '(';           }
 
   const char* GetPos() const           { return m_Pos;          }
   void  SetPos( const char* pText )    { m_Pos = pText;         }
@@ -110,4 +111,3 @@ public:
   virtual ~CParser();
 
 };
-

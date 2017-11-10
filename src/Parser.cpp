@@ -57,21 +57,23 @@ CParser::~CParser()
   CloseFile();
 }
 
+const char* CParser::ParseWord()
+{
+  const char* pos = m_Pos;
+  SkipSpaceNL();
+  while ( IsWord( *pos ) )
+  {
+    pos++;
+  }
+  return pos;
+}
+
 const CString& CParser::GetWord()
 {
-  int i;
-
-  SkipSpaceNL();
-  i = 0;
-
-  while( IsWord( m_Pos[i] ) )
-  {
-    i++;
-  }
-
-  m_Buffer.Copy( m_Pos, i );
-  m_Pos += i;
-
+  const char* pos;
+  pos = ParseWord();
+  m_Buffer.Copy( m_Pos, pos - m_Pos );
+  m_Pos = pos;
   return m_Buffer;
 }
 
@@ -186,10 +188,17 @@ void CParser::SkipComment()
 bool CParser::TryMatchSymbol( const char*& symbol_str )
 {
   const char* s1 = symbol_str;
+  SkipSpace();
   const char* s2 = m_Pos;
+
+  if ( IsWord( *s1 ) )
+  {
+    return false;
+  }
 
   while( *s1 && !( IsWord( *s1 ) || ( *s1 == '(' ) ) )
   {
+
     if( *s1 == CParser::m_OperatorAlpha )
     {
       s1++; //Next char is considered as word

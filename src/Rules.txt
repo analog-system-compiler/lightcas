@@ -20,12 +20,19 @@
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
 
+
+/*#sym  SYST(a b)       "a;b    "  
+#sym  COL( a b )      "a:\=b  "
+#sym  _set( a b )     "a:=b   "  
+IF2( COL( a b ) 0)    := b;
+IF2( (a:b) 1)         := a;*/
+
 #sym  SYST(a b)       "a;b    "  
-#sym  IF( b a )       "a?b    "  
+#sym  IF3( a b )      "a?b    "  
 #sym  COL( a b )      "a:\=b  " 
 #sym  EQV( a b )      "a=\=b  "  
 #sym  CONCAT( a b )   "a,(b)  "  
-#sym  _set( a b )      "a:=b   "  
+#sym  _set( a b )     "a:=b   "  
 #sym  OR( a b )       "a|\|b  "  
 #sym  XOR( a b )      "a~b    "  
 #sym  ADD( a b )      "a+b    "  
@@ -51,7 +58,7 @@
 #sym  LNOT( a )       "!a     "  
 #sym  NOT( a )        "~a     "  
 #sym  FACT( a )       "a!     "  
-#sym  VECT( a )       "{A}    "  
+#sym  VECT( a )       "{A}    " 
 
 //#sym  MUL(  a POW(10 b) ) "a$E(B) "
 //#sym  MUL(  a POW(10 b) ) "a$e(B) "
@@ -66,9 +73,11 @@
 // #sym MUL( a 1e6   )   "a$M"
 // #sym MUL( a 1e9   )   "a$G"
 
+
 IF2( (a:b) 0) := b;
 IF2( (a:b) 1) := a;
 IF( (a:b) c) := IF2( (a:b) BOOL(c) );
+IF3( a b ) := IF( b a );
 
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
@@ -511,14 +520,14 @@ VECT_REVERSE2( VECT_QUEUE(a),  b     ) := (a,b);
 
 //vector add
 (a,b)+(c,d)               := (a+c,b+d);
-(a,b)+c                   := (a+c,b+c);
-c+(a,b)                   := (c+a,c+b);
+(a,b)+c                   := (a,b+c);
+c+(a,b)                   := (a,c+b);
 {a}+{b}                   := {a+b};
 
 //vector sub
 (a,b)-(c,d)               := (a-c,b-d);
-(a,b)-c                   := (a-c,b-c);
-c-(a,b)                   := (c-a,c-b);
+(a,b)-c                   := (a,b-c);
+c-(a,b)                   := (-a,c-b);
 {a}-{b}                   := {a-b};
 
 //vector mul
@@ -546,6 +555,18 @@ c^(a,b)                   := (c^a,b);
 
 //Vector not
 ~(a,b)                    := (~a,~b);
+
+//vector min
+MIN({a})                  := MIN(a);
+MIN((a,b),c)              := MIN(a,MIN(b,c));
+
+//vector max
+MAX({a})                  := MAX(a);
+MAX((a,b),c)              := MAX(a,MAX(b,c));
+
+//vector creation
+ZEROES(_const(a)) := ( ( a == 1 )  ? 0 : (ZEROES(a-1),0) );
+ONES(_const(a))   := ( ( a == 1 )  ? 1 : (ONES(a-1),1) );
 
 RANGE( _const(a) _const(b) ):= ( (a < b) ? ( RANGE( a b-1 ), b ): a);
 SIN(a,b)                  := (SIN(a),SIN(b));

@@ -24,14 +24,12 @@
 #include "Function.h"
 
 CContextArray CMathExpression::m_ContextStack;
-//CPosArray     CMathExpression::m_PosArray;
 
-//#define OPTIMIZE_PROCESSING
-
-CAlgebraRule* CMathExpression::RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] )
+bool CMathExpression::RuleSearch()
 {
   unsigned i;
   unsigned n;
+  context_t save_context;
 
   OP_CODE op = GetLastOperator();
   const CElement* e = RefToElement( op );
@@ -46,14 +44,28 @@ CAlgebraRule* CMathExpression::RuleSearch( pos_t& pos, pos_t pos_array[CElementD
       CAlgebraRule* rule = funct->m_AlgebraRuleArray[ i ];
       const CMathExpression* equ = &( rule->m_SrcEquation );
 
-      pos = Match( GetSize(), *equ, pos_array );
+      pos_t pos = Match( GetSize(), *equ, save_context.m_PosArray );
       if( pos != GetSize() )
       {
-        return rule;
+#ifdef _TEST
+        rule->m_AccessNb++;
+#endif
+        if ( rule->m_bHasRule )
+        {
+          save_context.m_Pos = pos; //low stack limit
+          save_context.m_Size = GetSize(); //high stack limit, start of subsquent expressions
+          save_context.m_RuleDstPos = 0; //index in the rule. From 0 to m_DstEquation.GetSize()
+          save_context.m_RuleDstExp = &( rule->m_DstEquation );
+#ifdef _DEBUG
+          save_context.m_Rule = rule;
+#endif
+          m_ContextStack.Push( save_context );
+          return true;
+        }
       }
     }
   }
-  return NULL;
+  return false;
 }
 
 bool CMathExpression::Match( const CMathExpression& equ ) const
@@ -69,10 +81,6 @@ pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_
   bool match = true;
   pos_t pos1 = equ.GetSize();
   pos_t pos2 = pos3;
-
-  //Clear position table
-  //n = pos_index + CElementDataBase::MAX_EXP;
-  //m_PosArray.SetSize( n );
 
   for ( i = 0; i < CElementDataBase::MAX_EXP; i++ )
   {
@@ -136,34 +144,6 @@ pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_
   return match ? pos2 : pos3;
 }
 
-bool CMathExpression::OptimizeTree2()
-{
-  pos_t pos;
-  CAlgebraRule* rule;
-  context_t save_context;
-
-  rule = RuleSearch( pos, save_context.m_PosArray );
-  if ( rule )
-  {
-#ifdef _TEST
-    rule->m_AccessNb++;
-#endif
-    if ( rule->m_bHasRule )
-    {
-      save_context.m_Pos = pos; //low stack limit
-      save_context.m_Size = GetSize(); //high stack limit, start of subsquent expressions
-      save_context.m_RuleDstPos = 0; //index in the rule. From 0 to m_DstEquation.GetSize()
-      save_context.m_RuleDstExp = &( rule->m_DstEquation );
-#ifdef _DEBUG
-      save_context.m_Rule = rule;
-#endif
-      m_ContextStack.Push( save_context );
-      return true;
-    }
-  }
-  return false;
-}
-
 void CMathExpression::OptimizeTree()
 {
   OP_CODE op3;
@@ -172,8 +152,7 @@ void CMathExpression::OptimizeTree()
 
   if ( ExecuteCommand() )
   {
-    OptimizeTree2();
-
+    RuleSearch();
     while ( m_ContextStack.GetSize() )
     {
       save_context = m_ContextStack.Pop();
@@ -212,7 +191,7 @@ L1:
           if ( ExecuteCommand() )
           {
             m_ContextStack.Push( save_context ); //not finished
-            OptimizeTree2();
+            RuleSearch();
             save_context = m_ContextStack.Pop();
             n = save_context.m_RuleDstExp->GetSize();
           }
@@ -236,72 +215,11 @@ L1:
       Display( ds, false );
       TRACE( ds.GetBufferPtr() );
 #endif
-//      m_PosArray.SetSize( save_context.m_PosIndex );
     } //while ( m_ContextStack.GetSize() )
   }
 }
 
-#if 0//def OPTIMIZE_PROCESSING
-void CMathExpression::ApplyRule( pos_t pos4, unsigned pos_index, const CMathExpression& rule_equ, bool optimize )
-{
-  OP_CODE op3;
-  unsigned pos, pos3;
-  unsigned j;
 
-#if ( DEBUG_LEVEL >= 2 )
-  CDisplay ds;
-  ds += "Apply rule " ;
-  rule_equ.Display( ds );
-  ds += " : ";
-  equ.Display( ds );
-  ds += " => " ;
-#endif
-
-  ASSERT( m_StackSize > pos4 );
-  pos3 = GetSize();
-  ASSERT( pos_array[0] <= pos3 );
-  ASSERT( pos_array[1] <= pos3 );
-  ASSERT( pos_array[2] <= pos3 );
-  ASSERT( pos_array[3] <= pos3 );
-
-  for( pos = 0; pos < rule_equ.GetSize(); pos++ )
-  {
-
-    op3 = rule_equ.Get( pos );
-
-    if( CElementDataBase::IsReservedOP( op3 ) )
-    {
-      j = ReservedParameterIndex( op3 );
-      ASSERT( j < CElementDataBase::MAX_EXP );
-      unsigned pos2 = m_PosArray[pos_index + j];
-      ASSERT( pos2 <= GetSize() );
-      pos_t pos1 = pos2;
-      NextBranch( pos1 );
-      unsigned pos5 = GetSize();
-      InnerCopy( pos5, pos1, pos2 - pos1 );
-    }
-    else
-    {
-L1:
-      ASSERT( RefToElement( op3 ) != NULL );
-      Push( op3 );
-      if( optimize )
-      {
-        OptimizeTree();  // optimization is only made on the top branch
-      }
-    }
-  }
-
-  unsigned pos2 = GetSize();
-  InnerCopy( pos4, pos3, pos2 - pos3 );
-
-#if ( DEBUG_LEVEL >= 2 )
-  Display( ds );
-  TRACE( ds.GetBufferPtr() );
-#endif
-
-}
-#else
 void CMathExpression::ApplyRule( pos_t pos2, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ )
 {
   CMathExpression equ( m_ElementDB );
@@ -366,7 +284,6 @@ L1:
 #endif
 
 }
-#endif
 
 bool CMathExpression::ExecuteCommand()
 {

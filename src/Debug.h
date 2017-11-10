@@ -22,7 +22,7 @@ extern int( *PUTS )( const char* );
 
 #ifdef _DEBUG
 
-#define DEBUG_LEVEL 0
+#define DEBUG_LEVEL 1
 
 extern void TRACE( const char* s, ... );
 
