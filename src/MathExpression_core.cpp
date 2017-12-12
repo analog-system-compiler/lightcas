@@ -78,17 +78,13 @@ void CMathExpression::InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size )
 
 void CMathExpression::SetSize( pos_t i )
 {
-  //if ( i <= MAX_STACK_SIZE )
+  m_StackSize = i;
+  if ( i > m_AllocSize )
   {
-    m_StackSize = i;
-    if ( i > m_AllocSize )
-    {
-      m_AllocSize = i * 2;
-      m_StackArray = ( OP_CODE* )realloc( m_StackArray, m_AllocSize * sizeof( OP_CODE ) );
-      ASSERT( m_StackArray );
-    }
+    m_AllocSize = i * 2;
+    m_StackArray = ( OP_CODE* )realloc( m_StackArray, m_AllocSize * sizeof( OP_CODE ) );
+    ASSERT( m_StackArray );
   }
-  //else { Clear(); }
 }
 
 bool  CMathExpression::Compare( const CMathExpression& equ ) const

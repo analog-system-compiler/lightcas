@@ -19,13 +19,6 @@
 #include <cstdio>
 #include "Value.h"
 
-void CValue::Display( CString& ds ) const
-{
-  char buffer[32];
-  snprintf( buffer, sizeof( buffer ), "%.12g", m_Value );
-  ds.Append( buffer );
-}
-
 const char* CValue::GetFromString( const char* s1 )
 {
   char* s2;

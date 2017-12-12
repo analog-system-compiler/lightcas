@@ -116,9 +116,10 @@ int CMathExpression::GetLevel( CParser& IC )
 
 bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
 {
-  unsigned precedence, next_precedence;
-  const char*  char_pos;
+  unsigned precedence;
+  const char* char_pos;
   char c;
+  bool var_found;
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
 
   if ( IC.IsStopChar() )
@@ -126,44 +127,26 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
     return false;
   }
 
-  bool var_found = ParseAtom( IC );
+  var_found = ParseAtom( IC );
+  char_pos = IC.GetPos();
 
-  if ( !var_found ) { precedence = 0; } //symbol first
-  else { precedence = priority; }
+  precedence = var_found ? priority : 0;
 
   while ( precedence < st.GetSize() )
   {
     const char* sp = st[precedence]->m_Syntax;
-    char_pos = IC.GetPos();
-
     bool check_var = ( TryMatchExp( sp ) != '\0' );
     if ( check_var == var_found )
     {
-      while ( *sp != '\0' )
+      while ( *sp && IC.TryMatchSymbol( sp ) )
       {
-        if ( IC.TryMatchSymbol( sp ) )
+        c = TryMatchExp( sp );
+        if ( c )
         {
-          c = TryMatchExp( sp );
-          if ( c )
+          if ( !GetLevel( IC, ( c < 'a' ) ? 0 : precedence + 1 ) )
           {
-            if ( c < 'a' )
-            {
-              next_precedence = 0;
-            }
-            else
-            {
-              next_precedence = precedence + 1;
-            }
-
-            if ( !GetLevel( IC, next_precedence ) )
-            {
-              return false;
-            }
+            return false;
           }
-        }
-        else
-        {
-          break;
         }
       }
     }
@@ -172,6 +155,7 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
     {
       Push( st[precedence]->m_Equation.GetLastOperator() );
       var_found = true;
+      char_pos = IC.GetPos();
       precedence = priority;
 
 #if ( DEBUG_LEVEL >= 3 )
@@ -234,11 +218,13 @@ bool CMathExpression::ParseElement( CParser& IC )
       TRACE( ds.GetBufferPtr() );
 #endif
     }
-    ASSERT( f->GetParameterNb() == i );
+    if ( f->GetParameterNb() != i )
+    {
+      //ASSERT( false );
+      return false;
+    }
   }
-
   Push( e );
-
   return true;
 }
 

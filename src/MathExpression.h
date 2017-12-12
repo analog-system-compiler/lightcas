@@ -26,6 +26,7 @@
 #include "ElementDataBase.h"
 
 #define OPTIMIZATION_LEVEL 0//2
+//#define RECURSIVE_ALGO
 
 #if 1
 #define MAX_STACK_SIZE UINT_MAX
@@ -50,7 +51,6 @@ typedef struct
 } context_t;
 
 typedef CVector< context_t >  CContextArray;
-//typedef CVector< pos_t >      CPosArray;
 
 class CMathExpression
 {
@@ -58,7 +58,6 @@ class CMathExpression
   friend class CElementDataBase;
 
 protected:
-  //static CPosArray     m_PosArray;
   static CContextArray m_ContextStack;
   OP_CODE*  m_StackArray;
   pos_t     m_StackSize;
@@ -66,36 +65,29 @@ protected:
   CElementDataBase* m_ElementDB;
 
 protected:
-  void     SetSize( pos_t i );
+
   void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
   OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
   OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
   void     Push( OP_CODE op )           { SetSize( m_StackSize + 1  );  Set( m_StackSize - 1, op );  }
-  void     Push( const CElement* e )    { Push( ElementToRef( e ) );    }
 
+  void     SetSize( pos_t i );
+  void     Push( const CElement* e )    { Push( ElementToRef( e ) );    }
   void     Push( const CMathExpression& equ );
   void     PushEvalElement( CEvaluator& eval );
   void     Append( const OP_CODE* array, pos_t size );
-
   void     PushBranch( const CMathExpression& equ, pos_t& pos );
   bool     CompareBranchElement( pos_t pos1, pos_t pos2 ) const;
   bool     CompareBranch( pos_t pos1, pos_t pos2 ) const;
   void     NextBranch( pos_t& pos ) const;
-
   int      GetLevel( CParser& IC );
   bool     GetLevel( CParser& IC, unsigned priority );
-  CMathExpression* SearchOperator( CParser& IC, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned priority, bool symbol_first );
   bool     ParseMacro( CParser& IC );
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   int      Parse( CParser& IC );
-// bool     MatchOperator( CParser& IC, const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, bool symbol_first );
-  bool     RuleSearch();
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
-  //bool     OptimizeTree2();
-  //unsigned ApplyRule2();
-  char TryMatchExp( const char*& sp );
-  void     ApplyRule( pos_t pos, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ );
+  char     TryMatchExp( const char*& sp );
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
   pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
   bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
@@ -103,15 +95,23 @@ protected:
   void     RemoveZero();
   bool     ExecuteCommand();
 
+#ifdef RECURSIVE_ALGO
+  CAlgebraRule* RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] );
+  void          ApplyRule( pos_t pos2, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ );
+#else
+  bool  RuleSearch();
+  bool  RuleSearch( const CElement* e );
+#endif
+
   //static
   static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
   static OP_CODE    ElementToRef( const CElement* e )       { return CElementDataBase::ElementToRef( e );   }
   static unsigned   ReservedParameterIndex( OP_CODE op )    { return ( unsigned )( op - CElementDataBase::OP_EXP1 );  }
 
   //Display funct
-  unsigned    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
-  unsigned    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
-  void        DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const;
+  pos_t    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
+  pos_t    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
+  void     DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const;
 
 public:
   void  Initialize( CElementDataBase* db );

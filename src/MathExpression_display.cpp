@@ -42,12 +42,12 @@ void CMathExpression::Display( CDisplay& ds, bool bAll ) const
   }
 }
 
-unsigned CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const
+pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const
 {
   unsigned i, n;
   const CElement* e;
   unsigned pos2;
-  CDisplay ds2, ds3;
+  pos_t pos_array[CElementDataBase::MAX_EXP];
 
   ASSERT( pos );
   pos2 = DisplaySymbol( pos, priority, ds );
@@ -60,18 +60,19 @@ unsigned CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay&
     n = e->GetFunction()->GetParameterNb();
     if( n || e->IsNumeric() ) // For Rand(), n=0
     {
-      for( i = 0; i < n; i++ )
-      {
-        ds2.Clear();
-        pos = DisplayBranch( pos, 0, ds2 );
-        if( i != 0 )
-        {
-          ds2 += ' ' ;
-        }
-        ds3.Prepend( ds2 );
-      }
+      ASSERT( n <= CElementDataBase::MAX_EXP );
       ds += '(';
-      ds += ds3 ;
+      for ( i = 0; i < n; i++ )
+      {
+        pos_array[i] = pos;
+        NextBranch( pos );
+      }
+      for ( i = 0; i < n - 1; i++ )
+      {
+        DisplayBranch( pos_array[n - i - 1], 0, ds );
+        ds += ' ';
+      }
+      DisplayBranch( pos_array[0], 0, ds );
       ds += ')' ;
     }
   }
@@ -83,7 +84,7 @@ unsigned CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay&
   return pos;
 }
 
-unsigned  CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& ds ) const
+pos_t CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& ds ) const
 {
   pos_t pos_array[CElementDataBase::MAX_EXP];
 
@@ -114,7 +115,7 @@ unsigned  CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDispl
   return pos;
 }
 
-void  CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const
+void CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const
 {
   char c;
   unsigned i;
@@ -133,8 +134,12 @@ void  CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CEl
         precedence--;
       }
     }
-    else if( c == CParser::m_OperatorExclude )
+    else if( ( c == CParser::m_OperatorExclude ) || ( c == CParser::m_OperatorAlpha ) )
     {
+      if( c == CParser::m_OperatorAlpha )
+      {
+        ds += *sp;
+      }
       sp++; //Exclude operator
     }
     else if( CParser::IsWord( c ) )

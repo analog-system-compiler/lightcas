@@ -83,7 +83,7 @@ public:
   bool  LoadFile( const CString& name );
   void  CloseFile();
 
-  const char* ParseWord();
+  //const char* ParseWord();
   bool  GetQuote();
   const CString& GetWord();
   const CString& GetBuffer()                       { return m_Buffer; }

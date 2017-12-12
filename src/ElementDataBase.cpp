@@ -201,38 +201,43 @@ bool CElementDataBase::AssociateSymbol( CParser& IC )
 {
   char c;
   unsigned i;
-  CSymbolSyntaxStruct* sss;
   CString s;
+  CElement* e;
+  CSymbolSyntaxStruct* sss;
   CMathExpression src_equ( this );
-  CMathExpression dst_equ( this );
-  dst_equ.GetLevel( IC, 0 );
 
   sss = new CSymbolSyntaxStruct();
+  sss->m_Equation.Initialize( this );
+  sss->m_Equation.GetLevel( IC, 0 );
+
   if ( !IC.GetQuote() )
   {
     return false;
   }
+
   const char* sp = IC.GetBuffer().GetBufferPtr();
   i = 0;
   c = *sp++;
-  while( c && !isspace( c ) && ( i < sizeof( sss->m_Syntax ) - 1 ) )
+  while( c && ( i < sizeof( sss->m_Syntax ) - 1 ) )
   {
     if( CParser::IsWord( c ) )
     {
       s.Clear();
       s.Append( tolower( c ) );
-      CElement* e = GetElement( s );
+      e = GetElement( s );
       ASSERT( e );
       if( e )
       {
         src_equ.Push( e );
       }
     }
-    sss->m_Syntax[i++] = c;
+    if( !isspace( c ) )
+    {
+      sss->m_Syntax[i++] = c;
+    }
     c = *sp++;
   }
   sss->m_Syntax[i] = '\0';
-  sss->m_Equation.Copy( dst_equ );
   CMathExpression::ConvertToRule( src_equ, sss->m_Equation );
   m_SymbolSyntaxArray.Append( sss );
 
@@ -331,7 +336,6 @@ CElement* CElementDataBase::ParseElement( CParser& IC )
   {
     e = GetElement( IC.GetWord() );
   }
-
   return e;
 }
 

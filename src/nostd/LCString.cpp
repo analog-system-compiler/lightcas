@@ -72,7 +72,6 @@ int CString::Compare( const char* s1, const char* s2 )
   return bcomp;
 }
 
-
 void CString::Set( unsigned i, unsigned base )
 {
   char m_Buffer[ 256 ];

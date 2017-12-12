@@ -21,12 +21,9 @@
 #include <cstdio>
 #include "LCString.h"
 
-class CDisplay : public CString
+class CDisplay : virtual public CString
 {
 public:
-  virtual void Append( char c )               { *this += c; }
-  virtual void Append( const CString& str )   { *this += str; }
-  virtual void Append( int i )                { *this += CString( i );  }
   virtual void Print( const char* s )         { puts( s ); }
   void Print()                                { Print( GetBufferPtr() ); }
 };

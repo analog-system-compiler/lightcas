@@ -49,8 +49,6 @@ void CElementDataBase::Check( const char* s1, const char* s2 )
   TRACE( "** Check %s == %s", s1, s2 );
   if( equ.GetFromString( IC ) )
   {
-    //equ.Display( ds );
-    //ds.Clear();
     equ.OptimizeTree();
     equ.Display( ds );
     if( ds != s2 )
@@ -130,10 +128,13 @@ void CElementDataBase::Test()
   //CheckSyntaxError( "sin(x))" );
   CheckSyntaxError( "x+" );
   CheckSyntaxError( "x-*2" );
+  CheckSyntaxError( "TED(a)" );
   Check( "10.500e-2", "0.105" );
   Check( "0.5E4", "5000" );
   Check( "0xAA", "170" );
   Check( "0b1010", "10" );
+  //Check( "a b c", "a b c" );
+  Check( "TED( a b )", "TED(a b)" );
   Check( "a-(b-c)", "a-(b-c)" );
   Check( "a^(b^c)", "a^(b^c)" );
   Check( "a/(b/c)", "a/(b/c)" );
@@ -178,7 +179,7 @@ void CElementDataBase::Test()
   Check( "SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))", "0" );
   Check( "SIMPLIFY((4*a*b)/(3*a*b*c))", "1.33333333333/c" ); //"4/(3*c)" );
   Check( "SIMPLIFY((4*c*b)/(3*a*b*c))", "1.33333333333/a" ); //"4/(3*a)" );
-  Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(c*b*a)" ); //"1+1/(a*b*c)" );
+  Check( "SIMPLIFY((4*a*b*c+4)/(4*a*b*c))", "1+1/(c*b*a)" );
   Check( "SIMPLIFY(b/a+b/a)", "(2*b)/a" );
   Check( "SIMPLIFY(b/a-b/a)", "0" );
   Check( "SIMPLIFY(b*1/a)", "b/a" );
@@ -292,7 +293,7 @@ void CElementDataBase::Test()
   GetElement( "z" )->SetEquation( equ0 );
   Check( "SIMPLIFY(y-z)", "2*b" );
 
-  /********** Solve **********/
+  /********** Equation solving **********/
   Initialize();
   Check( "SOLVE(x^2-4,x)", "{-2,2}" );
   Check( "SOLVE(x^2+4,x)", "{-(2*j),2*j}" );

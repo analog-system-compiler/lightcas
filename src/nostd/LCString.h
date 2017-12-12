@@ -20,7 +20,12 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 #include "../Debug.h"
+
+#ifdef _WIN32
+#define snprintf _snprintf_s
+#endif
 
 class CString
 {
@@ -33,10 +38,11 @@ private:
 public:
 
   void  SetLength( unsigned len );
-  void  Set( unsigned i, unsigned base );
   void  Append( const char* s, unsigned i );
   static int Compare( const char* s1, const char* s2 );
+  void  Set( unsigned i, unsigned base );
 
+  void Set( double v )                     { char buffer[32]; snprintf( buffer, sizeof( buffer ), "%.12g", v ); Copy( buffer ); }
   bool     IsEmpty() const                 { return( m_Length == 0 );  }
   unsigned GetLength() const               { return m_Length;  }
   unsigned Search( char c ) const          { const char* s = strchr( m_Data, c ); return s ? s - m_Data : -1;  }

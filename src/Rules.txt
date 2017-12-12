@@ -20,13 +20,6 @@
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
 
-
-/*#sym  SYST(a b)       "a;b    "  
-#sym  COL( a b )      "a:\=b  "
-#sym  _set( a b )     "a:=b   "  
-IF2( COL( a b ) 0)    := b;
-IF2( (a:b) 1)         := a;*/
-
 #sym  SYST(a b)       "a;b    "  
 #sym  IF3( a b )      "a?b    "  
 #sym  COL( a b )      "a:\=b  " 
@@ -52,32 +45,20 @@ IF2( (a:b) 1)         := a;*/
 #sym  LOR( a b )      "a||b   "  
 #sym  RANGE( a b )    "a->b   "
 #sym  LAND( a b )     "a&&b   "  
-#sym  AT( a b )       "a[B]   "  
+#sym  AT( a b )       "a[B]   " 
+#sym  HIER( a b )     "a.b    "
+//#sym  GLOBAL( a )     "_a     "
 #sym  NEG( a )        "-a     "  
 #sym  INV( a )        "/a     "  
 #sym  LNOT( a )       "!a     "  
 #sym  NOT( a )        "~a     "  
 #sym  FACT( a )       "a!     "  
-#sym  VECT( a )       "{A}    " 
-
-//#sym  MUL(  a POW(10 b) ) "a$E(B) "
-//#sym  MUL(  a POW(10 b) ) "a$e(B) "
-
-// Uncomment rules below to enable power post-fixing
-// #sym MUL( a 1e-12 )   "a$p"
-// #sym MUL( a 1e-9  )   "a$n"
-// #sym MUL( a 1e-6  )   "a$u"
-// #sym MUL( a 1e-3  )   "a$m"
-// #sym MUL( a 1e3   )   "a$k"
-// #sym MUL( a 1e3   )   "a$K"
-// #sym MUL( a 1e6   )   "a$M"
-// #sym MUL( a 1e9   )   "a$G"
-
+#sym  VECT( a )       "{A}    "
 
 IF2( (a:b) 0) := b;
 IF2( (a:b) 1) := a;
-IF( (a:b) c) := IF2( (a:b) BOOL(c) );
-IF3( a b ) := IF( b a );
+IF( (a:b) c)  := IF2( (a:b) BOOL(c) );
+IF3( a b )    := IF( b a );
 
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
@@ -99,7 +80,7 @@ POLY(a/b,v)                      := MONDIV( POLY(a,v) , POLY(b,v)    );
 POLY(a^b,v)                      := MONPOW( POLY(a,v) , SIMPLIFY(b)  );
 POLY(a[b],v)                     := POLY(a,v)[SIMPLIFY(b)];
 
-IPOLY(a,j())                       := IPOLY2(REDUCE_COMPLEX(a),j);
+IPOLY(a,j())                     := IPOLY2(REDUCE_COMPLEX(a),j);
 IPOLY(a,v)                       := IPOLY2(a,v);
 
 //IPoly if simplication failure
@@ -109,17 +90,17 @@ IPOLY2(MONMUL(a,b),v)            := IPOLY(a,v)*IPOLY(b,v);
 IPOLY2(MONPOWCONST((a,b),c),v)   := IPOLY(a,v)^b;
 IPOLY2(a[b],v)                   := IPOLY(a,v)[b];
 
-IPOLY2(AND(a b),v)            := IPOLY(a,v)&IPOLY(b,v);
-IPOLY2(OR(a b),v)             := IPOLY(a,v)|IPOLY(b,v);
-IPOLY2(XOR(a b),v)            := IPOLY(a,v)^IPOLY(b,v);
-IPOLY2(NOT(a),v)              := ~IPOLY(a,v);
-
-NORM2(a,q)                    := IPOLY(NORM3(POLY(a,q)),q);
-NORM(a,q)                     := IPOLY_NORM(POLY(a,q),q);
-
-POLY( SOLVE(a,b),1 )         := POLYF( SIMPLIFY(SOLVE(a,b)));
-POLY( _funct1( a b   ), 1 )   := POLYF( _funct1( SIMPLIFY(a) b ));
-POLY( _funct2( a b c ), 1 )   := POLYF( _funct2( SIMPLIFY(a) SIMPLIFY(b) c ));
+IPOLY2(AND(a b),v)               := IPOLY(a,v)&IPOLY(b,v);
+IPOLY2(OR(a b),v)                := IPOLY(a,v)|IPOLY(b,v);
+IPOLY2(XOR(a b),v)               := IPOLY(a,v)^IPOLY(b,v);
+IPOLY2(NOT(a),v)                 := ~IPOLY(a,v);
+							   
+NORM2(a,q)                       := IPOLY(NORM3(POLY(a,q)),q);
+NORM(a,q)                        := IPOLY_NORM(POLY(a,q),q);
+							   
+POLY( SOLVE(a,b),1 )             := POLYF( SIMPLIFY(SOLVE(a,b)));
+POLY( _funct1( a b   ), 1 )      := POLYF( _funct1( SIMPLIFY(a) b ));
+POLY( _funct2( a b c ), 1 )      := POLYF( _funct2( SIMPLIFY(a) SIMPLIFY(b) c ));
 
 //Mult
 MONMUL( MON(a,b),MON(c,d))                  := MON(a*c,b+d);
@@ -144,15 +125,8 @@ MONNEG( POLYSTORE(a,b))       := POLYSTORE(MONNEG(a),MONNEG(b));
 MONNEG( MONDIV(a,b))          := MONDIV(MONNEG(a),b);
 
 //Div
-//#if 1
-MONDIV( MON(a,b),MON(c,d))          := MON(a/c,b-d);
+MONDIV( MON(a,b),MON(c,d))                 := MON(a/c,b-d);
 MONDIV( POLYSTORE(a,MON(b,c)),MON(d,e) )   := MONADD(MONDIV(a,MON(d,e)),MONDIV(MON(b,c),MON(d,e)));
-//#else
-/*
-MONDIV( a,MON(1,0))           := a;
-MONDIV( a,MON(b,c))           := MONMUL(a,MON(1/b,-c));
-*/
-//#endif
 
 //Pow
 MONPOW( MON(a,b), c )            := MON(a^c,b*c);
@@ -274,7 +248,7 @@ SQR(a)*SQR(b)    := SQR(a*b)  ;
 
 0/b              := 0  ;
 a/1              := a  ;
-a/0              := DIVISION_ERROR();
+a/0              := DIVIDE_BY_ZERO_ERROR();
 -a/b             := -(a/b)  ; // to simplify consts
 a/-b             := -(a/b)   ; // to simplify consts
 a/-b             := -a/b     ;
@@ -323,6 +297,7 @@ BOOL(a)            := !(a==0);
 RE(a)                 := RE(REDUCE_COMPLEX(POLY(a,j)));
 IM(a)                 := IM(REDUCE_COMPLEX(POLY(a,j)));
 
+HIER(a GLOBAL(b))     := b;
 POLY((a,b),v)         := (POLY(a,v),POLY(b,v)); //parenthesis are important there!!!
 POLY({a},v)           := {POLY(a,v)};
 
@@ -339,9 +314,6 @@ SIMPLIFYELEM(a v)     := SIMPLIFY2(a,v);
 SIMPLIFY2(a,1)        := IPOLY(POLY(a,1),1);
 SIMPLIFY2(a,v)        := IPOLY(SIMPLIFY(POLY(a,v)),v);
 
-//_set((a,b),(c,d))      := (_set(a,c),_set(b,d));
-//_set({a},{b})          := _set(a,b);
-
 //GETVAR(a,b)           := CHOOSEVAR(  GETVAR(a), GETVAR(b) );
 GETVAR(a+b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
 GETVAR(a-b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
@@ -349,7 +321,8 @@ GETVAR(a*b)           := CHOOSEVAR(    GETVAR(a), GETVAR(b) );
 GETVAR(a/b)           := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );
 GETVAR(a^b)           := GETVAR(a);
 GETVAR(-a)            := GETVAR(a);
-GETVAR(_elem(a))       := a;
+GETVAR(_elem(a))      := a;
+//GETVAR(a.b)           := a.b;
 GETVAR(a)             := 1;
 
 EXPAND(a+b)           := EXPAND2(a)+EXPAND2(b);
@@ -370,7 +343,7 @@ CHOOSEVARDIV(1,b)     := b;
 CHOOSEVARDIV(a,b)     := a; //No RANK there !!!
 
 DERN(a,b,0)     := a;
-DERN(a,b,_const(n))     := DERN(DER(a,b),b,n-1);
+DERN(a,b,_const(n))   := DERN(DER(a,b),b,n-1);
 DER(_const(a),c) := 0;
 DER(c,c)        := 1;
 DER(a+b,c)      := DER(a,c)+DER(b,c);
@@ -501,6 +474,7 @@ MAT_MUL3({  b},c)  :=                    { MAT_MUL4(b,c) };
 MAT_MUL4(b,{c,d})  := ( MAT_MUL4(b,{c}), VECT_MUL_ADD(b,d) );
 MAT_MUL4(b,{  d})  :=                    VECT_MUL_ADD(b,d) ;
 
+//Matrix transposition
 MAT_TRANSPOSE( {a} )        := { MAT_TRANSPOSE1( a ) };
 MAT_TRANSPOSE1( a,{b,c} )   := ( MAT_TRANSPOSE1( MAT_REM_HEAD( a ), {b} ), { MAT_TRANSPOSE_VECT( {a,{b,c}} ) } );
 MAT_TRANSPOSE1( a )         :=                                             { MAT_TRANSPOSE_VECT( {a} )       } ;
@@ -581,14 +555,22 @@ INVAT({a,b},_const(c))    := INVAT({a},c-1);
 INVAT({a},0)              := a;
 INVAT({a},-_const(b))     := ERROR(0);
 
+/*
+{{a}}                     := _none; //Avoid fonction propagation
+//vector function propagation
+_funct1( {a} b )                   := { VECT_PROPAG( _funct1( a b ) ) };
+VECT_PROPAG( _funct1( (a,b) c ) )  := ( VECT_PROPAG( _funct1( a c ) ), _funct1( b c ) );
+VECT_PROPAG( _funct1( a     c ) )  := _funct1( a c );
+*/
+
 SUBST2(a x xo)            := SIMPLIFY(SUBST(a x xo));
 TAYLOR(a,x,xo,0)          := SUBST2(a x xo);
 TAYLOR(a,x,xo,_const(n))  := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
 
 SUBST( _funct1(   b c ) x xo  )   := _funct1( SUBST( b x xo ) c );
 SUBST( _funct2( a b c ) x xo  )   := _funct2( SUBST( a x xo ) SUBST( b x xo ) c );
-SUBST( x               x xo  )   := xo;
-SUBST( a               x xo  )   := a;
+SUBST( x                x xo  )   := xo;
+SUBST( a                x xo  )   := a;
 
 ASSERT(1)    := 0;
 ASSERT(x)    := ERROR(1);

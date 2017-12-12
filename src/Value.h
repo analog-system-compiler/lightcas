@@ -39,7 +39,7 @@ public:
   bool   IsNegative()  const                   { return m_Value < 0.; }
   void   Negate()                              { m_Value = -m_Value; }
   virtual const char*   GetFromString( const char* s1 );
-  virtual void   Display( CString& s ) const;
+  virtual void Display( CString& ds ) const { ds.Set( m_Value ); }
 
   CValue( double v = 0. ) { m_Value = v;  }
   virtual ~CValue() {};

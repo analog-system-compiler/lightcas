@@ -30,7 +30,7 @@ const char CParser::m_CharTab[] =
   2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
   /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 4, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0,
 
   /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
   1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 0, 0, 1,
@@ -57,21 +57,15 @@ CParser::~CParser()
   CloseFile();
 }
 
-const char* CParser::ParseWord()
+const CString& CParser::GetWord()
 {
-  const char* pos = m_Pos;
+  const char* pos;
   SkipSpaceNL();
+  pos = m_Pos;
   while ( IsWord( *pos ) )
   {
     pos++;
   }
-  return pos;
-}
-
-const CString& CParser::GetWord()
-{
-  const char* pos;
-  pos = ParseWord();
   m_Buffer.Copy( m_Pos, pos - m_Pos );
   m_Pos = pos;
   return m_Buffer;

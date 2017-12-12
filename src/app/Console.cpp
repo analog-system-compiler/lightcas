@@ -56,7 +56,14 @@ public:
     }
     else
     {
-      *this += str;
+      if ( isdigit( str[0] ) )
+      {
+        *this += ConValue( str );
+      }
+      else
+      {
+        *this +=  str;
+      }
     }
   }
 
@@ -120,7 +127,7 @@ int main()
 
   CMathExpression equ( &db );
   CParser   IC;
-  CElement* simplify = db_root.GetElement( "SIMPLIFY" );
+  CElement* simplify = db.GetElement( "SIMPLIFY" );
   CElement* ans      = db.GetElement( "ans" );
   OP_CODE simplify_op = simplify->ToRef();
   std::string expression_str;
