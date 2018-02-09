@@ -341,9 +341,9 @@ void CElementDataBase::Test()
   /****** Fonction *********/
   Initialize();
   CElementDataBase db( "test_function", this );
-  db.Check( "a:=6", "a" );
-  db.Check( "EXECUTE( a:=6 )", "a" );
-  db.Check( "EXECUTE( a:=6; SIMPLIFY(a-5) )", "a;1" );
+  db.Check( "y:=6", "y" );
+  db.Check( "EXECUTE( y:=6 )", "y" );
+  db.Check( "EXECUTE( y:=6; SIMPLIFY(y-5) )", "y;1" );
   db.Check( "EXECUTE( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) )", "POLY(f(a),1)" ); //FIXME
   db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );

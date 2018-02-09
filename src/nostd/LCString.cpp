@@ -113,4 +113,3 @@ void CString::Set( unsigned i, unsigned base )
 #endif
 
 }
-

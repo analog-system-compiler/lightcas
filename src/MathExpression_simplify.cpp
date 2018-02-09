@@ -238,30 +238,7 @@ bool CMathExpression::RuleSearch()
   const CElement* e;
 
   e = RefToElement( op );
-  if ( RuleSearch( e ) )
-  {
-    return true;
-  }
-  /*
-  e = RefToElement( CElementDataBase::OP_FUNCT2 );
-  if ( RuleSearch( e ) )
-  {
-    return true;
-  }
-
-  e = RefToElement( CElementDataBase::OP_FUNCT1 );
-  if ( RuleSearch( e ) )
-  {
-    return true;
-  }
-
-  e = RefToElement( CElementDataBase::OP_FUNCT0 );
-  if ( RuleSearch( e ) )
-  {
-    return true;
-  }*/
-
-  return false;
+  return RuleSearch( e );
 }
 
 bool CMathExpression::RuleSearch( const CElement* e )

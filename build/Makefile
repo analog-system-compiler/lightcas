@@ -78,7 +78,7 @@ $(EXE):$(LIB)
 	echo 'Linking    $(notdir $@)'
 	$(CXX) -o $@  $(CPPFLAGS) $(LDFLAGS) $(EXE_SRC) $^
 ifeq ($(EMBED_RULES),0)	
-	cp ../src/Rules.txt .
+	cp ../src/Rules*.txt .    
 endif
 
 clean:

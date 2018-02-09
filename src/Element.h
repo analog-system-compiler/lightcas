@@ -38,7 +38,6 @@ private:
   };
 
   CString    m_Name;
-  //CString    m_PseudoName;
   CFunction  m_Function;
   ELEM_TYPE  m_Type;
   bool       m_Global;
@@ -56,7 +55,6 @@ public:
   void Lock();
 
   const CString&  GetName() const           { return m_Name;                   }
-  //void SetPseudoName( const CString& s )    { m_PseudoName = s;                }
   void SetFunct()                           { m_Type = ELEM_FUNCT;             }
   void SetVar()                             { m_Type = ELEM_VAR;               }
   void SetConst()                           { m_Type = ELEM_CONST;             }
@@ -69,7 +67,6 @@ public:
   bool IsVar()     const                    { return ( m_Type == ELEM_VAR   ); }
   bool IsConst()   const                    { return ( m_Type == ELEM_CONST ); }
   bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
-// bool IsFunct2()  const                    { return ( m_Function.GetSize() != 0 ); }
   bool IsNumeric() const                    { return ( m_Type == ELEM_NUM );   }
   bool IsAux()     const                    { return m_bAux;                   }
   bool IsLocked()  const                    { return m_bLock;                  }

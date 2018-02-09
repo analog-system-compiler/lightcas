@@ -20,40 +20,39 @@
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
 
-#sym  SYST(a b)       "a;b    "  
-#sym  IF3( a b )      "a?b    "  
-#sym  COL( a b )      "a:\=b  " 
-#sym  EQV( a b )      "a=\=b  "  
-#sym  CONCAT( a b )   "a,(b)  "  
-#sym  _set( a b )     "a:=b   "  
-#sym  OR( a b )       "a|\|b  "  
-#sym  XOR( a b )      "a~b    "  
-#sym  ADD( a b )      "a+b    "  
-#sym  SUB( a b )      "a-\>(b)"  
-#sym  AND( a b )      "a&\&b  "  
-#sym  MUL( a b )      "a*b    "  
-#sym  DIV( a b )      "a/(b)  "  
-#sym  POW( a b )      "(a)^(b)"  
-#sym  SHL( a b )      "a<<(b) "  
-#sym  SHR( a b )      "a>>(b) "  
-#sym  EQ( a b )       "a==b   "  
-#sym  NEQ( a b )      "a<>b   "  
-#sym  LTE( a b )      "a<=(b) "  
-#sym  LT( a b )       "a<(b)  "  
-#sym  GTE( a b )      "a>=(b) "  
-#sym  GT( a b )       "a>(b)  "  
-#sym  LOR( a b )      "a||b   "  
-#sym  RANGE( a b )    "a->b   "
-#sym  LAND( a b )     "a&&b   "  
-#sym  AT( a b )       "a[B]   " 
-#sym  HIER( a b )     "a.b    "
-//#sym  GLOBAL( a )     "_a     "
-#sym  NEG( a )        "-a     "  
-#sym  INV( a )        "/a     "  
-#sym  LNOT( a )       "!a     "  
-#sym  NOT( a )        "~a     "  
-#sym  FACT( a )       "a!     "  
-#sym  VECT( a )       "{A}    "
+SYST(a b)       "a;b    ";
+IF3( a b )      "a?b    ";
+COL( a b )      "a:\=b  ";
+CONCAT( a b )   "a,(b)  ";
+EQV( a b )      "a=\=b  ";
+_set( a b )     "a:=b   ";
+OR( a b )       "a|\|b  ";
+XOR( a b )      "a~b    ";
+ADD( a b )      "a+b    ";
+SUB( a b )      "a-\>(b)";
+AND( a b )      "a&\&b  ";
+MUL( a b )      "a*b    ";
+DIV( a b )      "a/(b)  ";
+POW( a b )      "(a)^(b)";
+SHL( a b )      "a<<(b) ";
+SHR( a b )      "a>>(b) ";
+EQ( a b )       "a==b   ";
+NEQ( a b )      "a<>b   ";
+LTE( a b )      "a<=(b) ";
+LT( a b )       "a<(b)  ";
+GTE( a b )      "a>=(b) ";
+GT( a b )       "a>(b)  ";
+LOR( a b )      "a||b   ";
+RANGE( a b )    "a->b   ";
+LAND( a b )     "a&&b   ";
+AT( a b )       "a[B]   ";
+HIER( a b )     "a.b    ";
+NEG( a )        "-a     ";
+INV( a )        "/a     ";
+LNOT( a )       "!a     ";
+NOT( a )        "~a     ";
+FACT( a )       "a!     ";
+VECT( a )       "{A}    ";
 
 IF2( (a:b) 0) := b;
 IF2( (a:b) 1) := a;
@@ -298,6 +297,7 @@ RE(a)                 := RE(REDUCE_COMPLEX(POLY(a,j)));
 IM(a)                 := IM(REDUCE_COMPLEX(POLY(a,j)));
 
 HIER(a GLOBAL(b))     := b;
+
 POLY((a,b),v)         := (POLY(a,v),POLY(b,v)); //parenthesis are important there!!!
 POLY({a},v)           := {POLY(a,v)};
 
@@ -432,7 +432,7 @@ DET_LINES( MATRIX_BOTTOM(    TED( 0 b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := 0;
 
 DET_LINES( MATRIX_BOTTOM( c, TED( a b ) )                 , DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( c )},                     { e } ) - DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP(     TED( a b ) ), DET_VAR( e ) );
 DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( d, c ) )}, { e } ) - DET_LINES( MATRIX_BOTTOM( c ), MATRIX_TOP( d , TED( a b ) ), DET_VAR( e ) );
-DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1( c ) )}   , { e } );
+DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1(    c ) )}, { e } );
 
 // common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
 DET( {0} ) := 0;
@@ -677,9 +677,11 @@ MAKE_EVAL( FACT(  a   ) )  := _fact(  MAKE_EVAL( a ) ) ;
 MAKE_EVAL( ABS(   a   ) )  := _abs(   MAKE_EVAL( a ) ) ;
 MAKE_EVAL( FLOOR( a   ) )  := _floor( MAKE_EVAL( a ) ) ;
 MAKE_EVAL( CEIL(  a   ) )  := _ceil(  MAKE_EVAL( a ) ) ;
-MAKE_EVAL( RAND()       )  := _rand()                 ;
-MAKE_EVAL( _const( a ) )    := a ;
-MAKE_EVAL( _elem( a ) )     := a ;
+MAKE_EVAL( RAND()       )  := _rand()                  ;
+MAKE_EVAL( _const( a ) )   := a ;
+MAKE_EVAL( _elem( a ) )    := a ;
 MAKE_EVAL( a )             := ERROR(2);
 
-DO_EVAL( a )               := _eval( MAKE_EVAL( a ) )
+DO_EVAL( a )               := _eval( MAKE_EVAL( a ) );
+
+#inc "RulesElectricity.txt"

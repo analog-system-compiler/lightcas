@@ -143,7 +143,7 @@ bool CElementDataBase::Initialize()
       return false;
     }
 #endif
-    CleanTempElements();
+    //CleanTempElements();
   }
   else
   {
@@ -156,7 +156,7 @@ void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp( this );
   static const char parameters[] = "a b c d e f g h";
-  static const char built_in[] = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0)";
+  static const char built_in[]   = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0)";
 
   exp.GetFromString( parameters );
   ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
@@ -197,10 +197,11 @@ void CElementDataBase::AddReservedFunctions()
   AddEvalFunctionTable( m_FunctionProperties, m_FunctionPropertiesSize );
 }
 
-bool CElementDataBase::AssociateSymbol( CParser& IC )
+bool CElementDataBase::AssociateSymbol( CParser& IC, const CMathExpression& ds_equ )
 {
   char c;
   unsigned i;
+  pos_t pos;
   CString s;
   CElement* e;
   CSymbolSyntaxStruct* sss;
@@ -208,7 +209,8 @@ bool CElementDataBase::AssociateSymbol( CParser& IC )
 
   sss = new CSymbolSyntaxStruct();
   sss->m_Equation.Initialize( this );
-  sss->m_Equation.GetLevel( IC, 0 );
+  pos = ds_equ.GetSize();
+  sss->m_Equation.PushBranch( ds_equ, pos );
 
   if ( !IC.GetQuote() )
   {
@@ -259,12 +261,10 @@ void CElementDataBase::InitAlgebraRuleTable()
   CMathExpression src( this );
   src.GetFromString( "_set( EXECUTE( SYST( a b ) )  SYST( EXECUTE( a ) EXECUTE( b ) )  )" );
   src.OptimizeTree();
-#if OPTIMIZATION_LEVEL < 2
   src.GetFromString( "_set( EXECUTE( _set( a b ) )  _set( a b ) )" );
   src.OptimizeTree();
   src.GetFromString( "_set( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )" );
   src.OptimizeTree();
-#endif
   src.GetFromString( "_set( EXECUTE( a )  a )" );
   src.OptimizeTree();
 }
@@ -274,7 +274,7 @@ void CElementDataBase::AddAlgebraRuleTable( CParser& IC )
   CMathExpression src( this );
   src.GetFromString( IC );
   src.Push( GetElement( "EXECUTE" ) );
-  src.OptimizeTree(); // optimize 'if' if any.
+  src.OptimizeTree();
 }
 
 void CElementDataBase::CleanTempElements()

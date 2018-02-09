@@ -25,7 +25,6 @@
 #include "Display.h"
 #include "ElementDataBase.h"
 
-#define OPTIMIZATION_LEVEL 0//2
 //#define RECURSIVE_ALGO
 
 #if 1
@@ -69,7 +68,7 @@ protected:
   void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
   OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
   OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
-  void     Push( OP_CODE op )           { SetSize( m_StackSize + 1  );  Set( m_StackSize - 1, op );  }
+  void     Push( OP_CODE op )           { SetSize( m_StackSize + 1 );  Set( m_StackSize - 1, op );  }
 
   void     SetSize( pos_t i );
   void     Push( const CElement* e )    { Push( ElementToRef( e ) );    }
@@ -82,7 +81,6 @@ protected:
   void     NextBranch( pos_t& pos ) const;
   int      GetLevel( CParser& IC );
   bool     GetLevel( CParser& IC, unsigned priority );
-  bool     ParseMacro( CParser& IC );
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
   int      Parse( CParser& IC );

@@ -26,68 +26,49 @@ int CMathExpression::Parse( CParser& IC )
   return GetLevel( IC );
 }
 
-bool CMathExpression::ParseMacro( CParser& IC )
-{
-  CString s = IC.GetWord();
-  if ( s == "sym" )
-  {
-    if ( !m_ElementDB->AssociateSymbol( IC ) )
-    {
-      return false;
-    }
-  }
-  else if ( s == "inc" )
-  {
-    if ( IC.GetQuote() )
-    {
-      CParser IC2;
-      if ( IC2.LoadFile( IC.GetBuffer() ) )
-      {
-        Parse( IC2 );
-      }
-      else
-      {
-        return false;
-      }
-    }
-    else
-    {
-      return false;
-    }
-  }
-  return true;
-}
-
 bool CMathExpression::ParseAtom( CParser& IC )
 {
-  if ( IC.TryFind( '(' ) )
-  {
-    GetLevel( IC );
-    if ( !IC.Find( ')' ) )
-    {
-      return false;
-    }
-  }
-  else if ( IC.IsDigit() )
+  bool bStatus;
+
+  if ( IC.IsDigit() )
   {
     CEvaluator* eval = m_ElementDB->GetEvaluator();
     const char* pos = IC.GetPos();
     pos = eval->GetValueFromString( pos );
     IC.SetPos( pos );
     PushEvalElement( *eval );
+    bStatus = true;
   }
   else if ( IC.IsWord() )
   {
-    if ( !ParseElement( IC ) )
+    bStatus = ParseElement( IC );
+    if ( bStatus && !IC.IsStopChar() )
     {
-      return false;
+      if ( IC.GetChar() == CParser::m_StringDelimiter )
+      {
+        m_ElementDB->AssociateSymbol( IC, *this );
+        NextBranch( m_StackSize );
+        Push( CElementDataBase::OP_NONE );
+      }
+    }
+  }
+  else if ( IC.TryFind( '(' ) )
+  {
+    GetLevel( IC );
+    if ( IC.IsStopChar() )
+    {
+      bStatus = IC.Find( ')' );
+    }
+    else
+    {
+      bStatus = false;
     }
   }
   else
   {
-    return false;
+    bStatus = false;
   }
-  return true;
+  return bStatus;
 }
 
 int CMathExpression::GetLevel( CParser& IC )
@@ -95,21 +76,11 @@ int CMathExpression::GetLevel( CParser& IC )
   int i = 0;
   while ( !IC.IsStopChar() )
   {
-    if ( IC.TryFind( CParser::m_SymbolMacro ) )
+    if( !GetLevel( IC, 0 ) )
     {
-      if( !ParseMacro( IC ) )
-      {
-        return -1; // IC.Error(CParserException::ID_ERROR_FILE_NOT_FOUND);
-      }
+      return -2; //IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
     }
-    else
-    {
-      if( !GetLevel( IC, 0 ) )
-      {
-        return -2; //IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
-      }
-      i++;
-    }
+    i++;
   }
   return i;
 }
@@ -128,51 +99,67 @@ bool CMathExpression::GetLevel( CParser& IC, unsigned priority )
   }
 
   var_found = ParseAtom( IC );
-  char_pos = IC.GetPos();
 
-  precedence = var_found ? priority : 0;
-
-  while ( precedence < st.GetSize() )
+  do
   {
-    const char* sp = st[precedence]->m_Syntax;
-    bool check_var = ( TryMatchExp( sp ) != '\0' );
-    if ( check_var == var_found )
+
+    if ( var_found )
     {
-      while ( *sp && IC.TryMatchSymbol( sp ) )
+      if ( IC.IsStopChar() ) // when ')' found, set precedence to maximum to avoid searching symbols
       {
-        c = TryMatchExp( sp );
-        if ( c )
-        {
-          if ( !GetLevel( IC, ( c < 'a' ) ? 0 : precedence + 1 ) )
-          {
-            return false;
-          }
-        }
+        precedence = st.GetSize();
       }
-    }
-
-    if ( *sp == '\0' )
-    {
-      Push( st[precedence]->m_Equation.GetLastOperator() );
-      var_found = true;
-      char_pos = IC.GetPos();
-      precedence = priority;
-
-#if ( DEBUG_LEVEL >= 3 )
-      CDisplay ds;
-      ds.Clear();
-      Display( ds );
-      TRACE( ds.GetBufferPtr() );
-#endif
+      else
+      {
+        precedence =  priority;
+      }
     }
     else
     {
+      precedence = 0;
+    }
+
+    char_pos = IC.GetPos();
+
+    while ( precedence < st.GetSize() )
+    {
+      const char* sp = st[precedence]->m_Syntax;
+      bool check_var = ( TryMatchExp( sp ) != '\0' );
+      if ( check_var == var_found )
+      {
+        while ( *sp && IC.TryMatchSymbol( sp ) )
+        {
+          c = TryMatchExp( sp );
+          if ( c )
+          {
+            if ( !GetLevel( IC, ( c < 'a' ) ? 0 : precedence + 1 ) )
+            {
+              return false;
+            }
+          }
+        }
+
+        if ( *sp == '\0' )
+        {
+          Push( st[precedence]->m_Equation.GetLastOperator() );
+          var_found = true;
+#if ( DEBUG_LEVEL >= 3 )
+          CDisplay ds;
+          ds.Clear();
+          Display( ds );
+          TRACE( ds.GetBufferPtr() );
+#endif
+          break;
+        }
+      }
+
       IC.SetPos( char_pos );
       precedence++;
     }
   }
+  while ( precedence < st.GetSize() );
 
-  return var_found || ( precedence != st.GetSize() );
+  return var_found;
 }
 
 bool CMathExpression::ParseElement( CParser& IC )
@@ -220,7 +207,6 @@ bool CMathExpression::ParseElement( CParser& IC )
     }
     if ( f->GetParameterNb() != i )
     {
-      //ASSERT( false );
       return false;
     }
   }

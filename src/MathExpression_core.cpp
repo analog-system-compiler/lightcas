@@ -99,7 +99,6 @@ void CMathExpression::Copy( const CMathExpression& equ )
     m_ElementDB = equ.m_ElementDB;
   }
 
-  ASSERT( equ.m_ElementDB );
   Clear();
 
   if( !equ.IsEmpty() )
@@ -192,11 +191,15 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
     if ( op >= CElementDataBase::GetSecureLimit() )
     {
       e = RefToElement( op );
-      if( e->IsVar() )
+      if ( e->IsVar() )
       {
         src.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
         dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
         i++;
+      }
+      else
+      {
+        ASSERT( e->GetName() != "a" );
       }
     }
   }

@@ -108,7 +108,7 @@ public:
   CElement*       GetElement();
   CElement*       GetElement( const CString& );
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
-  bool            AssociateSymbol( CParser& IC );
+  bool            AssociateSymbol( CParser& IC, const CMathExpression& dst_equ );
 
   static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )         { return m_ElementRefArray[ ( unsigned )op ]; }
