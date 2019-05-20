@@ -47,7 +47,7 @@ bool CMathExpression::ParseAtom( CParser& IC )
       if ( IC.GetChar() == CParser::m_StringDelimiter )
       {
         m_ElementDB->AssociateSymbol( IC, *this );
-        NextBranch( m_StackSize );
+        m_StackSize = NextBranch( m_StackSize );
         Push( CElementDataBase::OP_NONE );
       }
     }
@@ -205,7 +205,7 @@ bool CMathExpression::ParseElement( CParser& IC )
       TRACE( ds.GetBufferPtr() );
 #endif
     }
-    if ( f->GetParameterNb() != i )
+    if ( f->GetParameterNb() != ( unsigned )i )
     {
       return false;
     }

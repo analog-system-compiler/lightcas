@@ -21,7 +21,7 @@
 #include <cstdio>
 #include "LCString.h"
 
-class CDisplay : virtual public CString
+class CDisplay : public CString
 {
 public:
   virtual void Print( const char* s )         { puts( s ); }

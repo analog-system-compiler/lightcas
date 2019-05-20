@@ -16,62 +16,40 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#include <cstdarg>
-#include <cstdio>
-#include <cstring>
-#include "Debug.h"
+// precedence is defined here
+// lowercase: new precedence = old precedence + 1
+// uppercase: new precedence = 0
 
-int( *PUTS )( const char* ) = puts;
-
-#ifdef _DEBUG
-
-#ifdef _WIN32
-#include "WinBase.h"
-#endif
-
-static FILE* debug_file = NULL;
-
-void TRACE( const char* format, ... )
-{
-  va_list args;
-
-  if( !debug_file )
-  {
-    debug_file = fopen( "debug.log", "w+" );
-  }
-
-  if( debug_file )
-  {
-    va_start ( args, format );
-    vfprintf( debug_file, format, args );
-    va_end ( args );
-    fputc( '\n', debug_file );
-  }
-
-  unsigned i;
-  static char buffer[ 8192 ];
-  va_start ( args, format );
-  vsnprintf( buffer, sizeof( buffer ), format, args );
-  va_end ( args );
-  i = strlen( buffer );
-  if( ( i + 1 ) < sizeof( buffer ) )
-  {
-    buffer[i] = '\n';
-    buffer[i + 1] = '\0';
-  }
-#ifdef _WIN32
-  const unsigned CRT_DEBUG_BUFFER_MAX = 256;
-  buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 5] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 4] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 3] = '\r';
-  buffer[CRT_DEBUG_BUFFER_MAX - 2] = '\n';
-  buffer[CRT_DEBUG_BUFFER_MAX - 1] = '\0';
-  OutputDebugString( buffer );
-#else
-  PUTS( buffer );
-#endif
-
-}
-
-#endif
+SYST(a b)       "a;b    ";
+IF3( a b )      "a?b    ";
+COL( a b )      "a:\=b  ";
+CONCAT( a b )   "a,(b)  ";
+EQV( a b )      "a=\=b  ";
+_set( a b )     "a:=b   ";
+OR( a b )       "a|\|b  ";
+XOR( a b )      "a~b    ";
+ADD( a b )      "a+b    ";
+SUB( a b )      "a-\>(b)";
+AND( a b )      "a&\&b  ";
+MUL( a b )      "a*b    ";
+DIV( a b )      "a/(b)  ";
+POW( a b )      "(a)^(b)";
+SHL( a b )      "a<<(b) ";
+SHR( a b )      "a>>(b) ";
+EQ( a b )       "a==b   ";
+NEQ( a b )      "a<>b   ";
+LTE( a b )      "a<=(b) ";
+LT( a b )       "a<(b)  ";
+GTE( a b )      "a>=(b) ";
+GT( a b )       "a>(b)  ";
+LOR( a b )      "a||b   ";
+RANGE( a b )    "a->b   ";
+LAND( a b )     "a&&b   ";
+AT( a b )       "a[B]   ";
+HIER( a b )     "a.b    ";
+NEG( a )        "-a     ";
+INV( a )        "/a     ";
+LNOT( a )       "!a     ";
+NOT( a )        "~a     ";
+FACT( a )       "a!     ";
+VECT( a )       "{A}    ";

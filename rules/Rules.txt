@@ -325,6 +325,9 @@ DER(TANH(b),c)  := DER(b,c)*(1-TANH(b)^2);
 DER(EXP(b),c)   := DER(b,c)*EXP(b);
 DER(LOG(a),c)   := DER(a,c)/a;
 
+//Maxima compatibility
+DIFF(a,b,n)  := DERN(a,b,n);
+
 POLY_TED((a,b),v)   := (POLY_TED(a,v),POLY_TED(b,v));
 POLY_TED(a+b,v)     := TED_ADD(POLY_TED(a,v),POLY_TED(b,v));
 POLY_TED(a-b,v)     := TED_SUB(POLY_TED(a,v),POLY_TED(b,v));
@@ -375,6 +378,7 @@ SYSTEM_AUTO_SOLVE2({a},{c,d})  := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{
 SYSTEM_AUTO_SOLVE2({a},{c})    := SYSTEM_AUTO_SOLVE3({a});
 
 //entry points
+SOLVE(a=b,v)                   := SOLVE(a-b,v);
 SOLVE(a,v)                     := SOLVE2(POLY_TED(a,v));
 SYSTEM_SOLVE({a},{x})          := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
 SYSTEM_AUTO_SOLVE({a})         := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};

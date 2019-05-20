@@ -35,10 +35,12 @@ private:
   unsigned   m_Length;
   static const char m_NullString[1];
 
+protected:
+    void  Append( const char* s, unsigned i );
+
 public:
 
   void  SetLength( unsigned len );
-  void  Append( const char* s, unsigned i );
   static int Compare( const char* s1, const char* s2 );
   void  Set( unsigned i, unsigned base );
 
@@ -52,11 +54,11 @@ public:
   char  At( unsigned i ) const             { if( i < m_Length ) return m_Data[ i ]; else return '\0';  }
   void  Clear()                            { free( m_Data );    m_Data = NULL;    m_Length = 0;  }
 
-  void  Append( const CString& s )         { Append( s.m_Data, s.m_Length );  }
-  void  Append( char c )                   { Append( &c, 1 );  }
+  virtual void Append( const CString& s )  { Append( s.m_Data, s.m_Length );  }
+  virtual void Append( char c )            { Append( &c, 1 );  }
 
-  void  Prepend( const CString& s )        { CString s1( *this ); m_Length = 0; Append( s ); Append( s1 );  }
-  void  Prepend( char c )                  { CString s1( *this ); m_Length = 0; Append( c ); Append( s1 );  }
+  void  Prepend( const CString& s )        { CString s1( *this ); m_Length = 0; CString::Append( s ); CString::Append( s1 );  }
+  void  Prepend( char c )                  { CString s1( *this ); m_Length = 0; CString::Append( c ); CString::Append( s1 );  }
 
   void  Copy( const CString& s )           { m_Length = 0; Append( s, s.m_Length );  }
   void  Copy( const char* s )              { m_Length = 0; if( s ) Append( s, strlen( s ) );  }
@@ -65,16 +67,16 @@ public:
   const char* GetBufferPtr() const         { return ( m_Length == 0 ) ? m_NullString : m_Data;  }
   operator const char* () const            { return GetBufferPtr();  }
 
-  CString operator + ( const CString& s ) const  { CString s1( *this ); s1.Append( s ); return s1; }
-  CString operator + ( const char* s )    const  { CString s1( *this ); s1.Append( s ); return s1; }
-  CString operator + ( char c )           const  { CString s1( *this ); s1.Append( c ); return s1; }
+  CString operator + ( const CString& s ) const  { CString s1( *this ); s1.CString::Append( s ); return s1; }
+  CString operator + ( const char* s )    const  { CString s1( *this ); s1.CString::Append( s ); return s1; }
+  CString operator + ( char c )           const  { CString s1( *this ); s1.CString::Append( c ); return s1; }
 
-  void  operator += ( const CString& s )   { Append( s ); }
-  void  operator += ( const char* s )      { Append( s ); }
-  void  operator += ( char c )             { Append( c ); }
+  void  operator += ( const CString& s )   { CString::Append( s ); }
+  void  operator += ( const char* s )      { CString::Append( s ); }
+  void  operator += ( char c )             { CString::Append( c ); }
   void  operator = ( const CString& s )    { Copy( s );   }
   void  operator = ( const char* s )       { Copy( s );   }
-  void  operator = ( char c )              { m_Length = 0;    Append( c );  }
+  void  operator = ( char c )              { m_Length = 0; CString::Append( c );  }
 
   char  operator[] (  unsigned pos )       { ASSERT( pos < m_Length ); ASSERT( m_Data ); return m_Data[pos]; }
 

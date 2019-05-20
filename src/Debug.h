@@ -24,22 +24,24 @@ extern int( *PUTS )( const char* );
 
 #define DEBUG_LEVEL 0
 
-extern void TRACE( const char* s, ... );
+void TRACE( const char* s, ... );
 
-#ifdef _WIN32
+#ifdef __GNUC__
+
+#include <assert.h>
+#include <math.h>
+#define ASSERT(expr)    assert(expr)
+#define ASSERT_NAN( x ) assert( !isnan( x ) )
+#define IS_NAN( x )     isnan( x )
+
+#else // defined( __GNUC__ )
+
 #include <crtdbg.h>
 #define ASSERT(expr)    _ASSERTE(expr)
 #define ASSERT_NAN( x ) _ASSERTE( !_isnan( x ) )
 #define IS_NAN( x )     _isnan( x )
 
-#else // defined( _WIN32 )
-
-#include <assert.h>
-#define ASSERT(expr)    assert(expr)
-#define ASSERT_NAN( x ) assert( !isnan( x ) )
-#define IS_NAN( x )   isnan( x )
-
-#endif
+#endif // defined( __GNUC__ )
 
 #else // defined( _DEBUG )
 
@@ -49,7 +51,7 @@ extern void TRACE( const char* s, ... );
 #define ASSERT_NAN( x )
 #define IS_NAN( x ) 0
 
-#endif
+#endif // defined( _DEBUG )
 
 
 

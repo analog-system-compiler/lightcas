@@ -62,17 +62,20 @@ pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds
     {
       ASSERT( n <= CElementDataBase::MAX_EXP );
       ds += '(';
-      for ( i = 0; i < n; i++ )
+      if ( n )
       {
-        pos_array[i] = pos;
-        NextBranch( pos );
+        for ( i = 0; i < n; i++ )
+        {
+          pos_array[i] = pos;
+          pos = NextBranch( pos );
+        }
+        for ( i = 1; i < n; i++ )
+        {
+          DisplayBranch( pos_array[n - i], 0, ds );
+          ds += ' ';
+        }
+        DisplayBranch( pos_array[0], 0, ds );
       }
-      for ( i = 0; i < n - 1; i++ )
-      {
-        DisplayBranch( pos_array[n - i - 1], 0, ds );
-        ds += ' ';
-      }
-      DisplayBranch( pos_array[0], 0, ds );
       ds += ')' ;
     }
   }

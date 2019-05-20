@@ -27,7 +27,7 @@ CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned           CElementDataBase::m_SecureLimit;
 
 #ifdef EMBED_RULES
-extern const char Rules[] asm( "_binary___objs_Rules_txt_start" );
+extern const char Rules[] asm( "_binary_objs_rules_tmp_txt_start" );
 #endif
 
 const SProperties CElementDataBase::m_FunctionProperties[] =
@@ -132,7 +132,7 @@ bool CElementDataBase::Initialize()
     IC.SetPos( Rules );
     AddAlgebraRuleTable ( IC );
 #else
-    if( IC.LoadFile( CString( "Rules.txt" ) ) )
+    if( IC.LoadFile( CString( "Includes.txt" ) ) )
     {
       AddAlgebraRuleTable ( IC );
       IC.CloseFile();

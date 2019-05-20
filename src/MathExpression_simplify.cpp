@@ -163,7 +163,7 @@ void CMathExpression::OptimizeTree()
   context_t save_context;
   unsigned j;
 
-  if ( ExecuteCommand() )
+  if ( !IsEmpty() && ExecuteCommand() )
   {
     RuleSearch();
     while ( m_ContextStack.GetSize() )
@@ -193,7 +193,7 @@ void CMathExpression::OptimizeTree()
           }
 
           pos_t pos1 = pos2;
-          NextBranch( pos1 );
+          pos1 = NextBranch( pos1 );
           InnerCopy( GetSize(), pos1, pos2 - pos1 ); //Append to end of equation
         }
         else
@@ -230,6 +230,7 @@ L1:
 #endif
     } //while ( m_ContextStack.GetSize() )
   }
+  ASSERT( NextBranch( pos_t( m_StackSize ) ) == 0 );
 }
 
 bool CMathExpression::RuleSearch()
@@ -347,7 +348,7 @@ pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_
       match = RegisterBranch( pos_array,  op1,  pos2 );
       if( match )
       {
-        NextBranch( pos2 );
+        pos2 = NextBranch( pos2 );
       }
     }
     else
@@ -409,7 +410,7 @@ bool CMathExpression::ExecuteCommand()
     if ( eval )
     {
       pos_t pos = m_StackSize;
-      NextBranch( pos );
+      pos = NextBranch( pos );
       eval->Evaluate( m_StackSize - pos, m_StackArray + pos );
       m_StackSize = pos;
       PushEvalElement( *eval );
@@ -457,8 +458,8 @@ bool CMathExpression::CompareBranch( pos_t pos1, pos_t pos2 ) const
 
   pos11 = pos1;
   pos22 = pos2;
-  NextBranch( pos11 );
-  NextBranch( pos22 );
+  pos11 = NextBranch( pos11 );
+  pos22 = NextBranch( pos22 );
 
   return ( ( pos1 - pos11 ) == ( pos2 - pos22 ) ) && !memcmp( &m_StackArray[pos11], &m_StackArray[pos22], ( pos2 - pos22 ) * sizeof( OP_CODE ) );
 }

@@ -78,7 +78,7 @@ protected:
   void     PushBranch( const CMathExpression& equ, pos_t& pos );
   bool     CompareBranchElement( pos_t pos1, pos_t pos2 ) const;
   bool     CompareBranch( pos_t pos1, pos_t pos2 ) const;
-  void     NextBranch( pos_t& pos ) const;
+  pos_t    NextBranch( pos_t pos ) const;
   int      GetLevel( CParser& IC );
   bool     GetLevel( CParser& IC, unsigned priority );
   bool     ParseAtom( CParser& IC );

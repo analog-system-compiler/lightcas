@@ -111,11 +111,11 @@ void CMathExpression::PushBranch( const CMathExpression& equ, pos_t& pos )
 {
   pos_t pos1 = pos;
   ASSERT( pos );
-  equ.NextBranch( pos );
+  pos = equ.NextBranch( pos );
   Append( &equ.m_StackArray[pos], pos1 - pos );
 }
 
-void CMathExpression::NextBranch( pos_t& pos ) const
+pos_t CMathExpression::NextBranch( pos_t pos ) const
 {
   unsigned i = 1;
   OP_CODE op;
@@ -130,6 +130,7 @@ void CMathExpression::NextBranch( pos_t& pos ) const
     i += e->GetFunction()->GetParameterNb();
     i--;
   }
+  return pos;
 }
 
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )

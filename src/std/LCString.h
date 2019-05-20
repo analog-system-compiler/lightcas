@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <cstdio>
 
-#ifdef _WIN32
+#ifndef __GNUC__
 #define snprintf _snprintf_s
 #endif
 
@@ -35,8 +35,8 @@ public:
   void Copy( const char* pText, unsigned length )  { assign( pText, length ); }
   void Clear()                                     { clear(); }
   void Prepend( const CString& s )                 { insert( 0, s ); }
-  void Append( const CString& s )                  { append( s ); }
-  void Append( char c )                            { push_back( c ); }
+  virtual void Append( const CString& s )          { append( s ); }
+  virtual void Append( char c )                    { push_back( c ); }
   void SetLength( size_t n )                       { resize( n ); }
   int  Compare(  const CString& s ) const          { return compare( s ); }
   size_t Search( char c ) const                    { return find( c ); }
@@ -44,10 +44,10 @@ public:
   char At( unsigned n ) const                      { return at( n ); }
   void ToLower()                                   { std::for_each( begin(), end(), ::tolower ); }
   void Set( double v )                             { char buffer[32]; snprintf( buffer, sizeof( buffer ), "%.12g", v ); Copy( buffer ); }
-#ifdef _WIN32
-  void Set( unsigned i, unsigned base = 10 )       { char buffer[32]; _itoa_s( i, buffer, base ); Copy( buffer ); }
+#ifdef __GNUC__
+  void Set( unsigned i, unsigned base = 10 ) { char buffer[32]; snprintf( buffer, sizeof( buffer ), ( base == 16 ? "%x" : ( base == 10 ? "%d" : "%o" ) ), i ); Copy( buffer ); }
 #else
-  void Set( unsigned i, unsigned base = 10 )       { char buffer[32]; snprintf( buffer, sizeof( buffer ), ( base == 16 ? "%x" : ( base == 10 ? "%d" : "%o" ) ), i ); Copy( buffer ); }
+  void Set( unsigned i, unsigned base = 10 )       { char buffer[32]; _itoa_s( i, buffer, base ); Copy( buffer ); }
 #endif
 
   //Constructors

@@ -20,10 +20,12 @@
 #include <iostream>
 #include <string>
 
-#ifdef __GNUC__
-#define ISATTY 1
+#ifdef _WIN32
+#include <io.h>
+#define ISATTY(fd) _isatty(fd)
 #else
-#define ISATTY 0
+#include <unistd.h>
+#define ISATTY(fd) isatty(fd)
 #endif
 
 #include "Display.h"
@@ -39,15 +41,16 @@ void Help();
 class CDisplayEx : public CDisplay
 {
 public:
+  bool m_IsATTY;
   unsigned m_DisplayBase;
 
   void Append( const CString& str )
   {
-    if ( ISATTY )
+    if ( m_IsATTY )
     {
       if ( isdigit( str[0] ) )
       {
-        *this += CString( COLOR_BLUE ) + ConValue( str ) + CString( COLOR_OFF );
+        *this += CString( COLOR_BLUE ) + ValueConvert( str ) + CString( COLOR_OFF );
       }
       else
       {
@@ -58,7 +61,7 @@ public:
     {
       if ( isdigit( str[0] ) )
       {
-        *this += ConValue( str );
+        *this += ValueConvert( str );
       }
       else
       {
@@ -67,7 +70,7 @@ public:
     }
   }
 
-  CString ConValue( const CString& str )
+  CString ValueConvert( const CString& str )
   {
     CString s;
     if( str == "1.#INF" )
@@ -97,9 +100,10 @@ public:
     return s;
   }
 
-  CDisplayEx(): CDisplay()
+  CDisplayEx( bool isatty ):CDisplay()
   {
     m_DisplayBase = 10;
+    m_IsATTY = isatty;
   }
 };
 
@@ -108,12 +112,12 @@ int main()
 
   setlocale( LC_NUMERIC, "C" );
   std::cout << "*************************************\n";
-  std::cout << "*** LighCAS Console (" __DATE__ ") ***\n";
-  std::cout << "*** © Cyril Collineau 2017        ***\n";
+  std::cout << "*** LighCAS Console               ***\n";
+  std::cout << "*** © Cyril Collineau 2014        ***\n";
   std::cout << "*************************************\n";
   std::cout << "Type \"help\" for help.\n";
 
-  CDisplayEx ds;
+  CDisplayEx ds( ISATTY(1) );
   CEvaluator eval;
   CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
@@ -193,7 +197,7 @@ void Help()
             "\n" \
             "Simplifications:\n" \
             "  a:=5\n" \
-            "  a:=b\n" \
+            "  b:=a\n" \
             "\n" \
             "Supported operators:\n" \
             "a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!\n" \
@@ -220,8 +224,11 @@ void Help()
             "  SOLVE({x-y+1,x-y+1},{x,y})\n" \
             "\n" \
             "Complex numbers:\n" \
-            "  IM(x+j*y)\n"\
-            "  RE(x+j*y)\n"\
+            "  IM(x+j*y)\n" \
+            "  RE(x+j*y)\n" \
             "\n" \
+            "Conversion:\n" \
+            "  0b1110\n" \
+            "  0xABCE\n" \
             ;
 }
