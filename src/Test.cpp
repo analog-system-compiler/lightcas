@@ -103,18 +103,19 @@ void CElementDataBase::DisplayStats()
     CElement* e = m_ElementRefArray.GetAt( i );
     if( e )
     {
+      Printf( "********************* #%04d %s *************************", i, e->GetName().GetBufferPtr() );
       const CFunction* funct = e->GetFunction();
       for( unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++ )
       {
-        if( j == 0 )
-        {
-          Printf( "**************************" );
-        }
         CAlgebraRule* rule = funct->m_AlgebraRuleArray.GetAt( j );
         ds.Clear();
-        rule->m_SrcEquation.Display( ds );
-        Printf( "%4d \t%s\t", rule->m_AccessNb, ds.GetBufferPtr() );
+        rule->Display( j, ds );
+        Printf( "%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr() );
       }
+    }
+    else
+    {
+      Printf( "********************* #%04d No element *************************", i );
     }
   }
 }
@@ -129,6 +130,7 @@ void CElementDataBase::Test()
   CheckSyntaxError( "x+" );
   CheckSyntaxError( "x-*2" );
   CheckSyntaxError( "TED(a)" );
+#if 0
   Check( "10.500e-2", "0.105" );
   Check( "0.5E4", "5000" );
   Check( "0xAA", "170" );
@@ -323,6 +325,11 @@ void CElementDataBase::Test()
   Check( "DET({ {3,4} , {2,8} })", "16" );
   Check( "DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })", "32" );
 
+  /* Matrix inversion */
+  Check( "MAT_INV( { {4,-2,3} , {8,-3,5} , {7,-2,4} })", "{{-2,2,-1},{3,-5,4},{5,-6,4}}" );
+  Check( "MAT_INV( { {1,2} , {3,4} })", "{{-2,1},{1.5,-0.5}}" );
+  Check( "MAT_INV( { 4 } )", "{4}" );
+
   /*** Matrixes ***/
   Check( "MAT_TRANSPOSE( { { 1 },{ 6 } } )", "{{1,6}}" );
   Check( "MAT_TRANSPOSE( { { 2,3 },{ 4,5 } } )", "{{2,4},{3,5}}" );
@@ -347,7 +354,7 @@ void CElementDataBase::Test()
   db.Check( "EXECUTE( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) )", "POLY(f(a),1)" ); //FIXME
   db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
-
+#endif
   DisplayStats();
 
 }

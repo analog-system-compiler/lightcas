@@ -71,7 +71,7 @@ protected:
   void     Push( OP_CODE op )           { SetSize( m_StackSize + 1 );  Set( m_StackSize - 1, op );  }
 
   void     SetSize( pos_t i );
-  void     Push( const CElement* e )    { Push( ElementToRef( e ) );    }
+  void     Push( const CElement* e );
   void     Push( const CMathExpression& equ );
   void     PushEvalElement( CEvaluator& eval );
   void     Append( const OP_CODE* array, pos_t size );
@@ -89,7 +89,7 @@ protected:
   void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
   pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
   bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
-  void     AddZero();
+  void     Zero();
   void     RemoveZero();
   bool     ExecuteCommand();
 
@@ -102,13 +102,13 @@ protected:
 #endif
 
   //static
-  static CElement*  RefToElement( OP_CODE op )              { return CElementDataBase::RefToElement( op );  }
-  static OP_CODE    ElementToRef( const CElement* e )       { return CElementDataBase::ElementToRef( e );   }
-  static unsigned   ReservedParameterIndex( OP_CODE op )    { return ( unsigned )( op - CElementDataBase::OP_EXP1 );  }
+  static CElement*  RefToElement( OP_CODE op )            { return CElementDataBase::RefToElement( op );  }
+  //static OP_CODE    ElementToRef( const CElement* e )     { return CElementDataBase::ElementToRef( e );   }
+  static unsigned   ReservedParameterIndex( OP_CODE op )  { return ( unsigned )( op - CElementDataBase::OP_EXP1 );  }
 
   //Display funct
-  pos_t    DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const;
-  pos_t    DisplaySymbol( pos_t pos, unsigned priority, CDisplay& ds ) const;
+  pos_t    DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
+  pos_t    DisplaySymbol( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
   void     DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const;
 
 public:
@@ -118,10 +118,10 @@ public:
   void  UnaryOperation( OP_CODE op );
   void  VoidOperation( OP_CODE op );
 
-  void  Clear()                             { m_StackSize = 0;  }
-  void  Init( OP_CODE op )                  { Clear(); Push( op ); }
-  void  Init( const CElement* e )           { Clear(); Push( e ); }
-  bool  IsEmpty() const                     { return ( m_StackSize == 0 );  }
+  void  Clear()                          { m_StackSize = 0;  }
+  void  Init( OP_CODE op )               { Clear(); Push( op ); }
+  void  Init( const CElement* e )        { Clear(); Push( e ); }
+  bool  IsEmpty() const                  { return ( m_StackSize == 0 );  }
 
   bool  Compare( const CMathExpression& equ ) const;
   void  Copy( const CMathExpression& equ );
@@ -134,9 +134,9 @@ public:
 
   static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
 
-  OP_CODE GetLastOperator() const         { return IsEmpty() ? CElementDataBase::OP_ZERO : Get( m_StackSize - 1 ); }
-  pos_t             GetSize() const       { return m_StackSize;    }
-  CElementDataBase* GetElementDB() const  { return m_ElementDB;    }
+  OP_CODE GetLastOperator() const        { return IsEmpty() ? CElementDataBase::OP_ZERO : Get( m_StackSize - 1 ); }
+  pos_t             GetSize() const      { return m_StackSize;    }
+  CElementDataBase* GetElementDB() const { return m_ElementDB;    }
 
   CMathExpression( CElementDataBase* db = NULL );
   CMathExpression( const CMathExpression& equ ) { m_ElementDB = NULL; Copy( equ ); }

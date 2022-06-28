@@ -23,7 +23,7 @@
 #include <cstdio>
 #include "../Debug.h"
 
-#ifdef _WIN32
+#ifndef __GNUC__
 #define snprintf _snprintf_s
 #endif
 

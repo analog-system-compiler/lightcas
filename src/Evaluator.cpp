@@ -21,7 +21,6 @@
 #include "Evaluator.h"
 #include "Debug.h"
 
-
 CEvaluator::CEvaluator()
 {
   m_ValPos = 0;

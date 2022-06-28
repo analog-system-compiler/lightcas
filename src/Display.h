@@ -26,4 +26,11 @@ class CDisplay : public CString
 public:
   virtual void Print( const char* s )         { puts( s ); }
   void Print()                                { Print( GetBufferPtr() ); }
+
+  //Constructors
+  CDisplay( const char* s ) : CString( s ) {}
+  //CDisplay( const std::string& s ) : CString( s ) {} //implicit
+  CDisplay() : CString() {}
+  CDisplay( int i, unsigned base = 10 ) : CString() { Set( i, base ); }
+
 };

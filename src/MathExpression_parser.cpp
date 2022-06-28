@@ -178,6 +178,7 @@ bool CMathExpression::ParseElement( CParser& IC )
     return false;
   }
 
+  f = e->GetFunction();
   if ( IC.TryFind( '(' ) )
   {
     i = GetLevel( IC );
@@ -190,7 +191,6 @@ bool CMathExpression::ParseElement( CParser& IC )
       return false;
     }
 
-    f = e->GetFunction();
     if ( !e->IsFunct()  )
     {
       ASSERT( !e->IsFunct() );
@@ -207,6 +207,15 @@ bool CMathExpression::ParseElement( CParser& IC )
     }
     if ( f->GetParameterNb() != ( unsigned )i )
     {
+      return false;
+    }
+  }
+  else
+  {
+    //f = e->GetFunction();
+    if ( f->GetParameterNb() != 0 )
+    {
+      IC.CopyBuffer( "wrong number of parameters" );
       return false;
     }
   }

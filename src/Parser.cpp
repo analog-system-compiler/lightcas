@@ -296,6 +296,7 @@ bool CParser::LoadFile( const CString& name )
 
   if( file )
   {
+    TRACE( "Opening file %s", name.GetBufferPtr() );
     fseek( file, 0, SEEK_END );
     size = ftell( file );
     fseek( file, 0, SEEK_SET );
@@ -310,7 +311,7 @@ bool CParser::LoadFile( const CString& name )
     SetPos( text );
     return true;
   }
-
+  TRACE( "Failed to open file %s", name.GetBufferPtr() );
   return false;
 }
 

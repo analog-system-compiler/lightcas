@@ -29,13 +29,13 @@ class CElement
 
 private:
 
-  enum ELEM_TYPE
+  typedef enum 
   {
     ELEM_CONST,
     ELEM_VAR,
     ELEM_FUNCT,
     ELEM_NUM,
-  };
+  } ELEM_TYPE;
 
   CString    m_Name;
   CFunction  m_Function;

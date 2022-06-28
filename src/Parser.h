@@ -43,7 +43,6 @@ protected:
   CParserContextArray m_ContextArray;
 
 public:
-
   static const char m_StringDelimiter = '"';
   static const char m_SymbolMacro     = '#';
   static const char m_OperatorExclude = '\\';
@@ -55,7 +54,6 @@ protected:
   void  SkipSpace();
 
 public:
-
   bool  Find( char c );
   bool  TryFind( char c );
   void  Init( const char* pText );

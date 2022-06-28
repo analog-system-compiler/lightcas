@@ -1,11 +1,13 @@
 
+MAKEFLAGS = --jobs 4
+
 EXE         = LightCAS
 SRC_DIR     = ../src
 RULES_DIR   = ../rules
-OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ) ./objs
+OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/app ) ./objs
 LIB         = lib$(EXE).a
-EXE_SRC     = ../src/app/Console.cpp
-LIB_OBJS    = $(SRCS:%.cpp=$(OBJDIR)/%.o)
+EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
+LIB_OBJS    = $(OBJ_SRC:%.cpp=$(OBJDIR)/%.o)
 INCDIR      = -I$(SRC_DIR)
 RULE_FILES  = $(addprefix $(RULES_DIR)/, Symbols.txt Rules.txt RulesElectricity.txt )
 
@@ -18,13 +20,15 @@ LD          = $(CROSS_COMPILE)ld
 #options
 USE_STD     = 0
 DEBUG       = 0
-TEST        = 1
-EMBED_RULES = 1
+TEST        = 0
+EMBED_RULES = 0
 
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
-LDFLAGS   = -s -Wl,-Map=$(EXE).map
+LDFLAGS   = -Wl,-Map=$(EXE).map
 
-SRCS = \
+EXE_SRC = app/Console.cpp
+
+OBJ_SRC = \
     Debug.cpp \
     Element.cpp \
     ElementDataBase.cpp \
@@ -38,9 +42,13 @@ SRCS = \
     Test.cpp \
     Value.cpp
 
+ifeq ($(GPROF),1)
+	CPPFLAGS += -pg
+endif
+
 ifeq ($(USE_STD),0)
 	CPPFLAGS += -I$(SRC_DIR)/nostd 
-	SRCS   += nostd/LCString.cpp  
+	OBJ_SRC  += nostd/LCString.cpp  
 else
 	CPPFLAGS += -I$(SRC_DIR)/std
 endif
@@ -49,6 +57,7 @@ ifeq ($(DEBUG),1)
 	CPPFLAGS += -g -D_DEBUG
 else
 	CPPFLAGS += -Os
+	LDFLAGS  += -s
 endif
 
 ifeq ($(TEST),1)
@@ -56,22 +65,21 @@ ifeq ($(TEST),1)
 endif
 
 ifeq ($(EMBED_RULES),1)
-	CPPFLAGS  += -DEMBED_RULES
-	LIB_OBJS  += $(OBJDIR)/Rules.o
+	CPPFLAGS += -DEMBED_RULES
+	LIB_OBJS += $(OBJDIR)/Rules.o
 endif
 
-all:$(EXE)
+all:$(EXE) rules
 
 -include $(LIB_OBJS:.o=.d)
+-include $(EXE_OBJ:.o=.d)
 
 $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
 $(OBJDIR)/rules_tmp.txt : $(RULE_FILES)
-	rm -f $@
-	cat $^ >> $@
-	echo -e '\x00' >> $@
+	printf "%s\0" "$$(cat $^)" > $@
 
 $(OBJDIR)/Rules.o: $(OBJDIR)/rules_tmp.txt
 	echo 'Packaging  $(notdir $< )'	
@@ -80,17 +88,23 @@ $(OBJDIR)/Rules.o: $(OBJDIR)/rules_tmp.txt
 $(LIB): $(LIB_OBJS)
 	echo 'Archiving  $(notdir $@)'
 	$(AR) rcs $@ $^
-    
-$(EXE): $(EXE_SRC) $(LIB)
+
+$(EXE): $(EXE_OBJ) $(LIB)
 	echo 'Linking    $(notdir $@)'
-	$(CXX) -o $@  $(CPPFLAGS) $(LDFLAGS) $^
+	$(CXX) -o $@ $(LDFLAGS) $(EXE_OBJ) $(LIB)
+
+rules:
 ifeq ($(EMBED_RULES),0)
-	cp ../src/*.txt .
+	cp ../rules/*.txt .
 endif
 
 clean:
 	@echo 'Cleaning  ...'
 	rm -rf $(LIB) $(EXE) $(OBJDIR)
 
-.PHONY: all
+archive:
+	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
+
+.PHONY: all clean rules archive
 .SILENT:
+#.SECONDARY:

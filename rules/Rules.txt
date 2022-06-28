@@ -21,6 +21,8 @@ IF2( (a:b) 1) := a;
 IF( (a:b) c)  := IF2( (a:b) BOOL(c) );
 IF3( a b )    := IF( b a );
 
+SEM(a) := a; // ending semicolon 
+
 //Fract
 MONADD(a,MONDIV(b,c))            := MONDIV( MONADD( MONMUL(a,c) ,b ), c );                        //a+b/c   := (a*c+b)/c
 MONADD(MONDIV(a,c),b)            := MONDIV( MONADD( MONMUL(b,c) ,a ), c );                        //a/c+b   := (a+b*c)/c
@@ -50,6 +52,7 @@ IPOLY2(MONDIV(a,b),v)            := IPOLY(a,v)/IPOLY(b,v);
 IPOLY2(MONMUL(a,b),v)            := IPOLY(a,v)*IPOLY(b,v);
 IPOLY2(MONPOWCONST((a,b),c),v)   := IPOLY(a,v)^b;
 IPOLY2(a[b],v)                   := IPOLY(a,v)[b];
+IPOLY2({a},v)                    := {IPOLY(a,v)};
 
 IPOLY2(AND(a b),v)               := IPOLY(a,v)&IPOLY(b,v);
 IPOLY2(OR(a b),v)                := IPOLY(a,v)|IPOLY(b,v);
@@ -258,7 +261,7 @@ BOOL(a)            := !(a==0);
 RE(a)                 := RE(REDUCE_COMPLEX(POLY(a,j)));
 IM(a)                 := IM(REDUCE_COMPLEX(POLY(a,j)));
 
-HIER(a GLOBAL(b))     := b;
+HIER(a GLOBAL(b))     := b; // ??
 
 POLY((a,b),v)         := (POLY(a,v),POLY(b,v)); //parenthesis are important there!!!
 POLY({a},v)           := {POLY(a,v)};
@@ -284,7 +287,7 @@ GETVAR(a/b)           := CHOOSEVARDIV( GETVAR(a), GETVAR(b) );
 GETVAR(a^b)           := GETVAR(a);
 GETVAR(-a)            := GETVAR(a);
 GETVAR(_elem(a))      := a;
-//GETVAR(a.b)           := a.b;
+GETVAR(a.b)           := a.b;
 GETVAR(a)             := 1;
 
 EXPAND(a+b)           := EXPAND2(a)+EXPAND2(b);
@@ -401,7 +404,15 @@ DET_LINES( MATRIX_BOTTOM( c, TED( a b ) ), MATRIX_TOP( d ), DET_VAR( e ) ) := a 
 DET_LINES( MATRIX_BOTTOM(    TED( a b ) ), MATRIX_TOP( c ), DET_VAR( e ) ) := a * DET( {TED_TO_MATRIX( VECT_REVERSE1(    c ) )}, { e } );
 
 // common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
-DET( {0} ) := 0;
+DET( { 0 } ) := 0;
+
+/*DET( { a } ) := MAT_DET_LINES( {a}, {a} );
+
+MAT_DET_LINES( {a,{b,c}}, {d,e} ) := c * DET( { MAT_REM_HEAD( a ) } ) - MAT_DET_LINES( { VECT_ROR( a,{b,c} ) }, {d} );
+MAT_DET_LINES( {a,{b,c}}, {e}   ) := c * DET( { MAT_REM_HEAD( a ) } );
+MAT_DET_LINES( {{c}},     {e}   ) := c;
+*/
+
 DET( {a} ) := MAT_DET_LINES( MATRIX_BOTTOM( a ) );
 
 MAT_DET_LINES( MATRIX_BOTTOM( { a }    ) ) := a;
@@ -420,19 +431,38 @@ MAT_REM_HEAD( a, {c,d}) := ( MAT_REM_HEAD( a ), {c} );
 MAT_REM_HEAD(    {c,d}) := {c};
 
 //MATRIX HELP FUNCTIONS
-TED_TO_MATRIX( c , TED( a b ) )   := CHECK_NULL( TED_TO_MATRIX( c ), b );
-TED_TO_MATRIX(     TED( a b ) )   := b;
-TED_TO_MATRIX(  a, b    )         := ERROR(7);
+TED_TO_MATRIX( c , TED( a b ) ) := CHECK_NULL( TED_TO_MATRIX( c ), b );
+TED_TO_MATRIX(     TED( a b ) ) := b;
+TED_TO_MATRIX(  a, b    )       := ERROR(7);
 
-CHECK_NULL( a , 0 )               := 0;
-CHECK_NULL( 0 , a )               := 0;
-CHECK_NULL( a , b )               := (a,b);
+CHECK_NULL( a , 0 )             := 0;
+CHECK_NULL( 0 , a )             := 0;
+CHECK_NULL( a , b )             := (a,b);
+
+//Matrix inversion
+// common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
+MAT_INV( {a,b} ) := { MAT_INV_COLS( {a,b}, b ) } / DET( {a,b} );
+MAT_INV( {a}   ) := { a };
+
+MAT_INV_COLS( {a}, {b,c} ) := ( MAT_INV_COLS( { -MAT_ROL_LINES( {a} ) }, {b} ), { MAT_INV_LINES( { MAT_REM_HEAD(a) }, {a} ) } ); // {b,c} is used as an iterator
+MAT_INV_COLS( {a}, {b} )   :=                                                   { MAT_INV_LINES( { MAT_REM_HEAD(a) }, {a} ) };
+
+MAT_INV_LINES( {a,b}, {c,d} ) := ( MAT_INV_LINES( { -VECT_ROR( a, b ) }, {c} ), DET( { a } ) ); // {c,d} is used as an iterator
+MAT_INV_LINES( {a,b}, {c} )   := DET( { a } );
+
+//{{a,b,c,d},{e,f,g,h}} -> {{d,a,b,c},{h,e,f,g}}
+MAT_ROL_LINES( {a,{b}} ) := ( MAT_ROL_LINES( {a} ), { VECT_ROR( b ) } );
+MAT_ROL_LINES( {{b}} )   := { VECT_ROR( b ) };
+
+//(a,b,c,d) -> (d,a,b,c)
+VECT_ROR( ( a, b ), c ) := ( VECT_ROR( a, c ), b );
+VECT_ROR( a, c )       := ( c , a );
 
 //Matrix multiplication
-VECT_MUL_ADD( {a,b},{c,d} ) := VECT_MUL_ADD( {a},{c} ) + b*d;
-VECT_MUL_ADD( {  b},{  d} ) :=                           b*d;
+VECT_MUL_ADD( {a,b}, {c,d} ) := VECT_MUL_ADD( {a},{c} ) + b*d;
+VECT_MUL_ADD( {  b}, {  d} ) :=                           b*d;
 
-MAT_MUL(a,b)         := { MAT_MUL3(a,MAT_TRANSPOSE(b)) }; 
+MAT_MUL(a,b)       := { MAT_MUL3(a,MAT_TRANSPOSE(b)) }; 
 
 MAT_MUL3({a,b},c)  := ( MAT_MUL3({a},c), { MAT_MUL4(b,c) } );
 MAT_MUL3({  b},c)  :=                    { MAT_MUL4(b,c) };
@@ -451,12 +481,27 @@ MAT_TRANSPOSE_VECT( {{b,c}} )   := c;
 MAT_TRANSPOSE_VECT( {a,{c}} ) := ( MAT_TRANSPOSE_VECT( {a} ), c );
 MAT_TRANSPOSE_VECT( {{c}} )   := c;
 
-// Vector reversal {x,y,z} -> {z,y,x}
+// Vector reversal {x,y,z,t} -> {t,z,y,x} (see VECT_ROR)
 VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
-VECT_REVERSE1( a, b )      := VECT_REVERSE2( VECT_QUEUE(b), a );
+VECT_REVERSE1( a, b )      := VECT_REVERSE2( b, a );
 VECT_REVERSE1( a )         := a;
-VECT_REVERSE2( VECT_QUEUE(a), (b, c) ) := VECT_REVERSE2( VECT_QUEUE(a,c), b);
-VECT_REVERSE2( VECT_QUEUE(a),  b     ) := (a,b);
+VECT_REVERSE2( a, (b, c) ) := VECT_REVERSE2( (a,c), b);
+VECT_REVERSE2( a,  b     ) := (a,b);
+
+//vector permutation ( TO DO )
+//VECT_PERMUTE( {a} )           := { VECT_PERMUTE_ITER( a, {a} ) };
+//VECT_PERMUTE_ITER( a, {b,c} ) := ( VECT_PERMUTE_ITER( VECT_ROR( a ), {b} ), VECT_PERMUTE_ITER( VECT_PERMUTE_LAST( a ), {b} ) ); // b is used as iterator
+//VECT_PERMUTE_ITER( a, {b} )   := { a };
+//VECT_PERMUTE_ITER( a, {b} )   := ( { a }, { VECT_PERMUTE_LAST( a ) } ); // b is used as iterator
+
+//VECT_PERMUTE_LAST( a, b, c ) := ( VECT_PERMUTE_LAST( a, b ), c );
+//VECT_PERMUTE_LAST( a, b    ) := ( b, a );
+
+//VECT concatenation ({a,b,c},{d,e,f}) -> {d,e,f,a,b,c}
+VECT_CONCAT({a,b},{c}) := VECT_CONCAT({a},{c,b});
+VECT_CONCAT({a},{c}) := {c,a};
+
+VECT_INSIDE({a}) := a;
 
 //vector add
 (a,b)+(c,d)    := (a+c,b+d);
@@ -478,6 +523,11 @@ a*(c,d)        := (a*c,a*d);
 a*{b}          := {a*b};
 {a}*b          := {a*b};
 
+//vector div ( used by matrix inversion)
+(a,b)/c      := (a/c,b/c);
+{a}/_const(c) := {a/c};
+//{a}/c        := {a/c};
+
 //Vector or
 /*(a,b)|(c,d)    := (a|c,b|d);
 (a,b)|c        := (a|c,b);
@@ -492,6 +542,7 @@ c^(a,b)        := (c^a,b);
 
 //Vector minus
 -(a,b)         := (-a,-b);
+-{a}  := {-a};
 
 //Vector not
 ~(a,b)         := (~a,~b);
@@ -641,3 +692,8 @@ MAKE_EVAL( _elem( a ) )    := a ;
 MAKE_EVAL( a )             := ERROR(2);
 
 DO_EVAL( a )               := _eval( MAKE_EVAL( a ) );
+
+EXECUTE( _check(  a               b ) ) := _check( a  b );
+EXECUTE( _check( _funct0( a )     b ) ) := _check( _funct0( a )     b );  
+EXECUTE( _check( _funct1( a b )   c ) ) := _check( _funct1( a b )   c );
+EXECUTE( _check( _funct2( a b c ) d ) ) := _check( _funct2( a b c ) d );

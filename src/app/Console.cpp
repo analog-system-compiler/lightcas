@@ -20,21 +20,23 @@
 #include <iostream>
 #include <string>
 
-#ifdef _WIN32
-#include <io.h>
-#define ISATTY(fd) _isatty(fd)
-#else
+
+#ifdef __GNUC__
 #include <unistd.h>
 #define ISATTY(fd) isatty(fd)
+#else
+#include <io.h>
+#define ISATTY(fd) _isatty(fd)
 #endif
 
 #include "Display.h"
 #include "MathExpression.h"
 #include "Element.h"
 #include "ElementDataBase.h"
-#define COLOR_CYAN "\x1B[35m"
-#define COLOR_BLUE "\x1B[36m"
-#define COLOR_OFF  "\x1B[0m"
+
+#define COLOR_CYAN "\033[1;35m"
+#define COLOR_BLUE "\033[1;34m"
+#define COLOR_OFF  "\033[m"
 
 void Help();
 
@@ -100,7 +102,7 @@ public:
     return s;
   }
 
-  CDisplayEx( bool isatty ):CDisplay()
+  CDisplayEx( bool isatty ): CDisplay()
   {
     m_DisplayBase = 10;
     m_IsATTY = isatty;
@@ -113,11 +115,11 @@ int main()
   setlocale( LC_NUMERIC, "C" );
   std::cout << "*************************************\n";
   std::cout << "*** LighCAS Console               ***\n";
-  std::cout << "*** © Cyril Collineau 2014        ***\n";
+  std::cout << "*** (C)  Cyril Collineau 2014     ***\n";
   std::cout << "*************************************\n";
   std::cout << "Type \"help\" for help.\n";
 
-  CDisplayEx ds( ISATTY(1) );
+  CDisplayEx ds( 0 /*( bool )ISATTY( 1 )*/ );
   CEvaluator eval;
   CElementDataBase db_root( "Root", NULL, &eval );
   CElementDataBase db( "User", &db_root );
@@ -143,7 +145,7 @@ int main()
     if( expression_str == "exit" )
     {
       std::cout << "Exiting." << "\n";
-      exit( 0 );
+      break;
     }
     else if( expression_str == "help" )
     {

@@ -77,6 +77,8 @@ public :
     OP_NEG,
     OP_RANK,
     OP_EVAL,
+    OP_CHECK,
+    OP_PRINT,
     OP_END_RESERVED
   };
 
@@ -110,14 +112,14 @@ public:
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
   bool            AssociateSymbol( CParser& IC, const CMathExpression& dst_equ );
 
-  static OP_CODE    ElementToRef( const CElement* e );
+  //static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )       { return m_ElementRefArray[ ( unsigned )op ]; }
   static void       UnRef( OP_CODE op )              { m_ElementRefArray[ ( unsigned )op ] = NULL; }
   static const CSymbolSyntaxArray& GetSymbolTable()  { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                 { return m_SecureLimit;       }
-  static bool IsReservedOP( OP_CODE op )              { return ( op >= OP_EXP1   ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
-  static bool IsFunctionOP( OP_CODE op )              { return ( op >= OP_CONST ) && ( op <= OP_FUNCT2 ); }
-  CElementDataBase* GetParent() const                 { return m_Parent;            }
+  static bool IsReservedOP( OP_CODE op )             { return ( op >= OP_EXP1   ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
+  static bool IsFunctionOP( OP_CODE op )             { return ( op >= OP_CONST ) && ( op <= OP_FUNCT2 ); }
+  CElementDataBase* GetParent() const                { return m_Parent;            }
 
 
 #ifdef _TEST

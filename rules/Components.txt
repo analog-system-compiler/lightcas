@@ -16,6 +16,14 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#inc "Symbols.txt"
-#inc "Rules.txt"
-#inc "RulesElectricity.txt"
+//Components definition
+NAME.CV(@1,@2,V) := HCV(NAME,@1,@2,V);
+NAME.CR(@1,@2,R) := HCR(NAME,@1,@2,R);
+NAME.CL(@1,@2,L) := HCL(NAME,@1,@2,L);
+NAME.CC(@1,@2,C) := HCC(NAME,@1,@2,C);
+
+HCV(NAME,@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+SRC() };
+HCR(NAME,@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME.I };
+HCL(NAME,@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
+HCC(NAME,@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
+

@@ -11,12 +11,15 @@ add CLEAR()
 add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
 add mul 2a
 enlever TODOS
-OK résoudre pbm x^a
-OK créer lib quand compil ss linux
-OK utiliser nostd pour réduire conso mémoire
+DÃ©tecter ())
+OK rï¿½soudre pbm x^a
+OK crï¿½er lib quand compil ss linux
+OK utiliser nostd pour rï¿½duire conso mï¿½moire
 OK clean IsWord() && (='a' && = 'z')
 Use quadratic solving x^8+x^4+5=23
-revoir résolution de système pour éviter les x^2
-OK enlever les ';' et continuer de parser tant qu'il y des caractères
+revoir rï¿½solution de systï¿½me pour ï¿½viter les x^2
+OK enlever les ';' et continuer de parser tant qu'il y des caractï¿½res
  NON ajouter a(b) et (a) dans la table des symboles
-résoudre inégalités 2a+38 et =
+rï¿½soudre inï¿½galitï¿½s 2a+38 et =
+Check {a) 
+Check missing parenthesis

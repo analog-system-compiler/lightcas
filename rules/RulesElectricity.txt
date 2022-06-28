@@ -43,12 +43,22 @@ AC(a*b)       := AC(a)*AC(b);
 AC(a/b)       := AC(a)/AC(b);
 AC(-a)        := -AC(a);
 AC(SRC())     := 1;
-AC(DER(a,TIME()))  := a*p;
-AC(INT(a,TIME()))  := a/p;
-AC(TIME())         := 0;
+AC(DER(a,TIME())) := a*s;
+AC(INT(a,TIME())) := a/s;
+AC(TIME())        := 0;
+//AC(_const(a))  := 0;
 AC(ELEM(a))   := a;
-AC(CONST(a))  := a;
 AC(a)         := a;
+AC({a})       := {AC(a)};
+
+REM_DC(a;b)   := (REM_DC(a);REM_DC(b));
+REM_DC(a+b)   := REM_DC(a)+REM_DC(b);
+REM_DC(a-b)   := REM_DC(a)-REM_DC(b);
+REM_DC({a})   := {REM_DC(a)};
+REM_DC(-_const(a)) := 0;
+REM_DC( _const(a)) := 0;
+REM_DC(a)     := a;
+
 
 ACROSS( a, a)                            := 0;
 LOOP_CHECK(a-ACROSS(c,d);b-ACROSS(c,e))  := (b-a)-ACROSS(d,e);
@@ -60,6 +70,7 @@ LOOP_TRANS(a;b;c-ACROSS(d))              := LOOP_TRANS( LOOP_CHECK(a;c-ACROSS(d)
 LOOP_TRANS(a;b;c)                        := (LOOP_TRANS(a;b);c);
 LOOP_TRANS(a;c-ACROSS(d))                := LOOP_CHECK(a;c-ACROSS(d));
 LOOP_TRANS(a)                            := a;
+LOOP_TRANS({a})                          := {LOOP_TRANS(a)};
 
 NODE_ADD( NODE(b,c),NODE(d,c)  )         := NODE(d+b,c);
 NODE_ADD( NODE(b,_none),NODE(d,_none)  ) := (NODE(b,_none),NODE(d,_none));
@@ -82,48 +93,57 @@ INODE_REMOVE(a,NODE(b,c))                := a;
 INODE_REMOVE(a)                          := a;
 
 NODE_TRANS(a)                            := INODE_TRANS( INODE_REMOVE( NODE_TRANS2( a ) ) );
+NODE_TRANS({a})                          := {NODE_TRANS(a)};
 
-POLY( ACROSS( a, b ), c )  := POLYF( ACROSS(  _get(a), _get(b) ) );
+POLY(  ACROSS( a, b ), c ) := POLYF(  ACROSS( _get(a), _get(b) ) );
 POLY( THROUGH( a, b ), c ) := POLYF( THROUGH( _get(a), _get(b) ) );
 
 //Components definition
-NAME.CV(@1,@2,V) := HCV(NAME,@1,@2,V);
+/*NAME.CV(@1,@2,V) := HCV(NAME,@1,@2,V);
 NAME.CR(@1,@2,R) := HCR(NAME,@1,@2,R);
 NAME.CL(@1,@2,L) := HCL(NAME,@1,@2,L);
 NAME.CC(@1,@2,C) := HCC(NAME,@1,@2,C);
 
-HCV(NAME,@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V };
+HCV(NAME,@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+SRC() };
 HCR(NAME,@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME.I };
 HCL(NAME,@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
 HCC(NAME,@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
-
-FLAT_HIER2({a};{c})   := (c;a);
-FLAT_HIER2({a;b};{c}) := FLAT_HIER2({a};{c;b});
-
-FLAT_HIER3({a};{c})   :=               FLAT_HIER2({a};{c});
-FLAT_HIER3(a;{b};{c}) := FLAT_HIER3(a;{FLAT_HIER2({b};{c})});
-FLAT_HIER({a})        := FLAT_HIER3(a);
+*/
 
 ZERO_EQU(a=b) := a-b;
-ZERO_SYS(a)   := ZERO_EQU(a);
 ZERO_SYS(a;b) := (ZERO_SYS(a);ZERO_EQU(b));
+ZERO_SYS(a)   := ZERO_EQU(a);
+ZERO_SYS_ENTRY({a}) := { ZERO_SYS(a) };
 
 VECT_TO_CONCAT(a;b) := (VECT_TO_CONCAT(a),b);
-VECT_TO_CONCAT({a}) := {VECT_TO_CONCAT(a)};
 VECT_TO_CONCAT(a)   := a;
+VECT_TO_CONCAT({a}) := {VECT_TO_CONCAT(a)};
+
+SYS_CONCAT_ENTRY(a;{b};{c}) := SYS_CONCAT_ENTRY(a;SYS_CONCAT({b};{c}));
+SYS_CONCAT_ENTRY({b};{c}) := SYS_CONCAT({b};{c});
+
+SYS_CONCAT({a;b};{c}) := SYS_CONCAT({a};{c;b});
+SYS_CONCAT({a};{c}) := {c;a};
 
 //Define RLC circuit for testing purposes
-RLC()  := { 
+RLC() := { 
     V.CV(@1,@2,10); 
     R.CR(@2,@3,100); 
     L.CL(@3,@4,1m); 
     C.CC(@4,@1,10u) 
 };
 
-RLC1()       := FLAT_HIER(RLC);
-RLC2()       := ZERO_SYS(RLC1);
-RLC3()       := NODE_TRANS(RLC2);
-RLC4()       := LOOP_TRANS(RLC3);
-AC_RLC()     := AC(RLC4);
-SOLVE_RLC()  := SYSTEM_AUTO_SOLVE({AC_RLC});
-SOLVE_RLC2() := SYSTEM_SOLVE(VECT_TO_CONCAT({AC_RLC}),{C.U,V.U,R.U,L.U,R.I,V.I,C.I,L.I})
+AC_TRANSFORM( a ) := AC( REM_DC( LOOP_TRANS( NODE_TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( VECT_INSIDE( _get( a ) ) ) ) ) ) ) );
+SOLVE_RLC(a)      := SYSTEM_AUTO_SOLVE( AC_TRANSFORM( a ) );
+SOLVE_RLC2(a)     := SYSTEM_SOLVE( VECT_TO_CONCAT( AC_TRANSFORM( a ) ), {C.U,R.U,L.U,R.I,V.I,C.I,L.I,V.U} );
+
+ _check( SIMPLIFY(1n-1e-9)  0 );
+ _check( SIMPLIFY(1m-0.001) 0 );
+ _check( SIMPLIFY(1K-1000)  0 );
+
+ _check( NODE_TRANS(LOOP_TRANS( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
+ _check( LOOP_TRANS(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) )          SYST(U24-(U14-U12) U32-U34+U24) );
+
+ _check( AC_TRANSFORM( RLC ) { C.U+V.U+R.U+L.U;R.I-V.I;V.I-C.I;L.I-R.I;C.I-1e-05*(C.U*s);L.U-0.001*(L.I*s);R.U-100*R.I;V.U-1} );
+ _check( SOLVE_RLC2( RLC )   {((((((-(100/(100+(100*(1e-05*s))*(100+0.001*s))),-((100*(100*(1e-05*s)))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*((100*(1e-05*s))*(0.001*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*100))),-((100*(100*(1e-05*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*100))),-((100*(1e-05*s))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*(1e-05*s))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*((100*(1e-05*s))*(0.001*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*(100*(0.001*s))))),1} );
+ //_check( SOLVE_RLC( RLC )  {0} );

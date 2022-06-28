@@ -45,6 +45,11 @@ void CMathExpression::Initialize( CElementDataBase* db )
   m_ElementDB  = db;
 }
 
+void CMathExpression::Push( const CElement* e )
+{
+  Push( e->ToRef() );
+}
+
 void CMathExpression::Push( const CMathExpression& equ )
 {
   if( equ.IsEmpty() )
@@ -136,7 +141,7 @@ pos_t CMathExpression::NextBranch( pos_t pos ) const
 void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 {
   ASSERT( RefToElement( op )->IsBinary() );
-  AddZero();
+  Zero();
   Push( equ );
   Push( op );
   OptimizeTree();
@@ -146,7 +151,7 @@ void CMathExpression::BinaryOperation( OP_CODE op, const CMathExpression& equ )
 void CMathExpression::UnaryOperation( OP_CODE op )
 {
   ASSERT( RefToElement( op )->IsUnary() );
-  AddZero();
+  Zero();
   Push( op );
   OptimizeTree();
   RemoveZero();
@@ -158,7 +163,7 @@ void CMathExpression::VoidOperation( OP_CODE op )
   RemoveZero();
 }
 
-void CMathExpression::AddZero()
+void CMathExpression::Zero()
 {
   if( IsEmpty() )
   {

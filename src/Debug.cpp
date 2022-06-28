@@ -21,13 +21,14 @@
 #include <cstring>
 #include "Debug.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <winbase.h>
+#endif
+
 int( *PUTS )( const char* ) = puts;
 
 #ifdef _DEBUG
-
-#ifdef _WIN32
-#include "WinBase.h"
-#endif
 
 static FILE* debug_file = NULL;
 
@@ -48,17 +49,13 @@ void TRACE( const char* format, ... )
     fputc( '\n', debug_file );
   }
 
-  unsigned i;
   static char buffer[ 8192 ];
   va_start ( args, format );
   vsnprintf( buffer, sizeof( buffer ), format, args );
   va_end ( args );
-  i = strlen( buffer );
-  if( ( i + 1 ) < sizeof( buffer ) )
-  {
-    buffer[i] = '\n';
-    buffer[i + 1] = '\0';
-  }
+  buffer[sizeof( buffer )-2] = '\n';
+  buffer[sizeof( buffer )-1] = '\0';
+  
 #ifdef _WIN32
   const unsigned CRT_DEBUG_BUFFER_MAX = 256;
   buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
@@ -67,11 +64,10 @@ void TRACE( const char* format, ... )
   buffer[CRT_DEBUG_BUFFER_MAX - 3] = '\r';
   buffer[CRT_DEBUG_BUFFER_MAX - 2] = '\n';
   buffer[CRT_DEBUG_BUFFER_MAX - 1] = '\0';
-  OutputDebugString( buffer );
+  OutputDebugStringA( buffer );
 #else
   PUTS( buffer );
 #endif
 
 }
-
 #endif

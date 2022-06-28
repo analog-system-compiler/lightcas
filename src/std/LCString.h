@@ -54,7 +54,7 @@ public:
   CString( const char* s ): std::string( s )            {}
   CString( const std::string& s ): std::string( s )     {} //implicit
   CString(): std::string()                              {}
-  CString( int i, unsigned base = 10 )    { Set( i, base ); }
+  CString( int i, unsigned base = 10 ) : std::string() { Set( i, base ); }
 
 };
 

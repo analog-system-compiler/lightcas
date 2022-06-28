@@ -32,7 +32,7 @@ void CMathExpression::Display( CDisplay& ds, bool bAll ) const
   {
     while( pos )
     {
-      pos = DisplayBranch( pos, 0, ds );
+      pos = DisplayBranch( ds, pos );
       if ( !bAll ) { return; }
       if( pos )
       {
@@ -42,7 +42,7 @@ void CMathExpression::Display( CDisplay& ds, bool bAll ) const
   }
 }
 
-pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds ) const
+pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority ) const
 {
   unsigned i, n;
   const CElement* e;
@@ -50,7 +50,7 @@ pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds
   pos_t pos_array[CElementDataBase::MAX_EXP];
 
   ASSERT( pos );
-  pos2 = DisplaySymbol( pos, priority, ds );
+  pos2 = DisplaySymbol( ds, pos, priority );
 
   if( pos == pos2 ) //no symbol displayed
   {
@@ -71,10 +71,10 @@ pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds
         }
         for ( i = 1; i < n; i++ )
         {
-          DisplayBranch( pos_array[n - i], 0, ds );
+          DisplayBranch( ds, pos_array[n - i] );
           ds += ' ';
         }
-        DisplayBranch( pos_array[0], 0, ds );
+        DisplayBranch( ds, pos_array[0] );
       }
       ds += ')' ;
     }
@@ -87,7 +87,7 @@ pos_t CMathExpression::DisplayBranch( pos_t pos, unsigned priority, CDisplay& ds
   return pos;
 }
 
-pos_t CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& ds ) const
+pos_t CMathExpression::DisplaySymbol( CDisplay& ds, pos_t pos, unsigned precedence ) const
 {
   pos_t pos_array[CElementDataBase::MAX_EXP];
 
@@ -100,7 +100,11 @@ pos_t CMathExpression::DisplaySymbol( pos_t pos, unsigned precedence, CDisplay& 
     if( pos1 != pos )
     {
       const char* sp = ss->m_Syntax;
+#ifdef _DEBUG      
+      if( i <= precedence )
+#else
       if( i < precedence )
+#endif      
       {
         ds += '(' ;
         DisplaySymbolString( sp, pos_array, i, ds );
@@ -154,7 +158,7 @@ void CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CEle
       }
       ASSERT( c >= 'A' );
       i = tolower( c ) - 'a';
-      DisplayBranch( pos_array[i], precedence2, ds );
+      DisplayBranch( ds, pos_array[i], precedence2 );
     }
     else
     {

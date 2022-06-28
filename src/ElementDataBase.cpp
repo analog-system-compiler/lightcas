@@ -156,34 +156,37 @@ void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp( this );
   static const char parameters[] = "a b c d e f g h";
-  static const char built_in[]   = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0)";
+  //static const char built_in[]   = "_set(a a) _get(a) _none _const(a) _elem(a) _funct0(a) _funct1(a a) _funct2(a a a) NEG(a) _rank(a a) _eval(a) _assert(a)";
+  static const char built_in[] = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0) _check(0 0) _print(0)";
 
   exp.GetFromString( parameters );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP1   ] ) == OP_EXP1   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP2   ] ) == OP_EXP2   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP3   ] ) == OP_EXP3   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP4   ] ) == OP_EXP4   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP5   ] ) == OP_EXP5   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP6   ] ) == OP_EXP6   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP7   ] ) == OP_EXP7   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EXP8   ] ) == OP_EXP8   );
+  ASSERT( m_ElementRefArray[ OP_EXP1   ]->ToRef() == OP_EXP1   );
+  ASSERT( m_ElementRefArray[ OP_EXP2   ]->ToRef() == OP_EXP2   );
+  ASSERT( m_ElementRefArray[ OP_EXP3   ]->ToRef() == OP_EXP3   );
+  ASSERT( m_ElementRefArray[ OP_EXP4   ]->ToRef() == OP_EXP4   );
+  ASSERT( m_ElementRefArray[ OP_EXP5   ]->ToRef() == OP_EXP5   );
+  ASSERT( m_ElementRefArray[ OP_EXP6   ]->ToRef() == OP_EXP6   );
+  ASSERT( m_ElementRefArray[ OP_EXP7   ]->ToRef() == OP_EXP7   );
+  ASSERT( m_ElementRefArray[ OP_EXP8   ]->ToRef() == OP_EXP8   );
   m_SearchStart = MAX_EXP;
 
   GetElement( "0" )->SetConst();
-  ASSERT( ElementToRef( m_ElementRefArray[OP_ZERO] ) == OP_ZERO );
+  ASSERT( m_ElementRefArray[OP_ZERO]->ToRef() == OP_ZERO );
 
   exp.GetFromString( built_in );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_SET    ] ) == OP_SET    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_GET    ] ) == OP_GET    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_NONE   ] ) == OP_NONE   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_CONST  ] ) == OP_CONST  );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_ELEM   ] ) == OP_ELEM   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT0 ] ) == OP_FUNCT0 );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT1 ] ) == OP_FUNCT1 );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_FUNCT2 ] ) == OP_FUNCT2 );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_NEG    ] ) == OP_NEG    );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_RANK   ] ) == OP_RANK   );
-  ASSERT( ElementToRef( m_ElementRefArray[ OP_EVAL   ] ) == OP_EVAL   );
+  ASSERT( m_ElementRefArray[ OP_SET    ]->ToRef() == OP_SET    );
+  ASSERT( m_ElementRefArray[ OP_GET    ]->ToRef() == OP_GET    );
+  ASSERT( m_ElementRefArray[ OP_NONE   ]->ToRef() == OP_NONE   );
+  ASSERT( m_ElementRefArray[ OP_CONST  ]->ToRef() == OP_CONST  );
+  ASSERT( m_ElementRefArray[ OP_ELEM   ]->ToRef() == OP_ELEM   );
+  ASSERT( m_ElementRefArray[ OP_FUNCT0 ]->ToRef() == OP_FUNCT0 );
+  ASSERT( m_ElementRefArray[ OP_FUNCT1 ]->ToRef() == OP_FUNCT1 );
+  ASSERT( m_ElementRefArray[ OP_FUNCT2 ]->ToRef() == OP_FUNCT2 );
+  ASSERT( m_ElementRefArray[ OP_NEG    ]->ToRef() == OP_NEG    );
+  ASSERT( m_ElementRefArray[ OP_RANK   ]->ToRef() == OP_RANK   );
+  ASSERT( m_ElementRefArray[ OP_EVAL   ]->ToRef() == OP_EVAL   );
+  ASSERT( m_ElementRefArray[ OP_CHECK  ]->ToRef() == OP_CHECK  );
+  ASSERT( m_ElementRefArray[ OP_PRINT  ]->ToRef() == OP_PRINT  );
   ASSERT( GetSize() == OP_END_RESERVED );
 
   ASSERT( OP_ELEM   == OP_CONST  + 1 );
@@ -263,8 +266,6 @@ void CElementDataBase::InitAlgebraRuleTable()
   src.OptimizeTree();
   src.GetFromString( "_set( EXECUTE( _set( a b ) )  _set( a b ) )" );
   src.OptimizeTree();
-  src.GetFromString( "_set( EXECUTE( SIMPLIFY( a ) )  SIMPLIFY( a ) )" );
-  src.OptimizeTree();
   src.GetFromString( "_set( EXECUTE( a )  a )" );
   src.OptimizeTree();
 }
@@ -311,11 +312,6 @@ void CElementDataBase::AddEvalFunction( const CString& name, unsigned parameter_
     e->SetNumeric();
     GetEvaluator()->SetFunction( e->ToRef(), funct );
   }
-}
-
-OP_CODE CElementDataBase::ElementToRef( const CElement* e )
-{
-  return e->ToRef();
 }
 
 void CElementDataBase::Clear()

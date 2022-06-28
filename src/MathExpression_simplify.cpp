@@ -230,7 +230,7 @@ L1:
 #endif
     } //while ( m_ContextStack.GetSize() )
   }
-  ASSERT( NextBranch( pos_t( m_StackSize ) ) == 0 );
+  ASSERT( NextBranch( m_StackSize ) == 0 );
 }
 
 bool CMathExpression::RuleSearch()
@@ -418,6 +418,44 @@ bool CMathExpression::ExecuteCommand()
     return false;
   }
 
+  if ( op3 == CElementDataBase::OP_CHECK )
+  {
+    pos_t pos1 = m_StackSize;
+    pos_t pos2 = NextBranch( pos1 );
+    CDisplay ds;
+    if ( !CompareBranch( pos1, pos2 ) )
+    {
+      //TRACE("ASSERTION ERROR");
+      ds = "Assertion error : ";
+      /*pos_t pos22 =*/ DisplayBranch( ds, pos2 );
+      //while (pos2 != pos22) { --pos2; TRACE("%04x %s", m_StackArray[pos2], RefToElement(m_StackArray[pos2])->GetName().GetBufferPtr()); }
+      ds += " != ";
+      /*pos_t pos11 =*/ DisplayBranch( ds, pos1 );
+      //while ( pos1 != pos11 ) { --pos1; TRACE("%04x %s", m_StackArray[pos1], RefToElement(m_StackArray[pos1])->GetName().GetBufferPtr()); }
+    }
+    else
+    {
+      ds = "Assertion OK : ";
+      DisplayBranch( ds, pos2 );
+      ds += " == ";
+      DisplayBranch( ds, pos1 );
+    }
+    //TRACE( ds.GetBufferPtr() );
+    PUTS( ds.GetBufferPtr() );
+    m_StackSize++;
+    return false;
+  }
+
+  if ( op3 == CElementDataBase::OP_PRINT )
+  {
+    CDisplay ds;
+    m_StackSize = DisplayBranch( ds, m_StackSize );
+    //TRACE( ds.GetBufferPtr() );
+    PUTS( ds.GetBufferPtr() );
+    Push( CElementDataBase::OP_ZERO );    
+    return false;
+  }
+
   m_StackSize++;
 
 #if( DEBUG_LEVEL >= 2 )
@@ -464,7 +502,7 @@ bool CMathExpression::CompareBranch( pos_t pos1, pos_t pos2 ) const
   return ( ( pos1 - pos11 ) == ( pos2 - pos22 ) ) && !memcmp( &m_StackArray[pos11], &m_StackArray[pos22], ( pos2 - pos22 ) * sizeof( OP_CODE ) );
 }
 
-bool CMathExpression::RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const
+bool CMathExpression::RegisterBranch( pos_t pos_array[ CElementDataBase::MAX_EXP ], OP_CODE op1, pos_t pos2 ) const
 {
   unsigned i;
   bool match;
