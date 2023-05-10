@@ -98,26 +98,14 @@ NODE_TRANS({a})                          := {NODE_TRANS(a)};
 POLY(  ACROSS( a, b ), c ) := POLYF(  ACROSS( _get(a), _get(b) ) );
 POLY( THROUGH( a, b ), c ) := POLYF( THROUGH( _get(a), _get(b) ) );
 
-//Components definition
-/*NAME.CV(@1,@2,V) := HCV(NAME,@1,@2,V);
-NAME.CR(@1,@2,R) := HCR(NAME,@1,@2,R);
-NAME.CL(@1,@2,L) := HCL(NAME,@1,@2,L);
-NAME.CC(@1,@2,C) := HCC(NAME,@1,@2,C);
-
-HCV(NAME,@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+SRC() };
-HCR(NAME,@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME.I };
-HCL(NAME,@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
-HCC(NAME,@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
-*/
-
 ZERO_EQU(a=b) := a-b;
 ZERO_SYS(a;b) := (ZERO_SYS(a);ZERO_EQU(b));
 ZERO_SYS(a)   := ZERO_EQU(a);
 ZERO_SYS_ENTRY({a}) := { ZERO_SYS(a) };
 
-VECT_TO_CONCAT(a;b) := (VECT_TO_CONCAT(a),b);
-VECT_TO_CONCAT(a)   := a;
-VECT_TO_CONCAT({a}) := {VECT_TO_CONCAT(a)};
+VECT_TO_LIST(a;b) := (VECT_TO_LIST(a),b);
+VECT_TO_LIST(a)   := a;
+VECT_TO_LIST({a}) := {VECT_TO_LIST(a)};
 
 SYS_CONCAT_ENTRY(a;{b};{c}) := SYS_CONCAT_ENTRY(a;SYS_CONCAT({b};{c}));
 SYS_CONCAT_ENTRY({b};{c}) := SYS_CONCAT({b};{c});
@@ -125,25 +113,5 @@ SYS_CONCAT_ENTRY({b};{c}) := SYS_CONCAT({b};{c});
 SYS_CONCAT({a;b};{c}) := SYS_CONCAT({a};{c;b});
 SYS_CONCAT({a};{c}) := {c;a};
 
-//Define RLC circuit for testing purposes
-RLC() := { 
-    V.CV(@1,@2,10); 
-    R.CR(@2,@3,100); 
-    L.CL(@3,@4,1m); 
-    C.CC(@4,@1,10u) 
-};
-
 AC_TRANSFORM( a ) := AC( REM_DC( LOOP_TRANS( NODE_TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( VECT_INSIDE( _get( a ) ) ) ) ) ) ) );
-SOLVE_RLC(a)      := SYSTEM_AUTO_SOLVE( AC_TRANSFORM( a ) );
-SOLVE_RLC2(a)     := SYSTEM_SOLVE( VECT_TO_CONCAT( AC_TRANSFORM( a ) ), {C.U,R.U,L.U,R.I,V.I,C.I,L.I,V.U} );
-
- _check( SIMPLIFY(1n-1e-9)  0 );
- _check( SIMPLIFY(1m-0.001) 0 );
- _check( SIMPLIFY(1K-1000)  0 );
-
- _check( NODE_TRANS(LOOP_TRANS( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
- _check( LOOP_TRANS(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) )          SYST(U24-(U14-U12) U32-U34+U24) );
-
- _check( AC_TRANSFORM( RLC ) { C.U+V.U+R.U+L.U;R.I-V.I;V.I-C.I;L.I-R.I;C.I-1e-05*(C.U*s);L.U-0.001*(L.I*s);R.U-100*R.I;V.U-1} );
- _check( SOLVE_RLC2( RLC )   {((((((-(100/(100+(100*(1e-05*s))*(100+0.001*s))),-((100*(100*(1e-05*s)))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*((100*(1e-05*s))*(0.001*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*100))),-((100*(100*(1e-05*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*100))),-((100*(1e-05*s))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*(1e-05*s))/(100+(100*(1e-05*s))*(100+0.001*s)))),-((100*((100*(1e-05*s))*(0.001*s)))/((100+(100*(1e-05*s))*(100+0.001*s))*(100*(0.001*s))))),1} );
- //_check( SOLVE_RLC( RLC )  {0} );
+//SOLVE_RLC(a)      := SYSTEM_AUTO_SOLVE( AC_TRANSFORM( a ) );

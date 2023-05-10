@@ -18,6 +18,5 @@
 
 #inc "Symbols.txt"
 #inc "Rules.txt"
-#inc "Components.txt"
 #inc "RulesElectricity.txt"
-#inc "Tests.txt"
+

@@ -59,11 +59,11 @@ public:
   void SetVar()                             { m_Type = ELEM_VAR;               }
   void SetConst()                           { m_Type = ELEM_CONST;             }
   void SetNumeric()                         { m_Type = ELEM_NUM;               }
-  void SetOperandNb( unsigned operand_nb )  { SetFunct(); ASSERT( m_Function.GetParameterNb() == 0 || m_Function.GetParameterNb() == operand_nb ); m_Function.SetParameterNb( operand_nb ); }
-
+  void SetOperandNb( unsigned operand_nb )  { SetFunct(); ASSERT( m_Function.GetParameterNb() == 0 || m_Function.GetParameterNb() == operand_nb ); m_Function.SetParameterNb( operand_nb ); }  
   void SetGlobal( bool global )             { m_Global = global;               }
   void SetAux   ( bool bAux = true )        { m_bAux = bAux;                   }
   void SetRef( OP_CODE op )                 { m_Ref = op;                      }
+  unsigned GetOperandNb() const             { return m_Function.GetParameterNb();  }
   bool IsVar()     const                    { return ( m_Type == ELEM_VAR   ); }
   bool IsConst()   const                    { return ( m_Type == ELEM_CONST ); }
   bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
@@ -71,9 +71,9 @@ public:
   bool IsAux()     const                    { return m_bAux;                   }
   bool IsLocked()  const                    { return m_bLock;                  }
   bool IsGlobal()  const                    { return m_Global;                 }
-  bool IsVoid()    const                    { return ( m_Function.GetParameterNb() == 0 );  }
-  bool IsUnary()   const                    { return ( m_Function.GetParameterNb() == 1 );  }
-  bool IsBinary()  const                    { return ( m_Function.GetParameterNb() == 2 );  }
+  bool IsVoid()    const                    { return ( GetOperandNb() == 0 );  }
+  bool IsUnary()   const                    { return ( GetOperandNb() == 1 );  }
+  bool IsBinary()  const                    { return ( GetOperandNb() == 2 );  }
   OP_CODE ToRef()  const                    { return ( OP_CODE )m_Ref;         }
   const CFunction* GetFunction() const      { return &m_Function;              }
   CFunction* GetFunction()                  { return &m_Function;              }

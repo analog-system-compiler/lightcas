@@ -68,7 +68,7 @@ protected:
   void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
   OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
   OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
-  void     Push( OP_CODE op )           { SetSize( m_StackSize + 1 );  Set( m_StackSize - 1, op );  }
+  void     Push( OP_CODE op )           { SetSize( m_StackSize + 1 ); Set( m_StackSize - 1, op );  }
 
   void     SetSize( pos_t i );
   void     Push( const CElement* e );
@@ -86,7 +86,7 @@ protected:
   int      Parse( CParser& IC );
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
   char     TryMatchExp( const char*& sp );
-  void     InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size );
+  void     Move( pos_t pos_dest, pos_t pos_source, pos_t size );
   pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
   bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
   void     Zero();

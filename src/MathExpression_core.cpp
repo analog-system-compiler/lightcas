@@ -72,7 +72,7 @@ void CMathExpression::Append( const OP_CODE* src, pos_t size )
   }
 }
 
-void CMathExpression::InnerCopy( pos_t pos_dest, pos_t pos_source, pos_t size )
+void CMathExpression::Move( pos_t pos_dest, pos_t pos_source, pos_t size )
 {
   if ( size != 0 )
   {
@@ -127,14 +127,14 @@ pos_t CMathExpression::NextBranch( pos_t pos ) const
   const CElement* e;
 
   ASSERT( pos );
-  while( pos && i )
+  do //while( pos && i )
   {
     op = Pop( pos );
     e = RefToElement( op );
     ASSERT( e );
-    i += e->GetFunction()->GetParameterNb();
+    i += e->GetOperandNb();
     i--;
-  }
+  } while( pos && i );
   return pos;
 }
 

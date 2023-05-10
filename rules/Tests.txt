@@ -1,223 +1,252 @@
-  
- 
-  _check( 10.500e-2  0.105 );
-  _check( 0.5E4  5000 );
-  _check( 0xAA  170 );
-  _check( 0b1010  10 );
 
-  _check( TED( a b )  TED(a b) );
-  _check( a-(b-c)  a-(b-c) );
-  _check( a^(b^c)  a^(b^c) );
-  _check( a/(b/c)  a/(b/c) );
-  _check( (a^b)^c  (a^b)^c );
-  _check( SIMPLIFY(0)  0 );
-  _check( SIMPLIFY(1)  1 );
-  _check( SIMPLIFY(-1)  (-1) ); 
-  _check( SIMPLIFY(--2)  2 );
-  _check( SIMPLIFY(2--2)  4 );
-  _check( SIMPLIFY(-4-8)  (-12) );
-  _check( SIMPLIFY(3!)  6 );
-  _check( SIMPLIFY(-3!)  (-6) );
-  _check( SIMPLIFY(-3!!)  (-720) );
-  _check( SIMPLIFY(2*2^2*2^2-32)  0 );
-  _check( SIMPLIFY(a-a)  0 );
-  _check( SIMPLIFY(a+a)  2*a );
-  _check( SIMPLIFY(a+a+a)  3*a );
-  _check( SIMPLIFY(a+b)  a+b );
-  _check( SIMPLIFY(a-b)  a-b );
-  _check( SIMPLIFY(a+a+b+b)  2*a+2*b );
-  _check( SIMPLIFY(a+a-(b+b))  2*a-2*b );
-  _check( SIMPLIFY(a-b+c-(c+a-b))  0 );
-  _check( SIMPLIFY(a-(b-c))  a-b+c );
-  _check( SIMPLIFY(a-b-c)  a-b-c );
-  _check( SIMPLIFY((a+b)*(a-b))  a^2-b^2 );
- _check( SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)  0 );
+
+_check( 10.500e-2  0.105 );
+_check( 0.5E4  5000 );
+_check( 0xAA  170 );
+_check( 0b1010  10 );
+
+_check( TED( a b )  TED(a b) );
+_check( a-(b-c)  a-(b-c) );
+_check( a^(b^c)  a^(b^c) );
+_check( a/(b/c)  a/(b/c) );
+_check( (a^b)^c  (a^b)^c );
+_check( SIMPLIFY(0)  0 );
+_check( SIMPLIFY(1)  1 );
+_check( SIMPLIFY(-1)  (-1) ); 
+_check( SIMPLIFY(--2)  2 );
+_check( SIMPLIFY(2--2)  4 );
+_check( SIMPLIFY(-4-8)  (-12) );
+_check( SIMPLIFY(3!)  6 );
+_check( SIMPLIFY(-3!)  (-6) );
+_check( SIMPLIFY(-3!!)  (-720) );
+_check( SIMPLIFY(2*2^2*2^2-32)  0 );
+_check( SIMPLIFY(a-a)  0 );
+_check( SIMPLIFY(a+a)  2*a );
+_check( SIMPLIFY(a+a+a)  3*a );
+_check( SIMPLIFY(a+b)  a+b );
+_check( SIMPLIFY(a-b)  a-b );
+_check( SIMPLIFY(a+a+b+b)  2*a+2*b );
+_check( SIMPLIFY(a+a-(b+b))  2*a-2*b );
+_check( SIMPLIFY(a-b+c-(c+a-b))  0 );
+_check( SIMPLIFY(a-(b-c))  a-b+c );
+_check( SIMPLIFY(a-b-c)  a-b-c );
+_check( SIMPLIFY((a+b)*(a-b))  a^2-b^2 );
+_check( SIMPLIFY(0*a+a*0+a*1-1*a+a+0-a-0+a^1-a+a^0-a/a+0/a)  0 );
 //  _check( SIMPLIFY((2*x+3)*(10*x-5)/(2*x-1))  15+10*x );
-  _check( SIMPLIFY(2+2-4+0)  0 );
-  _check( SIMPLIFY(-2*MIN(2+2, 5)*MAX(2, 3)+2^4+8)  0 );
-  _check( SIMPLIFY(1-0*a*b)  1 );
-  _check( SIMPLIFY(2*a-2*a)  0 );
-  _check( SIMPLIFY(b*(a+2)-b*a-2*b)  0 );
-  _check( SIMPLIFY(-(a-b)-(b-a))  0 );
-  _check( SIMPLIFY(a/a-1)  0 );
-  _check( SIMPLIFY(-b/a)  (-(b/a)) );
-  _check( SIMPLIFY(a*b/(a*b)-1)  0 );
-  _check( SIMPLIFY(a*b/(a*b))  1 );
-  _check( SIMPLIFY(a*b*c/(a*b*c))  1 );
-  _check( SIMPLIFY(4*a*b*c/(4*a*b*c))  1 );
-  _check( SIMPLIFY(4*a*b*c/(4*a*b*c)-1)  0 );
-  _check( SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))  0 );
-  _check( SIMPLIFY((4*a*b)/(3*a*b*c))  1.33333333333/c ); //4/(3*c) );
-  _check( SIMPLIFY((4*c*b)/(3*a*b*c))  1.33333333333/a ); //4/(3*a) );
-  _check( SIMPLIFY((4*a*b*c+4)/(4*a*b*c))  1+1/(c*(b*a)) );
-  _check( SIMPLIFY(b/a+b/a)  (2*b)/a );
-  _check( SIMPLIFY(b/a-b/a)  0 );
-  _check( SIMPLIFY(b*1/a)  b/a );
-  _check( SIMPLIFY(x^(2+2))  x^4 );
-  _check( SIMPLIFY((a+b)^2)  a^2+b^2+2*a*b );
-  _check( SIMPLIFY(a^2-a^(1+1))  0 );
-  _check( SIMPLIFY((a-b)^2-(a^2-2*b*a+b^2))  0 );
-  _check( SIMPLIFY(b/a-a/b-(b^2-a^2)/(a*b))  0 );
-  _check( SIMPLIFY(1/(a+1)-1/(a+1))  0 );
-  _check( SIMPLIFY(1/(1/(a+1))-a-1)  0 );
-  _check( SIMPLIFY(1/(2*1/(2*a+2))-a-1)  0 );
-  _check( SIMPLIFY(a*(a^b))  a^(1+b) );
-  _check( SIMPLIFY(x^(a*b)/x^(a*b))  1 );
-  _check( SIMPLIFY(x^(a-a))  1 );
-  _check( SIMPLIFY(x^a)  x^a );
-  _check( SIMPLIFY(x^(a+a))  x^(2*a) );
-  _check( SIMPLIFY((x+y)^(a+a))  (x+y)^(2*a) );
-  _check( SIMPLIFY(1+(x+y)^(a+a))  1+(x+y)^(2*a) );
-  _check( SIMPLIFY((x^a)^2)  x^(2*a) );
-  _check( SIMPLIFY(x^2.5)  x^2.5 );
-  _check( SIMPLIFY((x+a)^2.5)  (x+a)^2.5 );
-  _check( SIMPLIFY(2*x^a-2*x^a)  0 );
-  _check( SIMPLIFY(x^(1+a)*x^(1-a))  x^2 );
-  _check( SIMPLIFY((a-a+1)>(a-a))  1 );
-  _check( SIMPLIFY({a+a,b+4*b,c-d})  {2*a,5*b,c-d} );
-  _check( SIMPLIFY(COS(b-b))  1 );
-  _check( SIMPLIFY((a*1000*1000)/(b*1000*1000))  a/b );
+_check( SIMPLIFY(2+2-4+0)  0 );
+_check( SIMPLIFY(-2*MIN(2+2, 5)*MAX(2, 3)+2^4+8)  0 );
+_check( SIMPLIFY(1-0*a*b)  1 );
+_check( SIMPLIFY(2*a-2*a)  0 );
+_check( SIMPLIFY(b*(a+2)-b*a-2*b)  0 );
+_check( SIMPLIFY(-(a-b)-(b-a))  0 );
+_check( SIMPLIFY(a/a-1)  0 );
+_check( SIMPLIFY(-b/a)  (-(b/a)) );
+_check( SIMPLIFY(a*b/(a*b)-1)  0 );
+_check( SIMPLIFY(a*b/(a*b))  1 );
+_check( SIMPLIFY(a*b*c/(a*b*c))  1 );
+_check( SIMPLIFY(4*a*b*c/(4*a*b*c))  1 );
+_check( SIMPLIFY(4*a*b*c/(4*a*b*c)-1)  0 );
+_check( SIMPLIFY(a*b/(4*a*b*c)-1/(4*c))  0 );
+_check( SIMPLIFY((4*a*b)/(3*a*b*c))  1.33333333333/c ); //4/(3*c) );
+_check( SIMPLIFY((4*c*b)/(3*a*b*c))  1.33333333333/a ); //4/(3*a) );
+_check( SIMPLIFY((4*a*b*c+4)/(4*a*b*c))  1+1/(c*(b*a)) );
+_check( SIMPLIFY(b/a+b/a)  (2*b)/a );
+_check( SIMPLIFY(b/a-b/a)  0 );
+_check( SIMPLIFY(b*1/a)  b/a );
+_check( SIMPLIFY(x^(2+2))  x^4 );
+_check( SIMPLIFY((a+b)^2)  a^2+b^2+2*a*b );
+_check( SIMPLIFY(a^2-a^(1+1))  0 );
+_check( SIMPLIFY((a-b)^2-(a^2-2*b*a+b^2))  0 );
+_check( SIMPLIFY(b/a-a/b-(b^2-a^2)/(a*b))  0 );
+_check( SIMPLIFY(1/(a+1)-1/(a+1))  0 );
+_check( SIMPLIFY(1/(1/(a+1))-a-1)  0 );
+_check( SIMPLIFY(1/(2*1/(2*a+2))-a-1)  0 );
+_check( SIMPLIFY(a*(a^b))  a^(1+b) );
+_check( SIMPLIFY(x^(a*b)/x^(a*b))  1 );
+_check( SIMPLIFY(x^(a-a))  1 );
+_check( SIMPLIFY(x^a)  x^a );
+_check( SIMPLIFY(x^(a+a))  x^(2*a) );
+_check( SIMPLIFY((x+y)^(a+a))  (x+y)^(2*a) );
+_check( SIMPLIFY(1+(x+y)^(a+a))  1+(x+y)^(2*a) );
+_check( SIMPLIFY((x^a)^2)  x^(2*a) );
+_check( SIMPLIFY(x^2.5)  x^2.5 );
+_check( SIMPLIFY((x+a)^2.5)  (x+a)^2.5 );
+_check( SIMPLIFY(2*x^a-2*x^a)  0 );
+_check( SIMPLIFY(x^(1+a)*x^(1-a))  x^2 );
+_check( SIMPLIFY((a-a+1)>(a-a))  1 );
+_check( SIMPLIFY({a+a,b+4*b,c-d})  {2*a,5*b,c-d} );
+_check( SIMPLIFY(COS(b-b))  1 );
+_check( SIMPLIFY((a*1000*1000)/(b*1000*1000))  a/b );
 
-  /****** Complex *********/
-  _check( SIMPLIFY(j*j)  (-1) );
-  _check( SIMPLIFY(j^2)  (-1) );
-  _check( SIMPLIFY(j^-2) (-1) );
-  _check( SIMPLIFY(1+j-(1+j))  0 );
-  _check( SIMPLIFY(j*j*j*j*j*j*j)  (-j) );
-  _check( SIMPLIFY(j*j+1)  0 );
-  _check( SIMPLIFY(1/j+j)  0 );
-  _check( SIMPLIFY(1+j+j^2+j^3)  0 );
-  _check( SIMPLIFY(1+2*j+j^2+j^7)  j );
-  _check( SIMPLIFY(2/(1+j)-(1-j))  0 );
-  _check( SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)  0 );
+/****** Complex *********/
+_check( SIMPLIFY(j*j)  (-1) );
+_check( SIMPLIFY(j^2)  (-1) );
+_check( SIMPLIFY(j^-2) (-1) );
+_check( SIMPLIFY(1+j-(1+j))  0 );
+_check( SIMPLIFY(j*j*j*j*j*j*j)  (-j) );
+_check( SIMPLIFY(j*j+1)  0 );
+_check( SIMPLIFY(1/j+j)  0 );
+_check( SIMPLIFY(1+j+j^2+j^3)  0 );
+_check( SIMPLIFY(1+2*j+j^2+j^7)  j );
+_check( SIMPLIFY(2/(1+j)-(1-j))  0 );
+_check( SIMPLIFY(2/((1+1/j)+(1+1/(1/j)))-1)  0 );
 
-  //FAIL!!_check( SIN(PI)  0 );
-  //FAIL!!_check( COS(PI/2)  0 );
-  _check( SQRT(-25)  5*j );
-  _check( SIMPLIFY(SQRT(-25)^2+26)  1 );
+//FAIL!!_check( SIN(PI)  0 );
+//FAIL!!_check( COS(PI/2)  0 );
+_check( SQRT(-25)  5*j );
+_check( SIMPLIFY(SQRT(-25)^2+26)  1 );
 
-  _check( SIMPLIFY(RE(4+j))  4 );
-  _check( SIMPLIFY(-IM(1-5*j))  5 );
-  _check( SIMPLIFY(RE(4*j^6+j))  (-4) );
-  _check( SIMPLIFY(-IM(1-5*j*(5*j^4)))  25 );
+_check( SIMPLIFY(RE(4+j))  4 );
+_check( SIMPLIFY(-IM(1-5*j))  5 );
+_check( SIMPLIFY(RE(4*j^6+j))  (-4) );
+_check( SIMPLIFY(-IM(1-5*j*(5*j^4)))  25 );
 
-  /******* In function reduction ******/
-  _check( SIMPLIFY((a+a)*COS(a+a))  2*COS(2*a)*a );
-  _check( SIMPLIFY(COS(2*(3*y-3*y+1)*x-x*y/y-x+x*y-x*y-1+1)-1)  0 );
-  _check( SIMPLIFY((1+2+a+a-2*a)!-6)  0 );
+/******* In function reduction ******/
+_check( SIMPLIFY((a+a)*COS(a+a))  2*COS(2*a)*a );
+_check( SIMPLIFY(COS(2*(3*y-3*y+1)*x-x*y/y-x+x*y-x*y-1+1)-1)  0 );
+_check( SIMPLIFY((1+2+a+a-2*a)!-6)  0 );
 
-  /****** Derival *****/
-  _check( DER(SIN(4*a),a)  4*COS(4*a) );
-  _check( DER(COS(a*b),b)  (-((b*DER(a,b)+a)*SIN(a*b))) );
-  _check( DER(LOG(a*b+c),b)  (b*DER(a,b)+a+DER(c,b))/(a*b+c) );
+/****** Derival *****/
+_check( DER(SIN(4*a),a)  4*COS(4*a) );
+_check( DER(COS(a*b),b)  (-((b*DER(a,b)+a)*SIN(a*b))) );
+_check( DER(LOG(a*b+c),b)  (b*DER(a,b)+a+DER(c,b))/(a*b+c) );
 
-  /****** Vector *********/
-  _check( SIMPLIFY({a,b}[c])  {a,b}[c] );
-  _check( SIMPLIFY({a+a,b-b}[c+c])  {2*a,0}[2*c] );
-  _check( VSIZE({a})  1 );
-  _check( VSIZE({a,b})  2 );
-  _check( VSIZE({a,b,c})  3 );
-  _check( {0}[0]  0 );
+/****** Vector *********/
+_check( SIMPLIFY({a,b}[c])  {a,b}[c] );
+_check( SIMPLIFY({a+a,b-b}[c+c])  {2*a,0}[2*c] );
+_check( VSIZE({a})  1 );
+_check( VSIZE({a,b})  2 );
+_check( VSIZE({a,b,c})  3 );
+_check( {0}[0]  0 );
 
-  _check( {0,1,-1}[0]  0 );
-  _check( {0,1,-1}[1]  1 );
-  _check( {0,1,-1}[2]  (-1) );
-  _check( {0,1,2}+{1,2,3}  {1,3,5} );
-  _check( {0,1,-1}-{0,1,-1}  {0,0,0} );
-  _check( {{0,1},{2,3}}+{{4,5},{6,7}}  {{4,6},{8,10}} );
-  _check( 5*{a,b,c}  {5*a,5*b,5*c} );
-  _check( {a,b,c}*5  {a*5,b*5,c*5} );
-  _check( SIMPLIFY({-2,2})  {-2,2} );
-  _check( MIN({1,2,3,4})  1 );
-  _check( MIN({5,1,3,4})  1 );
-  _check( MIN({5,3,1,4})  1 );
-  _check( MIN({5,3,4,1})  1 );
-  _check( MAX({1,2,3,4})  4 );
-  _check( MAX({5,1,3,4})  5 );
-  _check( MAX({1,5,1,4})  5 );
-  _check( MAX({4,3,5,1})  5 );
+_check( {0,1,-1}[0]  0 );
+_check( {0,1,-1}[1]  1 );
+_check( {0,1,-1}[2]  (-1) );
+_check( {0,1,2}+{1,2,3}  {1,3,5} );
+_check( {0,1,-1}-{0,1,-1}  {0,0,0} );
+_check( {{0,1},{2,3}}+{{4,5},{6,7}}  {{4,6},{8,10}} );
+_check( 5*{a,b,c}  {5*a,5*b,5*c} );
+_check( {a,b,c}*5  {a*5,b*5,c*5} );
+_check( SIMPLIFY({-2,2})  {-2,2} );
+_check( MIN({1,2,3,4})  1 );
+_check( MIN({5,1,3,4})  1 );
+_check( MIN({5,3,1,4})  1 );
+_check( MIN({5,3,4,1})  1 );
+_check( MAX({1,2,3,4})  4 );
+_check( MAX({5,1,3,4})  5 );
+_check( MAX({1,5,1,4})  5 );
+_check( MAX({4,3,5,1})  5 );
 
-  /****** Trinary *********/
-  _check( SIMPLIFY(0 ? a : b)  b );
-  _check( SIMPLIFY(1 ? a : b)  a );
-  _check( SIMPLIFY(5 ? a : b)  a );
-  _check( SIMPLIFY(2>3 ? a : b)  b );
-  _check( SIMPLIFY(a<=a ? b : c)  b );
+/****** Trinary *********/
+_check( SIMPLIFY(0 ? a : b)  b );
+_check( SIMPLIFY(1 ? a : b)  a );
+_check( SIMPLIFY(5 ? a : b)  a );
+_check( SIMPLIFY(2>3 ? a : b)  b );
+_check( SIMPLIFY(a<=a ? b : c)  b );
 
-  /****** Logic *********/
-  /*_check( SIMPLIFY(a|0)  a );
-  _check( SIMPLIFY(a|~0)  (-1) );
-  _check( SIMPLIFY(a&0)  0 );
-  _check( SIMPLIFY(a&~0)  a );
-  _check( SIMPLIFY((5<<2)|32)  52 );*/
-  _check( SIMPLIFY(57>>3)  7.125 );
+/****** Logic *********/
+/*_check( SIMPLIFY(a|0)  a );
+_check( SIMPLIFY(a|~0)  (-1) );
+_check( SIMPLIFY(a&0)  0 );
+_check( SIMPLIFY(a&~0)  a );
+_check( SIMPLIFY((5<<2)|32)  52 );*/
+_check( SIMPLIFY(57>>3)  7.125 );
 
-  /********** Transforms **********/
-  _check( NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)  (2+3*a+(4*a)^2)/(1+a+(6*a)^2) );
+/********** Transforms **********/
+_check( NORM((4+a*(6+32*a))/(2+a*(2+72*a)),a)  (2+3*a+(4*a)^2)/(1+a+(6*a)^2) );
 
-  /*********** Assignment ***/
-  //CMathExpression equ0( this );
-  //equ0.GetFromString( a+b );
-  //GetElement( y )->SetEquation( equ0 );
-  //equ0.GetFromString( a-b );
-  //GetElement( z )->SetEquation( equ0 );
-  //_check( SIMPLIFY(y-z)  2*b );
+/*********** Assignment ***/
+//CMathExpression equ0( this );
+//equ0.GetFromString( a+b );
+//GetElement( y )->SetEquation( equ0 );
+//equ0.GetFromString( a-b );
+//GetElement( z )->SetEquation( equ0 );
+//_check( SIMPLIFY(y-z)  2*b );
 
-  /********** Equation solving **********/
-  Initialize();
-  _check( SOLVE(x^2-4,x)  {-2,2} );
-  _check( SOLVE(x^2+4,x)  {-(2*j),2*j} );
-  _check( SIMPLIFY(SOLVE(x^2-4,x)[1]-2)  0 );
+/********** Equation solving **********/
+//Initialize();
+_check( SOLVE(x^2-4,x)  {-2,2} );
+_check( SOLVE(x^2+4,x)  {-(2*j),2*j} );
+//Fail _check( SOLVE(2*x^2-4*x+2,x)  {0,18} );
+_check( SIMPLIFY(SOLVE(x^2-4,x)[1]-2)  0 );
 
-  /***** System solving *****/
-  _check( SYSTEM_AUTO_SOLVE({x-y+1,x-y+1})  {y-(x+1),0} );
-  _check( SYSTEM_AUTO_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2})  {x-2,y-1,z-1} );
-  _check( SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})  {x-1,y-1,z-1} );
-  _check( SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})     {1,1,1} );
-  _check( SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})     {2,1,1} );
-  _check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})  {(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f))),(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*i))} );
-  /***** Determinant ******/
-  //_check(MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})  {x,y,z});
-  _check( VECT_REVERSE({ x,y,z,w})  {w,z,y,x} );
-  _check( VECT_REVERSE1( (a,b,c), (x,y,z,w))  x,y,z,w,c,b,a );
-  _check( VECT_REVERSE1( (a,b,c), x)    x,c,b,a );
-  _check( VECT_REVERSE1( a, (x,y,z,w))  x,y,z,w,a );
-  _check( DET({3*x+4*y, 2*x+8*y},                     {x,y})    16 );
-  _check( DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})   4 );
-  _check( DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})   4 );
-  _check( DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})  32 );
-  _check( DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})  32 );
-  _check( DET({ x+y+z+w, y+z+w, z+w, w}, {x,y,z,w})  1 );
-  _check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  0 );
-  _check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  (-C1_I) );
-  _check( DET({ {3,4} , {2,8} })  16 );
-  _check( DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })  32 );
+/***** System solving *****/
+_check( SYSTEM_AUTO_SOLVE({x-y+1,x-y+1})  {y-(x+1),0} );
+_check( SYSTEM_AUTO_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2})  {x-2,y-1,z-1} );
+_check( SYSTEM_AUTO_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1})  {x-1,y-1,z-1} );
+_check( SYSTEM_SOLVE({x+y+z-3,x-y+z-1,x+y-z-1},{x,y,z})     {1,1,1} );
+_check( SYSTEM_SOLVE({x-y-z+0,x-y+z-2,x+y-z-2},{x,y,z})     {2,1,1} );
+_check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2},{x,y,z})  {(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))/((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b)),(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))*(i*d+g*f)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*2+2*f))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*(i*e-h*f))),(((i*e-h*f)*(2*c)+(i*2+2*f)*(h*c+i*b))*((i*e-h*f)*g+(i*d+g*f)*h)-((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*2+(i*2+2*f)*h))/(((i*e-h*f)*(g*c-i*a)+(i*d+g*f)*(h*c+i*b))*((i*e-h*f)*i))} );
+/***** Determinant ******/
+//_check(MATRIX_GETVAR({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z})  {x,y,z});
+_check( VECT_REVERSE({ x,y,z,w})  {w,z,y,x} );
+_check( VECT_REVERSE1( (a,b,c), (x,y,z,w))  x,y,z,w,c,b,a );
+_check( VECT_REVERSE1( (a,b,c), x)    x,c,b,a );
+_check( VECT_REVERSE1( a, (x,y,z,w))  x,y,z,w,a );
+_check( DET({3*x+4*y, 2*x+8*y},                     {x,y})    16 );
+_check( DET({-x,         2*y+3*z, 8*y+10*z},        {x,y,z})   4 );
+_check( DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})   4 );
+_check( DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})  32 );
+_check( DET({ x+2*y+5*z-1, -x+2*y+3*z+1, -2*x+8*y+10*z-2}, {1,x,y,z})  32 );
+_check( DET({ x+y+z+w, y+z+w, z+w, w}, {x,y,z,w})  1 );
+_check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  0 );
+_check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  (-C1_I) );
+_check( DET({ {3,4} , {2,8} })  16 );
+_check( DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })  32 );
 
-  /* Matrix inversion */
-  _check( MAT_INV( { {4,-2,3} , {8,-3,5} , {7,-2,4} })  {{-2,2,-1},{3,-5,4},{5,-6,4}} );
-  _check( MAT_INV( { {1,2} , {3,4} })  {{-2,1},{1.5,-0.5}} );
-  _check( MAT_INV( { 4 } )  {4} );
+/* Matrix inversion */
+_check( MAT_INV( { {4,-2,3} , {8,-3,5} , {7,-2,4} })  {{-2,2,-1},{3,-5,4},{5,-6,4}} );
+_check( MAT_INV( { {1,2} , {3,4} })  {{-2,1},{1.5,-0.5}} );
+_check( MAT_INV( { 4 } )  {4} );
 
-  /*** Matrixes ***/
-  _check( MAT_TRANSPOSE( { { 1 },{ 6 } } )  {{1,6}} );
-  _check( MAT_TRANSPOSE( { { 2,3 },{ 4,5 } } )  {{2,4},{3,5}} );
-  _check( MAT_TRANSPOSE( { { 2,3,5 },{ 4,5,6 } } )  {{2,4},{3,5},{5,6}} );
-  _check( MAT_MUL( { { 2 } }, { { 1 } } )  {{2}} );
-  _check( MAT_MUL( { { 2,3 } }, { { 1 },{ 6 } } )  {{20}} );
-  _check( MAT_MUL( { { 2,3 } }, { { 1,6 } ,{ 8,9 } } )  {{26,39}} );
-  _check( MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1 } ,{ 8 } } )  {{26},{44}} );
-  _check( MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )  {{26,39},{44,69}} );
+/*** Matrixes ***/
+_check( MAT_TRANSPOSE( { { 1 },{ 6 } } )  {{1,6}} );
+_check( MAT_TRANSPOSE( { { 2,3 },{ 4,5 } } )  {{2,4},{3,5}} );
+_check( MAT_TRANSPOSE( { { 2,3,5 },{ 4,5,6 } } )  {{2,4},{3,5},{5,6}} );
+_check( MAT_MUL( { { 2 } }, { { 1 } } )  {{2}} );
+_check( MAT_MUL( { { 2,3 } }, { { 1 },{ 6 } } )  {{20}} );
+_check( MAT_MUL( { { 2,3 } }, { { 1,6 } ,{ 8,9 } } )  {{26,39}} );
+_check( MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1 } ,{ 8 } } )  {{26},{44}} );
+_check( MAT_MUL( { { 2,3 },{ 4,5 } }, { { 1,6 } ,{ 8,9 } } )  {{26,39},{44,69}} );
 
-  /**** Taylor suites ****/
-  _check( TAYLOR(COS(x),x,0,1)  1 );
-  _check( TAYLOR(COS(x),x,0,3)  1-x^2/2 );
-  _check( TAYLOR(EXP(x),x,0,5)  1+x+x^2/2+x^3/6+x^4/24+x^5/120 );
-  
-  _check( y:=6 y );
-  _check( SIMPLIFY( r:=6; r-5 ) r;1 );
-  // _check( ( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) ) POLY(f(a),1) ); //FIXME
-  _check( SIMPLIFY( m(x):=4*x; m(z)-4*z+1 ) (m(x);1) );
-  //_check( SIMPLIFY( t(x):=4*x; t(z+z)-8*z) (t(x);0) );
+/**** Taylor suites ****/
+_check( TAYLOR(COS(x),x,0,1)  1 );
+_check( TAYLOR(COS(x),x,0,3)  1-x^2/2 );
+_check( TAYLOR(EXP(x),x,0,5)  1+x+x^2/2+x^3/6+x^4/24+x^5/120 );
 
-  //Verify check
-  _check( 1 0 )
+_check( y:=6 y );
+_check( SIMPLIFY( r:=6; r-5 ) r;1 );
+// _check( ( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) ) POLY(f(a),1) ); //FIXME
+_check( SIMPLIFY( m(x):=4*x; m(z)-4*z+1 ) (m(x);1) );
+//_check( SIMPLIFY( t(x):=4*x; t(z+z)-8*z) (t(x);0) );
+
+//Verify check
+_check( 1 0 );
+
+#inc "Components.txt"
+
+//Define RLC circuit for testing purposes
+RLC() := { 
+  V.CV(@1,@2,10); 
+  R.CR(@2,@3,100); 
+  L.CL(@3,@4,1m); 
+  C.CC(@4,@1,10u) 
+};
+
+SOLVE_RLC2(a)     := SYSTEM_SOLVE( VECT_TO_LIST( AC_TRANSFORM( a ) ), {C.U,R.U,L.U,R.I,V.I,C.I,L.I,V.U} );
+TEST_SYSTEM() := SOLVE_RLC2( RLC );
+
+_check( NODE_TRANS(LOOP_TRANS( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
+_check( LOOP_TRANS(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) )          SYST(U24-(U14-U12) U32-U34+U24) );
+
+_check( AC_TRANSFORM( RLC ) { C.U+V.U+R.U+L.U;R.I-V.I;V.I-C.I;L.I-R.I;C.I-1e-05*(C.U*s);L.U-0.001*(L.I*s);R.U-100*R.I;V.U-1} );
+_check( SIMPLIFY( TEST_SYSTEM() ) {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} );
+
+//TEST_SYSTEM2() := SIMPLIFY( SOLVE_RLC2( RLC ) );
+//_check( SIMPLIFY( SIMPLIFY( SUBST( SIMPLIFY( TEST_SYSTEM2() ) s {10,30,100,300,1000,3000,10000,30000,100000} ) )  {10,30,100,300,1000,3000,10000,30000,100000} );
+//_check( SIMPLIFY( SUBST( {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} s {10,30,100,300,1000,3000,10000,30000,100000} ) )  {10,30,100,300,1000,3000,10000,30000,100000} );
+//_check( SOLVE_RLC( RLC )  {0} );
+
+_check( SIMPLIFY(1n-1e-9)  0 );
+_check( SIMPLIFY(1m-0.001) 0 );
+_check( SIMPLIFY(1K-1000)  0 )

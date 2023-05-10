@@ -31,105 +31,105 @@
 #define vsnprintf _vsnprintf_s
 #endif
 
-void CElementDataBase::Printf( const char* format, ... )
+void CElementDataBase::Printf(const char *format, ...)
 {
   static char buffer[2048];
   va_list args;
-  va_start ( args, format );
-  vsnprintf ( buffer, sizeof( buffer ), format, args );
-  PUTS( buffer );
-  va_end ( args );
+  va_start(args, format);
+  vsnprintf(buffer, sizeof(buffer), format, args);
+  PUTS(buffer);
+  va_end(args);
 }
 
-void CElementDataBase::Check( const char* s1, const char* s2 )
+void CElementDataBase::Check(const char *s1, const char *s2)
 {
   CDisplay ds;
-  CParser IC( s1 );
-  CMathExpression equ( this );
-  TRACE( "** Check %s == %s", s1, s2 );
-  if( equ.GetFromString( IC ) )
+  CParser IC(s1);
+  CMathExpression equ(this);
+  TRACE("** Check %s == %s", s1, s2);
+  if (equ.GetFromString(IC))
   {
     equ.OptimizeTree();
-    equ.Display( ds );
-    if( ds != s2 )
+    equ.Display(ds);
+    if (ds != s2)
     {
-      ASSERT( false );
-      Printf( "FAIL: %s => %s != %s", s1, ds.GetBufferPtr(), s2 );
+      ASSERT(false);
+      Printf("FAIL: %s => %s != %s", s1, ds.GetBufferPtr(), s2);
       return;
     }
   }
   else
   {
-    ASSERT( false );
-    Printf( "FAIL: Test exception: %s => %s", s1, s2 );
+    ASSERT(false);
+    Printf("FAIL: Test exception: %s => %s", s1, s2);
     return;
   }
-  Printf( "OK: %s => %s", s1, s2 );
+  Printf("OK: %s => %s", s1, s2);
 }
 
-void CElementDataBase::CheckEval( const char* s1, const CValue& v1 )
+void CElementDataBase::CheckEval(const char *s1, const CValue &v1)
 {
   CDisplay ds;
-  CMathExpression equ( this );
-  CParser IC( s1 );
-  equ.GetFromString( IC );
+  CMathExpression equ(this);
+  CParser IC(s1);
+  equ.GetFromString(IC);
   equ.Evaluate();
-  const CValue& v2 = GetEvaluator()->GetValue();
-  if( v2.GetValue() != v1.GetValue() )
+  const CValue &v2 = GetEvaluator()->GetValue();
+  if (v2.GetValue() != v1.GetValue())
   {
-    ASSERT( false );
-    Printf( "FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue() );
+    ASSERT(false);
+    Printf("FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue());
     return;
   }
-  Printf( "OK: %s => %g", s1, v1.GetValue() );
+  Printf("OK: %s => %g", s1, v1.GetValue());
 }
 
-void CElementDataBase::CheckSyntaxError( const char* s1 )
+void CElementDataBase::CheckSyntaxError(const char *s1)
 {
-  CParser IC( s1 );
-  CMathExpression equ( this );
-  if ( equ.GetFromString( IC ) )
+  CParser IC(s1);
+  CMathExpression equ(this);
+  if (equ.GetFromString(IC))
   {
-    ASSERT( false );
-    Printf( "Syntax check failed: %s", s1 );
+    ASSERT(false);
+    Printf("Syntax check failed: %s", s1);
   }
 }
 
 void CElementDataBase::DisplayStats()
 {
   CDisplay ds;
-  for( unsigned i = 0; i < m_ElementRefArray.GetSize(); i++ )
+  for (unsigned i = 0; i < m_ElementRefArray.GetSize(); i++)
   {
-    CElement* e = m_ElementRefArray.GetAt( i );
-    if( e )
+    CElement *e = m_ElementRefArray.GetAt(i);
+    if (e)
     {
-      Printf( "********************* #%04d %s *************************", i, e->GetName().GetBufferPtr() );
-      const CFunction* funct = e->GetFunction();
-      for( unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++ )
+      Printf("********************* #%04d %s *************************", i, e->GetName().GetBufferPtr());
+      const CFunction *funct = e->GetFunction();
+      for (unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++)
       {
-        CAlgebraRule* rule = funct->m_AlgebraRuleArray.GetAt( j );
+        CAlgebraRule *rule = funct->m_AlgebraRuleArray.GetAt(j);
         ds.Clear();
-        rule->Display( j, ds );
-        Printf( "%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr() );
+        rule->Display(j, ds);
+        Printf("%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr());
       }
     }
     else
     {
-      Printf( "********************* #%04d No element *************************", i );
+      Printf("********************* #%04d No element *************************", i);
     }
   }
 }
 
 void CElementDataBase::Test()
 {
-  Printf( "Running tests..." );
+  Printf("Running tests...");
 
   /***** Some basic tests *****/
-  CheckSyntaxError( "sin(x" );
-  //CheckSyntaxError( "sin(x))" );
-  CheckSyntaxError( "x+" );
-  CheckSyntaxError( "x-*2" );
-  CheckSyntaxError( "TED(a)" );
+  CheckSyntaxError("sin(x");
+  // CheckSyntaxError( "sin(x))" );
+  CheckSyntaxError("x+");
+  CheckSyntaxError("x-*2");
+  CheckSyntaxError("TED(a)");
 #if 0
   Check( "10.500e-2", "0.105" );
   Check( "0.5E4", "5000" );
@@ -355,9 +355,18 @@ void CElementDataBase::Test()
   db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 #endif
+  CParser IC;
+  if (IC.LoadFile(CString("Tests.txt")))
+  {
+    AddAlgebraRuleTable(IC);
+    IC.CloseFile();
+  }
+  else
+  {
+    IC.CopyBuffer("test description file not found.");
+  }
+  // CleanTempElements();
   DisplayStats();
-
 }
 
 #endif
-

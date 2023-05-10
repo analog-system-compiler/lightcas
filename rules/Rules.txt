@@ -542,7 +542,7 @@ c^(a,b)        := (c^a,b);
 
 //Vector minus
 -(a,b)         := (-a,-b);
--{a}  := {-a};
+-{a}           := {-a};
 
 //Vector not
 ~(a,b)         := (~a,~b);

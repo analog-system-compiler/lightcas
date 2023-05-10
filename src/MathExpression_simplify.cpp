@@ -194,16 +194,17 @@ void CMathExpression::OptimizeTree()
 
           pos_t pos1 = pos2;
           pos1 = NextBranch( pos1 );
-          InnerCopy( GetSize(), pos1, pos2 - pos1 ); //Append to end of equation
+          Move( GetSize(), pos1, pos2 - pos1 ); //Append to end of equation
         }
         else
         {
 L1:
           ASSERT( RefToElement( op3 ) != NULL );
           Push( op3 );
-          if ( ExecuteCommand() )
+          bool need_post_optim = ExecuteCommand();
+          if ( need_post_optim )
           {
-            m_ContextStack.Push( save_context ); //not finished
+            m_ContextStack.Push( save_context );
             RuleSearch();
             save_context = m_ContextStack.Pop();
             n = save_context.m_RuleDstExp->GetSize();
@@ -223,7 +224,7 @@ L1:
       Display( ds, false );
       ds += " => ";
 #endif
-      InnerCopy( save_context.m_Pos, pos3, pos2 - pos3 );
+      Move( save_context.m_Pos, pos3, pos2 - pos3 );
 #if( DEBUG_LEVEL >= 1 )
       Display( ds, false );
       TRACE( ds.GetBufferPtr() );
