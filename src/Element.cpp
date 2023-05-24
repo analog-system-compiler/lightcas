@@ -80,4 +80,3 @@ void CElement::AddFunction( const CMathExpression& src, const CMathExpression& d
   m_Function.AddAlgebraRule( src, dst, line_nb );
 }
 
-

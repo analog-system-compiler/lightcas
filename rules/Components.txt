@@ -22,3 +22,296 @@ NAME.CR(@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME
 NAME.CL(@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
 NAME.CC(@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
 
+NAME.IAOP( @plus, @minus, @out, @GND ) := {
+
+	/* ideal AOP. Have to be used in loopback mode only */
+	/* nodal equations */
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+    NAME.Uin  = ACROSS(  @plus, @minus );
+	NAME.Iin  = THROUGH( @plus, @minus );	
+	
+	/* physical equation */
+	NAME.Uin = 0;
+	NAME.Iin = 0
+
+};
+
+
+//NAME.AOP( @plus, @minus, @out, @GND, gain:=10000, vsat:=10 )
+NAME.AOP( @plus, @minus, @out, @GND, gain, vsat )
+:= {
+
+	/* nodal equations */
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin  = ACROSS(  @plus, @minus );
+
+	/* physical equation */
+	NAME.Uout = MIN( MAX( gain * NAME.Uin, -vsat ), vsat )
+
+};
+
+//NAME.POTENTIOMETER( @1, @2, @3, value:=100, x:=0.5 )
+NAME.POTENTIOMETER( @1, @2, @3, value, x )
+:= {
+	/* nodal equations */
+	NAME.UA = ACROSS( @1, @2 );
+	NAME.IA = THROUGH( @1, @2 );
+	NAME.UB = ACROSS( @2, @3 );
+	NAME.IB = THROUGH( @2, @3 );
+	
+	/* physical equation */
+	NAME.UA = value * x     * NAME.IA;
+	NAME.UB = value * (x-1) * NAME.IB
+	
+};
+
+/********************************/
+/* Mutual inductance            */
+/********************************/
+
+//NAME.MC( @1, @2, @3, @4, LA, LB, k:=1 )
+NAME.MC( @1, @2, @3, @4, LA, LB, k )
+:= {
+
+	/* nodal equations */
+	NAME.UA = ACROSS( @1, @2 );
+	NAME.IA = THROUGH( @1, @2 );
+	NAME.UB = ACROSS( @3, @4 );
+	NAME.IB = THROUGH( @3, @4 );
+	
+	/* physical equation */
+	NAME.M  = k * sqrt( LA * LB );
+	NAME.UA = LA * DER( NAME.IA , t ) + NAME.M * DER( NAME.IB , t); 
+	NAME.UB = LB * DER( NAME.IB , t ) + NAME.M * DER( NAME.IA , t)
+	
+};
+
+/********************************/
+/* current and voltages sources */
+/********************************/
+
+NAME.VS( @1, @2, value )
+:= {	
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+		
+	/* physical equation */
+	NAME.U = value
+};
+
+NAME.IS( @1, @2, value )
+:= {
+	/* nodal equations */	
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+		
+	/* physical equation */
+	NAME.I = value
+
+};
+
+//NAME.VSIN( @1, @2, value:=1, freq:=1, phase:=0, offset:=0 )
+NAME.VSIN( @1, @2, value, freq, phase, offset )
+:= {
+
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * SIN( 2 * PI * freq * t - phase ) + offset + SRC()
+		
+};
+
+//NAME.VMOD( @1, @2, value:=1, freq1:=1, freq2:=5 )
+NAME.VMOD( @1, @2, value, freq1, freq2 )
+:= {
+
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * SIN( 2 * PI * freq1 * t ) * SIN( 2 * PI * freq2 * t )
+		
+};
+
+NAME.VSLOPE( @1, @2, coeff, delay )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	td = t - delay;
+	NAME.U = ( td < 0 ) ? 0 : coeff * td
+
+};
+
+//NAME.VSAW( @1, @2, value, phase, duration, offset:=0 )
+NAME.VSAW( @1, @2, value, phase, duration, offset )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * MOD( t - phase, duration ) + offset
+
+};
+
+//NAME.VPULSE( @1, @2, value, delay, duration, offset:=0, tr:=1n, tf:=1n )
+NAME.VPULSE( @1, @2, value, delay, duration, offset, tr, tf )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * 0.5 *  ( TANH( ( t - delay ) / tr  ) - TANH( ( t - delay - duration ) / tf ) ) + offset
+
+};
+
+//NAME.VSQR( @1, @2, value, freq, phase:=0, offset:=0, tr:=1n, tf:=1n )
+NAME.VSQR( @1, @2, value, freq, phase, offset, tr, tf )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = 0.5 * value * ( TANH( ( MOD( t - phase + 0.5 / freq , 1 / freq ) - 0.5 / freq ) / tr  ) - TANH( ( MOD( t - phase , 1 / freq )- 0.5 / freq ) / tf ) ) + offset
+
+};
+
+NAME.VRAMP( @1, @2, @GND, min, max, rise_time, fall_time )
+:= {
+	/* nodal equations */
+	NAME.Uin  = ACROSS(  @1, @GND );
+	NAME.Uout = ACROSS(  @2, @GND );
+	NAME.Iout = THROUGH( @2, @GND );
+
+	NAME.val1 = ( NAME.Uout < max ) ?  rise_time : 0;
+	NAME.val2 = ( NAME.Uout > min ) ? -fall_time : 0;
+
+    DER( NAME.Uout , t) = ( NAME.Uin >= 0.5 ) ? NAME.val1 : NAME.val2
+
+};
+
+/********************************/
+/* Measurement                  */
+/********************************/
+
+NAME.PROBE( @1, @GND )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @GND )
+};
+
+/********************************/
+/* Miscellaneous                */
+/********************************/
+
+NAME.CONSTMUL( @in, @out, @GND, value )
+:= {
+	/* nodal equations */
+	NAME.Uin = ACROSS( @in, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */
+	NAME.Uout = NAME.Uin * value
+
+};
+
+NAME.TRIG( @in, @out, @GND, val )
+:= {
+
+	/* nodal equations */
+	NAME.Uin = ACROSS( @in, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.out = THROUGH( @out, @GND );
+	
+	/* physical equation */
+	NAME.Uout = NAME.Uin > val  	
+
+};
+
+NAME.ITRIG( @in, @out, @GND, val )
+:= {
+	/* nodal equations */
+	NAME.Uin = ACROSS( @in, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */
+	NAME.Uout = NAME.Uin < val  
+	
+};
+
+/********************************/
+/* Delay lines                  */
+/********************************/
+
+//NAME.DL( @1, @2, @GND, z, td, l := 0, alpha := 0 )
+NAME.DL( @1, @2, @GND, z, td, l, alpha )
+:= {
+  // fixme : DELAY2( a, b ) := DELAY( a b );
+	
+	/* nodal equations */	
+	NAME.U1 = ACROSS( @1, @GND );
+	NAME.I1 = THROUGH( @1, @GND );
+	NAME.U2 = ACROSS( @2, @GND );
+	NAME.I2 = THROUGH( @2, @GND );
+	
+	/* physical equations */
+	NAME.A = EXP( -alpha * l / 2 );
+	NAME.U1 = z * NAME.I1 + NAME.A * ( DELAY2( NAME.U2, t - td ) +  z * DELAY2( NAME.I2, t - td ) );
+	NAME.U2 = z * NAME.I2 + NAME.A * ( DELAY2( NAME.U1, t - td ) +  z * DELAY2( NAME.I1, t - td ) )
+
+};
+
+/********************************/
+/* Switch                       */
+/********************************/
+NAME.SWITCH( @1 , @2, command )
+:= {
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+		
+    0 = ( command == 0 ) ? NAME.U : NAME.I
+	
+};
+
+/********************************/
+/* Non-linears components       */
+/********************************/
+
+// ideal diode
+NAME.ID( @plus, @minus )
+:= {
+    
+	/* nodal equations */
+	NAME.U = ACROSS( @plus, @minus );
+	NAME.I = THROUGH( @plus, @minus );
+		
+	/* physical equation */
+    0 = ( ( U + I ) > 0 ) ? NAME.U : NAME.I
+
+};
+
+// diode
+//NAME.D( @plus, @minus, IS := 1e-15, UT := 26e-3  )
+NAME.D( @plus, @minus, IS, UT  )
+:= {
+	/* nodal equations */
+	NAME.U = ACROSS( @plus, @minus );
+	NAME.I = THROUGH( @plus, @minus );
+		
+	/* physical equation */
+	NAME.I = ( EXP( NAME.U / UT + LOG( IS )  ) - IS )
+		
+};
