@@ -19,8 +19,8 @@
 // precedence is defined here
 // lowercase: new precedence = old precedence + 1
 // uppercase: new precedence = 0
+// parenthesis are used for display only
 
-//SEM( a )        "a;     ";
 SYST(a b)       "a;b    ";
 IF3( a b )      "a?b    ";
 COL( a b )      "a:\=b  ";

@@ -37,8 +37,6 @@ NAME.IAOP( @plus, @minus, @out, @GND ) := {
 
 };
 
-
-//NAME.AOP( @plus, @minus, @out, @GND, gain:=10000, vsat:=10 )
 NAME.AOP( @plus, @minus, @out, @GND, gain, vsat )
 := {
 
@@ -51,6 +49,9 @@ NAME.AOP( @plus, @minus, @out, @GND, gain, vsat )
 	NAME.Uout = MIN( MAX( gain * NAME.Uin, -vsat ), vsat )
 
 };
+
+NAME.AOP( @plus, @minus, @out, @GND, gain ) := NAME.AOP( @plus, @minus, @out, @GND, gain, 10 );
+NAME.AOP( @plus, @minus, @out, @GND )       := NAME.AOP( @plus, @minus, @out, @GND, 10000, 10 );
 
 //NAME.POTENTIOMETER( @1, @2, @3, value:=100, x:=0.5 )
 NAME.POTENTIOMETER( @1, @2, @3, value, x )
@@ -163,7 +164,8 @@ NAME.VSAW( @1, @2, value, phase, duration, offset )
 
 };
 
-//NAME.VPULSE( @1, @2, value, delay, duration, offset:=0, tr:=1n, tf:=1n )
+//NAME.VPULSE( @1, @2, value, delay, duration ) := NAME.VPULSE( @1, @2, value, delay, duration, 0, 1n, 1n );
+
 NAME.VPULSE( @1, @2, value, delay, duration, offset, tr, tf )
 := {
 	/* nodal equations */
@@ -274,6 +276,9 @@ NAME.DL( @1, @2, @GND, z, td, l, alpha )
 
 };
 
+//NAME.DL( @1, @2, @GND, z, td )    := NAME.DL( @1, @2, @GND, z, td, 0, 0 );
+//NAME.DL( @1, @2, @GND, z, td, l ) := NAME.DL( @1, @2, @GND, z, td, l, 0 );
+
 /********************************/
 /* Switch                       */
 /********************************/
@@ -305,13 +310,12 @@ NAME.ID( @plus, @minus )
 
 // diode
 //NAME.D( @plus, @minus, IS := 1e-15, UT := 26e-3  )
-NAME.D( @plus, @minus, IS, UT  )
+NAME.DD( @plus, @minus, ISS, UT  )
 := {
 	/* nodal equations */
 	NAME.U = ACROSS( @plus, @minus );
 	NAME.I = THROUGH( @plus, @minus );
 		
 	/* physical equation */
-	NAME.I = ( EXP( NAME.U / UT + LOG( IS )  ) - IS )
-		
+	NAME.I = ( EXP( NAME.U / UT + LOG( ISS )  ) - ISS )
 };

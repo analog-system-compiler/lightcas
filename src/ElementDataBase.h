@@ -57,14 +57,22 @@ public :
 
   enum PRIVATE_OPCODE
   {
-    OP_EXP1,
-    OP_EXP2,
-    OP_EXP3,
-    OP_EXP4,
-    OP_EXP5,
-    OP_EXP6,
-    OP_EXP7,
-    OP_EXP8,
+    OP_PAR0,
+    OP_PAR1,
+    OP_PAR2,
+    OP_PAR3,
+    OP_PAR4,
+    OP_PAR5,
+    OP_PAR6,
+    OP_PAR7,
+    OP_PAR8,
+    OP_PAR9,
+    OP_PARA,
+    OP_PARB,
+    OP_PARC,
+    OP_PARD,
+    OP_PARE,
+    OP_PARF,
     OP_ZERO,
     OP_SET,
     OP_GET,
@@ -82,7 +90,7 @@ public :
     OP_END_RESERVED
   };
 
-  enum { MAX_EXP = OP_EXP8 - OP_EXP1 + 1 };
+  enum { MAX_PAR = OP_PARF - OP_PAR0 + 1 };
 
 protected:
 
@@ -117,7 +125,7 @@ public:
   static void       UnRef( OP_CODE op )              { m_ElementRefArray[ ( unsigned )op ] = NULL; }
   static const CSymbolSyntaxArray& GetSymbolTable()  { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                 { return m_SecureLimit;       }
-  static bool IsReservedOP( OP_CODE op )             { return ( op >= OP_EXP1   ) && ( op < ( OP_EXP1 + MAX_EXP ) ); }
+  static bool IsReservedOP( OP_CODE op )             { return ( op >= OP_PAR0   ) && ( op < ( OP_PAR0 + MAX_PAR ) ); }
   static bool IsFunctionOP( OP_CODE op )             { return ( op >= OP_CONST ) && ( op <= OP_FUNCT2 ); }
   CElementDataBase* GetParent() const                { return m_Parent;            }
 

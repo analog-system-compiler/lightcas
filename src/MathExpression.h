@@ -42,7 +42,7 @@ typedef struct
   pos_t      m_Pos;
   pos_t      m_Size;
   pos_t      m_RuleDstPos;
-  pos_t      m_PosArray[CElementDataBase::MAX_EXP];
+  pos_t      m_PosArray[CElementDataBase::MAX_PAR];
 #ifdef _DEBUG
   CAlgebraRule* m_Rule;
 #endif
@@ -87,8 +87,8 @@ protected:
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
   char     TryMatchExp( const char*& sp );
   void     Move( pos_t pos_dest, pos_t pos_source, pos_t size );
-  pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const;
-  bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_EXP], OP_CODE op1, pos_t pos2 ) const;
+  pos_t    Match( pos_t pos, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_PAR] ) const;
+  bool     RegisterBranch( pos_t pos_array[CElementDataBase::MAX_PAR], OP_CODE op1, pos_t pos2 ) const;
   void     Zero();
   void     RemoveZero();
   bool     ExecuteCommand();
@@ -104,12 +104,12 @@ protected:
   //static
   static CElement*  RefToElement( OP_CODE op )            { return CElementDataBase::RefToElement( op );  }
   //static OP_CODE    ElementToRef( const CElement* e )     { return CElementDataBase::ElementToRef( e );   }
-  static unsigned   ReservedParameterIndex( OP_CODE op )  { return ( unsigned )( op - CElementDataBase::OP_EXP1 );  }
+  static unsigned   ReservedParameterIndex( OP_CODE op )  { return ( unsigned )( op - CElementDataBase::OP_PAR0 );  }
 
   //Display funct
   pos_t    DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
   pos_t    DisplaySymbol( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
-  void     DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const;
+  void     DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay& ds ) const;
 
 public:
   void  Initialize( CElementDataBase* db );

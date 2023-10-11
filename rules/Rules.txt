@@ -302,6 +302,8 @@ EXPAND2( a )          := EXPAND( _get(a) ); // replace element with its equivale
 
 CHOOSEVAR(1,b)        := b;
 CHOOSEVAR(a,1)        := a;
+CHOOSEVAR(a.b,c)      := a.b;
+CHOOSEVAR(a,b.c)      := b.c;
 CHOOSEVAR(a,b)        := _rank(a b);
 //CHOOSEVAR(a,b)        := ( _eval( _gte( _rank(a) _rank(b) ) ) ? a : b );
 CHOOSEVARDIV(1,b)     := b;

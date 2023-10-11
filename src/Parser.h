@@ -51,7 +51,6 @@ public:
 protected:
   bool  SkipLineComment();
   bool  SkipBlockComment();
-  void  SkipSpace();
 
 public:
   bool  Find( char c );
@@ -60,6 +59,7 @@ public:
   bool  TryMatchSymbol( const char*& symbol_str );
   bool  LoadFile( const CString& name );
   bool  CloseFile();
+  void  SkipSpace();
 
   bool  ProcessMacro();
   bool  GetQuote();

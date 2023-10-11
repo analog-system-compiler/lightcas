@@ -155,20 +155,28 @@ bool CElementDataBase::Initialize()
 void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp( this );
-  static const char parameters[] = "a b c d e f g h";
+  static const char parameters[] = "_a _b _c _d _e _f _g _h _i _j _k _l _m _n _o _q";
   //static const char built_in[]   = "_set(a a) _get(a) _none _const(a) _elem(a) _funct0(a) _funct1(a a) _funct2(a a a) NEG(a) _rank(a a) _eval(a) _assert(a)";
   static const char built_in[] = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0) _check(0 0) _print(0)";
 
   exp.GetFromString( parameters );
-  ASSERT( m_ElementRefArray[ OP_EXP1   ]->ToRef() == OP_EXP1   );
-  ASSERT( m_ElementRefArray[ OP_EXP2   ]->ToRef() == OP_EXP2   );
-  ASSERT( m_ElementRefArray[ OP_EXP3   ]->ToRef() == OP_EXP3   );
-  ASSERT( m_ElementRefArray[ OP_EXP4   ]->ToRef() == OP_EXP4   );
-  ASSERT( m_ElementRefArray[ OP_EXP5   ]->ToRef() == OP_EXP5   );
-  ASSERT( m_ElementRefArray[ OP_EXP6   ]->ToRef() == OP_EXP6   );
-  ASSERT( m_ElementRefArray[ OP_EXP7   ]->ToRef() == OP_EXP7   );
-  ASSERT( m_ElementRefArray[ OP_EXP8   ]->ToRef() == OP_EXP8   );
-  m_SearchStart = MAX_EXP;
+  ASSERT( m_ElementRefArray[ OP_PAR0   ]->ToRef() == OP_PAR0   );
+  ASSERT( m_ElementRefArray[ OP_PAR1   ]->ToRef() == OP_PAR1   );
+  ASSERT( m_ElementRefArray[ OP_PAR2   ]->ToRef() == OP_PAR2   );
+  ASSERT( m_ElementRefArray[ OP_PAR3   ]->ToRef() == OP_PAR3   );
+  ASSERT( m_ElementRefArray[ OP_PAR4   ]->ToRef() == OP_PAR4   );
+  ASSERT( m_ElementRefArray[ OP_PAR5   ]->ToRef() == OP_PAR5   );
+  ASSERT( m_ElementRefArray[ OP_PAR6   ]->ToRef() == OP_PAR6   );
+  ASSERT( m_ElementRefArray[ OP_PAR7   ]->ToRef() == OP_PAR7   );
+  ASSERT( m_ElementRefArray[ OP_PAR8   ]->ToRef() == OP_PAR8   );
+  ASSERT( m_ElementRefArray[ OP_PAR9   ]->ToRef() == OP_PAR9   );
+  ASSERT( m_ElementRefArray[ OP_PARA   ]->ToRef() == OP_PARA   );
+  ASSERT( m_ElementRefArray[ OP_PARB   ]->ToRef() == OP_PARB   );
+  ASSERT( m_ElementRefArray[ OP_PARC   ]->ToRef() == OP_PARC   );
+  ASSERT( m_ElementRefArray[ OP_PARD   ]->ToRef() == OP_PARD   );
+  ASSERT( m_ElementRefArray[ OP_PARE   ]->ToRef() == OP_PARE   );
+  ASSERT( m_ElementRefArray[ OP_PARF   ]->ToRef() == OP_PARF   );
+  m_SearchStart = MAX_PAR;
 
   GetElement( "0" )->SetConst();
   ASSERT( m_ElementRefArray[OP_ZERO]->ToRef() == OP_ZERO );

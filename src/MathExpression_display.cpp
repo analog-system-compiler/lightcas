@@ -47,7 +47,7 @@ pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority
   unsigned i, n;
   const CElement* e;
   unsigned pos2;
-  pos_t pos_array[CElementDataBase::MAX_EXP];
+  pos_t pos_array[CElementDataBase::MAX_PAR];
 
   ASSERT( pos );
   pos2 = DisplaySymbol( ds, pos, priority );
@@ -60,7 +60,7 @@ pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority
     n = e->GetFunction()->GetParameterNb();
     if( n || e->IsNumeric() ) // For Rand(), n=0
     {
-      ASSERT( n <= CElementDataBase::MAX_EXP );
+      ASSERT( n <= CElementDataBase::MAX_PAR );
       ds += '(';
       if ( n )
       {
@@ -89,7 +89,7 @@ pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority
 
 pos_t CMathExpression::DisplaySymbol( CDisplay& ds, pos_t pos, unsigned precedence ) const
 {
-  pos_t pos_array[CElementDataBase::MAX_EXP];
+  pos_t pos_array[CElementDataBase::MAX_PAR];
 
   const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
   for( unsigned i = 0; i < st.GetSize(); i++ )
@@ -122,7 +122,7 @@ pos_t CMathExpression::DisplaySymbol( CDisplay& ds, pos_t pos, unsigned preceden
   return pos;
 }
 
-void CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_EXP], unsigned precedence, CDisplay& ds ) const
+void CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay& ds ) const
 {
   char c;
   unsigned i;

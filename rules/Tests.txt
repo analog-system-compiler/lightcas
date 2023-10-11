@@ -227,10 +227,10 @@ _check( 1 0 );
 
 //Define RLC circuit for testing purposes
 RLC() := { 
-  V.CV(@1,@2,10); 
-  R.CR(@2,@3,100); 
-  L.CL(@3,@4,1m); 
-  C.CC(@4,@1,10u) 
+  V.CV(@1, @2, 10); 
+  R.CR(@2, @3, 100); 
+  L.CL(@3, @4, 1m); 
+  C.CC(@4, @1, 10u) 
 };
 
 SOLVE_RLC2(a)     := SYSTEM_SOLVE( VECT_TO_LIST( AC_TRANSFORM( a ) ), {C.U,R.U,L.U,R.I,V.I,C.I,L.I,V.U} );
@@ -243,10 +243,30 @@ _check( AC_TRANSFORM( RLC ) { C.U+V.U+R.U+L.U;R.I-V.I;V.I-C.I;L.I-R.I;C.I-1e-05*
 _check( SIMPLIFY( TEST_SYSTEM() ) {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} );
 
 //TEST_SYSTEM2() := SIMPLIFY( SOLVE_RLC2( RLC ) );
-//_check( SIMPLIFY( SIMPLIFY( SUBST( SIMPLIFY( TEST_SYSTEM2() ) s {10,30,100,300,1000,3000,10000,30000,100000} ) )  {10,30,100,300,1000,3000,10000,30000,100000} );
+//_check( SIMPLIFY( SIMPLIFY( SUBST( SIMPLIFY( TEST_SYSTEM2() ) {10,30,100,300,1000,3000,10000,30000,100000} ) ) )  {10,30,100,300,1000,3000,10000,30000,100000} );
 //_check( SIMPLIFY( SUBST( {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} s {10,30,100,300,1000,3000,10000,30000,100000} ) )  {10,30,100,300,1000,3000,10000,30000,100000} );
 //_check( SOLVE_RLC( RLC )  {0} );
 
 _check( SIMPLIFY(1n-1e-9)  0 );
 _check( SIMPLIFY(1m-0.001) 0 );
-_check( SIMPLIFY(1K-1000)  0 )
+_check( SIMPLIFY(1K-1000)  0 );
+
+delay_line_test(RS) :=
+{
+	VP.VPULSE( @4, @GND, 1, 10n, 80n, 0, 1n, 1n );
+	R2.CR ( @4, @3, 5 );
+	L1.CL ( @3, @1, 10n );
+	C1.CC ( @1, @GND, 1n );
+	DL1.DL( @1, @2, @GND, 50, 1e-8, 0, 0 );
+	R1.CR ( @2, @GND, RS  );
+	DL2.DL( @2, @5, @GND, 50, 1e-8, 0, 0 );
+	R3.CR ( @5, @GND, 50  )
+};
+
+//delay_line_test_solved := SYSTEM_AUTO_SOLVE( TRANSIENT_TRANSFORM( delay_line_test( 50 ) ) );
+//TRANSIENT_TRANSFORM(a) => LOOP_TRANS(NODE_TRANS(ZERO_SYS_ENTRY(SYS_CONCAT_ENTRY(VECT_INSIDE(_get(a))))))
+//delay_line_test_solved :=  TRANSIENT_TRANSFORM( delay_line_test( 50 ) );
+//delay_line_test_solved2 :=  SYSTEM_AUTO_SOLVE( delay_line_test_solved );
+delay_line_test_solved2 :=  SYSTEM_AUTO_SOLVE( TRANSIENT_TRANSFORM( delay_line_test( 50 ) ) );
+//_check(  delay_line_test_solved {(((((((((((((((((((DL2.U2-R3.U;L1.I-R2.I);R2.I);C1.I+DL1.I1-L1.I);-(C1.I+(DL1.I1+(DL1.I2+(R1.I+(DL2.I1+(DL2.I2+R3.I)))))));DL1.I2+(R1.I+DL2.I1));R3.U-50*R3.I);DL2.U2-(50*DL2.I2+(DELAY2(DL2.U1,TIME-1e-08)+50*DELAY2(DL2.I1,TIME-1e-08))*DL2.A));DL2.U1-(50*DL2.I1+(DELAY2(DL2.U2,TIME-1e-08)+50*DELAY2(DL2.I2,TIME-1e-08))*DL2.A));DL2.A-1);DL1.U2-DL2.U1);R1.U-50*R1.I);DL1.U2-R1.U);DL1.U2-(50*DL1.I2+(DELAY2(DL1.U1,TIME-1e-08)+50*DELAY2(DL1.I1,TIME-1e-08))*DL1.A));DL1.U1-(50*DL1.I1+(DELAY2(DL1.U2,TIME-1e-08)+50*DELAY2(DL1.I2,TIME-1e-08))*DL1.A));DL1.A-1);C1.U-DL1.U1);C1.I-1e-09*DER(C1.U,TIME));L1.U-1e-08*DER(L1.I,TIME));R2.U-5*R2.I)} );
+_check(  _get( delay_line_test_solved2 ) 0 )

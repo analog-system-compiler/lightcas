@@ -199,8 +199,8 @@ void CMathExpression::ConvertToRule( CMathExpression& src, CMathExpression& dst 
       e = RefToElement( op );
       if ( e->IsVar() )
       {
-        src.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
-        dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_EXP1 + i ) );
+        src.Replace( op, ( OP_CODE )( CElementDataBase::OP_PAR0 + i ) );
+        dst.Replace( op, ( OP_CODE )( CElementDataBase::OP_PAR0 + i ) );
         i++;
       }
       else

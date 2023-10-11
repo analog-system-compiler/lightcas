@@ -79,4 +79,3 @@ void CElement::AddFunction( const CMathExpression& src, const CMathExpression& d
   SetFunct(); // to avoid function to be replaced by exp in "ConvertToRule"
   m_Function.AddAlgebraRule( src, dst, line_nb );
 }
-

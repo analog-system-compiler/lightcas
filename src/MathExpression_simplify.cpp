@@ -28,7 +28,7 @@
 void CMathExpression::OptimizeTree()
 {
   pos_t pos;
-  pos_t pos_array[CElementDataBase::MAX_EXP + 1];
+  pos_t pos_array[CElementDataBase::MAX_PAR + 1];
   CAlgebraRule* rule;
 
   if ( ExecuteCommand() )
@@ -64,7 +64,7 @@ void CMathExpression::OptimizeTree()
   }
 }
 
-CAlgebraRule* CMathExpression::RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] )
+CAlgebraRule* CMathExpression::RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_PAR] )
 {
   unsigned i;
   unsigned n;
@@ -91,7 +91,7 @@ CAlgebraRule* CMathExpression::RuleSearch( pos_t& pos, pos_t pos_array[CElementD
   }
   return NULL;
 }
-void CMathExpression::ApplyRule( pos_t pos2, pos_t pos_array[CElementDataBase::MAX_EXP], const CMathExpression& rule_equ )
+void CMathExpression::ApplyRule( pos_t pos2, pos_t pos_array[CElementDataBase::MAX_PAR], const CMathExpression& rule_equ )
 {
   CMathExpression equ( m_ElementDB );
   OP_CODE op3;
@@ -177,7 +177,7 @@ void CMathExpression::OptimizeTree()
         if ( CElementDataBase::IsReservedOP( op3 ) )
         {
           j = ReservedParameterIndex( op3 );
-          ASSERT( j < CElementDataBase::MAX_EXP );
+          ASSERT( j < CElementDataBase::MAX_PAR );
           unsigned pos2 = save_context.m_PosArray[j];
           ASSERT( pos2 <= GetSize() );
           pos_t pos5 = save_context.m_RuleDstPos; //already incremented
@@ -288,11 +288,11 @@ bool CMathExpression::RuleSearch( const CElement* e )
 
 bool CMathExpression::Match( const CMathExpression& equ ) const
 {
-  pos_t pos_array[CElementDataBase::MAX_EXP];
+  pos_t pos_array[CElementDataBase::MAX_PAR];
   return Match( GetSize(), equ, pos_array ) != GetSize();
 }
 
-pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_EXP] ) const
+pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_array[CElementDataBase::MAX_PAR] ) const
 {
   unsigned i;
   OP_CODE op1, op2, op3;
@@ -300,7 +300,7 @@ pos_t CMathExpression::Match( pos_t pos3, const CMathExpression& equ, pos_t pos_
   pos_t pos1 = equ.GetSize();
   pos_t pos2 = pos3;
 
-  for ( i = 0; i < CElementDataBase::MAX_EXP; i++ )
+  for ( i = 0; i < CElementDataBase::MAX_PAR; i++ )
   {
     pos_array[i] = 0;
   }
@@ -503,13 +503,13 @@ bool CMathExpression::CompareBranch( pos_t pos1, pos_t pos2 ) const
   return ( ( pos1 - pos11 ) == ( pos2 - pos22 ) ) && !memcmp( &m_StackArray[pos11], &m_StackArray[pos22], ( pos2 - pos22 ) * sizeof( OP_CODE ) );
 }
 
-bool CMathExpression::RegisterBranch( pos_t pos_array[ CElementDataBase::MAX_EXP ], OP_CODE op1, pos_t pos2 ) const
+bool CMathExpression::RegisterBranch( pos_t pos_array[ CElementDataBase::MAX_PAR ], OP_CODE op1, pos_t pos2 ) const
 {
   unsigned i;
   bool match;
 
   i = ReservedParameterIndex( op1 );
-  ASSERT( i < CElementDataBase::MAX_EXP );
+  ASSERT( i < CElementDataBase::MAX_PAR );
 
   if( pos_array[ i ] == 0 )
   {
