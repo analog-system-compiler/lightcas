@@ -267,6 +267,6 @@ delay_line_test(RS) :=
 //TRANSIENT_TRANSFORM(a) => LOOP_TRANS(NODE_TRANS(ZERO_SYS_ENTRY(SYS_CONCAT_ENTRY(VECT_INSIDE(_get(a))))))
 //delay_line_test_solved :=  TRANSIENT_TRANSFORM( delay_line_test( 50 ) );
 //delay_line_test_solved2 :=  SYSTEM_AUTO_SOLVE( delay_line_test_solved );
-delay_line_test_solved2 :=  SYSTEM_AUTO_SOLVE( TRANSIENT_TRANSFORM( delay_line_test( 50 ) ) );
+delay_line_test_solved2 :=  SYSTEM_AUTO_SOLVE( VECT_TO_LIST( TRANSIENT_TRANSFORM( delay_line_test( 50 ) ) ) );
 //_check(  delay_line_test_solved {(((((((((((((((((((DL2.U2-R3.U;L1.I-R2.I);R2.I);C1.I+DL1.I1-L1.I);-(C1.I+(DL1.I1+(DL1.I2+(R1.I+(DL2.I1+(DL2.I2+R3.I)))))));DL1.I2+(R1.I+DL2.I1));R3.U-50*R3.I);DL2.U2-(50*DL2.I2+(DELAY2(DL2.U1,TIME-1e-08)+50*DELAY2(DL2.I1,TIME-1e-08))*DL2.A));DL2.U1-(50*DL2.I1+(DELAY2(DL2.U2,TIME-1e-08)+50*DELAY2(DL2.I2,TIME-1e-08))*DL2.A));DL2.A-1);DL1.U2-DL2.U1);R1.U-50*R1.I);DL1.U2-R1.U);DL1.U2-(50*DL1.I2+(DELAY2(DL1.U1,TIME-1e-08)+50*DELAY2(DL1.I1,TIME-1e-08))*DL1.A));DL1.U1-(50*DL1.I1+(DELAY2(DL1.U2,TIME-1e-08)+50*DELAY2(DL1.I2,TIME-1e-08))*DL1.A));DL1.A-1);C1.U-DL1.U1);C1.I-1e-09*DER(C1.U,TIME));L1.U-1e-08*DER(L1.I,TIME));R2.U-5*R2.I)} );
 _check(  _get( delay_line_test_solved2 ) 0 )
