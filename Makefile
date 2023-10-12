@@ -2,8 +2,8 @@
 MAKEFLAGS = --jobs 4
 
 EXE         = LightCAS
-SRC_DIR     = ../src
-RULES_DIR   = ../rules
+SRC_DIR     = src
+RULES_DIR   = rules
 OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/app ) ./objs
 LIB         = lib$(EXE).a
 EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
