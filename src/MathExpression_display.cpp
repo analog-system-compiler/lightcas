@@ -20,21 +20,24 @@
 #include "Element.h"
 #include "MathExpression.h"
 
-void CMathExpression::Display( CDisplay& ds, bool bAll ) const
+void CMathExpression::Display(CDisplay &ds, bool bAll) const
 {
   unsigned pos = m_StackSize;
 
-  if( pos == 0 )
+  if (pos == 0)
   {
     ds += '0';
   }
   else
   {
-    while( pos )
+    while (pos)
     {
-      pos = DisplayBranch( ds, pos );
-      if ( !bAll ) { return; }
-      if( pos )
+      pos = DisplayBranch(ds, pos);
+      if (!bAll)
+      {
+        return;
+      }
+      if (pos)
       {
         ds += ' ';
       }
@@ -42,41 +45,42 @@ void CMathExpression::Display( CDisplay& ds, bool bAll ) const
   }
 }
 
-pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority ) const
+pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority) const
 {
   unsigned i, n;
-  const CElement* e;
+  const CElement *e;
   unsigned pos2;
   pos_t pos_array[CElementDataBase::MAX_PAR];
 
-  ASSERT( pos );
-  pos2 = DisplaySymbol( ds, pos, priority );
+  ASSERT(pos);
+  pos2 = DisplaySymbol(ds, pos, priority);
 
-  if( pos == pos2 ) //no symbol displayed
+  if (pos == pos2) // no symbol displayed
   {
-    OP_CODE op = Pop( pos );
-    e = RefToElement( op );
-    e->Display( ds );
-    n = e->GetFunction()->GetParameterNb();
-    if( n || e->IsNumeric() ) // For Rand(), n=0
+    OP_CODE op = Pop(pos);
+    e = RefToElement(op);
+    e->Display(ds);
+
+    if (e->IsNumeric() || e->IsFunct()) // For Rand(), n=0
     {
-      ASSERT( n <= CElementDataBase::MAX_PAR );
+      n = e->GetFunction()->GetParameterNb();
+      ASSERT(n <= CElementDataBase::MAX_PAR);
       ds += '(';
-      if ( n )
+      if (n)
       {
-        for ( i = 0; i < n; i++ )
+        for (i = 0; i < n; i++)
         {
           pos_array[i] = pos;
-          pos = NextBranch( pos );
+          pos = NextBranch(pos);
         }
-        for ( i = 1; i < n; i++ )
+        for (i = 1; i < n; i++)
         {
-          DisplayBranch( ds, pos_array[n - i] );
+          DisplayBranch(ds, pos_array[n - i]);
           ds += ' ';
         }
-        DisplayBranch( ds, pos_array[0] );
+        DisplayBranch(ds, pos_array[0]);
       }
-      ds += ')' ;
+      ds += ')';
     }
   }
   else
@@ -87,78 +91,74 @@ pos_t CMathExpression::DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority
   return pos;
 }
 
-pos_t CMathExpression::DisplaySymbol( CDisplay& ds, pos_t pos, unsigned precedence ) const
+pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
 {
+  pos_t pos1;
   pos_t pos_array[CElementDataBase::MAX_PAR];
 
-  const CSymbolSyntaxArray& st = m_ElementDB->GetSymbolTable();
-  for( unsigned i = 0; i < st.GetSize(); i++ )
+  const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
+  for (unsigned i = 0; i < st.GetSize(); i++)
   {
-    const CSymbolSyntaxStruct* ss = st[i];
-    const CMathExpression* equ =  &ss->m_Equation;
-    pos_t pos1 = Match( pos, *equ, pos_array );
-    if( pos1 != pos )
+    const CSymbolSyntaxStruct *ss = st[i];
+    pos1 = Match(pos, ss->m_Equation, pos_array);
+    if (pos1 != pos)
     {
-      const char* sp = ss->m_Syntax;
-#ifdef _DEBUG      
-      if( i <= precedence )
-#else
-      if( i < precedence )
-#endif      
+      const char *sp = ss->m_Syntax;
+
+      if ((i < precedence) || (ds.IsDebug() && (i == precedence)) )
       {
-        ds += '(' ;
-        DisplaySymbolString( sp, pos_array, i, ds );
+        ds += '(';
+        DisplaySymbolString(sp, pos_array, i, ds);
         ds += ')';
       }
       else
       {
-        DisplaySymbolString( sp, pos_array, i, ds );
+        DisplaySymbolString(sp, pos_array, i, ds);
       }
       pos = pos1;
       break;
     }
   }
-
   return pos;
 }
 
-void CMathExpression::DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay& ds ) const
+void CMathExpression::DisplaySymbolString(const char *sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay &ds) const
 {
   char c;
   unsigned i;
   unsigned precedence2;
 
-  while ( ( c = *sp++ ) )
+  while ((c = *sp++))
   {
-    if ( c == '(' )
+    if (c == '(')
     {
       precedence++;
     }
-    else if ( c == ')' )
+    else if (c == ')')
     {
-      if ( precedence )
+      if (precedence)
       {
         precedence--;
       }
     }
-    else if( ( c == CParser::m_OperatorExclude ) || ( c == CParser::m_OperatorAlpha ) )
+    else if ((c == CParser::m_OperatorExclude) || (c == CParser::m_OperatorAlpha))
     {
-      if( c == CParser::m_OperatorAlpha )
+      if (c == CParser::m_OperatorAlpha)
       {
         ds += *sp;
       }
-      sp++; //Exclude operator
+      sp++; // Exclude operator
     }
-    else if( CParser::IsWord( c ) )
+    else if (::isalpha(c))
     {
       precedence2 = precedence;
-      if( c < 'a' )
+      if (c < 'a')
       {
         precedence2 = 0;
       }
-      ASSERT( c >= 'A' );
-      i = tolower( c ) - 'a';
-      DisplayBranch( ds, pos_array[i], precedence2 );
+      ASSERT(c >= 'A');
+      i = ::tolower(c) - 'a';
+      DisplayBranch(ds, pos_array[i], precedence2);
     }
     else
     {

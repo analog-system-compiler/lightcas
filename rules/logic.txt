@@ -1,0 +1,79 @@
+/****************************************************/
+/*                                                  */
+/*  SimCAS library                                  */
+/*  Copyright (C) 2007 The SIMCAS project           */
+/*                                                  */
+/****************************************************/
+
+NAME.ANDC( @in1, @in2, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin1 = ACROSS( @in1, @GND );
+	NAME.Uin2 = ACROSS( @in2, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.Uout = NAME.Uin1 & NAME.Uin2
+};
+
+NAME.ORC( @in1, @in2, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin1 = ACROSS( @in1, @GND );
+	NAME.Uin2 = ACROSS( @in2, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.Uout = NAME.Uin1 | NAME.Uin2
+};
+
+NAME.XORC( @in1, @in2, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin1 = ACROSS( @in1, @GND );
+	NAME.Uin2 = ACROSS( @in2, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.Uout = XOR( NAME.Uin1  NAME.Uin2 )	
+};
+
+NAME.NOTC( @in, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin = ACROSS( @in, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.Uout = LNOT( NAME.Uin )
+};
+
+NAME.SRFFC( @in1, @in2, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin1 = ACROSS( @in1, @GND );
+	NAME.Uin2 = ACROSS( @in2, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.Uout = ( ( NAME.Uout>0.5) | ( NAME.Uin1 > 0.5) ) & ( NAME.Uin2 > 0.5 )
+};
+
+NAME.FFC( @in, @clk, @out, @GND ) :=
+{
+	/* nodal equations */
+	NAME.Uin  = ACROSS( @in, @GND );
+	NAME.Uclk = ACROSS( @clk, @GND );
+	NAME.Uout = ACROSS( @out, @GND );
+	NAME.Iout = THROUGH( @out, @GND );
+	
+	/* physical equation */				
+	NAME.aux1 = ( NAME.Uclk > 0.5 );
+	NAME.aux2 = ( NAME.Uclk > 0.5 ) & ( NAME.aux1==0 );
+	NAME.Uout = ( ( (NAME.Uout>0.5) & (NAME.aux2==0) ) | ( (NAME.Uin>0.5) & (NAME.aux2==1) ) )
+};

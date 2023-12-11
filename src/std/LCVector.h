@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 template < class T > class CVector : public std::vector < T >
@@ -42,6 +43,7 @@ public:
   T*        GetData()                                     { return std::vector < T >::data(); }
   unsigned  GetSize() const                               { return std::vector < T >::size(); }
   void      CheckSize( unsigned index )                   { if( index >= GetSize() ) SetSize( index + 1 ); }
+  bool      Find(const T e)                               { return std::find( std::vector < T >::begin(), std::vector < T >::end(), e) != std::vector < T >::end();}
 
 };
 

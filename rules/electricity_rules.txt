@@ -1,0 +1,166 @@
+/*******************************************************************************/
+/*  Copyright (C) 2014 The LightCAS project                                    */
+/*                                                                             */
+/*  This program is free software; you can redistribute it and/or modify       */
+/*  it under the terms of the GNU General Public License as published by       */
+/*  the Free Software Foundation; either version 2 of the License, or          */
+/*  (at your option) any later version.                                        */
+/*                                                                             */
+/*  This program is distributed in the hope that it will be useful,            */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of             */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the              */
+/*  GNU General Public License for more details.                               */
+/*                                                                             */
+/*  You should have received a copy of the GNU General Public License          */
+/*  along with this program; if not, write to the Free Software                */
+/*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
+/*******************************************************************************/
+
+`symbol "a$p" UNIT_p( a )
+`symbol "a$n" UNIT_n( a )
+`symbol "a$u" UNIT_u( a )
+`symbol "a$m" UNIT_m( a )
+`symbol "a$k" UNIT_k( a )
+`symbol "a$K" UNIT_K( a )
+`symbol "a$M" UNIT_M( a )
+`symbol "a$G" UNIT_G( a )
+
+UNIT_p(a) := a * 1e-12;
+UNIT_n(a) := a * 1e-9;
+UNIT_u(a) := a * 1e-6;
+UNIT_m(a) := a * 1e-3;
+UNIT_k(a) := a * 1e3;
+UNIT_K(a) := a * 1e3;
+UNIT_M(a) := a * 1e6;
+UNIT_G(a) := a * 1e9;
+
+t := TIME();
+
+AC(a;b)       := (AC(a);AC(b));
+AC(a+b)       := AC(a)+AC(b);
+AC(a-b)       := AC(a)-AC(b);
+AC(a*b)       := AC(a)*AC(b);
+AC(a/b)       := AC(a)/AC(b);
+AC(-a)        := -AC(a);
+AC(SRC())     := 1;
+AC(DER(a,TIME())) := a*s();
+AC(INT(a,TIME())) := a/s();
+AC(TIME())        := 0;
+//AC(_const(a))  := 0;
+//AC(ELEM(a))   := a;
+AC(a)         := a;
+AC({a})       := {AC(a)};
+
+TRANS(a;b)       := (TRANS(a);TRANS(b));
+TRANS(a+b)       := TRANS(a)+TRANS(b);
+TRANS(a-b)       := TRANS(a)-TRANS(b);
+TRANS(a*b)       := TRANS(a)*TRANS(b);
+TRANS(a/b)       := TRANS(a)/TRANS(b);
+TRANS(-a)        := -TRANS(a);
+TRANS(SRC())     := 0;
+//TRANS(DER(a,TIME())) := ( TRANS(a) - _delay(TRANS(a), DELTA_TIME() )) / DELTA_TIME() ;
+//TRANS(DER(a,TIME())) := 2 * ( TRANS(a) - _delay(TRANS(a), DELTA_TIME() )) / DELTA_TIME() - ( _delay(TRANS(a), DELTA_TIME() ) - _delay(TRANS(a), 2 * DELTA_TIME() ) ) / DELTA_TIME();
+//TRANS(DER(a,TIME())) := 2 * ( TRANS(a) - _delay(TRANS(a), DELTA_TIME() )) / DELTA_TIME() - _delay_DER( TRANS(a), DELTA_TIME() );
+TRANS(DER(a,TIME())) := _der1( TRANS(a) ) * TRANS(a) + _der0( TRANS(a) );
+TRANS(a.b)       := a.b;
+TRANS( _funct1( a   f ) ) := _funct1( TRANS(a) f );
+TRANS( _funct2( a b f ) ) := _funct2( TRANS(a) TRANS(b) f );
+TRANS(a)           := a;
+TRANS({a})         := {TRANS(a)};
+TRANS(IF((a:b) c)) := LIN_IF((a:b) c);
+TRANS(EXP(a))      := LIN_EXP(a);
+
+TRANS(GT ( a b ) ) :=  GT(  TKEEP(a)  TKEEP(b) );
+TRANS(EQ ( a b ) ) :=  EQ(  TKEEP(a)  TKEEP(b) );
+TRANS(NEQ( a b ) ) :=  NEQ( TKEEP(a)  TKEEP(b) );
+TRANS(LTE( a b ) ) :=  LTE( TKEEP(a)  TKEEP(b) );
+TRANS(LT ( a b ) ) :=  LT(  TKEEP(a)  TKEEP(b) );
+TRANS(GTE( a b ) ) :=  GTE( TKEEP(a)  TKEEP(b) );
+
+LIN_EXP(a)       := EXP( TKEEP(a) ) * a + ( 1 - TKEEP( a ) ) * EXP( TKEEP( a ) );
+LIN_IF((a:b) c)  := a*TKEEP(c) + b*(1-TKEEP(c));
+
+TKEEP( _const( a ) ) := a;
+TKEEP( a )   := _last( a );
+TKEEP(a+b)   := TKEEP(a) + TKEEP(b);
+TKEEP(a-b)   := TKEEP(a) - TKEEP(b);
+TKEEP(a*b)   := TKEEP(a) * TKEEP(b);
+TKEEP(a/b)   := TKEEP(a) / TKEEP(b);
+TKEEP(a>b)   := TKEEP(a) > TKEEP(b);
+TKEEP(a>=b)  := TKEEP(a) >= TKEEP(b);
+TKEEP(a<b)   := TKEEP(a) < TKEEP(b);
+TKEEP(a<=b)  := TKEEP(a) <= TKEEP(b);
+TKEEP(a==b)  := TKEEP(a) == TKEEP(b);
+
+// TODO check functions below. Don't work
+//TKEEP( _funct1( a   f ) ) := _funct1( TKEEP(a) f );
+//TKEEP( _funct2( a b f ) ) := _funct2( TKEEP(a) TKEEP(b) f );
+
+REM_DC(a;b)   := (REM_DC(a);REM_DC(b));
+REM_DC(a+b)   := REM_DC(a)+REM_DC(b);
+REM_DC(a-b)   := REM_DC(a)-REM_DC(b);
+REM_DC({a})   := {REM_DC(a)};
+REM_DC(-_const(a)) := 0;
+REM_DC( _const(a)) := 0;
+REM_DC(a)     := a;
+
+ACROSS( a, a)                            := 0;
+LOOP_CHECK(a-ACROSS(c,d);b-ACROSS(c,e))  := (b-a)-ACROSS(d,e);
+LOOP_CHECK(a-ACROSS(c,d);b-ACROSS(d,e))  := (a+b)-ACROSS(c,e);
+LOOP_CHECK(a;b;c)                        := (LOOP_CHECK(a;c);LOOP_CHECK(b;c));
+LOOP_CHECK(a;b)                          := a;
+
+KIRCHHOFF_LOOP(a;b;c-ACROSS(d))          := KIRCHHOFF_LOOP( LOOP_CHECK(a;c-ACROSS(d)); LOOP_CHECK(b;c-ACROSS(d)) );
+KIRCHHOFF_LOOP(a;b;c)                    := (KIRCHHOFF_LOOP(a;b);c);
+KIRCHHOFF_LOOP(a;c-ACROSS(d))            := LOOP_CHECK(a;c-ACROSS(d));
+KIRCHHOFF_LOOP(a)                        := a;
+KIRCHHOFF_LOOP({a})                      := {KIRCHHOFF_LOOP(a)};
+
+NODE_ADD( NODE(b,c),NODE(d,c)  )         := NODE(d+b,c);
+NODE_ADD( NODE(b,_none),NODE(d,_none)  ) := (NODE(b,_none),NODE(d,_none));
+NODE_ADD( NODE(b,c),NODE(d,e)  )         := (NODE(b,c),NODE(d,e));
+
+NODE_ADD( a,NODE(b,c),NODE(d,c)  )       := NODE_ADD( a,NODE(d+b,c) );
+NODE_ADD( a,NODE(b,c),NODE(d,e)  )       := ( NODE_ADD(a,NODE(d,e)), NODE(b,c) );
+
+NODE_TRANS2(d;a-THROUGH(b,c))            := NODE_ADD( NODE_ADD( NODE_TRANS2(d), NODE(a,b)) ,NODE(-a,c) );
+NODE_TRANS2(a;b)                         := ( NODE_TRANS2(a), NODE(b,_none) );
+NODE_TRANS2(a-THROUGH(b,c))              := ( NODE(a,b) ,NODE(-a,c) );
+NODE_TRANS2(a)                           := NODE(a,_none);
+
+INODE_TRANS(a,b)                         := (INODE_TRANS(a);INODE_TRANS(b));
+INODE_TRANS(NODE(b,c))                   := b;
+
+INODE_REMOVE(a,NODE(b,_none))            := (INODE_REMOVE(a),NODE(b,_none));
+INODE_REMOVE(a,NODE(b,c))                := a;
+INODE_REMOVE(a)                          := a;
+
+KIRCHHOFF_NODE(a)                        := INODE_TRANS( INODE_REMOVE( NODE_TRANS2( a ) ) );
+KIRCHHOFF_NODE({a})                      := {KIRCHHOFF_NODE(a)};
+
+POLY(  ACROSS( a, b ) c ) := POLYF(  ACROSS( _get(a), _get(b) ) );
+POLY( THROUGH( a, b ) c ) := POLYF( THROUGH( _get(a), _get(b) ) );
+
+ZERO_EQU(a)         := (a,ERROR(4));
+ZERO_EQU(a=b)       := a-b;
+ZERO_SYS(a;b)       := (ZERO_SYS(a);ZERO_EQU(b));
+ZERO_SYS(a)         := ZERO_EQU(a);
+ZERO_SYS_ENTRY({a}) := { ZERO_SYS(a) };
+
+//See also VECT_CONCAT {{a;b;{c;g}};{d;e;{f;h}}} -> {d;e;h;f;g;c;b;a}
+SYS_CONCAT1(a;(b;c)) := SYS_CONCAT1((a;c);b);
+SYS_CONCAT1(a;b)     := (a;b);
+
+SYS_CONCAT2(a;{b}) := SYS_CONCAT1(SYS_CONCAT2(a); SYS_CONCAT2(b));
+SYS_CONCAT2(a;b)   := (SYS_CONCAT2(a); b);
+SYS_CONCAT2(a)     := a;
+SYS_CONCAT2({a})   := SYS_CONCAT2(a);
+
+SYS_CONCAT_ENTRY({a}) := {SYS_CONCAT2(a)};
+
+AC_TRANSFORM( a )        := KIRCHHOFF_LOOP( KIRCHHOFF_NODE( AC( REM_DC ( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) ) );
+TRANSIENT_TRANSFORM( a ) := KIRCHHOFF_LOOP( KIRCHHOFF_NODE( TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) );
+
+RESOLVE_TRANS_LEGACY( a ) := SYSTEM_AUTO_SOLVE_LEGACY( VECT_TO_LIST( TRANSIENT_TRANSFORM( _get( a ) ) ) );
+RESOLVE_TRANS( a ) := SYSTEM_AUTO_SOLVE( VECT_TO_LIST( TRANSIENT_TRANSFORM( _get( a ) ) ) );
+SOLVE_AC( a )    := SYSTEM_AUTO_SOLVE( VECT_TO_LIST( AC_TRANSFORM( _get( a ) ) ) )

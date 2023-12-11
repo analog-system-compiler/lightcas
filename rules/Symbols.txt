@@ -21,36 +21,38 @@
 // uppercase: new precedence = 0
 // parenthesis are used for display only
 
-SYST(a b)       "a;b    ";
-IF3( a b )      "a?b    ";
-COL( a b )      "a:\=b  ";
-CONCAT( a b )   "a,(b)  ";
-EQV( a b )      "a=\=b  ";
-_set( a b )     "a:=b   ";
-OR( a b )       "a|\|b  ";
-XOR( a b )      "a~b    ";
-ADD( a b )      "a+b    ";
-SUB( a b )      "a-\>(b)";
-AND( a b )      "a&\&b  ";
-MUL( a b )      "a*b    ";
-DIV( a b )      "a/(b)  ";
-POW( a b )      "(a)^(b)";
-SHL( a b )      "a<<(b) ";
-SHR( a b )      "a>>(b) ";
-EQ( a b )       "a==b   ";
-NEQ( a b )      "a<>b   ";
-LTE( a b )      "a<=(b) ";
-LT( a b )       "a<(b)  ";
-GTE( a b )      "a>=(b) ";
-GT( a b )       "a>(b)  ";
-LOR( a b )      "a||b   ";
-RANGE( a b )    "a->b   ";
-LAND( a b )     "a&&b   ";
-AT( a b )       "a[B]   ";
-HIER( a b )     "a.b    ";
-NEG( a )        "-a     ";
-INV( a )        "/a     ";
-LNOT( a )       "!a     ";
-NOT( a )        "~a     ";
-FACT( a )       "a!     ";
-VECT( a )       "{A}    ";
+`symbol "a;\}b  " SYST(a b)    
+`symbol "a,(b)  " CONCAT( a b )
+`symbol "a=\=b  " EQV( a b )   
+`symbol "a:=b   " _set( a b )  
+`symbol "a?b    " IF3( a b )   
+`symbol "a:\=b  " COL( a b )   
+`symbol "a|\|b  " OR( a b )    
+`symbol "a~b    " XOR( a b )   
+`symbol "a+b    " ADD( a b )   
+`symbol "a-\>(b)" SUB( a b )   
+`symbol "a&\&b  " AND( a b )   
+`symbol "a*b    " MUL( a b )   
+`symbol "a/(b)  " DIV( a b )   
+`symbol "(a)^(b)" POW( a b )   
+`symbol "a<<(b) " SHL( a b )   
+`symbol "a>>(b) " SHR( a b )   
+`symbol "a==b   " EQ( a b )    
+`symbol "a<>b   " NEQ( a b )   
+`symbol "a!=b   " NEQ( a b )   
+`symbol "a<=(b) " LTE( a b )   
+`symbol "a<(b)  " LT( a b )    
+`symbol "a>=(b) " GTE( a b )   
+`symbol "a>(b)  " GT( a b )    
+`symbol "a||b   " LOR( a b )   
+`symbol "a->b   " RANGE( a b ) 
+`symbol "a&&b   " LAND( a b )  
+`symbol "a[B]   " AT( a b )    
+`symbol "a.b    " HIER( a b )  
+`symbol "-a     " NEG( a )     
+`symbol "/a     " INV( a )     
+`symbol "!a     " LNOT( a )    
+`symbol "~a     " NOT( a )     
+`symbol "a!     " FACT( a )    
+`symbol "{A}    " VECT( a )    
+`symbol "{A;}   " VECT( a )    

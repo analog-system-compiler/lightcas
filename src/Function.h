@@ -44,7 +44,7 @@ public:
     CMathExpression::ConvertToRule( m_SrcEquation, m_DstEquation );
   }
 
-#ifdef _DEBUG
+#if defined( _TEST ) || defined( _DEBUG )
   void Display( unsigned i, CDisplay& ds )
   {
     ds += "[";

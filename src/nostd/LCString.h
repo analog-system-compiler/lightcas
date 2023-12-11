@@ -35,8 +35,12 @@ private:
   unsigned   m_Length;
   static const char m_NullString[1];
 
+#if (DEBUG_LEVEL == 0)
 protected:
-    void  Append( const char* s, unsigned i );
+#else
+public:
+#endif
+  void  Append( const char* s, unsigned i );
 
 public:
 
@@ -54,8 +58,8 @@ public:
   char  At( unsigned i ) const             { if( i < m_Length ) return m_Data[ i ]; else return '\0';  }
   void  Clear()                            { free( m_Data );    m_Data = NULL;    m_Length = 0;  }
 
-  virtual void Append( const CString& s )  { Append( s.m_Data, s.m_Length );  }
-  virtual void Append( char c )            { Append( &c, 1 );  }
+  virtual CString& Append( const CString& s )  { Append( s.m_Data, s.m_Length ); return *this; }
+  virtual CString& Append( char c )            { Append( &c, 1 ); return *this; }
 
   void  Prepend( const CString& s )        { CString s1( *this ); m_Length = 0; CString::Append( s ); CString::Append( s1 );  }
   void  Prepend( char c )                  { CString s1( *this ); m_Length = 0; CString::Append( c ); CString::Append( s1 );  }
@@ -63,6 +67,7 @@ public:
   void  Copy( const CString& s )           { m_Length = 0; Append( s, s.m_Length );  }
   void  Copy( const char* s )              { m_Length = 0; if( s ) Append( s, strlen( s ) );  }
   void  Copy( const char* s, unsigned i )  { m_Length = 0; if( s ) Append( s, i );  }
+
 
   const char* GetBufferPtr() const         { return ( m_Length == 0 ) ? m_NullString : m_Data;  }
   operator const char* () const            { return GetBufferPtr();  }

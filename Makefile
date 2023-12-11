@@ -1,15 +1,16 @@
 
 MAKEFLAGS = --jobs 4
 
-EXE         = LightCAS
+EXE         = asysc
 SRC_DIR     = src
+APP_DIR     = app
 RULES_DIR   = rules
-OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/app ) ./objs
+OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
 LIB         = lib$(EXE).a
 EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
 LIB_OBJS    = $(OBJ_SRC:%.cpp=$(OBJDIR)/%.o)
 INCDIR      = -I$(SRC_DIR)
-RULE_FILES  = $(addprefix $(RULES_DIR)/, Symbols.txt Rules.txt RulesElectricity.txt )
+RULE_FILES  = $(addprefix $(RULES_DIR)/, $(wildcard *.txt) )
 
 #Compiler settings
 CXX         = $(CROSS_COMPILE)g++
@@ -26,7 +27,9 @@ EMBED_RULES = 0
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -Wl,-Map=$(EXE).map
 
-EXE_SRC = app/Console.cpp
+EXE_SRC = \
+	asysc/ASysC.cpp \
+	asysc/MathExpressionEx.cpp
 
 OBJ_SRC = \
     Debug.cpp \
@@ -74,6 +77,10 @@ all:$(EXE) rules
 -include $(LIB_OBJS:.o=.d)
 -include $(EXE_OBJ:.o=.d)
 
+$(OBJDIR)/%.o: $(APP_DIR)/%.cpp
+	echo 'Compiling  $(notdir $< )'
+	$(CXX) $(CPPFLAGS) -c $< -o $@
+
 $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
@@ -95,7 +102,7 @@ $(EXE): $(EXE_OBJ) $(LIB)
 
 rules:
 ifeq ($(EMBED_RULES),0)
-	cp ../rules/*.txt .
+	cp $(RULES_DIR)/*.txt .
 endif
 
 clean:

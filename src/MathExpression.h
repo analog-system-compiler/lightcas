@@ -64,7 +64,6 @@ protected:
   CElementDataBase* m_ElementDB;
 
 protected:
-
   void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
   OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
   OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
@@ -75,7 +74,7 @@ protected:
   void     Push( const CMathExpression& equ );
   void     PushEvalElement( CEvaluator& eval );
   void     Append( const OP_CODE* array, pos_t size );
-  void     PushBranch( const CMathExpression& equ, pos_t& pos );
+  void     PushBranch( const CMathExpression& equ, pos_t& pos );  //TODO: should return pos
   bool     CompareBranchElement( pos_t pos1, pos_t pos2 ) const;
   bool     CompareBranch( pos_t pos1, pos_t pos2 ) const;
   pos_t    NextBranch( pos_t pos ) const;
@@ -83,7 +82,7 @@ protected:
   bool     GetLevel( CParser& IC, unsigned priority );
   bool     ParseAtom( CParser& IC );
   bool     ParseElement( CParser& IC );
-  int      Parse( CParser& IC );
+  int      ParseOperator(CParser &IC, unsigned& priority, bool var_found );  
   void     Replace( OP_CODE op1, OP_CODE op2, pos_t pos = 0 );
   char     TryMatchExp( const char*& sp );
   void     Move( pos_t pos_dest, pos_t pos_source, pos_t size );
@@ -92,6 +91,7 @@ protected:
   void     Zero();
   void     RemoveZero();
   bool     ExecuteCommand();
+  void     DisplayRuleMessage( const CElement *e ) const;
 
 #ifdef RECURSIVE_ALGO
   CAlgebraRule* RuleSearch( pos_t& pos, pos_t pos_array[CElementDataBase::MAX_EXP] );
@@ -107,8 +107,8 @@ protected:
   static unsigned   ReservedParameterIndex( OP_CODE op )  { return ( unsigned )( op - CElementDataBase::OP_PAR0 );  }
 
   //Display funct
-  pos_t    DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
-  pos_t    DisplaySymbol( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
+  virtual pos_t DisplayBranch( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
+  virtual pos_t DisplaySymbol( CDisplay& ds, pos_t pos, unsigned priority = 0 ) const;
   void     DisplaySymbolString(  const char* sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay& ds ) const;
 
 public:
@@ -118,19 +118,21 @@ public:
   void  UnaryOperation( OP_CODE op );
   void  VoidOperation( OP_CODE op );
 
-  void  Clear()                          { m_StackSize = 0;  }
-  void  Init( OP_CODE op )               { Clear(); Push( op ); }
-  void  Init( const CElement* e )        { Clear(); Push( e ); }
-  bool  IsEmpty() const                  { return ( m_StackSize == 0 );  }
+  void  Clear()                    { m_StackSize = 0;  }
+  void  Init( OP_CODE op )         { Clear(); Push( op ); }
+  void  Init( const CElement* e )  { Clear(); Push( e ); }
+  bool  IsEmpty() const            { return ( m_StackSize == 0 );  }
 
   bool  Compare( const CMathExpression& equ ) const;
   void  Copy( const CMathExpression& equ );
   void  Display( CDisplay& ds, bool bAll = true ) const;
-  bool  GetFromString( CParser& IC )        { return ( Parse( IC ) > 0 ); }
-  bool  GetFromString( const char* text )   { CParser IC( text ); return GetFromString( IC ); }
+  //bool  GetFromString( CParser& IC )        { return ( Parse( IC ) > 0 ); }
+  int   Parse( CParser& IC );
+  int   Parse( const char* text )   { CParser IC( text ); return Parse( IC ); }
   void  OptimizeTree();
   bool  Match( const CMathExpression& equ ) const;
   void  Evaluate() const;
+  void  Compile();
 
   static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
 

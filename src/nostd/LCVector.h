@@ -34,20 +34,20 @@ public:
   void      InsertAt( unsigned index, const T e );
   void      InsertAt( unsigned index, const CVector& v  );
   void      RemoveAt( unsigned start, unsigned count = 1 );
-  void      Append( const CVector& v )           { InsertAt( m_Size, v );  }
-  void      Append( const T e )                  { InsertAt( m_Size, e );  }
+  void      Append( const CVector& v )           { InsertAt( m_Size, v ); }
+  void      Append( const T e )                  { InsertAt( m_Size, e ); }
   void      Push( const T e )                    { Append( e ); }
   T         Pop()                                { T e = GetAt( m_Size - 1 ); m_Size--; return e; }
   void      RemoveAll()                          { m_Size = 0;  }
   void      DeleteAll()                          { for( unsigned i = 0; i < GetSize(); i++ ) { delete m_Data[i]; } RemoveAll(); }
   void      Copy( const CVector& v )             { RemoveAll(); Append( v ); }
-  T&        GetAt( unsigned index ) const        { ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); return m_Data[ index ];  }
-  void      SetAt( unsigned index, const T e )   { ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); m_Data[ index ] = static_cast<T>( e );  }
+  T&        GetAt( unsigned index ) const        { ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); return m_Data[ index ]; }
+  void      SetAt( unsigned index, const T e )   { ASSERT( index < m_Size ); ASSERT( m_Data != NULL ); m_Data[ index ] = static_cast<T>( e ); }
   T*        GetData() const                      { ASSERT( m_Data != NULL ); return m_Data;  }
   unsigned  GetSize() const                      { return m_Size;  }
   void      CheckSize( unsigned index )          { if( index >= GetSize() ) SetSize( index + 1 ); }
   T&        operator[] ( unsigned index ) const  { return GetAt( index ); }
-
+  bool      Find(const T e)                      { for( unsigned i = 0; i < GetSize(); i++ ) if( GetAt(i) == e ) return true; return false; }
 public:
   CVector()
   {

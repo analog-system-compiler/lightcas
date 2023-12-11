@@ -27,7 +27,7 @@ class CMathExpression;
 class CElement;
 struct CSymbolSyntaxStruct;
 
-typedef CVector< class CElement* >             CElementArray;
+typedef CVector< CElement* > CElementArray;
 typedef CVector< struct CSymbolSyntaxStruct* > CSymbolSyntaxArray;
 
 struct SProperties
@@ -43,6 +43,7 @@ class CElementDataBase : public CElementArray
 protected:
 
   CString                   m_Name;
+  CString                   m_RootPath;
   CElementDataBase*         m_Parent;
   CEvaluator*               m_Evaluator;
   unsigned                  m_SearchStart;
@@ -87,6 +88,7 @@ public :
     OP_EVAL,
     OP_CHECK,
     OP_PRINT,
+    OP_EXEC,
     OP_END_RESERVED
   };
 
@@ -118,7 +120,7 @@ public:
   CElement*       GetElement();
   CElement*       GetElement( const CString& );
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
-  bool            AssociateSymbol( CParser& IC, const CMathExpression& dst_equ );
+  bool            AssociateSymbol( CParser& IC );
 
   //static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )       { return m_ElementRefArray[ ( unsigned )op ]; }
@@ -131,7 +133,6 @@ public:
 
 
 #ifdef _TEST
-  void Printf( const char* format, ... );
   void Test();
   void Check( const char* s1, const char* s2 );
   void CheckEval( const char* s1, const CValue& v1 );
@@ -140,7 +141,7 @@ public:
 #endif
 
   CElementDataBase( const CElementDataBase& db ); // avoid simple copy
-  CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true );
+  CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true, const CString &exe_path= CString() );
   virtual ~CElementDataBase();
 
 };

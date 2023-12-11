@@ -16,7 +16,8 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-#inc "Symbols.txt"
-#inc "Rules.txt"
-#inc "RulesElectricity.txt"
+`include <symbols.txt>
+`include <rules.txt>
+`include <matrix_vector_rules.txt>
+`include <electricity_rules.txt>
 

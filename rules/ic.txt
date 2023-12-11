@@ -1,0 +1,23 @@
+
+`include <logic.txt>
+
+NAME.NE555( @trigger,  @threshold,  @discharge, @output,  @vcc, @gnd ) :=
+{
+  NAME.VCC     = ACROSS(  @vcc,       @gnd );
+  NAME.UTRIG   = ACROSS(  @trigger,   @gnd );
+  NAME.UTRESH  = ACROSS(  @threshold, @gnd );
+  NAME.UOUT    = ACROSS(  @output,    @gnd );
+  NAME.IOUT    = THROUGH( @output,    @gnd );
+  NAME.UIN1    = ACROSS(  NAME.@in1,  @gnd );
+  NAME.UIN2    = ACROSS(  NAME.@in2,  @gnd );  
+  NAME.UOUT2   = ACROSS(  NAME.@out,  @gnd );
+  
+  NAME.UIN1    = ( NAME.UTRIG  <  ( NAME.VCC / 3 )     );
+  NAME.UIN2    = ( NAME.UTRESH <  ( NAME.VCC * 2 / 3 ) );
+  NAME.UOUT    = NAME.UOUT2 * TKEEP( NAME.VCC );
+
+  NAME.SW.SWITCH( @discharge, @gnd, NAME.UOUT2 < 0.5 );
+  NAME.SR.SRFFC( NAME.@in1, NAME.@in2, NAME.@out, @gnd)
+};
+
+

@@ -1,0 +1,315 @@
+
+POLY_TED((a,b),v)   := (POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a+b,v)     := TED_ADD(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a-b,v)     := TED_SUB(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a*b,v)     := TED_MUL(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a/b,v)     := TED_DIV(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(a^b,v)     := TED_POW(POLY_TED(a,v),POLY_TED(b,v));
+POLY_TED(-a,v)      := TED_NEG(POLY_TED(a,v));
+POLY_TED(v,v)       := TED(1 0);
+POLY_TED(a,v)       := TED(0 a);
+
+TED_ADD(TED(a b),TED(c d)) := TED( a+c b+d );
+TED_SUB(TED(a b),TED(c d)) := TED( a-c b-d );
+TED_MUL(TED(a b),TED(c d)) := TED( TED(a*c b*c+a*d) b*d ); 
+TED_DIV(TED(a b),TED(0 d)) := TED( a/d b/d );
+TED_DIV(TED(a b),TED(c d)) := ERROR(8);
+TED_POW(TED(a b),TED(0 _const(d))) := TED_MUL(TED(a b),TED_POW(TED(a b),TED(0 d-1)));
+TED_POW(TED(a b),TED(0 1)) := TED(a b);
+TED_POW(TED(a b),TED(0 0)) := TED(0 1);
+TED_POW(TED(a b),TED(c d)) := ERROR(10);
+TED_NEG(TED(a b))          := TED( 0-a 0-b );
+
+TED( TED( 0 a ) b ) := TED( a b );
+
+IPOLY_TED((a,b),v)             := (IPOLY_TED(a,v),IPOLY_TED(b,v)); //parenthesis are important there!!!
+IPOLY_TED(TED(a b),v)          := a*v+b;
+
+REDUCE(    TED(a b),TED(0 d))  := (TED(a b), TED(0 d));
+REDUCE(    TED(0 b),TED(c d))  := (TED(c d), TED(0 b));
+REDUCE(    TED(a b),TED(c d))  := (TED(c d), TED(0 c*b-d*a));
+REDUCE( e, TED(a b),TED(0 d))  := (REDUCE( e, TED(a b)), TED(0 d));
+REDUCE( e, TED(0 b),TED(c d))  := (REDUCE( e, TED(c d)), TED(0 b));
+REDUCE( e, TED(a b),TED(c d))  := (REDUCE( e, TED(c d)), TED(0 c*b-d*a));
+
+SOLVE2(TED(TED(a b) c)/e)      := SOLVE2(TED(TED(a b) c));
+SOLVE2(TED(TED(a b) c))        := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };
+SOLVE2(TED(a b)/e)             := SOLVE2(TED(a b));
+SOLVE2(TED(a b))               := -b/a;
+
+SYSTEM_SOLVE3({a},{x,y})       := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(POLY_TED(a,y)),y)},{x});
+SYSTEM_SOLVE3({a},{x})         := IPOLY_TED(REDUCE(POLY_TED(a,x)),x);
+
+SYSTEM_SOLVE4({a,b},{x,y})     := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));
+SYSTEM_SOLVE4({a},{x})         := SOLVE(a,x);
+
+POLY_NORM(TED(a b),v)          := (v=-b/a);
+VECTOR_NORM(a,b)               := POLY_NORM(POLY_TED(a,b),b);
+
+SYSTEM_NORM({a,b})             := (SYSTEM_NORM({a}),SYSTEM_NORM({b}));
+SYSTEM_NORM({a})               := VECTOR_NORM(a,GETVAR(a));
+
+SYSTEM_AUTO_SOLVE3({a,b})      := SYSTEM_SOLVE3({a,b},{GETVAR(b)});
+SYSTEM_AUTO_SOLVE2({a},{c,d})  := SYSTEM_AUTO_SOLVE2({SYSTEM_AUTO_SOLVE3({a})},{c});
+SYSTEM_AUTO_SOLVE2({a},{c})    := SYSTEM_AUTO_SOLVE3({a}); //end
+
+//entry points
+SOLVE(a=b,v)                   := SOLVE(a-b,v);
+SOLVE(a,v)                     := SOLVE2(POLY_TED(a,v));
+
+//Anciennes fonctions toujours OK
+SYSTEM_SOLVE_LEGACY({a},{x})          := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
+SYSTEM_AUTO_SOLVE_LEGACY({a})         := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
+
+VECT_TO_LIST(a;b) := (VECT_TO_LIST(a),b);
+VECT_TO_LIST(a)   := a;
+VECT_TO_LIST({a}) := {VECT_TO_LIST(a)};
+
+/**********************************************************************************/
+//vector defined matrix determinant { a*x+b*y..., c*x+d*y... }
+TED_1( TED( a b ) ) := a;
+DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}) );
+
+/**********************************************************************************/
+TED_MUL2( a, TED( b c ) )   := TED( a*b a*c );
+
+/* works also
+DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( c )    }, {          e  } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
+DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( d, c ) }, { VECT_ROR(e) } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
+DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX(    c ) }, { VECT_ROR(e) } ) );
+*/
+
+// Normal case
+// DET_LINES( { {    TED( a b ) }        }, { c } ) := TED( a b );
+// DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( { ( TED_TO_MATRIX(              c   ) ) }, { e } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
+// DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( { VECT_ROR( TED_TO_MATRIX( ( d, c ) ) ) }, { e } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
+// DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a , DET_LINES2( { VECT_ROR( TED_TO_MATRIX( (    c ) ) ) }, { e } ) );
+
+// //Optimisation
+// DET_LINES( { { c, TED( 0 b ) }        }, { e } ) := TED_NEG( DET_LINES( { { c }, {     TED( 0 b ) } }, { e } ) );
+// DET_LINES( { { c, TED( 0 b ) }, { d } }, { e } ) := TED_NEG( DET_LINES( { { c }, { d , TED( 0 b ) } }, { e } ) );
+// DET_LINES( { {    TED( 0 b ) }, { c } }, { e } ) := TED( 0 0 );
+
+//DET_LINES( {  a,  TED( d e )  }, { f }, n ) := TED_ADD( TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), TED_MUL2( -((n-(n/2)*2)*4-1), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
+//DET_LINES( {  a,  TED( d e )  }, { f }, 1 ) :=          TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+
+/* OK 3x3
+DET_LINES2( {a}, { c    } ) := POLY_TED( a, c );
+DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a, d ) }, { c }, 1, VSIZE( {a}) );
+DET_LINES( {  a,  TED( d e )  }, { f }, g, n ) := TED_ADD( TED_MUL2(   d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, -g, n - 1 ) );
+DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+//DET_LINES( {  a,  TED( d e )  }, { f }, -1, 1 ) :=          TED_MUL2( -d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+*/
+
+//La rotation avec VECT_ROR() fait changer le signe du déterminant pour un nombre de paramètres pairs 
+DET_LINES2( {a}, { c    } ) := POLY_TED( a, c );
+DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a, d ) }, { c }, VSIZE( {a}) );
+DET_LINES( {  a, TED( d e )  }, { f }, n ) := TED_ADD( TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
+DET_LINES( {  a, TED( d e )  }, { f }, 1 ) :=          TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+DET_LINES( {  a, TED( 0 e )  }, { f }, n ) :=                                                                      TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) );
+DET_LINES( {  a, TED( 0 e )  }, { f }, 1 ) :=          TED( 0 0 );
+//MATRIX HELP FUNCTIONS
+// Astuce ; avec VECT_ROR(), pas besoin de transférer l'arbre de droite vers la gauche.
+//TED_TO_MATRIX( c , TED( a b ) ) := CHECK_NULL( TED_TO_MATRIX( c ), b );
+//TED_TO_MATRIX( a, (c,b)       ) := TED_TO_MATRIX((a,b), c);
+TED_TO_MATRIX( c , TED( a b ) ) := ( TED_TO_MATRIX( c ), b );
+TED_TO_MATRIX(     TED( a b ) ) := b;
+TED_TO_MATRIX( a, b )           := ERROR(7);
+/*
+VECT_SWAP( { a, b   }, n ) := ERROR(8);
+VECT_SWAP( { a, b   }, 1 ) := (b,a);
+VECT_SWAP( { a, b, c}, n ) := ( VECT_SWAP( {a, c}, n-1 ), b);
+VECT_SWAP( { a, b, c}, 1 ) := ( a, c, b);
+VECT_SWAP( { a }, 0 ) := a;
+//VECT_SWAP( { a, b, c}, 1 ) := ( a, b);
+*/
+VSIGN( a )    := 1;
+VSIGN( a, b ) := -VSIGN(a);
+/**********************************************************************************/
+//IPOLY_TED3((a,b),v)    := (IPOLY_TED3(a,v), IPOLY_TED3(b,v)); //parenthesis are important there!!!
+IPOLY_TED3(TED(a b))       := -b/a;
+SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_SOLVE0({a},{x}) );
+SYSTEM_SOLVEN({a},{x}, 1 ) :=   SYSTEM_SOLVE0({a},{x}); // end of recursion
+SYSTEM_SOLVE0({a},{x})     :=   IPOLY_TED3( DET_LINES2( {a}, {x} ) );
+SYSTEM_SOLVE({a},{x})      := {  SYSTEM_SOLVEN( {a}, {VECT_ROR(x)}, VSIZE({a})  ) }; 
+
+/**********************************************************************************/
+IPOLY_TED4(TED(a b), v)         := (v=-b/a);
+SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_AUTO_SOLVE0({a},{x}) );
+SYSTEM_AUTO_SOLVEN({a},{x}, 1 ) :=   SYSTEM_AUTO_SOLVE0({a},{x}); // end of recursion
+SYSTEM_AUTO_SOLVE0({a},{x})     :=   IPOLY_TED4( DET_LINES2( {a}, {x} ), VECT_HEAD(x) );
+SYSTEM_AUTO_SOLVE({a})          := {  SYSTEM_AUTO_SOLVEN( {a}, {_print(GET_VAR_LIST(a))}, VSIZE({a}) )  };
+
+/**********************************************************************************/
+// common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
+DET( {{a}} ) := a;
+DET( {a,b} ) := MAT_DET_LINES( { a,b }, VSIZE( {a,b}) );
+
+MAT_DET_LINES( { c, { a, b } }, n ) := b * DET( { MAT_REM_HEAD( c ) } ) - VSIGN( c ) * MAT_DET_LINES( { VECT_ROR(c, {a,b} ) }, n-1 );
+MAT_DET_LINES( { c, { a, b } }, 1 ) := b * DET( { MAT_REM_HEAD( c ) } );
+
+// { {...,a,b}, {...,c,d}, ... } -> { {...,a}, {...,c}, ... }
+MAT_REM_HEAD( a, {c,d}) := ( MAT_REM_HEAD( a ), {c} );
+MAT_REM_HEAD(    {c,d}) := {c};
+
+/**********************************************************************************/
+/*
+CHECK_NULL( a , 0 )             := 0;
+CHECK_NULL( 0 , a )             := 0;
+CHECK_NULL( a , b )             := (a,b);
+*/
+//Matrix inversion
+// common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
+MAT_INV( {a,b} ) := { MAT_INV_COLS( {a,b}, b ) } / DET( {a,b} );
+MAT_INV( {a}   ) := { a };
+
+MAT_INV_COLS( {a}, {b,c} ) := ( MAT_INV_COLS( { -MAT_ROR_LINES( {a} ) }, {b} ), { MAT_INV_LINES( { MAT_REM_HEAD(a) }, {a} ) } ); // {b,c} is used as an iterator
+MAT_INV_COLS( {a}, {b} )   :=                                                   { MAT_INV_LINES( { MAT_REM_HEAD(a) }, {a} ) };
+
+MAT_INV_LINES( {a,b}, {c,d} ) := ( MAT_INV_LINES( { -VECT_ROR( a, b ) }, {c} ), DET( { a } ) ); // {c,d} is used as an iterator
+MAT_INV_LINES( {a,b}, {c} )   := DET( { a } );
+
+//{{a,b,c,d},{e,f,g,h}} -> {{d,a,b,c},{h,e,f,g}}
+MAT_ROR_LINES( {a,{b}} ) := ( MAT_ROR_LINES( {a} ), { VECT_ROR( b ) } );
+MAT_ROR_LINES( {{b}} )   := { VECT_ROR( b ) };
+
+//(a,b,c,d) -> (d,a,b,c)
+VECT_ROR( ( a, b ), c ) := ( VECT_ROR( a, c ), b );
+VECT_ROR( a, c )       := ( c , a );
+VECT_ROR( a )          := a;
+
+VECT_ROL( a, b )   := ( VECT_REM_HEAD( a ), b, VECT_HEAD( a ) );
+VECT_ROL( a )      := a;
+VECT_REM_HEAD( a, b, c ) := ( VECT_REM_HEAD( a, b ), c);
+VECT_REM_HEAD( a, b )    := b;
+VECT_HEAD( a, b ) := VECT_HEAD(a);
+VECT_HEAD( a )    := a;
+
+//Matrix multiplication
+VECT_MUL_ADD( {a,b}, {c,d} ) := VECT_MUL_ADD( {a},{c} ) + b*d;
+VECT_MUL_ADD( {  b}, {  d} ) :=                           b*d;
+
+MAT_MUL(a,b)       := { MAT_MUL3(a, MAT_TRANSPOSE(b)) }; 
+
+MAT_MUL3({a,b},c)  := ( MAT_MUL3({a},c), { MAT_MUL4(b,c) } );
+MAT_MUL3({  b},c)  :=                    { MAT_MUL4(b,c) };
+
+MAT_MUL4(b,{c,d})  := ( MAT_MUL4(b,{c}), VECT_MUL_ADD(b,d) );
+MAT_MUL4(b,{  d})  :=                    VECT_MUL_ADD(b,d) ;
+
+//Matrix transposition
+MAT_TRANSPOSE( {a} )        := { MAT_TRANSPOSE1( a ) };
+MAT_TRANSPOSE1( a,{b,c} )   := ( MAT_TRANSPOSE1( MAT_REM_HEAD( a ), {b} ), { MAT_TRANSPOSE_VECT( {a,{b,c}} ) } );
+MAT_TRANSPOSE1( a )         :=                                             { MAT_TRANSPOSE_VECT( {a} )       } ;
+
+MAT_TRANSPOSE_VECT( {a,{b,c}} ) := ( MAT_TRANSPOSE_VECT( {a} ), c );
+MAT_TRANSPOSE_VECT( {{b,c}} )   := c;
+
+MAT_TRANSPOSE_VECT( {a,{c}} ) := ( MAT_TRANSPOSE_VECT( {a} ), c );
+MAT_TRANSPOSE_VECT( {{c}} )   := c;
+
+// Vector reversal {x,y,z,t} -> {t,z,y,x} (see VECT_ROR)
+VECT_REVERSE( {a} )        := { VECT_REVERSE1( a ) };
+VECT_REVERSE1( a, b )      := VRIGHT_TO_LEFT( b, a );
+VECT_REVERSE1( a )         := a;
+
+VRIGHT_TO_LEFT( a, (b, c) ) := VRIGHT_TO_LEFT( (a, c), b);
+VRIGHT_TO_LEFT( a,  b     ) := (a,b);
+
+//vector permutation ( TO DO )
+//VECT_PERMUTE( {a} )           := { VECT_PERMUTE_ITER( a, {a} ) };
+//VECT_PERMUTE_ITER( a, {b,c} ) := ( VECT_PERMUTE_ITER( VECT_ROR( a ), {b} ), VECT_PERMUTE_ITER( VECT_PERMUTE_LAST( a ), {b} ) ); // b is used as iterator
+//VECT_PERMUTE_ITER( a, {b} )   := { a };
+//VECT_PERMUTE_ITER( a, {b} )   := ( { a }, { VECT_PERMUTE_LAST( a ) } ); // b is used as iterator
+
+//VECT_PERMUTE_LAST( a, b, c ) := ( VECT_PERMUTE_LAST( a, b ), c );
+//VECT_PERMUTE_LAST( a, b    ) := ( b, a );
+
+//VECT concatenation ({a,b,c},{d,e,f}) -> {d,e,f,a,b,c}
+VECT_CONCAT({a,b},{c}) := VECT_CONCAT({a},{c,b});
+VECT_CONCAT({a},{c}) := {c,a};
+
+VECT_INSIDE({a}) := a;
+
+//vector add
+(a,b)+(c,d)    := (a+c,b+d);
+(a,b)+c        := (a,b+c);
+c+(a,b)        := (a,c+b);
+{a}+{b}        := {a+b};
+
+//vector sub
+(a,b)-(c,d)    := (a-c,b-d);
+(a,b)-c        := (a,b-c);
+c-(a,b)        := (-a,c-b);
+{a}-{b}        := {a-b};
+
+//vector mul
+(a,b)*(c,d)    := (a*(c,d),b*(c,d));
+a*(c,d)        := (a*c,a*d);
+(c,d)*a        := (c*a,d*a);
+{a}*{b}        := {a*b};
+a*{b}          := {a*b};
+{a}*b          := {a*b};
+
+//vector div ( used by matrix inversion)
+(a,b)/c      := (a/c,b/c);
+{a}/_const(c) := {a/c};
+//{a}/c        := {a/c};
+
+//Vector or
+/*(a,b)|(c,d)    := (a|c,b|d);
+(a,b)|c        := (a|c,b);
+c|(a,b)        := (c|a,b);
+{a}|{b}        := {a|b};
+
+//Vector xor
+(a,b)^(c,d)    := (a^c,b^d);
+(a,b)^c        := (a^c,b);
+c^(a,b)        := (c^a,b);
+{a}^{b}        := {a^b};*/
+
+//Vector minus
+-(a,b)         := (-a,-b);
+-{a}           := {-a};
+
+//Vector not
+~(a,b)         := (~a,~b);
+
+//vector min
+MIN({a})       := MIN(a);
+MIN((a,b),c)   := MIN(a,MIN(b,c));
+
+//vector max
+MAX({a})       := MAX(a);
+MAX((a,b),c)   := MAX(a,MAX(b,c));
+
+//vector creation
+ZEROES(_const(a)) := ( ( a == 1 )  ? 0 : (ZEROES(a-1),0) );
+ONES(_const(a))   := ( ( a == 1 )  ? 1 : (ONES(a-1),1) );
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CHECK_UNIQUE(a)       := a;
+CHECK_UNIQUE(a,b)     := (a,b);
+CHECK_UNIQUE(a,a)     := a;
+CHECK_UNIQUE(a,1)     := a;
+CHECK_UNIQUE(1,a)     := a;
+CHECK_UNIQUE(a,b,c)   := (CHECK_UNIQUE( a, c ), b);
+CHECK_UNIQUE(a,b,b)   := (a,b);
+CHECK_UNIQUE(a,b,1)   := (a,b);
+
+ADD_TO_LIST(a,(c,d))        := ADD_TO_LIST( ADD_TO_LIST(a,d), c);
+ADD_TO_LIST( a, b )         := ADD_TO_LIST2( {b}, {a});
+ADD_TO_LIST2( {e}, {a, b} ) := ADD_TO_LIST2( { CHECK_UNIQUE(e,b) }, {a} );
+ADD_TO_LIST2( {e}, {a}    ) := CHECK_UNIQUE(e,a);
+
+GET_VAR_LIST(a,b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
+GET_VAR_LIST(a+b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
+GET_VAR_LIST(a-b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
+GET_VAR_LIST(a*b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
+GET_VAR_LIST(a/b)      := GET_VAR_LIST( a ); 
+GET_VAR_LIST(a^b)      := GET_VAR_LIST( a );
+GET_VAR_LIST(-a)       := GET_VAR_LIST( a );
+GET_VAR_LIST(_elem(a)) := a;
+GET_VAR_LIST(a.b)      := a.b;
+GET_VAR_LIST(a)        := 1;

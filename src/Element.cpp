@@ -25,7 +25,7 @@
 CElement::CElement( const CString& name )
 {
   m_Name   = name;
-  m_bLock  = false;
+ // m_bLock  = false;
   m_bAux   = false;
   m_Global = false;
   m_Ref    = 0;
@@ -47,7 +47,7 @@ void CElement::Display( CDisplay& ds ) const
 {
   ds.Append( m_Name );
 }
-
+/*
 void CElement::Lock()
 {
   ASSERT( !m_bLock );
@@ -59,7 +59,7 @@ void CElement::Unlock()
   ASSERT( m_bLock );
   m_bLock = false;
 }
-
+*/
 void CElement::RemoveRules()
 {
   m_Function.Clear();

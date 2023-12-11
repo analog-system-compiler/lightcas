@@ -35,7 +35,7 @@ public:
   void Copy( const char* pText, unsigned length )  { assign( pText, length ); }
   void Clear()                                     { clear(); }
   void Prepend( const CString& s )                 { insert( 0, s ); }
-  virtual void Append( const CString& s )          { append( s ); }
+  virtual CString& Append( const CString& s )      { append( s ); return *this; }
   virtual void Append( char c )                    { push_back( c ); }
   void SetLength( size_t n )                       { resize( n ); }
   int  Compare(  const CString& s ) const          { return compare( s ); }

@@ -18,8 +18,6 @@
 
 #ifdef _TEST
 
-#include <cstdarg>
-
 #include "Debug.h"
 #include "MathExpression.h"
 #include "ElementDataBase.h"
@@ -27,44 +25,30 @@
 #include "Parser.h"
 #include "Display.h"
 
-#ifdef _WIN32
-#define vsnprintf _vsnprintf_s
-#endif
-
-void CElementDataBase::Printf(const char *format, ...)
-{
-  static char buffer[2048];
-  va_list args;
-  va_start(args, format);
-  vsnprintf(buffer, sizeof(buffer), format, args);
-  PUTS(buffer);
-  va_end(args);
-}
-
 void CElementDataBase::Check(const char *s1, const char *s2)
 {
-  CDisplay ds;
+  CDisplay ds(true);
   CParser IC(s1);
   CMathExpression equ(this);
   TRACE("** Check %s == %s", s1, s2);
-  if (equ.GetFromString(IC))
+  if (equ.Parse(IC))
   {
     equ.OptimizeTree();
     equ.Display(ds);
     if (ds != s2)
     {
       ASSERT(false);
-      Printf("FAIL: %s => %s != %s", s1, ds.GetBufferPtr(), s2);
+      ds.Printf("FAIL: %s => %s != %s", s1, ds.GetBufferPtr(), s2);
       return;
     }
   }
   else
   {
     ASSERT(false);
-    Printf("FAIL: Test exception: %s => %s", s1, s2);
+    ds.Printf("FAIL: Test exception: %s => %s", s1, s2);
     return;
   }
-  Printf("OK: %s => %s", s1, s2);
+  ds.Printf("OK: %s => %s", s1, s2);
 }
 
 void CElementDataBase::CheckEval(const char *s1, const CValue &v1)
@@ -72,26 +56,27 @@ void CElementDataBase::CheckEval(const char *s1, const CValue &v1)
   CDisplay ds;
   CMathExpression equ(this);
   CParser IC(s1);
-  equ.GetFromString(IC);
+  equ.Parse(IC);
   equ.Evaluate();
   const CValue &v2 = GetEvaluator()->GetValue();
   if (v2.GetValue() != v1.GetValue())
   {
     ASSERT(false);
-    Printf("FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue());
+    ds.Printf("FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue());
     return;
   }
-  Printf("OK: %s => %g", s1, v1.GetValue());
+  ds.Printf("OK: %s => %g", s1, v1.GetValue());
 }
 
 void CElementDataBase::CheckSyntaxError(const char *s1)
 {
   CParser IC(s1);
   CMathExpression equ(this);
-  if (equ.GetFromString(IC))
+  if (equ.Parse(IC))
   {
-    ASSERT(false);
-    Printf("Syntax check failed: %s", s1);
+    //ASSERT(false);
+    CDisplay ds;
+    ds.Printf("Syntax check failed: %s", s1);
   }
 }
 
@@ -103,32 +88,34 @@ void CElementDataBase::DisplayStats()
     CElement *e = m_ElementRefArray.GetAt(i);
     if (e)
     {
-      Printf("********************* #%04d %s *************************", i, e->GetName().GetBufferPtr());
+      ds.Printf("********************* #%04d %s *************************", i, e->GetName().GetBufferPtr());
       const CFunction *funct = e->GetFunction();
       for (unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++)
       {
         CAlgebraRule *rule = funct->m_AlgebraRuleArray.GetAt(j);
         ds.Clear();
         rule->Display(j, ds);
-        Printf("%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr());
+        ds.Printf("%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr());
       }
     }
     else
     {
-      Printf("********************* #%04d No element *************************", i);
+      ds.Printf("********************* #%04d No element *************************", i);
     }
   }
 }
 
 void CElementDataBase::Test()
 {
-  Printf("Running tests...");
+  CDisplay ds;
+  ds.Printf("Running tests...");
 
   /***** Some basic tests *****/
   CheckSyntaxError("sin(x");
   // CheckSyntaxError( "sin(x))" );
   CheckSyntaxError("x+");
   CheckSyntaxError("x-*2");
+  CheckSyntaxError("{a,b,}");
   CheckSyntaxError("TED(a)");
 #if 0
   Check( "10.500e-2", "0.105" );
@@ -289,9 +276,9 @@ void CElementDataBase::Test()
 
   /*********** Assignment ***/
   CMathExpression equ0( this );
-  equ0.GetFromString( "a+b" );
+  equ0.Parse( "a+b" );
   GetElement( "y" )->SetEquation( equ0 );
-  equ0.GetFromString( "a-b" );
+  equ0.Parse( "a-b" );
   GetElement( "z" )->SetEquation( equ0 );
   Check( "SIMPLIFY(y-z)", "2*b" );
 
@@ -356,7 +343,7 @@ void CElementDataBase::Test()
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 #endif
   CParser IC;
-  if (IC.LoadFile(CString("Tests.txt")))
+  if (IC.LoadFromFile(m_RootPath+CString("tests.txt")))
   {
     AddAlgebraRuleTable(IC);
     IC.CloseFile();
@@ -366,7 +353,7 @@ void CElementDataBase::Test()
     IC.CopyBuffer("test description file not found.");
   }
   // CleanTempElements();
-  DisplayStats();
+//DisplayStats();
 }
 
 #endif

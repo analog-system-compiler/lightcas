@@ -38,10 +38,11 @@ private:
   } ELEM_TYPE;
 
   CString    m_Name;
+  CString    m_Message;
   CFunction  m_Function;
   ELEM_TYPE  m_Type;
   bool       m_Global;
-  bool       m_bLock;     // Prevents recursivity
+  //bool       m_bLock;     // Prevents recursivity
   bool       m_bAux;
   unsigned   m_Ref;
 
@@ -51,10 +52,11 @@ public:
   void RemoveRules();
   void SetEquation( const CMathExpression& equ );
   void AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb = 0 );
-  void Unlock();
-  void Lock();
+ // void Unlock();
+ // void Lock();
 
   const CString&  GetName() const           { return m_Name;                   }
+  void SetName( const CString& name )       { m_Name=name;                     }
   void SetFunct()                           { m_Type = ELEM_FUNCT;             }
   void SetVar()                             { m_Type = ELEM_VAR;               }
   void SetConst()                           { m_Type = ELEM_CONST;             }
@@ -63,20 +65,23 @@ public:
   void SetGlobal( bool global )             { m_Global = global;               }
   void SetAux   ( bool bAux = true )        { m_bAux = bAux;                   }
   void SetRef( OP_CODE op )                 { m_Ref = op;                      }
-  unsigned GetOperandNb() const             { return m_Function.GetParameterNb();  }
+  void SetMessage( const CString& message ) { m_Message = message;             }
+  unsigned GetOperandNb() const             { return m_Function.GetParameterNb();}
   bool IsVar()     const                    { return ( m_Type == ELEM_VAR   ); }
   bool IsConst()   const                    { return ( m_Type == ELEM_CONST ); }
   bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
   bool IsNumeric() const                    { return ( m_Type == ELEM_NUM );   }
   bool IsAux()     const                    { return m_bAux;                   }
-  bool IsLocked()  const                    { return m_bLock;                  }
+//  bool IsLocked()  const                    { return m_bLock;                  }
   bool IsGlobal()  const                    { return m_Global;                 }
   bool IsVoid()    const                    { return ( GetOperandNb() == 0 );  }
   bool IsUnary()   const                    { return ( GetOperandNb() == 1 );  }
   bool IsBinary()  const                    { return ( GetOperandNb() == 2 );  }
+  bool HasMessage() const                   { return ( !m_Message.IsEmpty() ); }
   OP_CODE ToRef()  const                    { return ( OP_CODE )m_Ref;         }
   const CFunction* GetFunction() const      { return &m_Function;              }
   CFunction* GetFunction()                  { return &m_Function;              }
+  const CString& GetMessage() const         { return m_Message;                }
 
   CElement( const CString& name );
   virtual ~CElement();

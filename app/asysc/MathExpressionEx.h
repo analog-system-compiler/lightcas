@@ -1,5 +1,5 @@
 /*******************************************************************************/
-/*  Copyright (C) 2014 The LightCAS project                                     */
+/*  Copyright (C) 2006 The SIMCAS project                                      */
 /*                                                                             */
 /*  This program is free software; you can redistribute it and/or modify       */
 /*  it under the terms of the GNU General Public License as published by       */
@@ -18,71 +18,27 @@
 
 #pragma once
 
-#include <cstdio>
-#include <cstdarg>
-#include "LCString.h"
+#include "MathExpression.h"
 
-#ifdef _WIN32
-#define vsnprintf _vsnprintf_s
-#endif
-
-class CDisplay : public CString
+enum CAnalysisMode
 {
+  AC_ANALYSIS,
+  TRANS_ANALYSIS,
+  DC_ANALYSIS
+};
+
+class CMathExpressionEx : public CMathExpression
+{
+  // friend class CEquSystem;
 private:
-  FILE *m_File;
-  bool m_DebugMode;
+  OP_CODE m_op_hier;
+  OP_CODE m_op_getv;
 
 public:
-  virtual void Print(const char *s) { puts(s); }
-  void Print()
-  {
-    if (m_File)
-    {
-      fwrite(GetBufferPtr(), GetLength(), 1, m_File);
-      fputc('\n', m_File);
-      // fputs("\r\n", m_File);
-    }
-    else
-      Print(GetBufferPtr());
-  }
+  bool ToPython(CDisplay &ds, CAnalysisMode mode);
+  pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
+  pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
 
-  void Printf(const char *format, ...)
-  {
-    static char buffer[2048];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    Print(buffer);
-  }
-
-  bool StoreToFile(const CString &name)
-  {
-    m_File = fopen(name.GetBufferPtr(), "w+");
-    return m_File != NULL;
-  }
-
-  bool IsDebug() { return m_DebugMode; }
-  void SetDebug() { m_DebugMode=true; }
-  // Constructors
-  CDisplay(const char *s) : CString(s)
-  {
-    m_File = NULL;
-    m_DebugMode = false;
-  }
-  CDisplay() : CString()
-  {
-    m_File = NULL;
-    m_DebugMode = false;
-  }
-  CDisplay(int i, unsigned base = 10) : CString(i, base)
-  {
-    m_File = NULL;
-    m_DebugMode = false;
-  }
-  ~CDisplay()
-  {
-    if (m_File)
-      fclose(m_File);
-  }
+public:
+  CMathExpressionEx(CElementDataBase *edb = NULL) : CMathExpression(edb) {};
 };
