@@ -35,7 +35,7 @@ CMathExpression::~CMathExpression()
 {
   if (m_StackArray)
   {
-    free(m_StackArray);
+    ::free(m_StackArray);
   }
 }
 
@@ -64,20 +64,20 @@ void CMathExpression::Push(const CMathExpression &equ)
 
 void CMathExpression::Append(const OP_CODE *src, pos_t size)
 {
-  if (size != 0)
+  if (size)
   {
     pos_t old_size = m_StackSize;
     SetSize(m_StackSize + size);
-    memcpy(&m_StackArray[old_size], src, size * sizeof(OP_CODE));
+    ::memcpy(&m_StackArray[old_size], src, size * sizeof(OP_CODE));
   }
 }
 
 void CMathExpression::Move(pos_t pos_dest, pos_t pos_source, pos_t size)
 {
-  if (size != 0)
+  if (size)
   {
     SetSize(pos_dest + size);
-    memmove(&m_StackArray[pos_dest], &m_StackArray[pos_source], size * sizeof(OP_CODE));
+    ::memmove(&m_StackArray[pos_dest], &m_StackArray[pos_source], size * sizeof(OP_CODE));
   }
 }
 
@@ -87,14 +87,14 @@ void CMathExpression::SetSize(pos_t i)
   if (i > m_AllocSize)
   {
     m_AllocSize = i * 2;
-    m_StackArray = (OP_CODE *)realloc(m_StackArray, m_AllocSize * sizeof(OP_CODE));
+    m_StackArray = (OP_CODE *)::realloc(m_StackArray, m_AllocSize * sizeof(OP_CODE));
     ASSERT(m_StackArray);
   }
 }
 
 bool CMathExpression::Compare(const CMathExpression &equ) const
 {
-  return (equ.m_StackSize == m_StackSize) && !memcmp(equ.m_StackArray, m_StackArray, m_StackSize * sizeof(OP_CODE));
+  return (equ.m_StackSize == m_StackSize) && !::memcmp(equ.m_StackArray, m_StackArray, m_StackSize * sizeof(OP_CODE));
 }
 
 void CMathExpression::Copy(const CMathExpression &equ)

@@ -70,11 +70,11 @@ template < class T > void CVector< T >::SetSize( unsigned size )
 {
   if( size )
   {
-    m_Data = static_cast<T*>( realloc( m_Data, size * sizeof( T ) ) );
+    m_Data = static_cast<T*>( ::realloc( m_Data, size * sizeof( T ) ) );
   }
   else
   {
-    free( m_Data );
+    ::free( m_Data );
     m_Data = NULL;
   }
   m_Size = size;
@@ -85,7 +85,7 @@ template < class T > void CVector< T >::InsertAt( unsigned index, const T e )
   ASSERT( index <= m_Size );
   unsigned old_size = m_Size;
   SetSize( m_Size + 1 );
-  memmove( &( m_Data[index + 1] ), &( m_Data[index] ), ( old_size - index ) * sizeof( T ) );
+  ::memmove( &( m_Data[index + 1] ), &( m_Data[index] ), ( old_size - index ) * sizeof( T ) );
   m_Data[ index ] = static_cast<T>( e );
 }
 
@@ -94,15 +94,15 @@ template < class T > void CVector< T >::InsertAt( unsigned index, const CVector<
   ASSERT( index <= m_Size );
   unsigned old_size = m_Size;
   SetSize( m_Size + v.m_Size );
-  memmove( &( m_Data[index + v.m_Size] ), &( m_Data[index] ), ( old_size - index  ) * sizeof( T ) );
-  memcpy( &( m_Data[index] ), v.m_Data, v.m_Size * sizeof( T ) );
+  ::memmove( &( m_Data[index + v.m_Size] ), &( m_Data[index] ), ( old_size - index  ) * sizeof( T ) );
+  ::memcpy( &( m_Data[index] ), v.m_Data, v.m_Size * sizeof( T ) );
 }
 
 template < class T > void CVector< T >::RemoveAt( unsigned start, unsigned count )
 {
   ASSERT( m_Data != NULL );
   ASSERT( ( int )( m_Size - start - count ) >= 0 );
-  memmove( &( m_Data[start] ), &( m_Data[start + count] ), ( m_Size - start - count ) * sizeof( T ) );
+  ::memmove( &( m_Data[start] ), &( m_Data[start + count] ), ( m_Size - start - count ) * sizeof( T ) );
   m_Size -= count;
 }
 

@@ -221,10 +221,10 @@ NAME.VRAMP( @1, @2, @GND, min, max, rise_time, fall_time ) := {
 /* Measurement                  */
 /********************************/
 
-NAME.PROBE( @1, @GND ) := { 
+NAME.PROBE( @1, @2 ) := { 
 
 	/* nodal equations */
-	NAME.U = ACROSS( @1, @GND )
+	NAME.U = ACROSS( @1, @2 )
 };
 
 /********************************/
@@ -331,3 +331,26 @@ NAME.DD( @plus, @minus, ISS, UT  ) := {
 };
 
 NAME.DD( @plus, @minus ) := NAME.DD( @plus, @minus, 1e-15, 26e-3  );
+
+// Transistors
+NAME.NPN( @base, @collector, @emitter, beta ) := {
+
+	NAME.I = THROUGH( @collector, @emitter );
+	
+	NAME.DE.DD( @base, @emitter );
+	NAME.DC.DD( @base, @collector );
+	
+	NAME.I = beta * NAME.DE.I
+		
+};
+
+NAME.PNP( @base, @collector, @emitter, beta ) := {
+
+	NAME.I = THROUGH( @collector, @emitter );
+	
+	NAME.DE.DD( @emitter  , @base );
+	NAME.DC.DD( @collector, @base );
+	
+	NAME.I = beta * NAME.DE.I
+		
+};

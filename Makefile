@@ -72,7 +72,7 @@ ifeq ($(EMBED_RULES),1)
 	LIB_OBJS += $(OBJDIR)/Rules.o
 endif
 
-all:$(EXE) rules
+all: $(EXE) rules
 
 -include $(LIB_OBJS:.o=.d)
 -include $(EXE_OBJ:.o=.d)
@@ -100,9 +100,10 @@ $(EXE): $(EXE_OBJ) $(LIB)
 	echo 'Linking    $(notdir $@)'
 	$(CXX) -o $@ $(LDFLAGS) $(EXE_OBJ) $(LIB)
 
-rules:
+rules: $(RULE_FILES)
 ifeq ($(EMBED_RULES),0)
-	cp $(RULES_DIR)/*.txt .
+	echo 'Copying    $(notdir $^)'
+	cp $(RULE_FILES) .
 endif
 
 clean:

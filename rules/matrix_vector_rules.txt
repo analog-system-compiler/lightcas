@@ -104,10 +104,12 @@ DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d, DET_LI
 //La rotation avec VECT_ROR() fait changer le signe du déterminant pour un nombre de paramètres pairs 
 DET_LINES2( {a}, { c    } ) := POLY_TED( a, c );
 DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a, d ) }, { c }, VSIZE( {a}) );
-DET_LINES( {  a, TED( d e )  }, { f }, n ) := TED_ADD( TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
-DET_LINES( {  a, TED( d e )  }, { f }, 1 ) :=          TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
-DET_LINES( {  a, TED( 0 e )  }, { f }, n ) :=                                                                      TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) );
-DET_LINES( {  a, TED( 0 e )  }, { f }, 1 ) :=          TED( 0 0 );
+DET_LINES3( {a}, {f}, d ) := TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+DET_LINES3( {a}, {f}, 0 ) := TED( 0 0 );
+DET_LINES( {  a, TED( d e )  }, { f }, n ) := TED_ADD( DET_LINES3({a},{f},d), TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
+DET_LINES( {  a, TED( d e )  }, { f }, 1 ) :=          DET_LINES3({a},{f},d);
+//DET_LINES( {  a, TED( 0 e )  }, { f }, n ) :=                                                                      TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) );
+//DET_LINES( {  a, TED( 0 e )  }, { f }, 1 ) :=          TED( 0 0 );
 //MATRIX HELP FUNCTIONS
 // Astuce ; avec VECT_ROR(), pas besoin de transférer l'arbre de droite vers la gauche.
 //TED_TO_MATRIX( c , TED( a b ) ) := CHECK_NULL( TED_TO_MATRIX( c ), b );
@@ -128,14 +130,14 @@ VSIGN( a, b ) := -VSIGN(a);
 /**********************************************************************************/
 //IPOLY_TED3((a,b),v)    := (IPOLY_TED3(a,v), IPOLY_TED3(b,v)); //parenthesis are important there!!!
 IPOLY_TED3(TED(a b))       := -b/a;
-SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_SOLVE0({a},{x}) );
+SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, _print( n-1 ) ), SYSTEM_SOLVE0({a},{x}) );
 SYSTEM_SOLVEN({a},{x}, 1 ) :=   SYSTEM_SOLVE0({a},{x}); // end of recursion
 SYSTEM_SOLVE0({a},{x})     :=   IPOLY_TED3( DET_LINES2( {a}, {x} ) );
 SYSTEM_SOLVE({a},{x})      := {  SYSTEM_SOLVEN( {a}, {VECT_ROR(x)}, VSIZE({a})  ) }; 
 
 /**********************************************************************************/
 IPOLY_TED4(TED(a b), v)         := (v=-b/a);
-SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_AUTO_SOLVE0({a},{x}) );
+SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, _print( n-1 ) ), SYSTEM_AUTO_SOLVE0({a},{x}) );
 SYSTEM_AUTO_SOLVEN({a},{x}, 1 ) :=   SYSTEM_AUTO_SOLVE0({a},{x}); // end of recursion
 SYSTEM_AUTO_SOLVE0({a},{x})     :=   IPOLY_TED4( DET_LINES2( {a}, {x} ), VECT_HEAD(x) );
 SYSTEM_AUTO_SOLVE({a})          := {  SYSTEM_AUTO_SOLVEN( {a}, {_print(GET_VAR_LIST(a))}, VSIZE({a}) )  };

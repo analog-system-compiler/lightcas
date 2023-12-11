@@ -236,7 +236,7 @@ void Help()
                "\n"
                "Vectors:\n"
                "  Addition       : {a,b}+{5,6}\n"
-               "  Sunstraction   : {a,b}-{5,6}\n"
+               "  Substraction   : {a,b}-{5,6}\n"
                "\n"
                "Solving:\n"
                "  SOLVE(x-2,x)\n"

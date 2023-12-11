@@ -327,7 +327,6 @@ bool CParser::LoadFromFile(const CString &name)
   CParserContext context;
   char *text;
 
-  m_LineStart = true;
 
   file = fopen(name.GetBufferPtr(), "r");
   if (file)
@@ -352,6 +351,7 @@ bool CParser::LoadFromFile(const CString &name)
     SetPos(text);
     m_LineNb = 1;
     m_FileName = name;
+    m_LineStart = true;
     return true;
   }
   CDisplay ds;
@@ -366,7 +366,7 @@ bool CParser::CloseFile()
   {
     const CParserContext &context = m_ContextArray.Pop();
     delete context.m_Text;
-    m_Pos = context.m_Pos;
+    SetPos( context.m_Pos );
     m_LineNb = context.m_LineNb;
     m_FileName = context.m_FileName;
     return true;
@@ -385,15 +385,13 @@ bool CParser::ProcessMacro()
     int type = GetQuotes();
     if (type == 1)
     {
-      LoadFromFile(GetPath(m_RootPath) + GetBuffer());
-      ret = true;
+      ret = LoadFromFile(GetPath(m_FileName) + GetBuffer());
     }
     else if (type == 2)
     {
-      LoadFromFile(GetPath(m_FileName) + GetBuffer());
-      ret = true;
+      ret = LoadFromFile(GetPath(m_RootPath) + GetBuffer());
     }
-  }  
+  }
   else if (GetWord() == "symbol")
   {
     if (GetQuotes())
