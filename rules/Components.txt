@@ -166,17 +166,18 @@ NAME.VSLOPE( @1, @2, coeff, delay ) := {
 
 };
 
-//NAME.VSAW( @1, @2, value, phase, duration, offset:=0 )
-NAME.VSAW( @1, @2, value, phase, duration, offset ) := { 
+NAME.VSAW( @1, @2, value, duration, phase, offset ) := { 
 
 	/* nodal equations */
 	NAME.U = ACROSS( @1, @2 );
 	NAME.I = THROUGH( @1, @2 );
 
 	/* physical equation */
-	NAME.U = value * MOD( t - phase, duration ) + offset
+	NAME.U = value * ( (t - phase) % duration ) + offset
 
 };
+
+NAME.VSAW( @1, @2, value, duration ) := NAME.VSAW( @1, @2, value, duration, 0, 0 );
 
 NAME.VPULSE( @1, @2, value, delay, duration, offset, tr, tf ) := { 
 
@@ -199,7 +200,7 @@ NAME.VSQR( @1, @2, value, freq, phase, offset, tr, tf ) := {
 	NAME.I = THROUGH( @1, @2 );
 
 	/* physical equation */
-	NAME.U = 0.5 * value * ( TANH( ( MOD( t - phase + 0.5 / freq , 1 / freq ) - 0.5 / freq ) / tr  ) - TANH( ( MOD( t - phase , 1 / freq )- 0.5 / freq ) / tf ) ) + offset
+	NAME.U = 0.5 * value * ( TANH( ( ( t - phase + 0.5 / freq )%( 1 / freq ) - 0.5 / freq ) / tr  ) - TANH( ( ( t - phase )%( 1 / freq )- 0.5 / freq ) / tf ) ) + offset
 
 };
 
@@ -335,13 +336,17 @@ NAME.DD( @plus, @minus ) := NAME.DD( @plus, @minus, 1e-15, 26e-3  );
 // Transistors
 NAME.NPN( @base, @collector, @emitter, beta ) := {
 
-	NAME.I = THROUGH( @collector, @emitter );
+	// NAME.IBE  = THROUGH( @collector, NAME.@bce );
+	NAME.IB = THROUGH( @base, NAME.@bce );
+	NAME.UB = ACROSS( @base, NAME.@bce );
+	NAME.UB = 0;
 	
-	NAME.DE.DD( @base, @emitter );
-	NAME.DC.DD( @base, @collector );
+	NAME.IBE = THROUGH( @collector, NAME.@bce );
+
+	NAME.DE.DD( NAME.@bce, @emitter );
+	//NAME.DC.DD( @base, @collector );
 	
-	NAME.I = beta * NAME.DE.I
-		
+	NAME.IBE = beta * NAME.IB	
 };
 
 NAME.PNP( @base, @collector, @emitter, beta ) := {

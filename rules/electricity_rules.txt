@@ -69,32 +69,35 @@ TRANS(a)           := a;
 TRANS({a})         := {TRANS(a)};
 TRANS(IF((a:b) c)) := LIN_IF((a:b) c);
 TRANS(EXP(a))      := LIN_EXP(a);
+TRANS(MOD(a b))   := LIN_MOD(a b);
 
-TRANS(GT ( a b ) ) :=  GT(  TKEEP(a)  TKEEP(b) );
-TRANS(EQ ( a b ) ) :=  EQ(  TKEEP(a)  TKEEP(b) );
-TRANS(NEQ( a b ) ) :=  NEQ( TKEEP(a)  TKEEP(b) );
-TRANS(LTE( a b ) ) :=  LTE( TKEEP(a)  TKEEP(b) );
-TRANS(LT ( a b ) ) :=  LT(  TKEEP(a)  TKEEP(b) );
-TRANS(GTE( a b ) ) :=  GTE( TKEEP(a)  TKEEP(b) );
+TRANS(GT ( a b ) ) :=  GT(  LAST(a)  LAST(b) );
+TRANS(EQ ( a b ) ) :=  EQ(  LAST(a)  LAST(b) );
+TRANS(NEQ( a b ) ) :=  NEQ( LAST(a)  LAST(b) );
+TRANS(LTE( a b ) ) :=  LTE( LAST(a)  LAST(b) );
+TRANS(LT ( a b ) ) :=  LT(  LAST(a)  LAST(b) );
+TRANS(GTE( a b ) ) :=  GTE( LAST(a)  LAST(b) );
 
-LIN_EXP(a)       := EXP( TKEEP(a) ) * a + ( 1 - TKEEP( a ) ) * EXP( TKEEP( a ) );
-LIN_IF((a:b) c)  := a*TKEEP(c) + b*(1-TKEEP(c));
+LIN_EXP(a)       := EXP( LAST(a) ) * a + ( 1 - LAST( a ) ) * EXP( LAST( a ) );
+LIN_IF((a:b) c)  := a*LAST(c) + b*(1-LAST(c));
+LIN_MOD(a b)     := LAST(a) % LAST(b);
 
-TKEEP( _const( a ) ) := a;
-TKEEP( a )   := _last( a );
-TKEEP(a+b)   := TKEEP(a) + TKEEP(b);
-TKEEP(a-b)   := TKEEP(a) - TKEEP(b);
-TKEEP(a*b)   := TKEEP(a) * TKEEP(b);
-TKEEP(a/b)   := TKEEP(a) / TKEEP(b);
-TKEEP(a>b)   := TKEEP(a) > TKEEP(b);
-TKEEP(a>=b)  := TKEEP(a) >= TKEEP(b);
-TKEEP(a<b)   := TKEEP(a) < TKEEP(b);
-TKEEP(a<=b)  := TKEEP(a) <= TKEEP(b);
-TKEEP(a==b)  := TKEEP(a) == TKEEP(b);
+LAST(TIME()) := TIME();
+LAST( _const( a ) ) := a;
+LAST( a )   := _last( a );
+LAST(a+b)   := LAST(a) + LAST(b);
+LAST(a-b)   := LAST(a) - LAST(b);
+LAST(a*b)   := LAST(a) * LAST(b);
+LAST(a/b)   := LAST(a) / LAST(b);
+LAST(a>b)   := LAST(a) > LAST(b);
+LAST(a>=b)  := LAST(a) >= LAST(b);
+LAST(a<b)   := LAST(a) < LAST(b);
+LAST(a<=b)  := LAST(a) <= LAST(b);
+LAST(a==b)  := LAST(a) == LAST(b);
 
 // TODO check functions below. Don't work
-//TKEEP( _funct1( a   f ) ) := _funct1( TKEEP(a) f );
-//TKEEP( _funct2( a b f ) ) := _funct2( TKEEP(a) TKEEP(b) f );
+//LAST( _funct1( a   f ) ) := _funct1( LAST(a) f );
+//LAST( _funct2( a b f ) ) := _funct2( LAST(a) LAST(b) f );
 
 REM_DC(a;b)   := (REM_DC(a);REM_DC(b));
 REM_DC(a+b)   := REM_DC(a)+REM_DC(b);

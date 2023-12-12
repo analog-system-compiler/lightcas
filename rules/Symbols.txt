@@ -33,6 +33,7 @@
 `symbol "a-\>(b)" SUB( a b )   
 `symbol "a&\&b  " AND( a b )   
 `symbol "a*b    " MUL( a b )   
+`symbol "a%b    " MOD( a b )   
 `symbol "a/(b)  " DIV( a b )   
 `symbol "(a)^(b)" POW( a b )   
 `symbol "a<<(b) " SHL( a b )   
