@@ -42,7 +42,6 @@ private:
   CFunction  m_Function;
   ELEM_TYPE  m_Type;
   bool       m_Global;
-  //bool       m_bLock;     // Prevents recursivity
   bool       m_bAux;
   unsigned   m_Ref;
 
@@ -52,8 +51,6 @@ public:
   void RemoveRules();
   void SetEquation( const CMathExpression& equ );
   void AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb = 0 );
- // void Unlock();
- // void Lock();
 
   const CString&  GetName() const           { return m_Name;                   }
   void SetName( const CString& name )       { m_Name=name;                     }
@@ -72,7 +69,6 @@ public:
   bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
   bool IsNumeric() const                    { return ( m_Type == ELEM_NUM );   }
   bool IsAux()     const                    { return m_bAux;                   }
-//  bool IsLocked()  const                    { return m_bLock;                  }
   bool IsGlobal()  const                    { return m_Global;                 }
   bool IsVoid()    const                    { return ( GetOperandNb() == 0 );  }
   bool IsUnary()   const                    { return ( GetOperandNb() == 1 );  }

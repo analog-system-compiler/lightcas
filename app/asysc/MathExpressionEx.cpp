@@ -20,7 +20,7 @@
 #include "Element.h"
 #include "MathExpressionEx.h"
 
-bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode)
+bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * circuit_name )
 {
   OP_CODE op;
   CElement *e, *eth, *es, *ec, *et, *ee, *ess;
@@ -52,7 +52,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode)
   ee->SetNumeric();
   et->SetName("time");
 
-  e = m_ElementDB->GetElement("CIRCUIT");
+  e = m_ElementDB->GetElement(circuit_name);
   if (e->IsFunct())
   {
     const CAlgebraRuleArray &rule_array = e->GetFunction()->GetAlgebraRulesArray();

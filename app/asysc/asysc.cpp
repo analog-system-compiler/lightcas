@@ -34,14 +34,16 @@ typedef enum
 } lang_t;
 
 void Help();
-int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *exe_path);
+int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name, const char *exe_path);
 int InteractiveMode(CElementDataBase &db, const char *exe_path);
 
 int main(int argc, char *argv[])
 {
   lang_t language = LANG_PYTHON;
   char *input_filename = NULL;
-  char *output_filename = NULL;
+  const char *output_filename = "out";
+  const char *circuit_name = "CIRCUIT";
+
   CAnalysisMode analysis_type = TRANS_ANALYSIS;
 
   while (true)
@@ -67,6 +69,9 @@ int main(int argc, char *argv[])
         analysis_type = CAnalysisMode::AC_ANALYSIS;
       else if (!strcmp(optarg, "trans"))
         analysis_type = CAnalysisMode::TRANS_ANALYSIS;
+      continue;
+    case 'c':
+      circuit_name = optarg;
       continue;
     case '?':
       if (optopt == 'i' or optopt == 'o')
@@ -98,7 +103,7 @@ int main(int argc, char *argv[])
 
   if (input_filename)
   {
-    FileMode(db, input_filename, output_filename, language, analysis_type, argv[0]);
+    FileMode(db, input_filename, output_filename, language, analysis_type, circuit_name, argv[0]);
   }
   else
   {
@@ -114,7 +119,7 @@ int main(int argc, char *argv[])
   return 0;
 }
 
-int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *exe_path)
+int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name, const char *exe_path)
 {
   CMathExpressionEx equ(&db);
   CDisplay ds;
@@ -129,7 +134,7 @@ int FileMode(CElementDataBase &db, const char *input_filename, const char *outpu
       equ.Parse(parser);
       equ.Compile();
       if (language == LANG_PYTHON)
-        equ.ToPython(ds, analysis_type);
+        equ.ToPython(ds, analysis_type, circuit_name);
     }
   }
   return 0;

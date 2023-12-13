@@ -14,11 +14,11 @@ TED_SUB(TED(a b),TED(c d)) := TED( a-c b-d );
 TED_MUL(TED(a b),TED(c d)) := TED( TED(a*c b*c+a*d) b*d ); 
 TED_DIV(TED(a b),TED(0 d)) := TED( a/d b/d );
 TED_DIV(TED(a b),TED(c d)) := ERROR(8);
-TED_POW(TED(a b),TED(0 _const(d))) := TED_MUL(TED(a b),TED_POW(TED(a b),TED(0 d-1)));
 TED_POW(TED(a b),TED(0 1)) := TED(a b);
 TED_POW(TED(a b),TED(0 0)) := TED(0 1);
 TED_POW(TED(a b),TED(c d)) := ERROR(10);
 TED_NEG(TED(a b))          := TED( 0-a 0-b );
+TED_POW(TED(a b),TED(0 _const(d))) := TED_MUL(TED(a b),TED_POW(TED(a b),TED(0 d-1)));
 
 TED( TED( 0 a ) b ) := TED( a b );
 

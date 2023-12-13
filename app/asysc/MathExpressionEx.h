@@ -35,7 +35,7 @@ private:
   OP_CODE m_op_getv;
 
 public:
-  bool ToPython(CDisplay &ds, CAnalysisMode mode);
+  bool ToPython(CDisplay &ds, CAnalysisMode mode, const char * circuit_name);
   pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
   pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
 
