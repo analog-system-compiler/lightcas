@@ -73,6 +73,7 @@ DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}) );
 /**********************************************************************************/
 TED_MUL2( a, TED( b c ) )   := TED( a*b a*c );
 
+// TODO: give result like this {a}, {b}, {c} where c is the comatrix values, a is the unknown coefficient column and b is the source column.
 /* works also
 DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( c )    }, {          e  } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
 DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( d, c ) }, { VECT_ROR(e) } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
@@ -130,14 +131,14 @@ VSIGN( a, b ) := -VSIGN(a);
 /**********************************************************************************/
 //IPOLY_TED3((a,b),v)    := (IPOLY_TED3(a,v), IPOLY_TED3(b,v)); //parenthesis are important there!!!
 IPOLY_TED3(TED(a b))       := -b/a;
-SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, _print( n-1 ) ), SYSTEM_SOLVE0({a},{x}) );
+SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_SOLVE0({a},{x}) );
 SYSTEM_SOLVEN({a},{x}, 1 ) :=   SYSTEM_SOLVE0({a},{x}); // end of recursion
 SYSTEM_SOLVE0({a},{x})     :=   IPOLY_TED3( DET_LINES2( {a}, {x} ) );
 SYSTEM_SOLVE({a},{x})      := {  SYSTEM_SOLVEN( {a}, {VECT_ROR(x)}, VSIZE({a})  ) }; 
 
 /**********************************************************************************/
 IPOLY_TED4(TED(a b), v)         := (v=-b/a);
-SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, _print( n-1 ) ), SYSTEM_AUTO_SOLVE0({a},{x}) );
+SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_AUTO_SOLVE0({a},{x}) );
 SYSTEM_AUTO_SOLVEN({a},{x}, 1 ) :=   SYSTEM_AUTO_SOLVE0({a},{x}); // end of recursion
 SYSTEM_AUTO_SOLVE0({a},{x})     :=   IPOLY_TED4( DET_LINES2( {a}, {x} ), VECT_HEAD(x) );
 SYSTEM_AUTO_SOLVE({a})          := {  SYSTEM_AUTO_SOLVEN( {a}, {_print(GET_VAR_LIST(a))}, VSIZE({a}) )  };
@@ -291,7 +292,10 @@ ONES(_const(a))   := ( ( a == 1 )  ? 1 : (ONES(a-1),1) );
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-CHECK_UNIQUE(a)       := a;
+// VRANK_ELEM(a, b) := (  _eval( _elemid(a) ) > _eval( _elemid(b) )  ? (a,b) : (b,a) );
+// VRANK(a, b, c) := VRANK_ELEM(b, c)
+
+//CHECK_UNIQUE(a)       := a; // never called
 CHECK_UNIQUE(a,b)     := (a,b);
 CHECK_UNIQUE(a,a)     := a;
 CHECK_UNIQUE(a,1)     := a;
@@ -315,3 +319,101 @@ GET_VAR_LIST(-a)       := GET_VAR_LIST( a );
 GET_VAR_LIST(_elem(a)) := a;
 GET_VAR_LIST(a.b)      := a.b;
 GET_VAR_LIST(a)        := 1;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+LIST_RANK( a b ) :=  _eval( _gt( _elemid( a ) _elemid( b ) ) );
+LIST_RANK( 1 a ) :=  0;
+LIST_RANK( a 1 ) :=  1;
+CHOOSE_VAR2(a,b) := ( LIST_RANK( a b ) ? a : b );
+//CHOOSE_VAR2(1,a) := a;
+//CHOOSE_VAR2(a,1) := a;
+
+GET_VAR2( a + b )  := CHOOSE_VAR2( GET_VAR2(a), GET_VAR2(b) );
+GET_VAR2( a - b )  := CHOOSE_VAR2( GET_VAR2(a), GET_VAR2(b) );
+GET_VAR2( a * b )  := CHOOSE_VAR2( GET_VAR2(a), GET_VAR2(b) );
+GET_VAR2( a / b )  := GET_VAR2( a ); 
+GET_VAR2( a ^ b )  := GET_VAR2( a );
+GET_VAR2( -a )     := GET_VAR2( a );
+GET_VAR2(_elem(a)) := a;
+GET_VAR2(a.b)      := a.b;
+GET_VAR2( a )      := 1;
+
+TO_SPARSE({a})         := {TO_SPARSE_RECURSE(a)};
+TO_SPARSE_RECURSE(a,b) := ( TO_SPARSE_RECURSE(a), TO_SPARSE4(b) );
+TO_SPARSE_RECURSE(a)   := TO_SPARSE4(a);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//TO_SPARSE_VECT(a,b) := ({a},{b});
+
+TO_SPARSE4(a)      := TO_SPARSE3( a, GET_VAR2(a) );
+TO_SPARSE3( a, b ) := TO_SPARSE2( POLY_TED( a, b ), b );
+TO_SPARSE3( a, 1 ) := ( {a}, {1} );
+
+TO_SPARSE2( TED( a b ), c ) := TO_SPARSE_SPLIT( TO_SPARSE4(b) , (a,c) );
+TO_SPARSE2( TED( a 0 ), c ) := ({a},{c}); // remove this if you want {1,x,y,z} when rest is null rather than {x,y,z}
+
+TO_SPARSE_SPLIT( {a}, {b}, (c,d) ) := ( {a,c}, {b,d} );
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+LIST_RANK2( a b )    :=  _eval( _lt( _elemid( a ) _elemid( b ) ) );
+LIST_RANK2( 1 a )    :=  1;
+LIST_RANK2( a 1 )    :=  0;
+LIST_ORDER( a, b, b) := ( a, b );
+LIST_ORDER( a, a)    := a;
+LIST_ORDER( a, b, c) := ( LIST_RANK2(b c) ? (a,b,c) : (LIST_ORDER(a,c), b) );
+LIST_ORDER( a, b )   := ( LIST_RANK2(a b) ? (a,b) : (b,a) );
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+COMATRIX_ENTRY( a ) := COMATRIX2( _print( TO_SPARSE(a) ) );
+COMATRIX2( {a} ) := COMATRIX3( a,  COMATRIX_GET_LIST( a ) );
+COMATRIX3( a, f ) := COMATRIX(  a, {f}, VSIZE({f} ));
+
+COMATRIX_ADD_TO_LIST( a, (b,c) ) := COMATRIX_ADD_TO_LIST(LIST_ORDER( a, c ), b);
+COMATRIX_ADD_TO_LIST( a, b ) := LIST_ORDER( a, b );
+
+COMATRIX_GET_LIST( a, ({b},{c}) ) := COMATRIX_ADD_TO_LIST( COMATRIX_GET_LIST(a), c );
+COMATRIX_GET_LIST(    ({b},{c}) ) :=  c ;
+
+// COMATRIX_ROR( a, (b, c) , (d,e) ) := ( COMATRIX_ROR( a, (d,e) ), (b,c) );
+// COMATRIX_ROR(    (b, c) , (d,e) ) := ( (d,e) , (b,c) );
+// COMATRIX_ROR( a )                 := a;
+
+COMATRIX( a, {f}, n ) :=  -VSIGN( {f} ) * COMATRIX( a, {VECT_ROR(f)}, n-1) + COMATRIX1( a, {f} );
+COMATRIX( a, {f}, 1 ) :=  COMATRIX1( a, {f} ) ;
+
+COMATRIX1(  a, ( b, c ), {f,e} ) := COMATRIX_GET( ( b,c ), e ) * COMATRIX(  a, {f}, VSIZE({f} ));
+COMATRIX1(  a, ( b, c ),   {e} ) := COMATRIX_GET( ( b,c ), e ) * COMATRIX(  a, {f}, VSIZE({f} ));
+COMATRIX1(     ( b, c ), {f,e} ) := COMATRIX_GET( ( b,c ), e );
+COMATRIX1(     ( b, c ),   {e} ) := COMATRIX_GET( ( b,c ), e );
+
+COMATRIX_GET( {a,b}, {c,v}, v ) := _print( b );
+COMATRIX_GET(   {b},   {v}, v ) := _print( b );
+COMATRIX_GET( {a,b}, {c,d}, v ) := COMATRIX_GET( {a}, {c}, v );
+COMATRIX_GET(   {b},   {d}, v ) := 0;
+
+// COMATRIX1( a, ({b,c} , {d,e}), {f,e} ) := c * COMATRIX( _print( COMATRIX_REMOVE_HEAD( a, e ) ), {f}, _print(VSIZE({f}) ));
+// COMATRIX1( a, (  {c} ,   {e}), {f,e} ) := c * COMATRIX( _print( COMATRIX_REMOVE_HEAD( a, e ) ), {f}, _print(VSIZE({f}) ));
+// COMATRIX1( a, (  {c} ,   {e}), {e} )   := c;
+// COMATRIX1( a, ( {b}  , {d,e}), {f,g} ) := 0;
+// COMATRIX1( a, ( {b}  ,   {e}), {f,g} ) := 0;
+// COMATRIX1( a, ( {b}  ,   {e}), {g} )   := 0;
+
+// COMATRIX1(    ({b,c} , {d,e}), {f,e} ) := c;
+// COMATRIX1(    ( {c}  ,   {e}), {f,e} ) := c;
+// COMATRIX1(    ( {c}  ,   {e}), {e  } ) := c;
+// COMATRIX1(    ( {b}  , {d,e}), {f,g} ) := 0;
+// COMATRIX1(    ( {b}  ,   {e}), {f,g} ) := 0;
+// COMATRIX1(    ( {b}  ,   {e}), {g  } ) := 0;
+
+// COMATRIX_REMOVE_HEAD( a, ({b,c}, {d,v}), v) := ( COMATRIX_REMOVE_HEAD(a, v), ({b},{d}) );
+// COMATRIX_REMOVE_HEAD( a, ({b}  , {d  }), v) := ( COMATRIX_REMOVE_HEAD(a, v), ({b},{d}) );
+// COMATRIX_REMOVE_HEAD(    ({b,c}, {d,v}), v) := ({b},{d}) ;
+// COMATRIX_REMOVE_HEAD(    ({b}  , {d  }), v) := ({b},{d}) ;
+
+// DET( {{a}} ) := a;
+// DET( {a,b} ) := MAT_DET_LINES( { a,b }, VSIZE( {a,b}) );
+//MAT_DET_LINES( { c, { a, b } }, n ) := b * DET( { MAT_REM_HEAD( c ) } ) - VSIGN( c ) * MAT_DET_LINES( { VECT_ROR(c, {a,b} ) }, n-1 );
+//MAT_DET_LINES( { c, { a, b } }, 1 ) := b * DET( { MAT_REM_HEAD( c ) } );

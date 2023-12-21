@@ -208,9 +208,8 @@ pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precede
       pos1 = Match(pos, ss->m_Equation, pos_array);
       if (pos1 != pos)
       {
-        const char *sp = ss->m_Syntax;
-        if (1)
-        // if ((i < precedence) || (ds.IsDebug() && i <= precedence))
+        const char *sp = ss->m_Syntax;        
+        if ((i < precedence) || (ds.IsDebug() && i <= precedence))
         {
           ds += '(';
           DisplaySymbolString(sp, pos_array, i, ds);

@@ -6,6 +6,10 @@ _check( 0.5E4  5000 );
 _check( 0xAA  170 );
 _check( 0b1010  10 );
 _check( KEEP   KEEP  );
+_check(  _eval( _elemid( a ) ) 84 );
+_check(  _eval( _elemid( b ) ) 85 );
+_check(  _eval( _gt( _elemid( b )  _elemid( a ) ) ) 1 );
+_check(  _eval( _gt( _elemid( a )  _elemid( b ) ) ) 0 );
 //_check( {1;2;3;}   {1;2;3}  ); // cause symplfy error
 
 _check( TED( a b )  TED(a b) );
@@ -165,7 +169,7 @@ _check( SIMPLIFY(57>>3)  7.125 );
 _check( NORM((4+a*(6+32*a))/(2+a*(2+72*a)), a)  (2+3*a+(4*a)^2)/(1+a+(6*a)^2) );
 
 /*********** Assignment ***/
-_check( ( y:=a+b; z:=a-b; y-z )  2*b );
+_check( SIMPLIFY( yyy:=a+b; zzz:=a-b; yyy-zzz )   (yyy();zzz();2*b) );
 
 /********** Equation solving **********/
 //Initialize();
@@ -188,6 +192,16 @@ _check( SYSTEM_SOLVE( {x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*
 _check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2}, {x,y,z})    {(i*b*2+f*b*2+c*(h*2+e*2))/(i*(b*d-e*a)+f*(b*g+h*a)+c*(h*d+e*g)),(g*c*2-(d*c*2+a*(i*2+f*2)))/(a*(i*e-f*h)-d*(c*h+i*b)-g*(f*b+c*e)),(h*a*2+e*a*2-b*(d*2-g*2))/(h*(d*c+a*f)+e*(g*c-a*i)+b*(g*f+d*i))} );
 
 _check( GET_VAR_LIST(x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9) (u,z,y,x) );
+
+_check( TO_SPARSE( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{1,x,y,u,z},({-3,1,2,2,2},{1,x,y,u,z}),({-5,1,2,3,3},{1,x,y,u,z}),({-9,1,2,4,3},{1,x,y,u,z})} );
+_check( TO_SPARSE( {x+z-1, y+2*z, x+2*y+3*u-5, x+2*y-9} )                           {{-1,1,1},{1,x,z},({0,1,2},{1,y,z}),({-5,1,2,3},{1,x,y,u}),({-9,1,2},{1,x,y})} );
+_check( COMATRIX_GET_LIST( {-1,1,1,1},{1,x,y,z},({-3,2,2,2},{1,u,z,y}),({-3,3,2,1},{1,z,y,x}),({-9,4,3,1},{1,u,z,x}) ) (1,x,y,u,z)  );
+//_check( COMATRIX_ENTRY( {y+x+u+z, x+2*y+2*z+2*u, x+2*y+3*z+3*u, x+2*y+3*z+4*u} ) {{-1,1,1,1,1},{1,u,z,y,x},({-3,2,2,2,1},{1,u,z,y,x}),({-5,3,3,2,1},{1,u,z,y,x}),({-9,4,3,2,1},{1,u,z,y,x})} );
+//_check( COMATRIX_ENTRY( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{1,u,z,y,x},({-3,2,2,2,1},{1,u,z,y,x}),({-5,3,3,2,1},{1,u,z,y,x}),({-9,4,3,2,1},{1,u,z,y,x})} );
+_check( COMATRIX_ENTRY( {3*x+4*y, 2*x+8*y}                     )  16 );
+_check( COMATRIX_ENTRY( {-x,         2*y+3*z, 8*y+10*z}        )   4 );
+_check( COMATRIX_ENTRY( {-x+2*y+5*z, 2*y+3*z, 8*y+10*z}        )   4 );
+_check( COMATRIX_ENTRY( {-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z} )  32 );
 
 /********** Variable List *************/
 _check( ADD_TO_LIST(x,y,z,z,y)                              (y,x,z) );

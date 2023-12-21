@@ -54,6 +54,9 @@ bool CMathExpression::ParseAtom(CParser &IC)
 int CMathExpression::GetLevel(CParser &IC)
 {
   int i = 0;
+  
+  m_ElementDB->GetEvaluator()->ClearValue();
+
   while (!IC.IsStopChar())
   {
     if (GetLevel(IC, 0))
@@ -157,8 +160,8 @@ bool CMathExpression::ParseElement(CParser &IC)
   bool is_funct = false;
 
   ASSERT(IC.IsWord());
-  CEvaluator *eval = m_ElementDB->GetEvaluator();
-  eval->ClearValue(); // ???
+  // CEvaluator *eval = m_ElementDB->GetEvaluator();
+  // eval->ClearValue(); // ???
   e = m_ElementDB->GetElement(IC.GetWord());
 
   if (!e)
