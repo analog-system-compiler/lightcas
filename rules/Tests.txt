@@ -193,15 +193,16 @@ _check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2}, {x,y,z})    {(
 
 _check( GET_VAR_LIST(x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9) (u,z,y,x) );
 
-_check( TO_SPARSE( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{1,x,y,u,z},({-3,1,2,2,2},{1,x,y,u,z}),({-5,1,2,3,3},{1,x,y,u,z}),({-9,1,2,4,3},{1,x,y,u,z})} );
-_check( TO_SPARSE( {x+z-1, y+2*z, x+2*y+3*u-5, x+2*y-9} )                           {{-1,1,1},{1,x,z},({0,1,2},{1,y,z}),({-5,1,2,3},{1,x,y,u}),({-9,1,2},{1,x,y})} );
-_check( COMATRIX_GET_LIST( {-1,1,1,1},{1,x,y,z},({-3,2,2,2},{1,u,z,y}),({-3,3,2,1},{1,z,y,x}),({-9,4,3,1},{1,u,z,x}) ) (1,x,y,u,z)  );
-//_check( COMATRIX_ENTRY( {y+x+u+z, x+2*y+2*z+2*u, x+2*y+3*z+3*u, x+2*y+3*z+4*u} ) {{-1,1,1,1,1},{1,u,z,y,x},({-3,2,2,2,1},{1,u,z,y,x}),({-5,3,3,2,1},{1,u,z,y,x}),({-9,4,3,2,1},{1,u,z,y,x})} );
-//_check( COMATRIX_ENTRY( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{1,u,z,y,x},({-3,2,2,2,1},{1,u,z,y,x}),({-5,3,3,2,1},{1,u,z,y,x}),({-9,4,3,2,1},{1,u,z,y,x})} );
+_check( TO_SPARSE( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{-3,1,2,2,2},{-5,1,2,3,3},{-9,1,2,4,3}},{{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z}} );
+_check( TO_SPARSE( {x+z-1, y+2*z, x+2*y+3*u-5, x+2*y-9} )                           {{-1,1,1},{1,2},{-5,1,2,3},{-9,1,2}},{{1,x,z},{y,z},{1,x,y,u},{1,x,y}} );
+_check( COMATRIX_GET_LIST( {1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z} )             (1,x,y,u,z) );
+_check( COMATRIX_ENTRY( {y+x+u+z, x+2*y+2*z+2*u, x+2*y+3*z+3*u, x+2*y+3*z+4*u} )         (-1) );
+_check( COMATRIX_ENTRY( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) (-69) );
 _check( COMATRIX_ENTRY( {3*x+4*y, 2*x+8*y}                     )  16 );
 _check( COMATRIX_ENTRY( {-x,         2*y+3*z, 8*y+10*z}        )   4 );
 _check( COMATRIX_ENTRY( {-x+2*y+5*z, 2*y+3*z, 8*y+10*z}        )   4 );
 _check( COMATRIX_ENTRY( {-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z} )  32 );
+_check( COMATRIX_SOLVE( {-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z} )  ({0,32},{0,32},{0,32}) );
 
 /********** Variable List *************/
 _check( ADD_TO_LIST(x,y,z,z,y)                              (y,x,z) );
@@ -220,8 +221,8 @@ _check( DET({-x+2*y+5*z, 2*y+3*z, 8*y+10*z},        {x,y,z})   4 );
 _check( DET({-x+2*y+5*z, x+2*y+3*z, -2*x+8*y+10*z}, {x,y,z})  32 );
 _check( DET({ x+y+z+w, y+z+w, z+w, w}, {x,y,z,w})  1 );
 
-_check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  0 );
-_check( DET({(L1_U+C1_U)-(V_U+V1_U)-R1_U,-(V1_I+C1_I),V1_I-V_I,V_I+R1_I,C1_I-L1_I,R1_U-10*R1_I,L1_U-0.001*0,C1_I-5e-07*0},{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  (-C1_I) );
+//_check( DET({ {(L1_U+C1_U)-(V_U+V1_U)-R1_U},{-(V1_I+C1_I)},{V1_I-V_I,V_I+R1_I},{C1_I-L1_I},{R1_U-10*R1_I},{L1_U-0.001*0},{C1_I-5e-07*0} },{1,C1_I,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  0 );
+//_check( DET({ {(L1_U+C1_U)-(V_U+V1_U)-R1_U},{-(V1_I+C1_I)},{V1_I-V_I,V_I+R1_I},{C1_I-L1_I},{R1_U-10*R1_I},{L1_U-0.001*0},{C1_I-5e-07*0} },{1,R1_U,L1_U,R1_I,R1_U,L1_I,V_I,V1_I,C1_U})  (-C1_I) );
 _check( DET({ {3,4} , {2,8} })  16 );
 _check( DET({ {-1,2,5} , {1,2,3} , {-2,8,10} })  32 );
 _check( DET({ {8, 1, 1, 1}, {1, 2, 2, 2}, {1, 2, 3, 3}, {1, 2, 3, 4} }) 15 );
@@ -279,7 +280,7 @@ TEST_SYSTEM() := SOLVE_RLC2( RLC );
 //_check( KIRCHHOFF_NODE(KIRCHHOFF_LOOP( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
 _check( KIRCHHOFF_LOOP(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) )          SYST(U24-(U14-U12) U32-U34+U24) );
 
-_check( AC_TRANSFORM( RLC ) { C.U+V.U+R.U+L.U;R.I-V.I;V.I-C.I;L.I-R.I;C.I-1e-05*(C.U*s);L.U-0.001*(L.I*s);R.U-100*R.I;V.U-1} );
+_check( AC_TRANSFORM( RLC ) {V.U+R.U+L.U+C.U;V.I-C.I;C.I-L.I;L.I-R.I;V.U-1;R.U-100*R.I;L.U-0.001*L.I*s();C.I-1e-05*C.U*s()} );
 _check( SIMPLIFY( TEST_SYSTEM() ) {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} );
 
 //TEST_SYSTEM2() := SIMPLIFY( SOLVE_RLC2( RLC ) );
