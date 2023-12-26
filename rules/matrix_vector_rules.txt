@@ -177,9 +177,11 @@ MAT_ROR_LINES( {a,{b}} ) := ( MAT_ROR_LINES( {a} ), { VECT_ROR( b ) } );
 MAT_ROR_LINES( {{b}} )   := { VECT_ROR( b ) };
 
 //(a,b,c,d) -> (d,a,b,c)
+VECT_ROR( ( a, b, c, d, e, f, g, h ), i ) := ( VECT_ROR( a, i ), b, c, d, e, f, g, h );
+VECT_ROR( ( a, b, c, d ), e ) := ( VECT_ROR( a, e ), b, c, d );
 VECT_ROR( ( a, b ), c ) := ( VECT_ROR( a, c ), b );
-VECT_ROR( a, c )       := ( c , a );
-VECT_ROR( a )          := a;
+VECT_ROR( a, c ) := ( c , a );
+VECT_ROR( a ) := a;
 
 VECT_ROL( a, b )   := ( VECT_REM_HEAD( a ), b, VECT_HEAD( a ) );
 VECT_ROL( a )      := a;
@@ -356,13 +358,15 @@ TO_SPARSE_SPLIT( {a}, {b}, (c,d) ) := ( {a,c}, {b,d} );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LIST_RANK2( a b )    :=  _eval( _lt( _elemid( a ) _elemid( b ) ) );
-LIST_RANK2( 1 a )    :=  1;
-LIST_RANK2( a 1 )    :=  0;
-LIST_ORDER( a, b, b) := ( a, b );
-LIST_ORDER( a, a)    := a;
-LIST_ORDER( a, b, c) := ( LIST_RANK2(b c) ? (a,b,c) : (LIST_ORDER(a,c), b) );
-LIST_ORDER( a, b )   := ( LIST_RANK2(a b) ? (a,b) : (b,a) );
+// LIST_RANK2( a b )    :=  _eval( _lt( _elemid( a ) _elemid( b ) ) );
+// LIST_RANK2( 1 a )    :=  1;
+// LIST_RANK2( a 1 )    :=  0;
+LIST_ORDER( a, b, b ) := ( a, b );
+LIST_ORDER( a, b )   := (a,b);
+LIST_ORDER( a, a )   := a;
+//LIST_ORDER( a, b, c) := ( LIST_RANK2(b c) ? (a,b,c) : (LIST_ORDER(a,c), b) );
+//LIST_ORDER( a, b )   := ( LIST_RANK2(a b) ? (a,b) : (b,a) );
+LIST_ORDER( a, b, c ) := (LIST_ORDER(a,c), b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 COMATRIX_ADD_TO_LIST( a, (b,c) ) := COMATRIX_ADD_TO_LIST(LIST_ORDER( a, c ), b);
@@ -372,36 +376,45 @@ COMATRIX_GET_LIST( a, {b})  := COMATRIX_ADD_TO_LIST( COMATRIX_GET_LIST(a), b );
 COMATRIX_GET_LIST(    {b})  := b ;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+REMOVE_ONE(a,b,1) := REMOVE_ONE(a,b);
+REMOVE_ONE(a,b,c) := ( REMOVE_ONE(a,b), c );
+REMOVE_ONE(1,b) := b;
+REMOVE_ONE(b,1) := b;
+REMOVE_ONE(b)   := b;
 
-COMATRIX_SOLVE( a )                 := COMATRIX_SOLVE1( _print( TO_SPARSE(a) ) );
-COMATRIX_SOLVE1( {a}, {b} )         := COMATRIX_SOLVE2( {a}, {b}, {COMATRIX_GET_LIST( b )} );
-COMATRIX_SOLVE2( {a}, {b}, {f} )    := COMATRIX_SOLVE5( {a}, {b}, {f}, VSIZE({a}) );
+COMATRIX_SOLVE( a )                 := { COMATRIX_SOLVE1( _print( TO_SPARSE(a) ) ) };
+COMATRIX_SOLVE1( {a}, {b} )         := COMATRIX_SOLVE2( {a}, {b}, {_print(REMOVE_ONE(COMATRIX_GET_LIST( b )))} );
+COMATRIX_SOLVE2( {a}, {b}, {f} )    := COMATRIX_SOLVE5( {a}, {b}, {f}, VSIZE({b}) );
 
-COMATRIX_SOLVE5( {a}, {b}, {f}, n ) := ( COMATRIX_SOLVE5( {a}, {b}, {VECT_ROR(f)}, n-1 ), COMATRIX_SOLVE3( {a}, {b}, {f}, VSIZE({a}) ) );
-COMATRIX_SOLVE5( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE3( {a}, {b}, {f}, VSIZE({a}) );
+COMATRIX_SOLVE5( {a}, {b}, {f}, n ) := ( COMATRIX_SOLVE5( {a}, {b}, {VECT_ROR(f)}, n-1 ), COMATRIX_SOLVE6( {a}, {b}, {f} ) );
+COMATRIX_SOLVE5( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE6( {a}, {b}, {f} );
 
-COMATRIX_SOLVE3( {a}, {b}, {f}, n ) := (VSIGN( f ) * COMATRIX_SOLVE3( {VECT_ROR(a)}, {VECT_ROR(b)}, {f}, n-1) + COMATRIX_SOLVE4( {a}, {b}, {f} ) );
+COMATRIX_SOLVE6( {a}, {b}, {f,e} )  := IPOLY_TED4( COMATRIX_SOLVE3( {a}, {b}, {f,e}, VSIZE({b}) ), e );
+
+COMATRIX_SOLVE3( {a}, {b}, {f}, n ) := TED_ADD( TED_MUL2( VSIGN( b ) , COMATRIX_SOLVE3( {VECT_ROR(a)}, {VECT_ROR(b)}, {f}, n-1) ), COMATRIX_SOLVE4( {a}, {b}, {f} ) );
 COMATRIX_SOLVE3( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE4( {a}, {b}, {f} ) ;
 
-COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := { COMATRIX_GET_COEFF( ( d, c ), 1 ), COMATRIX_GET_COEFF( ( d, c ), e ) } * COMATRIX(  {a}, {b}, {f}, VSIZE({a} ));
-COMATRIX_SOLVE4( { a, d }, { b, c },    { e } ) := { COMATRIX_GET_COEFF( ( d, c ), 1 ), COMATRIX_GET_COEFF( ( d, c ), e ) } * COMATRIX(  {a}, {b}, {f}, VSIZE({a} ));
-COMATRIX_SOLVE4( {    d },    { c }, { f, e } ) := { COMATRIX_GET_COEFF( ( d, c ), 1 ), COMATRIX_GET_COEFF( ( d, c ), e ) };
-COMATRIX_SOLVE4( {    d },    { c },    { e } ) := { COMATRIX_GET_COEFF( ( d, c ), 1 ), COMATRIX_GET_COEFF( ( d, c ), e ) };
+COMATRIX_SOLVE7({a}, {b}, {f}, TED(  c d )  ) := TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  c d ) );
+COMATRIX_SOLVE7({a}, {b}, {f}, TED(  0 0 )  ) := TED( 0 0 );
+
+COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := COMATRIX_SOLVE7({a}, {b}, {f}, TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) ) ); //TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) ) );
+COMATRIX_SOLVE4( {    d },    { c },    { e } ) := TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 COMATRIX_ENTRY( a )        := COMATRIX2( TO_SPARSE(a) );
-COMATRIX2( {a}, {b}      ) := COMATRIX3( {a}, {b}, {COMATRIX_GET_LIST( b )} );
-COMATRIX3( {a}, {b}, {f} ) := COMATRIX(  {a}, {b}, {f}, VSIZE({a}) );
-
-COMATRIX( {a}, {b}, {f}, n ) :=  VSIGN( f ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, n-1) + COMATRIX1( {a}, {b}, {f} );
-COMATRIX( {a}, {b}, {f}, 1 ) :=  COMATRIX1( {a}, {b}, {f} ) ;
+COMATRIX2( {a}, {b}      ) := COMATRIX3( {a}, {b}, {REMOVE_ONE(COMATRIX_GET_LIST( b ))} );
+COMATRIX3( {a}, {b}, {f} ) := COMATRIX(  {a}, {b}, {f}, VSIZE({b}) );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-COMATRIX1( { a, d }, { b, c }, { f, e } ) := COMATRIX_GET_COEFF( ( d, c ), e ) * COMATRIX(  {a}, {b}, {f}, VSIZE({a} ));
-COMATRIX1( { a, d }, { b, c },    { e } ) := COMATRIX_GET_COEFF( ( d, c ), e ) * COMATRIX(  {a}, {b}, {f}, VSIZE({a} ));
-COMATRIX1( {    d },    { c }, { f, e } ) := COMATRIX_GET_COEFF( ( d, c ), e );
-COMATRIX1( {    d },    { c },    { e } ) := COMATRIX_GET_COEFF( ( d, c ), e );
+COMATRIX( {a}, {b}, {f}, n ) :=  VSIGN( b ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, n-1) + COMATRIX1( {a}, {b}, {f} );
+COMATRIX( {a}, {b}, {f}, 1 ) :=  COMATRIX1( {a}, {b}, {f} ) ;
+
+COMATRIX11(  {a}, {b}, {f}, c ) := c * COMATRIX( {a}, {b}, {f}, VSIZE({b}) );
+COMATRIX11(  {a}, {b}, {f}, 0 ) := 0;
+
+COMATRIX1( { a, d }, { b, c }, { f, e } ) := COMATRIX11( {a}, {b}, {f}, COMATRIX_GET_COEFF( ( d, c ), e ) );
+COMATRIX1( {    d },    { c },    { e } ) := COMATRIX_GET_COEFF( ( d, c ), e ) ;
 
 COMATRIX_GET_COEFF( {a,b}, {c,v}, v ) := b;
 COMATRIX_GET_COEFF(   {b},   {v}, v ) := b;
