@@ -184,7 +184,7 @@ void CMathExpression::Evaluate() const
   m_ElementDB->GetEvaluator()->Evaluate(m_StackSize, m_StackArray);
 }
 
-void CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &dst)
+unsigned CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &dst)
 {
   OP_CODE op;
   const CElement *e;
@@ -209,6 +209,7 @@ void CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &dst)
       }
     }
   }
+  return i;
 }
 
 void CMathExpression::Replace(OP_CODE op1, OP_CODE op2, pos_t pos)

@@ -134,7 +134,7 @@ public:
   void  Evaluate() const;
   void  Compile();
 
-  static void ConvertToRule( CMathExpression& src, CMathExpression& dst );
+  static unsigned ConvertToRule( CMathExpression& src, CMathExpression& dst );
 
   OP_CODE GetLastOperator() const        { return IsEmpty() ? CElementDataBase::OP_ZERO : Get( m_StackSize - 1 ); }
   pos_t             GetSize() const      { return m_StackSize;    }

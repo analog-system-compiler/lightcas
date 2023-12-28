@@ -23,3 +23,31 @@ OK enlever les ';' et continuer de parser tant qu'il y des caract�res
 r�soudre in�galit�s 2a+38 et =
 Check {a) 
 Check missing parenthesis
+ A B C
+|a b c x|    | a       b       c       x|    | a       b                                       c                                             x | 
+|d e f y| => |   a*e-d*b a*f-d*c a*y-d*x| => |   a*e-d*b                                 a*f-d*c                                       a*y-d*x | 
+|g h i z|    |   a*h-g*b a*i-g*c a*z-g*x|    |           (a*e-d*b)*(a*i-g*c)-(a*h-b*g)*(a*f-d*c)      (a*e-d*b)*(a*z-g*x)-(a*h-b*g)*(a*y-d*x)  |
+                                                         aeai-aegc-dbai+dbgc-ahaf+ahdc+bgaf-bgdc       aeaz-aegx-dbaz+dbgx-ahay+ahdx+bgay-bgdx |
+
+=> C = (aeaz-aegx-dbaz-ahay+ahdx+bgay)/(aeai-aegc-dbai-ahaf+ahdc+bgaf)                                                 
+=> C = (eaz-egx-dbz-hay+hdx+bgy)/(eai-egc-dbi-haf+hdc+bgf)  
+
+---------------------------------
+
+ A B C
+|a b c x|    | a       b       c       x|    | a       b                                       c                                             x | 
+|d e f y| => |   a*e-d*b a*f-d*c a*y-d*x| => |   a*e-d*b                                 a*f-d*c                                       a*y-d*x | 
+|g h i z|    |   d*h-g*e d*i-g*f d*z-g*y|    |           (a*e-d*b)*(d*i-g*f)-(d*h-g*e)*(a*f-d*c)      (a*e-d*b)*(d*z-g*y)-(d*h-g*e)*(a*y-d*x)  |
+                                                         aedi-aegf-dbdi+dbgf-dhaf+dhdc+geaf-gedc       aedz-aegy-dbdz+dbgy-dhay+dhdx+geay-gedx |
+
+=> C = (aedz-dbdz+dbgy-dhay+dhdx-gedx)/(aedi-dbdi+dbgf-dhaf+dhdc-gedc)                                                 
+=> C = (aez-dbz+bgy-hay+hdx-gex)/(aei-bdi+bgf-haf+hdc-gec)
+
+---------------------------------
+Essai...
+
+ A B C
+|a b c x|    | a       b       c       x|    | a*e-b*d      0 e*c-b*f e*x-b*y |
+|d e f y| => | 0 a*e-d*b a*f-d*c a*y-d*x| => | 0      a*e-d*b a*f-d*c a*y-d*x |
+|g h i z|    | g       h       i       z|    | g            h       i       z |
+                                             

@@ -340,8 +340,11 @@ SIN(a,b)                  := (SIN(a),SIN(b));
 COS(a,b)                  := (COS(a),COS(b));
 TAN(a,b)                  := (TAN(a),TAN(b));
 
+VSIZE({a,b,c,d,e,f,g,h})  := VSIZE({a})+7;
+VSIZE({a,b,c,d})          := VSIZE({a})+3;
 VSIZE({a,b})              := VSIZE({a})+1;
 VSIZE(a)                  := 1;
+
 {a}[_const(c)]            := INVAT({a}, VSIZE({a}) -1 - c );
 INVAT({a,b},0)            := b;
 INVAT({a,b},_const(c))    := INVAT({a},c-1);

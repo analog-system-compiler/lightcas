@@ -68,10 +68,10 @@ VECT_TO_LIST({a}) := {VECT_TO_LIST(a)};
 /**********************************************************************************/
 //vector defined matrix determinant { a*x+b*y..., c*x+d*y... }
 TED_1( TED( a b ) ) := a;
-DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}) );
+DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}, VSIZE({a}) ) );
 
 /**********************************************************************************/
-TED_MUL2( a, TED( b c ) )   := TED( a*b a*c );
+TED_MUL2( a, TED( b c ) ) := TED( a*b a*c );
 
 // TODO: give result like this {a}, {b}, {c} where c is the comatrix values, a is the unknown coefficient column and b is the source column.
 /* works also
@@ -103,12 +103,12 @@ DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d, DET_LI
 */
 
 //La rotation avec VECT_ROR() fait changer le signe du déterminant pour un nombre de paramètres pairs 
-DET_LINES2( {a}, { c    } ) := POLY_TED( a, c );
-DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a, d ) }, { c }, VSIZE( {a}) );
-DET_LINES3( {a}, {f}, d ) := TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
-DET_LINES3( {a}, {f}, 0 ) := TED( 0 0 );
-DET_LINES( {  a, TED( d e )  }, { f }, n ) := TED_ADD( DET_LINES3({a},{f},d), TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
-DET_LINES( {  a, TED( d e )  }, { f }, 1 ) :=          DET_LINES3({a},{f},d);
+DET_LINES2( {a}, { c    }, m ) := POLY_TED( a, c );
+DET_LINES2( {a}, { c, d }, m ) := DET_LINES( { POLY_TED( a, d ) }, { c }, m , m); //VSIZE( {a}) );
+DET_LINES3( {a}, {f}, m, d ) := TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f }, m ) );
+DET_LINES3( {a}, {f}, m, 0 ) := TED( 0 0 );
+DET_LINES( {  a, TED( d e )  }, { f }, m, n ) := TED_ADD( DET_LINES3({a},{f},m-1,d), TED_MUL2( VSIGN2( m ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, m, n - 1 ) ) );
+DET_LINES( {  a, TED( d e )  }, { f }, m, 1 ) :=          DET_LINES3({a},{f},m-1,d);
 //DET_LINES( {  a, TED( 0 e )  }, { f }, n ) :=                                                                      TED_MUL2( -VSIGN( a ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) );
 //DET_LINES( {  a, TED( 0 e )  }, { f }, 1 ) :=          TED( 0 0 );
 //MATRIX HELP FUNCTIONS
@@ -128,20 +128,22 @@ VECT_SWAP( { a }, 0 ) := a;
 */
 VSIGN( a )    := 1;
 VSIGN( a, b ) := -VSIGN(a);
+VSIGN( a, b, c, d ) := -VSIGN(a);
+VSIGN( a, b, c, d, e, f, g, h ) := -VSIGN(a);
 /**********************************************************************************/
 //IPOLY_TED3((a,b),v)    := (IPOLY_TED3(a,v), IPOLY_TED3(b,v)); //parenthesis are important there!!!
-IPOLY_TED3(TED(a b))       := -b/a;
-SYSTEM_SOLVEN({a},{x}, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_SOLVE0({a},{x}) );
-SYSTEM_SOLVEN({a},{x}, 1 ) :=   SYSTEM_SOLVE0({a},{x}); // end of recursion
-SYSTEM_SOLVE0({a},{x})     :=   IPOLY_TED3( DET_LINES2( {a}, {x} ) );
-SYSTEM_SOLVE({a},{x})      := {  SYSTEM_SOLVEN( {a}, {VECT_ROR(x)}, VSIZE({a})  ) }; 
+IPOLY_TED3(TED(a b))          := -b/a;
+SYSTEM_SOLVEN({a},{x}, m, n ) := ( SYSTEM_SOLVEN({a},{VECT_ROR(x)}, m, n-1 ), SYSTEM_SOLVE0({a},{x},m) );
+SYSTEM_SOLVEN({a},{x}, m, 1 ) :=   SYSTEM_SOLVE0({a},{x}, m); // end of recursion
+SYSTEM_SOLVE0({a},{x}, m)     :=   IPOLY_TED3( DET_LINES2( {a}, {x}, m ) );
+SYSTEM_SOLVE({a},{x})         := {  SYSTEM_SOLVEN( {a}, {VECT_ROR(x)}, VSIZE({a}), VSIZE({a}) ) }; 
 
 /**********************************************************************************/
-IPOLY_TED4(TED(a b), v)         := (v=-b/a);
-SYSTEM_AUTO_SOLVEN({a},{x}, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, n-1 ), SYSTEM_AUTO_SOLVE0({a},{x}) );
-SYSTEM_AUTO_SOLVEN({a},{x}, 1 ) :=   SYSTEM_AUTO_SOLVE0({a},{x}); // end of recursion
-SYSTEM_AUTO_SOLVE0({a},{x})     :=   IPOLY_TED4( DET_LINES2( {a}, {x} ), VECT_HEAD(x) );
-SYSTEM_AUTO_SOLVE({a})          := {  SYSTEM_AUTO_SOLVEN( {a}, {_print(GET_VAR_LIST(a))}, VSIZE({a}) )  };
+IPOLY_TED4(TED(a b), v)            := (v=-b/a);
+SYSTEM_AUTO_SOLVEN({a},{x}, m, n ) := ( SYSTEM_AUTO_SOLVEN({a},{VECT_ROR(x)}, m, n-1 ), SYSTEM_AUTO_SOLVE0({a},{x}, m) );
+SYSTEM_AUTO_SOLVEN({a},{x}, m, 1 ) :=   SYSTEM_AUTO_SOLVE0({a},{x},m); // end of recursion
+SYSTEM_AUTO_SOLVE0({a},{x}, m)     :=   IPOLY_TED4( DET_LINES2( {a}, {x}, m ), VECT_HEAD(x) );
+SYSTEM_AUTO_SOLVE({a})             := {  SYSTEM_AUTO_SOLVEN( {a}, {_print(GET_VAR_LIST(a))}, VSIZE({a}), VSIZE({a}) )  };
 
 /**********************************************************************************/
 // common defined matrix determinant { {a,b,...}, {c,d,...}, ... }
@@ -394,27 +396,27 @@ COMATRIX_SOLVE6( {a}, {b}, {f,e} )  := IPOLY_TED4( COMATRIX_SOLVE3( {a}, {b}, {f
 COMATRIX_SOLVE3( {a}, {b}, {f}, n ) := TED_ADD( TED_MUL2( VSIGN( b ) , COMATRIX_SOLVE3( {VECT_ROR(a)}, {VECT_ROR(b)}, {f}, n-1) ), COMATRIX_SOLVE4( {a}, {b}, {f} ) );
 COMATRIX_SOLVE3( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE4( {a}, {b}, {f} ) ;
 
-COMATRIX_SOLVE7({a}, {b}, {f}, TED(  c d )  ) := TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  c d ) );
-COMATRIX_SOLVE7({a}, {b}, {f}, TED(  0 0 )  ) := TED( 0 0 );
+COMATRIX_SOLVE7({a}, {b}, {f}, TED(  c d ), m  ) := TED_MUL2( COMATRIX( {a}, {b}, {f}, m, m ), TED(  c d ) );
+COMATRIX_SOLVE7({a}, {b}, {f}, TED(  0 0 ), m  ) := TED( 0 0 );
 
-COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := COMATRIX_SOLVE7({a}, {b}, {f}, TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) ) ); //TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) ) );
+COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := COMATRIX_SOLVE7({a}, {b}, {f}, TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) ), VSIZE({b}) ); //TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) ) );
 COMATRIX_SOLVE4( {    d },    { c },    { e } ) := TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 COMATRIX_ENTRY( a )        := COMATRIX2( TO_SPARSE(a) );
-COMATRIX2( {a}, {b}      ) := COMATRIX3( {a}, {b}, {REMOVE_ONE(COMATRIX_GET_LIST( b ))} );
-COMATRIX3( {a}, {b}, {f} ) := COMATRIX(  {a}, {b}, {f}, VSIZE({b}) );
+COMATRIX2( {a}, {b}      ) := COMATRIX3( {a}, {b}, {REMOVE_ONE(COMATRIX_GET_LIST( b ))}, VSIZE({b}) );
+COMATRIX3( {a}, {b}, {f}, m ) := COMATRIX(  {a}, {b}, {f}, m, m);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+VSIGN2( a ) := ( ( a % 2 ) * 2) -1;
+COMATRIX( {a}, {b}, {f}, m, n ) :=  VSIGN2( m ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, m, n-1) + COMATRIX1( {a}, {b}, {f}, m );
+COMATRIX( {a}, {b}, {f}, m, 1 ) :=  COMATRIX1( {a}, {b}, {f}, m ) ;
 
-COMATRIX( {a}, {b}, {f}, n ) :=  VSIGN( b ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, n-1) + COMATRIX1( {a}, {b}, {f} );
-COMATRIX( {a}, {b}, {f}, 1 ) :=  COMATRIX1( {a}, {b}, {f} ) ;
+COMATRIX11(  {a}, {b}, {f}, m, c ) := c * COMATRIX( {a}, {b}, {f}, m, m);
+COMATRIX11(  {a}, {b}, {f}, m, 0 ) := 0;
 
-COMATRIX11(  {a}, {b}, {f}, c ) := c * COMATRIX( {a}, {b}, {f}, VSIZE({b}) );
-COMATRIX11(  {a}, {b}, {f}, 0 ) := 0;
-
-COMATRIX1( { a, d }, { b, c }, { f, e } ) := COMATRIX11( {a}, {b}, {f}, COMATRIX_GET_COEFF( ( d, c ), e ) );
-COMATRIX1( {    d },    { c },    { e } ) := COMATRIX_GET_COEFF( ( d, c ), e ) ;
+COMATRIX1( { a, d }, { b, c }, { f, e }, m ) := COMATRIX11( {a}, {b}, {f}, m-1, COMATRIX_GET_COEFF( ( d, c ), e ) );
+COMATRIX1( {    d },    { c },    { e }, m ) := COMATRIX_GET_COEFF( ( d, c ), e ) ;
 
 COMATRIX_GET_COEFF( {a,b}, {c,v}, v ) := b;
 COMATRIX_GET_COEFF(   {b},   {v}, v ) := b;
