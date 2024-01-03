@@ -343,7 +343,12 @@ TAN(a,b)                  := (TAN(a),TAN(b));
 VSIZE({a,b,c,d,e,f,g,h})  := VSIZE({a})+7;
 VSIZE({a,b,c,d})          := VSIZE({a})+3;
 VSIZE({a,b})              := VSIZE({a})+1;
-VSIZE(a)                  := 1;
+VSIZE({a})                  := 1;
+
+VSIZE2(a,b,c,d,e,f,g,h)  := VSIZE2(a)+7;
+VSIZE2(a,b,c,d)          := VSIZE2(a)+3;
+VSIZE2(a,b)              := VSIZE2(a)+1;
+VSIZE2(a)                  := 1;
 
 {a}[_const(c)]            := INVAT({a}, VSIZE({a}) -1 - c );
 INVAT({a,b},0)            := b;

@@ -16,17 +16,27 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-// precedence is defined here
-// lowercase: new precedence = old precedence + 1
-// uppercase: new precedence = 0
-// parenthesis are used for display only
+// Symbol precedence is defined here
+// Lowercase: new precedence = old precedence + 1
+// Uppercase: new precedence = 0
+// Parenthesis are used for display only
 
 `symbol "a;\}b  " SYST(a b)    
 `symbol "a,(b)  " CONCAT( a b )
 `symbol "a=\=b  " EQV( a b )   
 `symbol "a:=b   " _set( a b )  
 `symbol "a?b    " IF3( a b )   
-`symbol "a:\=b  " COL( a b )   
+`symbol "a:\=b  " COL( a b ) 
+`symbol "a==b   " EQ( a b )    
+`symbol "a<>b   " NEQ( a b )   
+`symbol "a!=b   " NEQ( a b )   
+`symbol "a<=(b) " LTE( a b )   
+`symbol "a<(b)  " LT( a b )    
+`symbol "a>=(b) " GTE( a b )   
+`symbol "a>(b)  " GT( a b )    
+`symbol "a||b   " LOR( a b )   
+`symbol "a->b   " RANGE( a b ) 
+`symbol "a&&b   " LAND( a b )    
 `symbol "a|\|b  " OR( a b )    
 `symbol "a~b    " XOR( a b )   
 `symbol "a+b    " ADD( a b )   
@@ -38,16 +48,6 @@
 `symbol "(a)^(b)" POW( a b )   
 `symbol "a<<(b) " SHL( a b )   
 `symbol "a>>(b) " SHR( a b )   
-`symbol "a==b   " EQ( a b )    
-`symbol "a<>b   " NEQ( a b )   
-`symbol "a!=b   " NEQ( a b )   
-`symbol "a<=(b) " LTE( a b )   
-`symbol "a<(b)  " LT( a b )    
-`symbol "a>=(b) " GTE( a b )   
-`symbol "a>(b)  " GT( a b )    
-`symbol "a||b   " LOR( a b )   
-`symbol "a->b   " RANGE( a b ) 
-`symbol "a&&b   " LAND( a b )  
 `symbol "a[B]   " AT( a b )    
 `symbol "a.b    " HIER( a b )  
 `symbol "-a     " NEG( a )     

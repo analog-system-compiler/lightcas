@@ -345,7 +345,7 @@ TO_SPARSE_LINE3( a, b ) := TO_SPARSE_LINE2( POLY_TED( a, b ), b );
 TO_SPARSE_LINE3( a, 1 ) := ( {a}, {1} );
 
 TO_SPARSE_LINE2( TED( a b ), c ) := TO_SPARSE_SPLIT2( TO_SPARSE_LINE(b) , (a,c) );
-TO_SPARSE_LINE2( TED( a 0 ), c ) := ({a},{c}); // remove this if you want {1,x,y,z} when rest is null rather than {x,y,z}
+//TO_SPARSE_LINE2( TED( a 0 ), c ) := ({a},{c}); // remove this if you want {1,x,y,z} when rest is null rather than {x,y,z}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,8 +402,8 @@ COMATRIX3( {a}, {b}, {f}, m ) := COMATRIX(  {a}, {b}, {f}, m, m);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 VSIGN2( a ) := ( ( a % 2 ) * 2) -1;
-COMATRIX( {a}, {b}, {f}, m, n ) :=  VSIGN2( m ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, m, n-1) + COMATRIX1( {a}, {b}, {f}, m );
-COMATRIX( {a}, {b}, {f}, m, 1 ) :=  COMATRIX1( {a}, {b}, {f}, m ) ;
+COMATRIX( {a}, {b}, {f}, m, n ) := VSIGN2( m ) * COMATRIX( {a}, {b}, {VECT_ROR(f)}, m, n-1) + COMATRIX1( {a}, {b}, {f}, m );
+COMATRIX( {a}, {b}, {f}, m, 1 ) := COMATRIX1( {a}, {b}, {f}, m ) ;
 
 COMATRIX11(  {a}, {b}, {f}, m, c ) := c * COMATRIX( {a}, {b}, {f}, m, m);
 COMATRIX11(  {a}, {b}, {f}, m, 0 ) := 0;
@@ -417,36 +417,32 @@ COMATRIX_GET_COEFF( {a,b}, {c,d}, v ) := COMATRIX_GET_COEFF( {a}, {c}, v );
 COMATRIX_GET_COEFF(   {b},   {d}, v ) := 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-COMATRIX_ENTRY1( a )   := COMATRIX_RECURSE1( TO_SPARSE(a) );
-COMATRIX_SOLVE2( a )   := {COMATRIX_SOLVE3( TO_SPARSE(a) )};
-COMATRIX_SOLVE3( {a}, {b} ) := COMATRIX_SOLVE_LINE( {a}, {b}, VSIZE(b) );
+COMATRIX_ENTRY1( a )         := COMATRIX_RECURSE1( TO_SPARSE(a) );
+COMATRIX_SOLVE12( a )        := { COMATRIX_SOLVE13( _print(TO_SPARSE(a)) ) };
+COMATRIX_SOLVE13( {a}, {b} ) := COMATRIX_SOLVE_LINE( {a}, {b}, VSIZE2(b) );
 
-COMATRIX_SOLVE_LINE( {a}, {b}, m) := COMATRIX_SPLIT( COMATRIX_SOLVE_COL( a, b ), COMATRIX_SOLVE_LINE( {VECT_ROR(a)}, {VECT_ROR(b)}, m-1) );
-COMATRIX_SOLVE_LINE( {a}, {b}, 1) := COMATRIX_SOLVE( a, b );
+COMATRIX_SOLVE_LINE( {a}, {b}, m) := COMATRIX_SPLIT( COMATRIX_SOLVE_LINE( {VECT_ROR(a)}, {VECT_ROR(b)}, m-1), COMATRIX_SOLVE_COL( {a}, {b} ) );
+COMATRIX_SOLVE_LINE( {a}, {b}, 1) := COMATRIX_SPLIT0( COMATRIX_SOLVE_COL( {a}, {b} ) );
 
-COMATRIX_SOLVE_COL( { a, {b,c} }, { d, {e,f} } ) := COMATRIX_SPLIT( COMATRIX_SOLVE_COL( {a, {b} }, { d, {e} }), (c, COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) ) ) );
-COMATRIX_SOLVE_COL( { a, {  c} }, { d, {  f} } ) := COMATRIX_SPLIT0( c, COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) ) );
+COMATRIX_SOLVE_COL( { a, {b,c} }, { d, {e,f} } ) := COMATRIX_SPLIT( COMATRIX_SOLVE_COL( {a, {b} }, { d, {e} }), (COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) ) , f ) );
+COMATRIX_SOLVE_COL( { a, {b,c} }, { d, {1,f} } ) := COMATRIX_SPLIT0( COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) ), f );
+COMATRIX_SOLVE_COL( {    {b,c} }, {    {1,f} } ) := COMATRIX_SPLIT0( 1, f );
 
 COMATRIX_RECURSE1( { a, {b,c} }, { d, {e,f} } ) := c * COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) ) - COMATRIX_RECURSE1( {a, {b} }, { d, {e} });
-COMATRIX_RECURSE1( { a, {  c} }, { d, {  f} } ) := c * COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) );
-COMATRIX_RECURSE1( {    {  c} }, {    {  f} } ) := c;
-COMATRIX_RECURSE1( 0 ) := 0;
+COMATRIX_RECURSE1( { a, {b,c} }, { d, {1,f} } ) := c * COMATRIX_RECURSE1( COMATRIX_REMOVE( {a}, {d}, f ) );
+COMATRIX_RECURSE1( {    {b,c} }, {    {1,f} } ) := c;
+COMATRIX_RECURSE1( {    {  0} }, {    {  1} } ) := 0;
 
 COMATRIX_SPLIT0( (c,d) ) := ( {c}, {d} );
-COMATRIX_SPLIT0( 0 )    := 0;
-
 COMATRIX_SPLIT( {a}, {b}, (c,d) ) := ( {a,c}, {b,d} );
-COMATRIX_SPLIT( 0, (c,d) ) := 0;
-COMATRIX_SPLIT( {a}, {b}, 0 ) := 0;
+COMATRIX_SPLIT( {a}, {b}, ({c},{1}) ) := ( {{0}}, {{1}} );
+COMATRIX_SPLIT( {{a}}, {{1}}, (c,d) ) := ( {{0}}, {{1}} );
 
 COMATRIX_SPLIT_SUB( {a}, {b}, (c,d) ) := ( {a,c}, {b,d} );
-COMATRIX_SPLIT_SUB( 0, (c,d) )    := ( {c}, {d} ); //_print( 0 );
-//COMATRIX_SPLIT_SUB( a, 0 ) := ( a ); //_print( 0 );
 
 COMATRIX_REMOVE( { a, b }, { c, d }, v ) := COMATRIX_SPLIT( COMATRIX_REMOVE( { a }, { c }, v ), COMATRIX_REMOVE_SUB(b,d,v) );
 COMATRIX_REMOVE( {    b }, {    d }, v ) := COMATRIX_SPLIT0( COMATRIX_REMOVE_SUB(b,d,v) );
 
 COMATRIX_REMOVE_SUB( { a, b }, { c, v }, v ) := ({a},{c});
 COMATRIX_REMOVE_SUB( { a, b }, { c, f }, v ) := COMATRIX_SPLIT_SUB( COMATRIX_REMOVE_SUB( { a }, { c }, v ), (b,f) );
-COMATRIX_REMOVE_SUB( {    b }, {    v }, v ) := 0; //_none; //{x,u,v} remove x => not null
 COMATRIX_REMOVE_SUB( {    a }, {    c }, v ) := ({a},{c});
