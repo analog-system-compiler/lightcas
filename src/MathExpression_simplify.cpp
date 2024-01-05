@@ -216,8 +216,7 @@ void CMathExpression::OptimizeTree()
 #if (DEBUG_LEVEL >= 1)
       CDisplay ds;
       ds += "OptimizeTree rule";
-      //        ds += CString( rule->m_LineNo );
-      save_context.m_Rule->Display(0, ds);
+      save_context.m_Rule->Display(save_context.m_RuleNb, ds);
       ds += " : ";
       SetSize(pos3);
       Display(ds, false);
@@ -279,6 +278,7 @@ bool CMathExpression::RuleSearch(const CElement *e)
           save_context.m_RuleDstExp = &(rule->m_DstEquation);
 #ifdef _DEBUG
           save_context.m_Rule = rule;
+          save_context.m_RuleNb = i;
 #endif
           m_ContextStack.Push(save_context);
           DisplayRuleMessage(e);

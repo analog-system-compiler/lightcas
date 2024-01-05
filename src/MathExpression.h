@@ -45,6 +45,7 @@ typedef struct
   pos_t      m_PosArray[CElementDataBase::MAX_PAR];
 #ifdef _DEBUG
   CAlgebraRule* m_Rule;
+  unsigned m_RuleNb;
 #endif
   const CMathExpression* m_RuleDstExp;
 } context_t;
