@@ -343,6 +343,7 @@ void CElementDataBase::Test()
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 #endif
   CParser IC;
+  IC.SetRootPath(m_RootPath);
   if (IC.LoadFromFile(m_RootPath+CString("tests.txt")))
   {
     AddAlgebraRuleTable(IC);

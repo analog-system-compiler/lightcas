@@ -55,7 +55,7 @@ int CMathExpression::GetLevel(CParser &IC)
 {
   int i = 0;
   
-  m_ElementDB->GetEvaluator()->ClearValue();
+  //m_ElementDB->GetEvaluator()->ClearValue();
 
   while (!IC.IsStopChar())
   {

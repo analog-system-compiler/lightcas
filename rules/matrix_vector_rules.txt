@@ -125,14 +125,7 @@ DET_LINES({a, TED(d e)}, {f}, m, 1) := DET_LINES3({a}, {f}, m - 1, d);
 TED_TO_MATRIX(c, TED(a b)) := (TED_TO_MATRIX(c), b);
 TED_TO_MATRIX(TED(a b)) := b;
 TED_TO_MATRIX(a, b) := ERROR(7);
-/*
-VECT_SWAP( { a, b   }, n ) := ERROR(8);
-VECT_SWAP( { a, b   }, 1 ) := (b,a);
-VECT_SWAP( { a, b, c}, n ) := ( VECT_SWAP( {a, c}, n-1 ), b);
-VECT_SWAP( { a, b, c}, 1 ) := ( a, c, b);
-VECT_SWAP( { a }, 0 ) := a;
-//VECT_SWAP( { a, b, c}, 1 ) := ( a, b);
-*/
+
 VSIGN( a )    := 1;
 VSIGN( a, b ) := -VSIGN(a);
 VSIGN( a, b, c, d ) := -VSIGN(a);

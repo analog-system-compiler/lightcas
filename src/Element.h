@@ -53,7 +53,7 @@ public:
   void AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb = 0 );
 
   const CString&  GetName() const           { return m_Name;                   }
-  void SetName( const CString& name )       { m_Name=name;                     }
+  void SetName( const CString& name )       { m_Name = name;                   }
   void SetFunct()                           { m_Type = ELEM_FUNCT;             }
   void SetVar()                             { m_Type = ELEM_VAR;               }
   void SetConst()                           { m_Type = ELEM_CONST;             }

@@ -47,7 +47,8 @@ Check missing parenthesis
 Essai...
 
  A B C
-|a b c x|    | a       b       c       x|    | a*e-b*d      0 e*c-b*f e*x-b*y |
-|d e f y| => | 0 a*e-d*b a*f-d*c a*y-d*x| => | 0      a*e-d*b a*f-d*c a*y-d*x |
-|g h i z|    | g       h       i       z|    | g            h       i       z |
+|a b c x|    | a*e-d*b        0   b*f-e*c   b*y-e*x|    | a*e-d*b        0        b*f-e*c                                         b*y-e*x|   | a*e-d*b        0        b*f-e*c                                                                b*y-e*x|
+|d e f y| => | 0        a*e-d*b   a*f-d*c   a*y-d*x| => | 0        a*e-d*b        a*f-d*c                                         a*y-d*x|=> | 0        a*e-d*b        a*f-d*c                                                                a*y-d*x|
+|g h i z|    | g              h         i         z|    | 0        (a*e-d*b)*h    (a*e-d*b)*i-g*(b*f-e*c)         (a*e-d*b)*z-g*(b*y-e*x)|   | 0              0      (a*e-d*b)*i-g*(b*f-e*c)-h*( a*f-d*c)         (a*e-d*b)*z-g*(b*y-e*x)-h*(a*y-d*x)|
                                              
+=> C = (aez-dbz-gby+gex-hay+hdx)/(aei-dbi-gbf+gec-haf+hdc)

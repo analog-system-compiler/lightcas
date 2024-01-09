@@ -327,7 +327,6 @@ bool CParser::LoadFromFile(const CString &name)
   CParserContext context;
   char *text;
 
-
   file = fopen(name.GetBufferPtr(), "r");
   if (file)
   {
@@ -366,7 +365,7 @@ bool CParser::CloseFile()
   {
     const CParserContext &context = m_ContextArray.Pop();
     delete context.m_Text;
-    SetPos( context.m_Pos );
+    SetPos(context.m_Pos);
     m_LineNb = context.m_LineNb;
     m_FileName = context.m_FileName;
     return true;
