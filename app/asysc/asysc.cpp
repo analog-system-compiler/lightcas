@@ -17,8 +17,8 @@
 /*******************************************************************************/
 
 #include <cstdio>
+#include <cstring>
 #include <iostream>
-#include <unistd.h>
 
 #include "Parser.h"
 #include "Element.h"
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
   while (true)
   {
-    switch (getopt(argc, argv, "i:o:t:l:"))
+    switch (::getopt(argc, argv, "i:o:t:l:"))
     {
     case 'i':
       input_filename = optarg;
@@ -57,15 +57,15 @@ int main(int argc, char *argv[])
       output_filename = optarg;
       continue;
     case 'l':
-      if (!strcmp(optarg, "python"))
+      if (!::strcmp(optarg, "python"))
         language = LANG_PYTHON;
-      else if (!strcmp(optarg, "c"))
+      else if (!::strcmp(optarg, "c"))
         language = LANG_C;
       else
         language = LANG_UNKNOWN;
       continue;
     case 't':
-      if (!strcmp(optarg, "ac"))
+      if (!::strcmp(optarg, "ac"))
         analysis_type = CAnalysisMode::AC_ANALYSIS;
       else if (!strcmp(optarg, "trans"))
         analysis_type = CAnalysisMode::TRANS_ANALYSIS;
@@ -75,16 +75,16 @@ int main(int argc, char *argv[])
       continue;
     case '?':
       if (optopt == 'i' or optopt == 'o')
-        fprintf(stderr, "Option -%c requires an argument.\n", optopt);
+        ::fprintf(stderr, "Option -%c requires an argument.\n", optopt);
       else if (isprint(optopt))
-        fprintf(stderr, "Unknown option `-%c'.\n", optopt);
+        ::fprintf(stderr, "Unknown option `-%c'.\n", optopt);
       else
-        fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
+        ::fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
       return 1;
     case -1:
       break;
     default:
-      abort();
+      ::abort();
     }
     break;
   }
