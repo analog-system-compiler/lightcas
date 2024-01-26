@@ -19,10 +19,11 @@ AR          = $(CROSS_COMPILE)ar
 LD          = $(CROSS_COMPILE)ld
 
 #options
-USE_STD     = 0
+USE_STD     = 1
 DEBUG       = 0
 TEST        = 0
 EMBED_RULES = 0
+GPROF       = 0
 
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -Wl,-Map=$(EXE).map
@@ -33,22 +34,18 @@ EXE_SRC = \
 
 OBJ_SRC = \
     Debug.cpp \
+	Parser.cpp \
     Element.cpp \
     ElementDataBase.cpp \
-    Evaluator.cpp \
     Function.cpp \
     MathExpression_core.cpp \
     MathExpression_display.cpp \
     MathExpression_parser.cpp \
     MathExpression_simplify.cpp \
-    Parser.cpp \
-    Test.cpp \
-    Value.cpp
-
-ifeq ($(GPROF),1)
-	CPPFLAGS += -pg
-endif
-
+	Value.cpp \
+	Evaluator.cpp \
+    Test.cpp
+	
 ifeq ($(USE_STD),0)
 	CPPFLAGS += -I$(SRC_DIR)/nostd 
 	OBJ_SRC  += nostd/LCString.cpp  
@@ -58,8 +55,11 @@ endif
 
 ifeq ($(DEBUG),1)
 	CPPFLAGS += -g -D_DEBUG
-else
-	CPPFLAGS += -Os
+else ifeq ($(GPROF),1)
+	CPPFLAGS += -pg
+	LDFLAGS  += -pg
+else	
+	CPPFLAGS += -O3
 	LDFLAGS  += -s
 endif
 

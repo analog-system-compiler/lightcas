@@ -189,7 +189,7 @@ _check( SYSTEM_SOLVE({x+y+z-6,x-y+z-2,x+y-z},{x,y,z})       {1,2,3} );
 _check( SYSTEM_SOLVE({x-y-z-1,x-y+z-1,x+y-z-3},{x,y,z})     {2,1,0} );
 _check( SYSTEM_SOLVE( {x-1}, {x}) {1} );
 _check( SYSTEM_SOLVE( {x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9}, {x,y,z,u}) {-1,0,-2,4});
-_check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2}, {x,y,z})    {(i*b*2+f*b*2+c*(h*2+e*2))/(i*(b*d-e*a)+f*(b*g+h*a)+c*(h*d+e*g)),(g*c*2-(d*c*2+a*(i*2+f*2)))/(a*(i*e-f*h)-d*(c*h+i*b)-g*(f*b+c*e)),(h*a*2+e*a*2-b*(d*2-g*2))/(h*(d*c+a*f)+e*(g*c-a*i)+b*(g*f+d*i))} );
+_check( SYSTEM_SOLVE({a*x-b*y-c*z+0,d*x-e*y+f*z-2,g*x+h*y-i*z-2}, {x,y,z})    {((i*(b*2)+(f*(b*2)+c*(h*2+e*2)))/(i*(b*d-e*a)+(f*(b*g+h*a)+c*(h*d+e*g))),(g*(c*2)-(d*(c*2)+a*(i*2+f*2)))/((a*(i*e-f*h)-d*(c*h+i*b))-g*(f*b+c*e))),(h*(a*2)+e*(a*2)-b*(d*2-g*2))/(h*(d*c+a*f)+(e*(g*c-a*i)+b*(g*f+d*i)))} );
 
 _check( GET_VAR_LIST(x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9) (u,z,y,x) );
 
@@ -310,8 +310,8 @@ TEST_SYSTEM() := SOLVE_RLC2( RLC );
 //_check( KIRCHHOFF_NODE(KIRCHHOFF_LOOP( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
 _check( KIRCHHOFF_LOOP(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) ) SYST(U24-(U14-U12) U32-U34+U24) );
 
-_check( AC_TRANSFORM( RLC ) {V.U+R.U+L.U+C.U;V.I-C.I;C.I-L.I;L.I-R.I;V.U-1;R.U-100*R.I;L.U-0.001*L.I*s();C.I-1e-05*C.U*s()} );
-_check( SIMPLIFY( TEST_SYSTEM() ) {-(100/(100+1e-06*s^2+0.1*s)),-((0.1*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10000+10*s+0.0001*s^2)),-((0.1*s)/(10000+10*s+0.0001*s^2)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.001*s)/(100+1e-06*s^2+0.1*s)),-((0.0001*s^2)/(10*s+0.01*s^2+1e-07*s^3)),1} );
+_check( AC_TRANSFORM( RLC ) {(((((((V.U+(R.U+(L.U+C.U));V.I-C.I);C.I-L.I);L.I-R.I);V.U-1);R.U-100*R.I);L.U-0.001*(L.I*s()));C.I-1e-05*(C.U*s()))} );
+_check( SIMPLIFY( TEST_SYSTEM() ) {((((((-(1/((0.001*s()+1e-08*s()^2)+1)),-((0.001*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-08*s()^2)/((1+0.001*s())+1e-08*s()^2))),-((1e-05*s())/((1+1e-08*s()^2)+0.001*s()))),-((1e-05*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-05*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-05*s())/((1+1e-08*s()^2)+0.001*s()))),((1e-08*s()^2+1)+0.001*s())/((1e-08*s()^2+1)+0.001*s())} );
 
 //TEST_SYSTEM2() := SIMPLIFY( SOLVE_RLC2( RLC ) );
 //_check( SIMPLIFY( SIMPLIFY( SUBST( SIMPLIFY( TEST_SYSTEM2() ) {10,30,100,300,1000,3000,10000,30000,100000} ) ) )  {10,30,100,300,1000,3000,10000,30000,100000} );

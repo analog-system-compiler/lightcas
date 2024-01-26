@@ -337,14 +337,15 @@ NAME.DD( @plus, @minus ) := NAME.DD( @plus, @minus, 1e-15, 26e-3  );
 // Transistors (Ebers-Moll model)
 NAME.NPN( @base, @collector, @emitter, beta, ISS, UT ) := {	
 
-	NAME.UC = ACROSS( @collector, @base );
-	NAME.UE = ACROSS( @emitter,   @base );
+	NAME.UBC = ACROSS( @base, @collector );
+	NAME.UBE = ACROSS( @base, @emitter   );
 
-	NAME.IC = THROUGH( @collector, @base );
-	NAME.IE = THROUGH( @emitter,   @base );
+	NAME.IBC = THROUGH( @base, @collector );
+	NAME.IBE = THROUGH( @base, @emitter   );
 
-	NAME.IE = ISS * ( EXP( NAME.UE / UT ) - EXP( NAME.UC / UT ) + 1/beta * ( EXP( NAME.UE / UT ) - 1 ) );
-	NAME.IC = ISS * ( EXP( NAME.UE / UT ) - EXP( NAME.UC / UT ) - 1/beta * ( EXP( NAME.UC / UT ) - 1 ) )
+	NAME.IBE = ISS * ( EXP( NAME.UBE / UT ) - EXP( NAME.UBC / UT ) + 1/beta * ( EXP( NAME.UBE / UT ) - 1 ) );
+	NAME.IBC = ISS * ( EXP( NAME.UBC / UT ) - EXP( NAME.UBE / UT ) + 1/beta * ( EXP( NAME.UBC / UT ) - 1 ) )
 };
 
-NAME.NPN( @base, @collector, @emitter ) := NAME.NPN( @base, @collector, @emitter, 100, 1e-15, 26e-3 );
+NAME.NPN( @base, @collector, @emitter, beta ) := NAME.NPN( @base, @collector, @emitter, beta, 1e-15, 26e-3 );
+NAME.NPN( @base, @collector, @emitter ) := NAME.NPN( @base, @collector, @emitter, 100 );

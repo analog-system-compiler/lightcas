@@ -160,8 +160,6 @@ bool CMathExpression::ParseElement(CParser &IC)
   bool is_funct = false;
 
   ASSERT(IC.IsWord());
-  // CEvaluator *eval = m_ElementDB->GetEvaluator();
-  // eval->ClearValue(); // ???
   e = m_ElementDB->GetElement(IC.GetWord());
 
   if (!e)

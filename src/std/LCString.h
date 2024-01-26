@@ -28,6 +28,14 @@
 
 class CString: public std::string
 {
+
+#if (DEBUG_LEVEL == 0)
+protected:
+#else
+public:
+#endif
+  void  Append( const char* s, unsigned i )        { append (s, i); }
+
 public:
   const char* GetBufferPtr() const                 { return c_str(); }
   unsigned GetLength() const                       { return length(); }
@@ -49,7 +57,7 @@ public:
 #else
   void Set( unsigned i, unsigned base = 10 )       { char buffer[32]; _itoa_s( i, buffer, base ); Copy( buffer ); }
 #endif
-
+  operator const char* () const                    { return c_str();  }
   //Constructors
   CString( const char* s ): std::string( s )            {}
   CString( const std::string& s ): std::string( s )     {} //implicit

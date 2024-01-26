@@ -8,7 +8,7 @@ TODO
 OK use static CEquation for temporary buffer
 OK compil linux
 add CLEAR()
-add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
+OK add UNDEFINED() ERROR_DIV0() or ERROR(0), ERROR(1)...
 add mul 2a
 enlever TODOS
 Détecter ())
@@ -19,10 +19,13 @@ OK clean IsWord() && (='a' && = 'z')
 Use quadratic solving x^8+x^4+5=23
 revoir r�solution de syst�me pour �viter les x^2
 OK enlever les ';' et continuer de parser tant qu'il y des caract�res
- NON ajouter a(b) et (a) dans la table des symboles
+NON ajouter a(b) et (a) dans la table des symboles
 r�soudre in�galit�s 2a+38 et =
 Check {a) 
 Check missing parenthesis
+- 1->7 marche mais pas 7->1
+
+
  A B C
 |a b c x|    | a       b       c       x|    | a       b                                       c                                             x | 
 |d e f y| => |   a*e-d*b a*f-d*c a*y-d*x| => |   a*e-d*b                                 a*f-d*c                                       a*y-d*x | 
@@ -50,5 +53,14 @@ Essai...
 |a b c x|    | a*e-d*b        0   b*f-e*c   b*y-e*x|    | a*e-d*b        0        b*f-e*c                                         b*y-e*x|   | a*e-d*b        0        b*f-e*c                                                                b*y-e*x|
 |d e f y| => | 0        a*e-d*b   a*f-d*c   a*y-d*x| => | 0        a*e-d*b        a*f-d*c                                         a*y-d*x|=> | 0        a*e-d*b        a*f-d*c                                                                a*y-d*x|
 |g h i z|    | g              h         i         z|    | 0        (a*e-d*b)*h    (a*e-d*b)*i-g*(b*f-e*c)         (a*e-d*b)*z-g*(b*y-e*x)|   | 0              0      (a*e-d*b)*i-g*(b*f-e*c)-h*( a*f-d*c)         (a*e-d*b)*z-g*(b*y-e*x)-h*(a*y-d*x)|
+                                             
+=> C = (aez-dbz-gby+gex-hay+hdx)/(aei-dbi-gbf+gec-haf+hdc)
+
+Essai 2
+ A B C
+|a b c x|    | a              b        c                                                 x 
+|d e f y| => | 0        a*e-d*b        a*f-d*c                                     a*y-d*x  
+|g h i z|    | 0        a*h-g*b
+|j k l t|    | 0        a*k-j*b 
                                              
 => C = (aez-dbz-gby+gex-hay+hdx)/(aei-dbi-gbf+gec-haf+hdc)

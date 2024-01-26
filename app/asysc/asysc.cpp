@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
     setlocale(LC_NUMERIC, "C");
     std::cout << "*************************************\n";
     std::cout << "*** LighCAS Console               ***\n";
-    std::cout << "*** (C) Cyril Collineau 2014-2023 ***\n";
+    std::cout << "*** (C) Cyril Collineau 2014-2024 ***\n";
     std::cout << "*************************************\n";
     std::cout << "Type \"help\" for help.\n";
     InteractiveMode(db, argv[0]);

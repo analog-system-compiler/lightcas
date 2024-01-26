@@ -81,15 +81,11 @@ void CMathExpression::Move(pos_t pos_dest, pos_t pos_source, pos_t size)
   }
 }
 
-void CMathExpression::SetSize(pos_t i)
+void CMathExpression::AllocSize(pos_t i)
 {
-  m_StackSize = i;
-  if (i > m_AllocSize)
-  {
-    m_AllocSize = i * 2;
-    m_StackArray = (OP_CODE *)::realloc(m_StackArray, m_AllocSize * sizeof(OP_CODE));
-    ASSERT(m_StackArray);
-  }
+  m_AllocSize = i * 2;
+  m_StackArray = (OP_CODE *)::realloc(m_StackArray, m_AllocSize * sizeof(OP_CODE));
+  ASSERT(m_StackArray);
 }
 
 bool CMathExpression::Compare(const CMathExpression &equ) const
@@ -135,6 +131,7 @@ pos_t CMathExpression::NextBranch(pos_t pos) const
     i += e->GetOperandNb();
     i--;
   } while (pos && i);
+
   return pos;
 }
 
@@ -205,7 +202,7 @@ unsigned CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &d
       }
       else
       {
-        ASSERT(e->GetName() != "a");
+        //ASSERT(e->GetName() != "a");
       }
     }
   }

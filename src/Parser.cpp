@@ -123,8 +123,9 @@ bool CParser::TryFind(char c)
 void CParser::SkipSpace()
 {
   char c;
+  bool char_found = false;
 
-  while (true)
+  while (!char_found)
   {
     c = m_Pos[0];
     if (EOL(c))
@@ -140,7 +141,7 @@ void CParser::SkipSpace()
       const char *pos = strchr(m_Pos, '\n');
       if (pos)
         ds.Append(m_Pos, pos - m_Pos);
-      TRACE(ds.GetBufferPtr());
+      TRACESTR(ds.GetBufferPtr()); //Can't use TRACE because of char '%'
 #endif
     }
     else if (isspace(c)) //\n is considered as space
@@ -159,12 +160,12 @@ void CParser::SkipSpace()
       {
         if (!SkipBlockComment())
         {
-          return;
+          char_found=true;
         }
       }
       else
       {
-        return;
+        char_found=true;
       }
     }
     else if ((c == m_SymbolMacro) && m_LineStart)
@@ -177,13 +178,13 @@ void CParser::SkipSpace()
       m_LineStart = true;
       if (!CloseFile())
       {
-        return;
+        char_found=true;
       }
     }
     else
     {
       m_LineStart = false;
-      return;
+      char_found=true;
     }
   }
 }
@@ -379,7 +380,8 @@ bool CParser::ProcessMacro()
   const char *pos = m_Pos;
   m_Pos++;
 
-  if (GetWord() == "include")
+  GetWord();
+  if (m_Buffer == "include")
   {
     int type = GetQuotes();
     if (type == 1)
@@ -391,7 +393,7 @@ bool CParser::ProcessMacro()
       ret = LoadFromFile(GetPath(m_RootPath) + GetBuffer());
     }
   }
-  else if (GetWord() == "symbol")
+  else if (m_Buffer == "symbol")
   {
     if (GetQuotes())
     {

@@ -225,7 +225,7 @@ void CMathExpression::OptimizeTree()
       Move(save_context.m_Pos, pos3, pos2 - pos3);
 #if (DEBUG_LEVEL >= 1)
       Display(ds, false);
-      TRACE(ds.GetBufferPtr());
+      TRACESTR(ds.GetBufferPtr());
 #endif
     } // while ( m_ContextStack.GetSize() )
   }
@@ -433,14 +433,14 @@ bool CMathExpression::ExecuteCommand()
     ds.SetDebug();
     if (!CompareBranch(pos1, pos2))
     {
-      ds = "Assertion error : ";
+      ds += "Assertion error : ";
       DisplayBranch(ds, pos2);
       ds += " != ";
       DisplayBranch(ds, pos1);
     }
     else
     {
-      ds = "Assertion OK : ";
+      ds += "Assertion OK : ";
       DisplayBranch(ds, pos2);
       ds += " == ";
       DisplayBranch(ds, pos1);

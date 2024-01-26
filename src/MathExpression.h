@@ -68,9 +68,10 @@ protected:
   void     Set( pos_t pos, OP_CODE op ) { m_StackArray[ pos ] = op;    }
   OP_CODE  Get( pos_t pos )   const     { return m_StackArray[ pos ];  }
   OP_CODE  Pop( pos_t& pos )  const     { ASSERT( pos > 0 && pos <= m_StackSize ); pos--; return Get( pos );  }
+  void     SetSize(pos_t i)             { m_StackSize = i; if (i > m_AllocSize) AllocSize(i); }
   void     Push( OP_CODE op )           { SetSize( m_StackSize + 1 ); Set( m_StackSize - 1, op );  }
 
-  void     SetSize( pos_t i );
+  void     AllocSize( pos_t i );
   void     Push( const CElement* e );
   void     Push( const CMathExpression& equ );
   void     PushEvalElement( CEvaluator& eval );

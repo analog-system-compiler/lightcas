@@ -71,13 +71,13 @@ public:
   bool  ProcessMacro();
   int   GetQuotes();
   const CString& GetWord();
-  const CString& GetBuffer()                       { return m_Buffer;  }
-  const CString& GetSymbolBuffer()                 { return m_SymbolBuffer; }
-  char  GetChar()                                  { return( *m_Pos ); }
+  const CString& GetBuffer() const                 { return m_Buffer;  }
+  const CString& GetSymbolBuffer() const           { return m_SymbolBuffer; }
+  const CString& GetFileName() const               { return m_FileName;       }
+  char  GetChar() const                            { return( *m_Pos ); }
   void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
   void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
-  unsigned  GetLineNb() const                      { return m_LineNb;         }
-  const  CString& GetFileName() const              { return m_FileName;       }
+  unsigned  GetLineNb() const                      { return m_LineNb;         }  
   void SetRootPath(CString& root_path)             { m_RootPath = root_path;  }
   static CString GetPath(const CString &path);
 

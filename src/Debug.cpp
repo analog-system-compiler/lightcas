@@ -26,48 +26,44 @@
 #include <winbase.h>
 #endif
 
-int( *PUTS )( const char* ) = puts;
+int (*PUTS)(const char *) = puts;
 
 #ifdef _DEBUG
 
-static FILE* debug_file = NULL;
+static FILE *debug_file = NULL;
+static char buffer[8192];
 
-void TRACE( const char* format, ... )
+void TRACESTR(const char *str)
+{
+
+  if (!debug_file)
+  {
+    debug_file = ::fopen("debug.log", "w+");
+  }
+
+  if (debug_file)
+  {
+    ::fputs(str, debug_file);
+    ::fputc('\n', debug_file);
+  }
+
+#ifdef _WIN32
+  if (::IsDebuggerPresent())
+    ::OutputDebugStringA(str);
+  else
+    PUTS(str);
+#else
+  PUTS(str);
+#endif
+}
+
+void TRACE(const char *format, ...)
 {
   va_list args;
-
-  if( !debug_file )
-  {
-    debug_file = fopen( "debug.log", "w+" );
-  }
-
-  if( debug_file )
-  {
-    va_start ( args, format );
-    vfprintf( debug_file, format, args );
-    va_end ( args );
-    fputc( '\n', debug_file );
-  }
-
-  static char buffer[ 8192 ];
-  va_start ( args, format );
-  vsnprintf( buffer, sizeof( buffer ), format, args );
-  va_end ( args );
-  buffer[sizeof( buffer )-2] = '\n';
-  buffer[sizeof( buffer )-1] = '\0';
-  
-#ifdef _WIN32
-  const unsigned CRT_DEBUG_BUFFER_MAX = 256;
-  buffer[CRT_DEBUG_BUFFER_MAX - 6] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 5] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 4] = '.';
-  buffer[CRT_DEBUG_BUFFER_MAX - 3] = '\r';
-  buffer[CRT_DEBUG_BUFFER_MAX - 2] = '\n';
-  buffer[CRT_DEBUG_BUFFER_MAX - 1] = '\0';
-  OutputDebugStringA( buffer );
-#else
-  PUTS( buffer );
-#endif
-
+  va_start(args, format);
+  vsnprintf(buffer, sizeof(buffer), format, args);
+  va_end(args);
+  TRACESTR(buffer);
 }
-#endif
+
+#endif //_DEBUG
