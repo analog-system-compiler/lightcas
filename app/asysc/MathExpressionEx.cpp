@@ -97,6 +97,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * 
     }
 
     // Search for results
+    ds3.SetDebug();
     pos = GetSize();
     op = Pop(pos);
     if (op == op_vect)

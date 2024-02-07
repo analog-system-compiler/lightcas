@@ -75,9 +75,9 @@ TRANS(LTE( a b ) ) :=  LTE( LAST(a)  LAST(b) );
 TRANS(LT ( a b ) ) :=  LT(  LAST(a)  LAST(b) );
 TRANS(GTE( a b ) ) :=  GTE( LAST(a)  LAST(b) );
 
-LIN_EXP(a)       := EXP( LAST(a) ) * a + ( 1 - LAST( a ) ) * EXP( LAST( a ) );
-LIN_IF((a:b) c)  := a*LAST(c) + b*(LNOT(LAST(c)));
-LIN_MOD(a b)     := LAST(a) % LAST(b);
+LIN_EXP(a)      := EXP( LAST(a) ) * a + ( 1 - LAST( a ) ) * EXP( LAST( a ) );
+LIN_IF((a:b) c) := a*LAST(c) + b*(LNOT(LAST(c)));
+LIN_MOD(a b)    := LAST(a) % LAST(b);
 
 LAST(TIME()) := TIME();
 LAST( _const( a ) ) := a;

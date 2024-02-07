@@ -152,7 +152,7 @@ void CMathExpression::DisplaySymbolString(const char *sp, pos_t pos_array[CEleme
     else if (::isalpha(c))
     {
       precedence2 = precedence;
-      if (c < 'a')
+      if (::isupper(c))
       {
         precedence2 = 0;
       }

@@ -34,7 +34,7 @@
 `symbol "a<(b)  " LT(a b)    
 `symbol "a>=(b) " GTE(a b)   
 `symbol "a>(b)  " GT(a b)    
-`symbol "a->b   " RANGE(a b) 
+`symbol "a->b   " RANGE(a b)
 `symbol "a||b   " LOR(a b)   
 `symbol "a&&b   " LAND(a b)    
 `symbol "a|\|b  " OR(a b)    

@@ -56,7 +56,7 @@ public:
   int Compare( const CString& s ) const    { return Compare( m_Data, s.m_Data );  }
 
   char  At( unsigned i ) const             { if( i < m_Length ) return m_Data[ i ]; else return '\0';  }
-  void  Clear()                            { free( m_Data );    m_Data = NULL;    m_Length = 0;  }
+  void  Clear()                            { free( m_Data ); m_Data = NULL; m_Length = 0; }
 
   virtual CString& Append( const CString& s )  { Append( s.m_Data, s.m_Length ); return *this; }
   virtual CString& Append( char c )            { Append( &c, 1 ); return *this; }

@@ -335,8 +335,8 @@ DER(LOG(a),c)   := DER(a,c)/a;
 DIFF(a,b,n)  := DERN(a,b,n);
 
 //Range
-RANGE( _const(a) _const(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ) : ( (a > b) ? ( RANGE( a b+1 ), b ) : b ) );
-//RANGE( _const(a) _const(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ) : a );
+//RANGE( _const(a) _const(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ) : ( (a > b) ? ( RANGE( a b+1 ), b ) : b ) );
+RANGE( _const(a) _const(b) ) := ( (a == b) ? a : ( (a < b) ? ( RANGE( a b-1 ), b ) : ( RANGE( a b+1 ), b ) ) );
 
 SIN(a,b)                  := (SIN(a),SIN(b));
 COS(a,b)                  := (COS(a),COS(b));

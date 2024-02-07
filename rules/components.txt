@@ -84,7 +84,6 @@ NAME.POTENTIOMETER( @1, @2, @3, value, x ) := {
 /* Mutual inductance            */
 /********************************/
 
-//NAME.MC( @1, @2, @3, @4, LA, LB, k:=1 )
 NAME.MC( @1, @2, @3, @4, LA, LB, k ) := { 
 
 
@@ -100,6 +99,8 @@ NAME.MC( @1, @2, @3, @4, LA, LB, k ) := {
 	NAME.UB = LB * DER( NAME.IB , t ) + NAME.M * DER( NAME.IA , t)
 	
 };
+
+NAME.MC( @1, @2, @3, @4, LA, LB ) := NAME.MC( @1, @2, @3, @4, LA, LB, 1 );
 
 /********************************/
 /* current and voltages sources */
@@ -300,7 +301,7 @@ NAME.SWITCH( @1 , @2, command ) := {
 	NAME.U = ACROSS(  @1, @2 );
 	NAME.I = THROUGH( @1, @2 );
 
-    ( command < 0.5 ) ? NAME.I : NAME.U = 0
+    ( ( command < 0.5 ) ? NAME.I : NAME.U ) = 0
 };
 
 /********************************/

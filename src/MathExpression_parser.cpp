@@ -126,7 +126,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_f
           if (IC.IsStopChar())
             return 2;
 
-          if (!GetLevel(IC, (c < 'a') ? 0 : precedence + 1))
+          if (!GetLevel(IC, ::isupper(c) ? 0 : precedence + 1))
             // return 2;
             goto next;
         }
