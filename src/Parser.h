@@ -78,7 +78,7 @@ public:
   void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
   void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
   unsigned  GetLineNb() const                      { return m_LineNb;         }  
-  void SetRootPath(CString& root_path)             { m_RootPath = root_path;  }
+  void SetRootPath(const CString& root_path)       { m_RootPath = root_path;  }
   static CString GetPath(const CString &path);
 
   static bool IsWord( char c )         { return ( m_CharTab[( int )c] & 1 ) != 0; }

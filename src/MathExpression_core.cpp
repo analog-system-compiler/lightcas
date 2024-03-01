@@ -119,14 +119,12 @@ void CMathExpression::PushBranch(const CMathExpression &equ, pos_t &pos)
 pos_t CMathExpression::NextBranch(pos_t pos) const
 {
   unsigned i = 1;
-  OP_CODE op;
-  const CElement *e;
 
   ASSERT(pos);
   do // while( pos && i )
   {
-    op = Pop(pos);
-    e = RefToElement(op);
+    OP_CODE op = Pop(pos);
+    const CElement * e = RefToElement(op);
     ASSERT(e);
     i += e->GetOperandNb();
     i--;
@@ -183,17 +181,15 @@ void CMathExpression::Evaluate() const
 
 unsigned CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &dst)
 {
-  OP_CODE op;
-  const CElement *e;
   unsigned i = 0;
   pos_t pos;
 
   for (pos = 0; pos < src.GetSize(); pos++)
   {
-    op = src.Get(pos);
+    OP_CODE op = src.Get(pos);
     if (op >= CElementDataBase::GetSecureLimit())
     {
-      e = RefToElement(op);
+      const CElement * e = RefToElement(op);
       if (e->IsVar())
       {
         src.Replace(op, (OP_CODE)(CElementDataBase::OP_PAR0 + i));

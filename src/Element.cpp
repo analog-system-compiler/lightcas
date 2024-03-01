@@ -22,10 +22,8 @@
 #include "Function.h"
 #include "Display.h"
 
-CElement::CElement( const CString& name )
+CElement::CElement( const CString& name ) : m_Name( name )
 {
-  m_Name   = name;
- // m_bLock  = false;
   m_bAux   = false;
   m_Global = false;
   m_Ref    = 0;

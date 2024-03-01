@@ -8,7 +8,7 @@ RULES_DIR   = rules
 OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
 LIB         = lib$(EXE).a
 EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
-LIB_OBJS    = $(OBJ_SRC:%.cpp=$(OBJDIR)/%.o)
+LIB_OBJS    = $(CPP_SRC:%.cpp=$(OBJDIR)/%.o)
 INCDIR      = -I$(SRC_DIR)
 RULE_FILES  = $(addprefix $(RULES_DIR)/, $(wildcard *.txt) )
 
@@ -25,6 +25,13 @@ TEST        = 0
 EMBED_RULES = 0
 GPROF       = 0
 
+ifeq ($(USE_STD),0)
+	INCDIR += -I$(SRC_DIR)/nostd 
+else
+	INCDIR += -I$(SRC_DIR)/std
+endif
+
+
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -Wl,-Map=$(EXE).map
 
@@ -32,7 +39,7 @@ EXE_SRC = \
 	asysc/ASysC.cpp \
 	asysc/MathExpressionEx.cpp
 
-OBJ_SRC = \
+CPP_SRC = \
     Debug.cpp \
 	Parser.cpp \
     Element.cpp \
@@ -47,10 +54,7 @@ OBJ_SRC = \
     Test.cpp
 	
 ifeq ($(USE_STD),0)
-	CPPFLAGS += -I$(SRC_DIR)/nostd 
-	OBJ_SRC  += nostd/LCString.cpp  
-else
-	CPPFLAGS += -I$(SRC_DIR)/std
+	CPP_SRC  += nostd/LCString.cpp  
 endif
 
 ifeq ($(DEBUG),1)
@@ -112,6 +116,9 @@ clean:
 
 archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
+
+cppcheck:
+	cppcheck cppcheck --enable=all $(INCDIR) $(addprefix $(SRC_DIR)/, $(CPP_SRC) )
 
 .PHONY: all clean rules archive
 .SILENT:

@@ -93,14 +93,13 @@ pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority)
 
 pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
 {
-  pos_t pos1;
   pos_t pos_array[CElementDataBase::MAX_PAR];
 
   const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
   for (unsigned i = 0; i < st.GetSize(); i++)
   {
     const CSymbolSyntaxStruct *ss = st[i];
-    pos1 = Match(pos, ss->m_Equation, pos_array);
+    pos_t pos1 = Match(pos, ss->m_Equation, pos_array);
     if (pos1 != pos)
     {
       const char *sp = ss->m_Syntax;

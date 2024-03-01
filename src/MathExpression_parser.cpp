@@ -80,7 +80,6 @@ int CMathExpression::GetLevel(CParser &IC)
 
 bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
 {
-  unsigned precedence;
   bool var_found;
   int ret = 1;
 
@@ -94,7 +93,7 @@ bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
 
   while (!IC.IsStopChar() && (ret == 1))
   {
-    precedence = var_found ? priority : 0;
+    unsigned precedence = var_found ? priority : 0;
     ret = ParseOperator(IC, precedence, var_found);
     if (ret == 2)
       return false;
@@ -208,7 +207,7 @@ bool CMathExpression::ParseElement(CParser &IC)
       CDisplay ds;
       if (f->GetParameterNb() > (unsigned)i)
         ds = "Error: not enough parameters for: ";
-      else if (f->GetParameterNb() < (unsigned)i)
+      else// if (f->GetParameterNb() < (unsigned)i)
         ds = "Error: too much parameters for: ";
       ds += e->GetName();
       ds += ". Expected:";

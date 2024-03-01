@@ -31,12 +31,12 @@ private:
 
 public:
   void      SetSize( unsigned size );
-  void      InsertAt( unsigned index, const T e );
+  void      InsertAt( unsigned index, const T& e );
   void      InsertAt( unsigned index, const CVector& v  );
   void      RemoveAt( unsigned start, unsigned count = 1 );
   void      Append( const CVector& v )           { InsertAt( m_Size, v ); }
-  void      Append( const T e )                  { InsertAt( m_Size, e ); }
-  void      Push( const T e )                    { Append( e ); }
+  void      Append( const T& e )                 { InsertAt( m_Size, e ); }
+  void      Push( const T& e )                   { Append( e ); }
   T         Pop()                                { T e = GetAt( m_Size - 1 ); m_Size--; return e; }
   void      RemoveAll()                          { m_Size = 0;  }
   void      DeleteAll()                          { for( unsigned i = 0; i < GetSize(); i++ ) { delete m_Data[i]; } RemoveAll(); }
@@ -47,7 +47,7 @@ public:
   unsigned  GetSize() const                      { return m_Size;  }
   void      CheckSize( unsigned index )          { if( index >= GetSize() ) SetSize( index + 1 ); }
   T&        operator[] ( unsigned index ) const  { return GetAt( index ); }
-  bool      Find(const T e)                      { for( unsigned i = 0; i < GetSize(); i++ ) if( GetAt(i) == e ) return true; return false; }
+  bool      Find(const T& e)                     { for( unsigned i = 0; i < GetSize(); i++ ) if( GetAt(i) == e ) return true; return false; }
 public:
   CVector()
   {
@@ -80,7 +80,7 @@ template < class T > void CVector< T >::SetSize( unsigned size )
   m_Size = size;
 }
 
-template < class T > void CVector< T >::InsertAt( unsigned index, const T e )
+template < class T > void CVector< T >::InsertAt( unsigned index, const T& e )
 {
   ASSERT( index <= m_Size );
   unsigned old_size = m_Size;

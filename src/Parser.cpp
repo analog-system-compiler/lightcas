@@ -340,7 +340,7 @@ bool CParser::LoadFromFile(const CString &name)
     size = ftell(file);
     fseek(file, 0, SEEK_SET);
     text = new char[size + 1];
-    size = fread((void *)text, sizeof(char), size, file);
+    size = fread(text, sizeof(char), size, file);
     fclose(file);
     text[size] = '\0';
     context.m_Text = text;
