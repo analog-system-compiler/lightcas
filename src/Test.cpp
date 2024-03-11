@@ -74,9 +74,8 @@ void CElementDataBase::CheckSyntaxError(const char *s1)
   CMathExpression equ(this);
   if (equ.Parse(IC))
   {
-    //ASSERT(false);
     CDisplay ds;
-    ds.Printf("Syntax check failed: %s", s1);
+    ds.Printf("Syntax check detected: %s", s1);
   }
 }
 

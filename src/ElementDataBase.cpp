@@ -53,6 +53,7 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
         {"_max", 2, &CEvaluator::Max},
         {"_mod", 2, &CEvaluator::Mod},
         {"_pow", 2, &CEvaluator::Pow},
+        {"_par", 2, &CEvaluator::Par},
         {"_neg", 1, &CEvaluator::Neg},
         {"_inv", 1, &CEvaluator::Inv},
         {"_not", 1, &CEvaluator::Not},
@@ -83,8 +84,7 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
         {"_rand", 0, &CEvaluator::Rand},
         {"_if2", 3, &CEvaluator::If},
         {"_if", 3, &CEvaluator::If},
-        {"_elemid", 1, &CEvaluator::ElemId},
-};
+        {"_elemid", 1, &CEvaluator::ElemId}};
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof(CElementDataBase::m_FunctionProperties) / sizeof(SProperties);
 
@@ -108,11 +108,8 @@ CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent
     m_Name = name;
   }
   if (bInitialize)
-  {    
-    if (!Initialize())
-    {
-      m_Error = true; // IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
-    }
+  {
+      m_Error = !Initialize(); // IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
   }
   // if (parent)
   // {
@@ -130,7 +127,7 @@ bool CElementDataBase::Initialize()
 
   Clear();
   if (m_Parent == NULL)
-  {   
+  {
     AddReservedElements();
     AddReservedFunctions();
     SetSecureLimit(GetSize());
@@ -141,7 +138,7 @@ bool CElementDataBase::Initialize()
     AddAlgebraRuleTable(IC);
 #else
     IC.SetRootPath(m_RootPath);
-    if (IC.LoadFromFile( m_RootPath + CString("rules/includes.txt")))
+    if (IC.LoadFromFile(m_RootPath + CString("rules/includes.txt")))
     {
       AddAlgebraRuleTable(IC);
       IC.CloseFile();
@@ -292,10 +289,9 @@ void CElementDataBase::AddAlgebraRuleTable(CParser &IC)
 
 void CElementDataBase::CleanTempElements()
 {
-  CElement *e;
   for (unsigned i = 0; i < GetSize(); i++)
   {
-    e = GetAt(i);
+    CElement *e = GetAt(i);
     if ((e->ToRef() > CElementDataBase::GetSecureLimit()) && !e->IsFunct() && !e->IsConst())
     {
       delete e;
@@ -316,8 +312,7 @@ void CElementDataBase::AddEvalFunctionTable(const SProperties *property_table, u
 
 void CElementDataBase::AddEvalFunction(const CString &name, unsigned parameter_nb, CEvaluatorFunct funct)
 {
-  CElement *e;
-  e = GetElement(name);
+  CElement *e = GetElement(name);
   e->SetOperandNb(parameter_nb);
   if (funct)
   {
@@ -386,29 +381,23 @@ CElement *CElementDataBase::CreateElement(const CString &string, unsigned pos)
 
 CElement *CElementDataBase::SearchElement(const CString &string, unsigned &pos) const
 {
-  unsigned start;
-  unsigned stop;
-  unsigned mid;
-  int compare;
-  CElement *e;
-
   if (m_Parent)
   {
-    e = m_Parent->SearchElement(string, pos);
+    CElement *e = m_Parent->SearchElement(string, pos);
     if (e)
     {
       return e;
     }
   }
 
-  start = m_SearchStart;
-  stop = GetSize();
+  unsigned start = m_SearchStart;
+  unsigned stop = GetSize();
   while (start < stop)
   {
-    mid = (start + stop) / 2;
-    e = GetAt(mid);
+    unsigned mid = (start + stop) / 2;
+    CElement *e = GetAt(mid);
     ASSERT(e);
-    compare = string.Compare(e->GetName());
+    int compare = string.Compare(e->GetName());
     if (compare == 0)
     {
       return e;

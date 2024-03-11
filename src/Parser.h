@@ -100,7 +100,7 @@ public:
   static bool EOL(char x) { return x == '\n'; }
 
   CParser();
-  CParser( const char* pText );
+  explicit CParser( const char* pText );
   virtual ~CParser();
 
 };

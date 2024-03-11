@@ -127,7 +127,7 @@ public:
   static void       UnRef( OP_CODE op )              { m_ElementRefArray[ ( unsigned )op ] = NULL; }
   static const CSymbolSyntaxArray& GetSymbolTable()  { return m_SymbolSyntaxArray; }
   static unsigned   GetSecureLimit()                 { return m_SecureLimit;       }
-  static bool IsReservedOP( OP_CODE op )             { return ( op >= OP_PAR0   ) && ( op < ( OP_PAR0 + MAX_PAR ) ); }
+  static bool IsReservedOP( OP_CODE op )             { return ( op >= OP_PAR0  ) && ( op < ( OP_PAR0 + MAX_PAR ) ); }
   static bool IsFunctionOP( OP_CODE op )             { return ( op >= OP_CONST ) && ( op <= OP_FUNCT2 ); }
   CElementDataBase* GetParent() const                { return m_Parent;            }
 
@@ -140,8 +140,8 @@ public:
   void DisplayStats();
 #endif
 
-  CElementDataBase( const CElementDataBase& db ); // avoid simple copy
-  CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true, const CString &exe_path= CString() );
+  explicit CElementDataBase( const CElementDataBase& db ); // avoid simple copy
+  explicit CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true, const CString &exe_path= CString() );
   virtual ~CElementDataBase();
 
 };

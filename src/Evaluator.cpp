@@ -50,7 +50,7 @@ bool CEvaluator::Display( CString& s )
 
 void CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 {
-  unsigned pos, index, n;
+  unsigned pos, n;
   CEvaluatorFunct funct_ptr;
   n = m_FunctionArray.GetSize();
 
@@ -60,7 +60,7 @@ void CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
 
   for ( pos = 0; pos < size; pos++ )
   {
-    index = *m_OpPos++;
+    unsigned index = *m_OpPos++;
 
     if ( index < n )
     {
@@ -85,11 +85,11 @@ void CEvaluator::Evaluate( unsigned size, const OP_CODE* p )
   if ( m_ValPos == 0 )
   {
     ASSERT( size == 0 );
-    m_Value = 0.;
+    m_Value.SetValue( 0. );
   }
   else
   {
-    m_Value = Pop();
+    m_Value.SetValue( Pop() );
   }
   ASSERT( m_ValPos == 0 );
 }

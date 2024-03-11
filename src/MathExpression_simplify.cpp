@@ -66,8 +66,6 @@ void CMathExpression::OptimizeTree()
 
 CAlgebraRule *CMathExpression::RuleSearch(pos_t &pos, pos_t pos_array[CElementDataBase::MAX_PAR])
 {
-  unsigned i;
-  unsigned n;
 
   OP_CODE op = GetLastOperator();
   const CElement *e = RefToElement(op);
@@ -76,6 +74,8 @@ CAlgebraRule *CMathExpression::RuleSearch(pos_t &pos, pos_t pos_array[CElementDa
 
   if (funct)
   {
+    unsigned i;
+    unsigned n;
     n = funct->m_AlgebraRuleArray.GetSize();
     for (i = 0; i < n; i++)
     {
@@ -229,7 +229,7 @@ void CMathExpression::OptimizeTree()
 #endif
     } // while ( m_ContextStack.GetSize() )
   }
-#if (DEBUG_LEVEL >= 1)  
+#if (DEBUG_LEVEL >= 1)
   if (NextBranch(m_StackSize) != 0)
   {
     CDisplay ds;
@@ -237,7 +237,7 @@ void CMathExpression::OptimizeTree()
     Display(ds, false);
     TRACE(ds.GetBufferPtr());
   }
-#endif  
+#endif
 }
 
 bool CMathExpression::RuleSearch()
@@ -304,7 +304,7 @@ bool CMathExpression::Match(const CMathExpression &equ) const
 pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_array[CElementDataBase::MAX_PAR]) const
 {
   unsigned i;
-  OP_CODE op1, op2, op3;
+  OP_CODE op2;
   bool match = true;
   pos_t pos1 = equ.GetSize();
   pos_t pos2 = pos3;
@@ -317,7 +317,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
   // Try to match pattern
   while (match && pos1)
   {
-    op1 = equ.Pop(pos1);
+    OP_CODE op1 = equ.Pop(pos1);
     if (CElementDataBase::IsReservedOP(op1)) // a,b or c
     {
       match = RegisterBranch(pos_array, op1, pos2);
@@ -328,7 +328,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
     }
     else if (CElementDataBase::IsFunctionOP(op1)) // IsFunctionOP( OP_CODE op )
     {
-      op3 = equ.Pop(pos1);
+      OP_CODE op3 = equ.Pop(pos1);
       if (CElementDataBase::IsReservedOP(op3))
       {
         match = RegisterBranch(pos_array, op3, pos2);
@@ -354,8 +354,9 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
           }
         }
       }
-      else {
-        match = false;        
+      else
+      {
+        match = false;
         ASSERT(false);
       }
     }
@@ -475,15 +476,13 @@ bool CMathExpression::ExecuteCommand()
 
 bool CMathExpression::CompareBranchElement(pos_t pos1, pos_t pos2) const
 {
-  OP_CODE op3, op4;
-  const CElement *e;
 
-  op4 = Pop(pos2);
-  e = RefToElement(op4);
+  OP_CODE op4 = Pop(pos2);
+  const CElement *e = RefToElement(op4);
 
   if (e && e->IsVoid())
   {
-    op3 = Pop(pos1);
+    OP_CODE op3 = Pop(pos1);
     return (op3 == op4);
   }
 

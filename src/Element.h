@@ -79,7 +79,7 @@ public:
   CFunction* GetFunction()                  { return &m_Function;              }
   const CString& GetMessage() const         { return m_Message;                }
 
-  CElement( const CString& name );
+  explicit CElement( const CString& name );
   virtual ~CElement();
 
 };

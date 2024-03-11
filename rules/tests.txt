@@ -6,8 +6,8 @@ _check( 0.5E4  5000 );
 _check( 0xAA  170 );
 _check( 0b1010  10 );
 _check( KEEP   KEEP  );
-_check(  _eval( _elemid( a ) ) 84 );
-_check(  _eval( _elemid( b ) ) 85 );
+_check(  _eval( _elemid( a ) ) 85 );
+_check(  _eval( _elemid( b ) ) 86 );
 _check(  _eval( _gt( _elemid( b )  _elemid( a ) ) ) 1 );
 _check(  _eval( _gt( _elemid( a )  _elemid( b ) ) ) 0 );
 //_check( {1;2;3;}   {1;2;3}  ); // cause symplfy error

@@ -45,19 +45,7 @@ void CElement::Display( CDisplay& ds ) const
 {
   ds.Append( m_Name );
 }
-/*
-void CElement::Lock()
-{
-  ASSERT( !m_bLock );
-  m_bLock = true;
-}
 
-void CElement::Unlock()
-{
-  ASSERT( m_bLock );
-  m_bLock = false;
-}
-*/
 void CElement::RemoveRules()
 {
   m_Function.Clear();

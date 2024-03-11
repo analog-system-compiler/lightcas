@@ -26,7 +26,7 @@ template < class T > class CVector : public std::vector < T >
 
 public:
   void      SetSize( unsigned size )                      { std::vector < T >::resize( size ); }
-  void      InsertAt( unsigned index, const T e )         { std::vector < T >::insert( std::vector < T >::begin() + index, e ); }
+  void      InsertAt( unsigned index, const T& e )        { std::vector < T >::insert( std::vector < T >::begin() + index, e ); }
   void      InsertAt( unsigned index, const CVector& v  ) { std::vector < T >::insert( std::vector < T >::begin() + index, v.std::vector < T >::begin(), v.std::vector < T >::end() ); }
   void      RemoveAt( unsigned start )                    { std::vector < T >::erase(  std::vector < T >::begin() + start ); }
   void      RemoveAt( unsigned start, unsigned count  )   { std::vector < T >::erase(  std::vector < T >::begin() + start, std::vector < T >::begin() + start + count ); }

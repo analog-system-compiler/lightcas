@@ -58,24 +58,31 @@ public:
 
   bool StoreToFile(const CString &name)
   {
+    if (m_File)
+      fclose(m_File);
     m_File = fopen(name.GetBufferPtr(), "w+");
     return m_File != NULL;
   }
 
   bool IsDebug() { return m_DebugMode; }
-  void SetDebug() { m_DebugMode=true; }
+  void SetDebug() { m_DebugMode = true; }
   // Constructors
-  CDisplay(const char *s) : CString(s)
-  {
-    m_File = NULL;
-    m_DebugMode = false;
-  }
   CDisplay() : CString()
   {
     m_File = NULL;
     m_DebugMode = false;
   }
-  CDisplay(int i, unsigned base = 10) : CString(i, base)
+  CDisplay(const char *s) : CString(s)
+  {
+    m_File = NULL;
+    m_DebugMode = false;
+  }
+  CDisplay(const CString& s) : CString(s)
+  {
+    m_File = NULL;
+    m_DebugMode = false;
+  }
+  explicit CDisplay(int i, unsigned base = 10) : CString(i, base)
   {
     m_File = NULL;
     m_DebugMode = false;

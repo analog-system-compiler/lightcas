@@ -192,7 +192,7 @@ bool CMathExpression::ParseElement(CParser &IC)
     {
       f->SetParameterNb(i);
       e->SetFunct();
-#if (DEBUG_LEVEL >= 0)
+#if (DEBUG_LEVEL > 0)
       CDisplay ds;
       ds += "SetParamNb   : ";
       e->Display(ds);
@@ -203,7 +203,7 @@ bool CMathExpression::ParseElement(CParser &IC)
     }
     else
     {
-#if (DEBUG_LEVEL >= 0)
+#if (DEBUG_LEVEL > 0)
       CDisplay ds;
       if (f->GetParameterNb() > (unsigned)i)
         ds = "Error: not enough parameters for: ";

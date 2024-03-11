@@ -142,8 +142,8 @@ public:
   pos_t             GetSize() const      { return m_StackSize;    }
   CElementDataBase* GetElementDB() const { return m_ElementDB;    }
 
-  CMathExpression( CElementDataBase* db = NULL );
-  CMathExpression( const CMathExpression& equ ) { m_ElementDB = NULL; Copy( equ ); }
+  explicit CMathExpression( CElementDataBase* db = NULL );
+  explicit CMathExpression( const CMathExpression& equ ) { m_ElementDB = NULL; Copy( equ ); }
   virtual ~CMathExpression();
 
 };

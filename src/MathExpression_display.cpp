@@ -47,10 +47,8 @@ void CMathExpression::Display(CDisplay &ds, bool bAll) const
 
 pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority) const
 {
-  unsigned i, n;
   const CElement *e;
   unsigned pos2;
-  pos_t pos_array[CElementDataBase::MAX_PAR];
 
   ASSERT(pos);
   pos2 = DisplaySymbol(ds, pos, priority);
@@ -63,11 +61,13 @@ pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority)
 
     if (e->IsNumeric() || e->IsFunct()) // For Rand(), n=0
     {
-      n = e->GetFunction()->GetParameterNb();
+      unsigned n = e->GetFunction()->GetParameterNb();
       ASSERT(n <= CElementDataBase::MAX_PAR);
       ds += '(';
       if (n)
       {
+        unsigned i;
+        pos_t pos_array[CElementDataBase::MAX_PAR];
         for (i = 0; i < n; i++)
         {
           pos_array[i] = pos;

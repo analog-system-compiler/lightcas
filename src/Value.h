@@ -41,6 +41,6 @@ public:
   const char*   GetFromString( const char* s1 );
   void Display( CString& ds ) const { CString s; s.Set( m_Value ); ds.Append( s );  }
 
-  CValue( double v = 0. ) : m_Value( v ) {};
+  explicit CValue( double v = 0. ) : m_Value( v ) {};
   //virtual ~CValue() {};
 };
