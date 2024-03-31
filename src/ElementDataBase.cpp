@@ -88,7 +88,7 @@ const SProperties CElementDataBase::m_FunctionProperties[] =
 
 const unsigned CElementDataBase::m_FunctionPropertiesSize = sizeof(CElementDataBase::m_FunctionProperties) / sizeof(SProperties);
 
-CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent, CEvaluator *eval, bool bInitialize, const CString &exe_path)
+CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent, CEvaluator *eval, const CString &exe_path)
 {
   m_Parent = parent;
   m_SearchStart = 0;
@@ -107,14 +107,6 @@ CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent
     m_RootPath = CParser::GetPath(exe_path);
     m_Name = name;
   }
-  if (bInitialize)
-  {
-      m_Error = !Initialize(); // IC.Error( CParserException::ID_ERROR_FILE_NOT_FOUND );
-  }
-  // if (parent)
-  // {
-  //   m_RootPath = parent->m_RootPath;
-  // }
 }
 
 CElementDataBase::~CElementDataBase()

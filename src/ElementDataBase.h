@@ -141,7 +141,7 @@ public:
 #endif
 
   explicit CElementDataBase( const CElementDataBase& db ); // avoid simple copy
-  explicit CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, bool bInitialize = true, const CString &exe_path= CString() );
+  explicit CElementDataBase( const CString& name = CString(), CElementDataBase* db = NULL, CEvaluator* eval = NULL, const CString &exe_path= CString() );
   virtual ~CElementDataBase();
 
 };

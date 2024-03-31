@@ -90,7 +90,9 @@ int main(int argc, char *argv[])
   }
 
   CEvaluator eval;
-  CElementDataBase db_root("Root", NULL, &eval, true, argv[0]);
+  CElementDataBase db_root("Root", NULL, &eval, argv[0]);
+  if(!db_root.Initialize())
+    return -1;
   CElementDataBase db("User", &db_root);
 
 #ifdef _TEST

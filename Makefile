@@ -118,7 +118,10 @@ archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
 
 cppcheck:
-	cppcheck cppcheck --enable=all --suppress=missingIncludeSystem $(INCDIR) $(addprefix $(SRC_DIR)/, $(CPP_SRC) )
+	cppcheck --enable=all --suppress=missingIncludeSystem --suppress=noExplicitConstructor $(INCDIR) $(addprefix $(SRC_DIR)/, $(CPP_SRC) )
+
+clang-tidy:
+	clang-tidy $(addprefix $(SRC_DIR)/, $(CPP_SRC) ) -- $(INCDIR)
 
 .PHONY: all clean rules archive
 .SILENT:
