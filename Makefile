@@ -15,13 +15,13 @@ RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
 
 #Compiler settings
 ifeq ($(USE_CLANG),1)
-	CXX         = $(CROSS_COMPILE)clang++
-	LD          = $(CROSS_COMPILE)ld
-	AR          = $(CROSS_COMPILE)ar
+	CXX = $(CROSS_COMPILE)clang++
+	LD  = $(CROSS_COMPILE)ld
+	AR  = $(CROSS_COMPILE)ar
 else
-	CXX         = $(CROSS_COMPILE)g++
-	LD          = $(CROSS_COMPILE)ld
-	AR          = $(CROSS_COMPILE)ar
+	CXX = $(CROSS_COMPILE)g++
+	LD  = $(CROSS_COMPILE)ld
+	AR  = $(CROSS_COMPILE)ar
 endif
 
 #options

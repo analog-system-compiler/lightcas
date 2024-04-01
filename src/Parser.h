@@ -85,10 +85,10 @@ public:
   static bool IsStopChar( char c )     { return ( m_CharTab[( int )c] & 2 ) != 0; }
   static bool IsDigit( char c )        { return ( m_CharTab[( int )c] & 4 ) != 0; }
 
-  bool  IsWord()                       { return IsWord( GetChar() );     }
-  bool  IsStopChar()                   { SkipSpace(); return IsStopChar( GetChar() ); }
-  bool  IsDigit()                      { return IsDigit( GetChar() );    }
-  bool  IsChar( char c )               { return GetChar() == c;          }
+  bool IsWord() const                  { return IsWord( GetChar() );  }
+  bool IsStopChar()                    { SkipSpace(); return IsStopChar( GetChar() ); }
+  bool IsDigit() const                 { return IsDigit( GetChar() ); }
+  bool IsChar( char c ) const          { return GetChar() == c;       }
   bool IsSymbolMacro() const           { return m_SymbolMacroSeen; }
   void ClearSymbolMacro()              {  m_SymbolMacroSeen=false; }
 
