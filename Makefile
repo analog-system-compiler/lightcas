@@ -1,6 +1,7 @@
 
 MAKEFLAGS = --jobs 4
 
+USE_CLANG   = 1
 EXE         = asysc
 SRC_DIR     = src
 APP_DIR     = app
@@ -10,13 +11,18 @@ LIB         = lib$(EXE).a
 EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
 LIB_OBJS    = $(CPP_SRC:%.cpp=$(OBJDIR)/%.o)
 INCDIR      = -I$(SRC_DIR)
-RULE_FILES  = $(addprefix $(RULES_DIR)/, $(wildcard *.txt) )
+RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
 
 #Compiler settings
-CXX         = $(CROSS_COMPILE)g++
-#CXX         = $(CROSS_COMPILE)clang++
-AR          = $(CROSS_COMPILE)ar
-LD          = $(CROSS_COMPILE)ld
+ifeq ($(USE_CLANG),1)
+	CXX         = $(CROSS_COMPILE)clang++
+	LD          = $(CROSS_COMPILE)ld
+	AR          = $(CROSS_COMPILE)ar
+else
+	CXX         = $(CROSS_COMPILE)g++
+	LD          = $(CROSS_COMPILE)ld
+	AR          = $(CROSS_COMPILE)ar
+endif
 
 #options
 USE_STD     = 1
