@@ -3,15 +3,16 @@ MAKEFLAGS = --jobs 4
 
 USE_CLANG   = 1
 EXE         = asysc
-SRC_DIR     = src
+LIB_DIR     = src
 APP_DIR     = app
 RULES_DIR   = rules
 OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
 LIB         = lib$(EXE).a
-EXE_OBJ     = $(EXE_SRC:%.cpp=$(OBJDIR)/%.o)
-LIB_OBJS    = $(CPP_SRC:%.cpp=$(OBJDIR)/%.o)
-INCDIR      = -I$(SRC_DIR)
+EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJDIR)/%.o)
+LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJDIR)/%.o)
+INCDIR      = -I$(LIB_DIR)
 RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
+CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
 
 #Compiler settings
 ifeq ($(USE_CLANG),1)
@@ -32,20 +33,20 @@ EMBED_RULES = 0
 GPROF       = 0
 
 ifeq ($(USE_STD),0)
-	INCDIR += -I$(SRC_DIR)/nostd 
+	INCDIR += -I$(LIB_DIR)/nostd 
 else
-	INCDIR += -I$(SRC_DIR)/std
+	INCDIR += -I$(LIB_DIR)/std
 endif
 
 
 CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 LDFLAGS   = -Wl,-Map=$(EXE).map
 
-EXE_SRC = \
+APP_SRC = \
 	asysc/ASysC.cpp \
 	asysc/MathExpressionEx.cpp
 
-CPP_SRC = \
+LIB_SRC = \
     Debug.cpp \
 	Parser.cpp \
     Element.cpp \
@@ -60,7 +61,7 @@ CPP_SRC = \
     Test.cpp
 	
 ifeq ($(USE_STD),0)
-	CPP_SRC  += nostd/LCString.cpp  
+	LIB_SRC  += nostd/LCString.cpp  
 endif
 
 ifeq ($(DEBUG),1)
@@ -91,7 +92,7 @@ $(OBJDIR)/%.o: $(APP_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJDIR)/%.o: $(LIB_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
@@ -124,10 +125,10 @@ archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
 
 cppcheck:
-	cppcheck --enable=all --suppress=missingIncludeSystem --suppress=noExplicitConstructor $(INCDIR) $(addprefix $(SRC_DIR)/, $(CPP_SRC) )
+	cppcheck --enable=all --suppress=missingIncludeSystem --suppress=noExplicitConstructor $(INCDIR) $(CPP_FILES)
 
 clang-tidy:
-	clang-tidy $(addprefix $(SRC_DIR)/, $(CPP_SRC) ) -- $(INCDIR)
+	clang-tidy $(CPP_FILES) -- $(INCDIR)
 
 .PHONY: all clean rules archive
 .SILENT:

@@ -417,8 +417,7 @@ bool CMathExpression::ExecuteCommand()
     CEvaluator *eval = m_ElementDB->GetEvaluator();
     if (eval)
     {
-      pos_t pos = m_StackSize;
-      pos = NextBranch(pos);
+      pos_t pos = NextBranch(m_StackSize);
       eval->Evaluate(m_StackSize - pos, m_StackArray + pos);
       m_StackSize = pos;
       PushEvalElement(*eval);
@@ -498,10 +497,8 @@ bool CMathExpression::CompareBranch(pos_t pos1, pos_t pos2) const
     return true;
   }
 
-  pos11 = pos1;
-  pos22 = pos2;
-  pos11 = NextBranch(pos11);
-  pos22 = NextBranch(pos22);
+  pos11 = NextBranch(pos1);
+  pos22 = NextBranch(pos2);
 
   return ((pos1 - pos11) == (pos2 - pos22)) && !::memcmp(&m_StackArray[pos11], &m_StackArray[pos22], (pos2 - pos22) * sizeof(OP_CODE));
 }

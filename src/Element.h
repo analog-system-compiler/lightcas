@@ -67,7 +67,7 @@ public:
   bool IsVar()     const                    { return ( m_Type == ELEM_VAR   ); }
   bool IsConst()   const                    { return ( m_Type == ELEM_CONST ); }
   bool IsFunct()   const                    { return ( m_Type == ELEM_FUNCT ); }
-  bool IsNumeric() const                    { return ( m_Type == ELEM_NUM );   }
+  bool IsNumeric() const                    { return ( m_Type == ELEM_NUM   ); }
   bool IsAux()     const                    { return m_bAux;                   }
   bool IsGlobal()  const                    { return m_Global;                 }
   bool IsVoid()    const                    { return ( GetOperandNb() == 0 );  }
