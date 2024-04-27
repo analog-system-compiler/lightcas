@@ -21,7 +21,7 @@ public:
   bool m_IsATTY;
   unsigned m_DisplayBase;
 
-  CString& Append( const CString& str )
+  CString& Append( const CString& str ) override
   {
     if ( m_IsATTY )
     {

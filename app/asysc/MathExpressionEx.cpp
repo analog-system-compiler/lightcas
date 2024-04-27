@@ -20,10 +20,9 @@
 #include "Element.h"
 #include "MathExpressionEx.h"
 
-bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * circuit_name )
+bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *circuit_name)
 {
-  OP_CODE op;
-  CElement *e, *eth, *es, *ec, *et, *ee, *ess;
+  CElement *eth, *es, *ec, *et, *ee, *ess;
   CDisplay ds1, ds2, ds3, ds4;
   CElementArray element_array;
 
@@ -52,7 +51,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * 
   ee->SetNumeric();
   et->SetName("time");
 
-  e = m_ElementDB->GetElement(circuit_name);
+  CElement *e = m_ElementDB->GetElement(circuit_name);
   if (e->IsFunct())
   {
     const CAlgebraRuleArray &rule_array = e->GetFunction()->GetAlgebraRulesArray();
@@ -75,12 +74,12 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * 
     pos_t pos = GetSize();
     while (pos)
     {
-      op = Pop(pos);
+      OP_CODE op = Pop(pos);
       if (op == m_op_getv)
       {
         op = Pop(pos);
         ASSERT(pos);
-        CElement *e = RefToElement(op);
+        e = RefToElement(op);
         if (!element_array.Find(e))
         {
           element_array.Append(e);
@@ -99,7 +98,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * 
     // Search for results
     ds3.SetDebug();
     pos = GetSize();
-    op = Pop(pos);
+    OP_CODE op = Pop(pos);
     if (op == op_vect)
     {
       while (pos)
@@ -173,8 +172,6 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char * 
 
 pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
 {
-  pos_t pos1;
-  pos_t pos_array[CElementDataBase::MAX_PAR];
 
   OP_CODE op = Pop(pos);
   if (op == m_op_hier)
@@ -202,14 +199,15 @@ pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precede
   else
   {
     pos++;
+    pos_t pos_array[CElementDataBase::MAX_PAR];
     const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
     for (unsigned i = 0; i < st.GetSize(); i++)
     {
       const CSymbolSyntaxStruct *ss = st[i];
-      pos1 = Match(pos, ss->m_Equation, pos_array);
+      pos_t pos1 = Match(pos, ss->m_Equation, pos_array);
       if (pos1 != pos)
       {
-        const char *sp = ss->m_Syntax;        
+        const char *sp = ss->m_Syntax;
         if ((i < precedence) || (ds.IsDebug() && i <= precedence))
         {
           ds += '(';
@@ -230,10 +228,8 @@ pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precede
 
 pos_t CMathExpressionEx::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority) const
 {
-  unsigned i, n;
   const CElement *e;
   unsigned pos2;
-  pos_t pos_array[CElementDataBase::MAX_PAR];
 
   ASSERT(pos);
   pos2 = DisplaySymbol(ds, pos, priority);
@@ -250,17 +246,18 @@ pos_t CMathExpressionEx::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priorit
 
     if (e->IsNumeric() || e->IsFunct()) // For Rand(), n=0
     {
-      n = e->GetFunction()->GetParameterNb();
+      unsigned n = e->GetFunction()->GetParameterNb();
       ASSERT(n <= CElementDataBase::MAX_PAR);
       ds += '(';
       if (n)
       {
-        for (i = 0; i < n; i++)
+        pos_t pos_array[CElementDataBase::MAX_PAR];
+        for (unsigned i = 0; i < n; i++)
         {
           pos_array[i] = pos;
           pos = NextBranch(pos);
         }
-        for (i = 1; i < n; i++)
+        for (unsigned i = 1; i < n; i++)
         {
           DisplayBranch(ds, pos_array[n - i]);
           ds += ' ';

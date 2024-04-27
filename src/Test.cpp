@@ -343,7 +343,7 @@ void CElementDataBase::Test()
 #endif
   CParser IC;
   IC.SetRootPath(m_RootPath);
-  if (IC.LoadFromFile(m_RootPath+CString("tests.txt")))
+  if (IC.LoadFromFile(m_RootPath + CString("tests.txt")))
   {
     AddAlgebraRuleTable(IC);
     IC.CloseFile();
@@ -353,7 +353,7 @@ void CElementDataBase::Test()
     IC.CopyBuffer("test description file not found.");
   }
   // CleanTempElements();
-//DisplayStats();
+  // DisplayStats();
 }
 
 #endif
