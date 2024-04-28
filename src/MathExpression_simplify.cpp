@@ -169,28 +169,26 @@ void CMathExpression::OptimizeTree()
     {
       save_context = m_ContextStack.Pop();
       pos_t n = save_context.m_RuleDstExp->GetSize();
-      while (save_context.m_RuleDstPos < n)
+      pos_t pos5 = save_context.m_RuleDstPos;
+      while (pos5 < n)
       {
-        op3 = save_context.m_RuleDstExp->Get(save_context.m_RuleDstPos++);
-
+        op3 = save_context.m_RuleDstExp->Get(pos5);
         if (CElementDataBase::IsReservedOP(op3))
         {
+          pos5++;
           j = ReservedParameterIndex(op3);
           ASSERT(j < CElementDataBase::MAX_PAR);
           unsigned pos2 = save_context.m_PosArray[j];
           ASSERT(pos2 <= GetSize());
-          pos_t pos5 = save_context.m_RuleDstPos; // already incremented
-          if (pos5 < n)                           // if followed by FUNCT1 or FUNCT2
+          if (pos5 < n) // if followed by FUNCT1 or FUNCT2
           {
             op3 = save_context.m_RuleDstExp->Get(pos5);
             if (CElementDataBase::IsFunctionOP(op3))
             {
-              save_context.m_RuleDstPos++;
               op3 = Get(save_context.m_PosArray[j] - 1);
               goto L1;
             }
           }
-
           pos_t pos1 = pos2;
           pos1 = NextBranch(pos1);
           Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
@@ -198,15 +196,18 @@ void CMathExpression::OptimizeTree()
         else
         {
         L1:
+          pos5++;
           ASSERT(RefToElement(op3) != NULL);
           Push(op3);
           bool need_post_optim = ExecuteCommand();
           if (need_post_optim)
           {
+            save_context.m_RuleDstPos = pos5;
             m_ContextStack.Push(save_context);
             RuleSearch(RefToElement(GetLastOperator()));
             save_context = m_ContextStack.Pop();
             n = save_context.m_RuleDstExp->GetSize();
+            pos5 = save_context.m_RuleDstPos;
           }
         } // if ( CElementDataBase::IsReservedOP( op3 ) )
       }   // while ( save_context.m_RuleDstPos < n )
