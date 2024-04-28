@@ -164,7 +164,7 @@ void CMathExpression::OptimizeTree()
 
   if (!IsEmpty() && ExecuteCommand())
   {
-    RuleSearch();
+    RuleSearch(RefToElement(GetLastOperator()));
     while (m_ContextStack.GetSize())
     {
       save_context = m_ContextStack.Pop();
@@ -204,7 +204,7 @@ void CMathExpression::OptimizeTree()
           if (need_post_optim)
           {
             m_ContextStack.Push(save_context);
-            RuleSearch();
+            RuleSearch(RefToElement(GetLastOperator()));
             save_context = m_ContextStack.Pop();
             n = save_context.m_RuleDstExp->GetSize();
           }
@@ -238,15 +238,6 @@ void CMathExpression::OptimizeTree()
     TRACE(ds.GetBufferPtr());
   }
 #endif
-}
-
-bool CMathExpression::RuleSearch()
-{
-  OP_CODE op = GetLastOperator();
-  const CElement *e;
-
-  e = RefToElement(op);
-  return RuleSearch(e);
 }
 
 bool CMathExpression::RuleSearch(const CElement *e)
