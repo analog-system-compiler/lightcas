@@ -160,85 +160,81 @@ void CMathExpression::OptimizeTree()
 {
   OP_CODE op3;
   context_t save_context;
-  unsigned j;
 
-  if (!IsEmpty() && ExecuteCommand())
+  if (!IsEmpty())
   {
-    RuleSearch(RefToElement(GetLastOperator()));
-    while (m_ContextStack.GetSize())
+    bool need_post_optim = ExecuteCommand();
+    if (need_post_optim)
     {
-      save_context = m_ContextStack.Pop();
-      pos_t n = save_context.m_RuleDstExp->GetSize();
-      pos_t pos5 = save_context.m_RuleDstPos;
-      while (pos5 < n)
+    L1:
+      RuleSearch(RefToElement(GetLastOperator()));
+      while (m_ContextStack.GetSize())
       {
-        op3 = save_context.m_RuleDstExp->Get(pos5);
-        if (CElementDataBase::IsReservedOP(op3))
+        save_context = m_ContextStack.Pop();
+        pos_t n = save_context.m_RuleDstExp->GetSize();
+        pos_t pos5 = save_context.m_RuleDstPos;
+        while (pos5 < n)
         {
-          pos5++;
-          j = ReservedParameterIndex(op3);
-          ASSERT(j < CElementDataBase::MAX_PAR);
-          unsigned pos2 = save_context.m_PosArray[j];
-          ASSERT(pos2 <= GetSize());
-          if (pos5 < n) // if followed by FUNCT1 or FUNCT2
+          op3 = save_context.m_RuleDstExp->Get(pos5++);
+          if (CElementDataBase::IsReservedOP(op3))
           {
+            unsigned j = ReservedParameterIndex(op3);
+            ASSERT(j < CElementDataBase::MAX_PAR);
+            unsigned pos2 = save_context.m_PosArray[j];
+            ASSERT(pos2 <= GetSize());
             op3 = save_context.m_RuleDstExp->Get(pos5);
-            if (CElementDataBase::IsFunctionOP(op3))
+            if ((pos5 < n) && CElementDataBase::IsFunctionOP(op3))
             {
-              op3 = Get(save_context.m_PosArray[j] - 1);
-              goto L1;
+              op3 = Get(pos2 - 1);
+              pos5++;
+            }
+            else
+            {
+              pos_t pos1 = pos2;
+              pos1 = NextBranch(pos1);
+              Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
+              continue;
             }
           }
-          pos_t pos1 = pos2;
-          pos1 = NextBranch(pos1);
-          Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
-        }
-        else
-        {
-        L1:
-          pos5++;
           ASSERT(RefToElement(op3) != NULL);
           Push(op3);
-          bool need_post_optim = ExecuteCommand();
+          need_post_optim = ExecuteCommand();
           if (need_post_optim)
           {
             save_context.m_RuleDstPos = pos5;
             m_ContextStack.Push(save_context);
-            RuleSearch(RefToElement(GetLastOperator()));
-            save_context = m_ContextStack.Pop();
-            n = save_context.m_RuleDstExp->GetSize();
-            pos5 = save_context.m_RuleDstPos;
-          }
-        } // if ( CElementDataBase::IsReservedOP( op3 ) )
-      }   // while ( save_context.m_RuleDstPos < n )
+            goto L1;
+          } // if ( CElementDataBase::IsReservedOP( op3 ) )
+        }   // while ( save_context.m_RuleDstPos < n )
+        pos_t pos3 = save_context.m_Size;
+        pos_t pos2 = GetSize();
+#if (DEBUG_LEVEL >= 1)
+        CDisplay ds;
+        ds += "OptimizeTree rule";
+        save_context.m_Rule->Display(save_context.m_RuleNb, ds);
+        ds += " : ";
+        SetSize(pos3);
+        Display(ds, false);
+        ds += " => ";
+#endif
+        Move(save_context.m_Pos, pos3, pos2 - pos3);
+#if (DEBUG_LEVEL >= 1)
+        Display(ds, false);
+        TRACESTR(ds.GetBufferPtr());
+#endif
+      } // while ( m_ContextStack.GetSize() )
 
-      pos_t pos3 = save_context.m_Size;
-      pos_t pos2 = GetSize();
 #if (DEBUG_LEVEL >= 1)
-      CDisplay ds;
-      ds += "OptimizeTree rule";
-      save_context.m_Rule->Display(save_context.m_RuleNb, ds);
-      ds += " : ";
-      SetSize(pos3);
-      Display(ds, false);
-      ds += " => ";
+      if (NextBranch(m_StackSize) != 0)
+      {
+        CDisplay ds;
+        ds.Print("Simplify error:");
+        Display(ds, false);
+        TRACE(ds.GetBufferPtr());
+      }
 #endif
-      Move(save_context.m_Pos, pos3, pos2 - pos3);
-#if (DEBUG_LEVEL >= 1)
-      Display(ds, false);
-      TRACESTR(ds.GetBufferPtr());
-#endif
-    } // while ( m_ContextStack.GetSize() )
+    }
   }
-#if (DEBUG_LEVEL >= 1)
-  if (NextBranch(m_StackSize) != 0)
-  {
-    CDisplay ds;
-    ds.Print("Simplify error:");
-    Display(ds, false);
-    TRACE(ds.GetBufferPtr());
-  }
-#endif
 }
 
 bool CMathExpression::RuleSearch(const CElement *e)
