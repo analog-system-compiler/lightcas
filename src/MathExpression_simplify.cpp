@@ -171,6 +171,8 @@ void CMathExpression::OptimizeTree()
       while (m_ContextStack.GetSize())
       {
         save_context = m_ContextStack.Pop();
+        pos_t pos1;
+        pos_t pos2;
         pos_t n = save_context.m_RuleDstExp->GetSize();
         pos_t pos5 = save_context.m_RuleDstPos;
         while (pos5 < n)
@@ -180,7 +182,7 @@ void CMathExpression::OptimizeTree()
           {
             unsigned j = ReservedParameterIndex(op3);
             ASSERT(j < CElementDataBase::MAX_PAR);
-            unsigned pos2 = save_context.m_PosArray[j];
+            pos2 = save_context.m_PosArray[j];
             ASSERT(pos2 <= GetSize());
             op3 = save_context.m_RuleDstExp->Get(pos5);
             if ((pos5 < n) && CElementDataBase::IsFunctionOP(op3))
@@ -190,7 +192,7 @@ void CMathExpression::OptimizeTree()
             }
             else
             {
-              pos_t pos1 = pos2;
+              pos1 = pos2;
               pos1 = NextBranch(pos1);
               Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
               continue;
@@ -206,22 +208,7 @@ void CMathExpression::OptimizeTree()
             goto L1;
           } // if ( CElementDataBase::IsReservedOP( op3 ) )
         }   // while ( save_context.m_RuleDstPos < n )
-        pos_t pos3 = save_context.m_Size;
-        pos_t pos2 = GetSize();
-#if (DEBUG_LEVEL >= 1)
-        CDisplay ds;
-        ds += "OptimizeTree rule";
-        save_context.m_Rule->Display(save_context.m_RuleNb, ds);
-        ds += " : ";
-        SetSize(pos3);
-        Display(ds, false);
-        ds += " => ";
-#endif
-        Move(save_context.m_Pos, pos3, pos2 - pos3);
-#if (DEBUG_LEVEL >= 1)
-        Display(ds, false);
-        TRACESTR(ds.GetBufferPtr());
-#endif
+        OptimizeTree(save_context);
       } // while ( m_ContextStack.GetSize() )
 
 #if (DEBUG_LEVEL >= 1)
@@ -235,6 +222,26 @@ void CMathExpression::OptimizeTree()
 #endif
     }
   }
+}
+
+void CMathExpression::OptimizeTree(const context_t &save_context)
+{
+  pos_t pos1 = save_context.m_Size;
+  pos_t pos2 = GetSize();
+#if (DEBUG_LEVEL >= 1)
+  CDisplay ds;
+  ds += "OptimizeTree rule";
+  save_context.m_Rule->Display(save_context.m_RuleNb, ds);
+  ds += " : ";
+  SetSize(pos1);
+  Display(ds, false);
+  ds += " => ";
+#endif
+  Move(save_context.m_Pos, pos1, pos2 - pos1);
+#if (DEBUG_LEVEL >= 1)
+  Display(ds, false);
+  TRACESTR(ds.GetBufferPtr());
+#endif
 }
 
 bool CMathExpression::RuleSearch(const CElement *e)

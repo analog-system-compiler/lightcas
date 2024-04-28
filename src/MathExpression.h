@@ -108,6 +108,7 @@ protected:
   void RemoveZero();
   bool ExecuteCommand();
   void DisplayRuleMessage(const CElement *e) const;
+  void OptimizeTree(const context_t &save_context);
 
 #ifdef RECURSIVE_ALGO
   CAlgebraRule *RuleSearch(pos_t &pos, pos_t pos_array[CElementDataBase::MAX_EXP]);
