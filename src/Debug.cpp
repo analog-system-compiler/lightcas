@@ -26,7 +26,7 @@
 #include <winbase.h>
 #endif
 
-int (*PUTS)(const char *) = puts;
+int (*PUTS)(const char *) = ::puts;
 
 #ifdef _DEBUG
 
@@ -61,7 +61,7 @@ void TRACE(const char *format, ...)
 {
   va_list args;
   va_start(args, format);
-  vsnprintf(buffer, sizeof(buffer), format, args);
+  ::vsnprintf(buffer, sizeof(buffer)-1, format, args);
   va_end(args);
   TRACESTR(buffer);
 }

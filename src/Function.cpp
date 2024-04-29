@@ -80,6 +80,6 @@ void CFunction::AddOrReplaceRule( CAlgebraRule* rule2 )
   }
 #ifdef _DEBUG
   rule2->Display( i, ds );
-  TRACE( ds.GetBufferPtr() );
+  TRACE( "%s", ds.GetBufferPtr() );
 #endif
 }

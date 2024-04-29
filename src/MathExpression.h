@@ -102,13 +102,12 @@ protected:
   void Replace(OP_CODE op1, OP_CODE op2, pos_t pos = 0);
   char TryMatchExp(const char *&sp);
   void Move(pos_t pos_dest, pos_t pos_source, pos_t size);
-  pos_t Match(pos_t pos, const CMathExpression &equ, pos_t pos_array[CElementDataBase::MAX_PAR]) const;
-  bool RegisterBranch(pos_t pos_array[CElementDataBase::MAX_PAR], OP_CODE op1, pos_t pos2) const;
+  pos_t Match(pos_t pos, const CMathExpression &equ, pos_t pos_array[CElementDataBase::MAX_PAR]) const;  
   void Zero();
   void RemoveZero();
   bool ExecuteCommand();
   void DisplayRuleMessage(const CElement *e) const;
-  void OptimizeTree(const context_t &save_context);
+  void ReduceTree(const context_t &save_context);
 
 #ifdef RECURSIVE_ALGO
   CAlgebraRule *RuleSearch(pos_t &pos, pos_t pos_array[CElementDataBase::MAX_EXP]);
@@ -119,7 +118,7 @@ protected:
 
   // static
   static CElement *RefToElement(OP_CODE op) { return CElementDataBase::RefToElement(op); }
-  static unsigned ReservedParameterIndex(OP_CODE op) { return (unsigned)(op - CElementDataBase::OP_PAR0); }
+  static unsigned ReservedParameterIndex(OP_CODE op) { ASSERT(op <= CElementDataBase::OP_PARF); return (unsigned)(op - CElementDataBase::OP_PAR0); }
 
   // Display funct
   virtual pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const;

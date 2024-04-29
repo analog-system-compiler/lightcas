@@ -158,73 +158,65 @@ CContextArray CMathExpression::m_ContextStack;
 
 void CMathExpression::OptimizeTree()
 {
-  OP_CODE op3;
   context_t save_context;
 
-  if (!IsEmpty())
-  {
-    bool need_post_optim = ExecuteCommand();
-    if (need_post_optim)
-    {
-    L1:
-      RuleSearch(RefToElement(GetLastOperator()));
-      while (m_ContextStack.GetSize())
-      {
-        save_context = m_ContextStack.Pop();
-        pos_t pos1;
-        pos_t pos2;
-        pos_t n = save_context.m_RuleDstExp->GetSize();
-        pos_t pos5 = save_context.m_RuleDstPos;
-        while (pos5 < n)
-        {
-          op3 = save_context.m_RuleDstExp->Get(pos5++);
-          if (CElementDataBase::IsReservedOP(op3))
-          {
-            unsigned j = ReservedParameterIndex(op3);
-            ASSERT(j < CElementDataBase::MAX_PAR);
-            pos2 = save_context.m_PosArray[j];
-            ASSERT(pos2 <= GetSize());
-            op3 = save_context.m_RuleDstExp->Get(pos5);
-            if ((pos5 < n) && CElementDataBase::IsFunctionOP(op3))
-            {
-              op3 = Get(pos2 - 1);
-              pos5++;
-            }
-            else
-            {
-              pos1 = pos2;
-              pos1 = NextBranch(pos1);
-              Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
-              continue;
-            }
-          }
-          ASSERT(RefToElement(op3) != NULL);
-          Push(op3);
-          need_post_optim = ExecuteCommand();
-          if (need_post_optim)
-          {
-            save_context.m_RuleDstPos = pos5;
-            m_ContextStack.Push(save_context);
-            goto L1;
-          } // if ( CElementDataBase::IsReservedOP( op3 ) )
-        }   // while ( save_context.m_RuleDstPos < n )
-        OptimizeTree(save_context);
-      } // while ( m_ContextStack.GetSize() )
+  if (IsEmpty())
+    return;
 
-#if (DEBUG_LEVEL >= 1)
-      if (NextBranch(m_StackSize) != 0)
+L1:
+  if (ExecuteCommand())
+    RuleSearch(RefToElement(GetLastOperator()));
+
+  while (m_ContextStack.GetSize())
+  {
+    save_context = m_ContextStack.Pop();
+    pos_t n = save_context.m_RuleDstExp->GetSize();
+    pos_t pos5 = save_context.m_RuleDstPos;
+    while (pos5 < n)
+    {
+      OP_CODE op3 = save_context.m_RuleDstExp->Get(pos5++);
+      if (CElementDataBase::IsReservedOP(op3))
       {
-        CDisplay ds;
-        ds.Print("Simplify error:");
-        Display(ds, false);
-        TRACE(ds.GetBufferPtr());
+        unsigned j = ReservedParameterIndex(op3);
+        ASSERT(j < CElementDataBase::MAX_PAR);
+        pos_t pos2 = save_context.m_PosArray[j];
+        ASSERT(pos2 <= GetSize());
+        op3 = save_context.m_RuleDstExp->Get(pos5);
+        if (CElementDataBase::IsFunctionOP(op3))
+        {
+          pos5++;
+          op3 = Get(pos2 - 1);
+          Push(op3);
+        }
+        else
+        {
+          pos_t pos1 = NextBranch(pos2);
+          Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
+        }
       }
-#endif
+      else
+      {
+        ASSERT(RefToElement(op3) != NULL);
+        Push(op3);
+        save_context.m_RuleDstPos = pos5;
+        m_ContextStack.Push(save_context);
+        goto L1;
+      }
     }
+    ReduceTree(save_context);
   }
+#if (DEBUG_LEVEL >= 1)
+  if (NextBranch(m_StackSize) != 0)
+  {
+    CDisplay ds;
+    ds.Print("Simplify error:");
+    Display(ds, false);
+    TRACE(ds.GetBufferPtr());
+  }
+#endif
 }
 
-void CMathExpression::OptimizeTree(const context_t &save_context)
+void CMathExpression::ReduceTree(const context_t &save_context)
 {
   pos_t pos1 = save_context.m_Size;
   pos_t pos2 = GetSize();
@@ -315,7 +307,12 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
     OP_CODE op1 = equ.Pop(pos1);
     if (CElementDataBase::IsReservedOP(op1)) // a,b or c
     {
-      match = RegisterBranch(pos_array, op1, pos2);
+      i = ReservedParameterIndex(op1);
+      if (!pos_array[i])
+        pos_array[i] = pos2;
+      else
+        match = CompareBranch(pos2, pos_array[i]);
+
       if (match)
       {
         pos2 = NextBranch(pos2);
@@ -326,7 +323,12 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
       OP_CODE op3 = equ.Pop(pos1);
       if (CElementDataBase::IsReservedOP(op3))
       {
-        match = RegisterBranch(pos_array, op3, pos2);
+        i = ReservedParameterIndex(op3);
+        if (!pos_array[i])
+          pos_array[i] = pos2;
+        else
+          match = CompareBranch(pos2, pos_array[i]);
+
         if (match)
         {
           op2 = Pop(pos2);
@@ -496,28 +498,6 @@ bool CMathExpression::CompareBranch(pos_t pos1, pos_t pos2) const
   pos22 = NextBranch(pos2);
 
   return ((pos1 - pos11) == (pos2 - pos22)) && !::memcmp(&m_StackArray[pos11], &m_StackArray[pos22], (pos2 - pos22) * sizeof(OP_CODE));
-}
-
-bool CMathExpression::RegisterBranch(pos_t pos_array[CElementDataBase::MAX_PAR], OP_CODE op1, pos_t pos2) const
-{
-  unsigned i;
-  bool match;
-
-  i = ReservedParameterIndex(op1);
-  ASSERT(i < CElementDataBase::MAX_PAR);
-
-  if (pos_array[i] == 0)
-  {
-    pos_array[i] = pos2;
-    ASSERT(pos2 != 0);
-    match = true;
-  }
-  else
-  {
-    match = CompareBranch(pos2, pos_array[i]);
-  }
-
-  return match;
 }
 
 void CMathExpression::PushEvalElement(CEvaluator &eval)
