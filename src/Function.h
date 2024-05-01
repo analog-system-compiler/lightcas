@@ -77,7 +77,6 @@ public:
   void SetParameterNb( unsigned parameter_nb )          { m_ParameterNb = parameter_nb; }
   unsigned GetParameterNb() const                       { return m_ParameterNb; }
   const CAlgebraRuleArray& GetAlgebraRulesArray() const { return m_AlgebraRuleArray; }
-  //unsigned GetSize() const                              { return m_AlgebraRuleArray.GetSize();  }
 
   CFunction();
   ~CFunction();
