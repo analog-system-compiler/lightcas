@@ -1,7 +1,6 @@
 
 MAKEFLAGS = --jobs 4
 
-USE_CLANG   = 1
 EXE         = asysc
 LIB_DIR     = src
 APP_DIR     = app
@@ -26,11 +25,12 @@ else
 endif
 
 #options
-USE_STD     = 1
-DEBUG       = 0
-TEST        = 0
-EMBED_RULES = 0
-GPROF       = 0
+USE_CLANG   ?= 1
+USE_STD     ?= 1
+DEBUG       ?= 0
+TEST        ?= 0
+EMBED_RULES ?= 0
+GPROF       ?= 0
 
 ifeq ($(USE_STD),0)
 	INCDIR += -I$(LIB_DIR)/nostd 
