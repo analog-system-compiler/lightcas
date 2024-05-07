@@ -49,7 +49,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
   ec->SetNumeric();
   ee->SetName("exp");
   ee->SetNumeric();
-  et->SetName("time");
+  et->SetName("_time");
 
   CElement *e = m_ElementDB->GetElement(circuit_name);
   if (e->IsFunct())
@@ -124,9 +124,10 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
 
           ds2.Append("\t\t");
           if (mode == CAnalysisMode::AC_ANALYSIS)
-          {
+          {            
+            ds2.Append("self._setf(");
             ds2.Append(ds4);
-            ds2.Append(".set_f(");
+            ds2.Append(",");
             ds2.Append(ds3);
             ds2.Append(", self.freq)\n");
           }
