@@ -190,7 +190,7 @@ L1:
         }
         else
         {
-          pos_t pos1 = NextBranch(pos2);
+          pos_t pos1 = NextBranch(pos2); //TODO: optimize
           Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
         }
       }
@@ -199,7 +199,7 @@ L1:
         ASSERT(RefToElement(op3) != NULL);
         Push(op3);
         save_context.m_RuleDstPos = pos5;
-        m_ContextStack.Push(save_context);
+        m_ContextStack.Push(save_context); //TODO: avoid push/pop
         goto L1;
       }
     }
@@ -291,7 +291,6 @@ bool CMathExpression::Match(const CMathExpression &equ) const
 pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_array[CElementDataBase::MAX_PAR]) const
 {
   unsigned i;
-  OP_CODE op2;
   bool match = true;
   pos_t pos1 = equ.GetSize();
   pos_t pos2 = pos3;
@@ -318,7 +317,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
         pos2 = NextBranch(pos2);
       }
     }
-    else if (CElementDataBase::IsFunctionOP(op1)) // IsFunctionOP( OP_CODE op )
+    else if (CElementDataBase::IsFunctionOP(op1))
     {
       OP_CODE op3 = equ.Pop(pos1);
       if (CElementDataBase::IsReservedOP(op3))
@@ -331,7 +330,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
 
         if (match)
         {
-          op2 = Pop(pos2);
+          OP_CODE op2 = Pop(pos2);
           match = false;
           if (!CElementDataBase::IsReservedOP(op2))
           {
@@ -359,7 +358,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
     }
     else
     {
-      op2 = Pop(pos2);
+      OP_CODE op2 = Pop(pos2);
       match = (op2 == op1);
     }
   }
