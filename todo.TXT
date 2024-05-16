@@ -26,6 +26,10 @@ Check missing parenthesis
 - 1->7 marche mais pas 7->1
 
 
+// TODO check functions below. Don't work
+//LAST( _funct1( a   f ) ) := _funct1( LAST(a) f );
+//LAST( _funct2( a b f ) ) := _funct2( LAST(a) LAST(b) f );
+
  A B C
 |a b c x|    | a       b       c       x|    | a       b                                       c                                             x | 
 |d e f y| => |   a*e-d*b a*f-d*c a*y-d*x| => |   a*e-d*b                                 a*f-d*c                                       a*y-d*x | 

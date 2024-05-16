@@ -158,15 +158,20 @@ CContextArray CMathExpression::m_ContextStack;
 
 void CMathExpression::OptimizeTree()
 {
-  context_t save_context;
+  context_t save_context, save_context_new;
 
   if (IsEmpty())
     return;
 
-L1:
-  if (ExecuteCommand())
-    RuleSearch(RefToElement(GetLastOperator()));
+  if (ExecuteDirective())
+  {
+    if (RuleSearch(RefToElement(GetLastOperator()), save_context_new))
+    {
+      m_ContextStack.Push(save_context_new);
+    }
+  }
 
+L1:
   while (m_ContextStack.GetSize())
   {
     save_context = m_ContextStack.Pop();
@@ -182,26 +187,28 @@ L1:
         pos_t pos2 = save_context.m_PosArray[j];
         ASSERT(pos2 <= GetSize());
         op3 = save_context.m_RuleDstExp->Get(pos5);
-        if (CElementDataBase::IsFunctionOP(op3))
+        if (!CElementDataBase::IsFunctionOP(op3))
         {
-          pos5++;
-          op3 = Get(pos2 - 1);
-          Push(op3);
-        }
-        else
-        {
-          pos_t pos1 = NextBranch(pos2); //TODO: optimize
+          pos_t pos1 = NextBranch(pos2);      // TODO: optimize
           Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
+          continue;
         }
+        pos5++;
+        op3 = Get(pos2 - 1); // Get real function OP
       }
-      else
+
+      ASSERT(RefToElement(op3) != NULL);
+      Push(op3);
+      if (ExecuteDirective())
       {
-        ASSERT(RefToElement(op3) != NULL);
-        Push(op3);
-        save_context.m_RuleDstPos = pos5;
-        m_ContextStack.Push(save_context); //TODO: avoid push/pop
-        goto L1;
-      }
+        if (RuleSearch(RefToElement(GetLastOperator()), save_context_new))
+        {
+          save_context.m_RuleDstPos = pos5;
+          m_ContextStack.Push(save_context); // TODO: avoid push/pop
+          m_ContextStack.Push(save_context_new);          
+          goto L1; // Do recursion
+        }        
+      }      
     }
     ReduceTree(save_context);
   }
@@ -236,11 +243,10 @@ void CMathExpression::ReduceTree(const context_t &save_context)
 #endif
 }
 
-bool CMathExpression::RuleSearch(const CElement *e)
+bool CMathExpression::RuleSearch(const CElement *e, context_t &save_context)
 {
   unsigned i;
   unsigned n;
-  context_t save_context;
 
   ASSERT(e);
   const CFunction *funct = e->GetFunction();
@@ -270,7 +276,6 @@ bool CMathExpression::RuleSearch(const CElement *e)
           save_context.m_Rule = rule;
           save_context.m_RuleNb = i;
 #endif
-          m_ContextStack.Push(save_context);
           DisplayRuleMessage(e);
           return true;
         }
@@ -366,7 +371,7 @@ pos_t CMathExpression::Match(pos_t pos3, const CMathExpression &equ, pos_t pos_a
   return match ? pos2 : pos3;
 }
 
-bool CMathExpression::ExecuteCommand()
+bool CMathExpression::ExecuteDirective()
 {
   OP_CODE op3 = Pop(m_StackSize);
 
@@ -425,23 +430,22 @@ bool CMathExpression::ExecuteCommand()
   {
     pos_t pos1 = m_StackSize;
     pos_t pos2 = NextBranch(pos1);
-    CDisplay ds;
+    CDisplay ds("assertion : ");
     ds.SetDebug();
     if (!CompareBranch(pos1, pos2))
     {
-      ds += "Assertion error : ";
       DisplayBranch(ds, pos2);
       ds += " != ";
       DisplayBranch(ds, pos1);
+      ds.Log(LOG_ERR);
     }
     else
     {
-      ds += "Assertion OK : ";
       DisplayBranch(ds, pos2);
       ds += " == ";
       DisplayBranch(ds, pos1);
-    }
-    PUTS(ds.GetBufferPtr());
+      ds.Log(LOG_INFO);
+    }    
     m_StackSize++;
     return false;
   }

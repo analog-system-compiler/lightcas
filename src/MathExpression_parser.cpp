@@ -55,23 +55,13 @@ int CMathExpression::GetLevel(CParser &IC)
 {
   int i = 0;
   
-  //m_ElementDB->GetEvaluator()->ClearValue();
-
   while (!IC.IsStopChar())
   {
     if (GetLevel(IC, 0))
       i++;
     else
     {
-      CDisplay ds;
-      ds += "Error: ";
-      ds += IC.GetBuffer();
-      ds += " in line ";
-      ds += CDisplay(IC.GetLineNb(), 10);
-      ds += " in file ";
-      ds += IC.GetFileName();
-      ds.Print();
-      TRACE(ds.GetBufferPtr());
+      IC.Error(IC.GetBuffer());      
       return -2; // IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
     }
   }
@@ -203,7 +193,6 @@ bool CMathExpression::ParseElement(CParser &IC)
     }
     else
     {
-#if (DEBUG_LEVEL > 0)
       CDisplay ds;
       if (f->GetParameterNb() > (unsigned)i)
         ds = "Error: not enough parameters for: ";
@@ -214,9 +203,7 @@ bool CMathExpression::ParseElement(CParser &IC)
       ds += CString(f->GetParameterNb());
       ds += ", got:";
       ds += CString(i);
-      ds.Print();
-      TRACE(ds.GetBufferPtr());
-#endif
+      ds.Log(LOG_ERR);
       return false;
     }
   }

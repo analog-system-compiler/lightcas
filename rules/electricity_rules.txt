@@ -46,7 +46,6 @@ AC(SRC())     := 1;
 AC(DER(a,TIME())) := a*s();
 AC(INT(a,TIME())) := a/s();
 AC(TIME())        := 0;
-//AC(_const(a))  := 0;
 //AC(ELEM(a))   := a;
 AC(a)         := a;
 AC({a})       := {AC(a)};

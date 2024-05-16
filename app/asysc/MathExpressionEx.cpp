@@ -142,7 +142,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
         }
         else
         {
-          ds.Print("Resolution error 1");
+          ds.Log(LOG_ERR,"Resolution error 1");
           ds.Clear();
           Display(ds);
           ds.Print();
@@ -152,7 +152,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
     }
     else
     {
-      ds.Print("Resolution error 2");
+      ds.Log(LOG_ERR,"Resolution error 2");
       ds.Clear();
       Display(ds);
       ds.Print();

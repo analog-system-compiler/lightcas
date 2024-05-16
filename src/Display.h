@@ -26,6 +26,13 @@
 #define vsnprintf _vsnprintf_s
 #endif
 
+typedef enum
+{
+  LOG_INFO,
+  LOG_WARN,
+  LOG_ERR
+} log_t;
+
 class CDisplay : public CString
 {
 private:
@@ -34,26 +41,35 @@ private:
 
 public:
   virtual void Print(const char *s) { puts(s); }
+
+  static void Log(log_t type, const char *format, ...)
+  {
+    char buffer[2048];
+    va_list args;
+    va_start(args, format);
+    vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    CDisplay ds(buffer);
+    ds.Log(type);
+  }
+
+  void Log(log_t type)
+  {
+    Prepend(type == LOG_INFO ? CString("Info ") : type == LOG_WARN ? CString("Warning ")
+                                                                   : CString("Error "));
+    Print();
+    TRACE(GetBufferPtr());
+  }
+
   void Print()
   {
     if (m_File)
     {
       fwrite(GetBufferPtr(), GetLength(), 1, m_File);
       fputc('\n', m_File);
-      // fputs("\r\n", m_File);
     }
     else
       Print(GetBufferPtr());
-  }
-
-  void Printf(const char *format, ...)
-  {
-    static char buffer[2048];
-    va_list args;
-    va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
-    va_end(args);
-    Print(buffer);
   }
 
   bool StoreToFile(const CString &name)
@@ -77,7 +93,7 @@ public:
     m_File = NULL;
     m_DebugMode = false;
   }
-  CDisplay(const CString& s) : CString(s)
+  CDisplay(const CString &s) : CString(s)
   {
     m_File = NULL;
     m_DebugMode = false;

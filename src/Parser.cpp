@@ -141,7 +141,7 @@ void CParser::SkipSpace()
       const char *pos = strchr(m_Pos, '\n');
       if (pos)
         ds.Append(m_Pos, pos - m_Pos);
-      TRACESTR(ds.GetBufferPtr()); //Can't use TRACE because of char '%'
+      ds.Log(LOG_INFO); // Can't use TRACE because of char '%'
 #endif
     }
     else if (isspace(c)) //\n is considered as space
@@ -160,12 +160,12 @@ void CParser::SkipSpace()
       {
         if (!SkipBlockComment())
         {
-          char_found=true;
+          char_found = true;
         }
       }
       else
       {
-        char_found=true;
+        char_found = true;
       }
     }
     else if ((c == m_SymbolMacro) && m_LineStart)
@@ -178,13 +178,13 @@ void CParser::SkipSpace()
       m_LineStart = true;
       if (!CloseFile())
       {
-        char_found=true;
+        char_found = true;
       }
     }
     else
     {
       m_LineStart = false;
-      char_found=true;
+      char_found = true;
     }
   }
 }
@@ -334,7 +334,7 @@ bool CParser::LoadFromFile(const CString &name)
     TRACE("Opening file %s", name.GetBufferPtr());
 #if (DEBUG_LEVEL >= 1)
     CDisplay ds;
-    ds.Printf("Opening file %s", name.GetBufferPtr());
+    ds.Log(LOG_INFO, CString("Opening file ") + name);
 #endif
     fseek(file, 0, SEEK_END);
     size = ftell(file);
@@ -354,9 +354,7 @@ bool CParser::LoadFromFile(const CString &name)
     m_LineStart = true;
     return true;
   }
-  CDisplay ds;
-  ds.Printf("Error: failed to open file \"%s\"", name.GetBufferPtr());
-  TRACE(ds.GetBufferPtr());
+  Error(CString("failed to open file \"") + name + CString("\"") );
   return false;
 }
 
@@ -414,12 +412,10 @@ bool CParser::ProcessMacro()
 void CParser::Error(const CString &s) const
 {
   CDisplay ds;
-  ds += "Error: ";
   ds += s;
   ds += " in line ";
   ds += CDisplay(GetLineNb(), 10);
   ds += " in file ";
   ds += GetFileName();
-  ds.Print();
-  TRACE(ds.GetBufferPtr());
+  ds.Log(LOG_ERR);
 }
