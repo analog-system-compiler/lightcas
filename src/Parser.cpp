@@ -334,7 +334,9 @@ bool CParser::LoadFromFile(const CString &name)
     TRACE("Opening file %s", name.GetBufferPtr());
 #if (DEBUG_LEVEL >= 1)
     CDisplay ds;
-    ds.Log(LOG_INFO, CString("Opening file ") + name);
+    ds.Append("Opening file ");
+    ds.Append(name);
+    ds.Log(LOG_INFO);
 #endif
     fseek(file, 0, SEEK_END);
     size = ftell(file);

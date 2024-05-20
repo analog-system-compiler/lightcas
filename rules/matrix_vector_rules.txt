@@ -292,19 +292,19 @@ ONES(_const(a))   := ( ( a == 1 )  ? 1 : (ONES(a-1),1) );
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//CHECK_UNIQUE(a)       := a; // never called
-CHECK_UNIQUE(a,b)     := (a,b);
-CHECK_UNIQUE(a,a)     := a;
-CHECK_UNIQUE(a,1)     := a;
-CHECK_UNIQUE(1,a)     := a;
-CHECK_UNIQUE(a,b,c)   := (CHECK_UNIQUE( a, c ), b);
-CHECK_UNIQUE(a,b,b)   := (a,b);
-CHECK_UNIQUE(a,b,1)   := (a,b);
+//CHECK_UNICITY(a)       := a; // never called
+CHECK_UNICITY(a,b)     := (a,b);
+CHECK_UNICITY(a,a)     := a;
+CHECK_UNICITY(a,1)     := a;
+CHECK_UNICITY(1,a)     := a;
+CHECK_UNICITY(a,b,c)   := (CHECK_UNICITY( a, c ), b);
+CHECK_UNICITY(a,b,b)   := (a,b);
+CHECK_UNICITY(a,b,1)   := (a,b);
 
 ADD_TO_LIST(a,(c,d))        := ADD_TO_LIST( ADD_TO_LIST(a,d), c);
 ADD_TO_LIST( a, b )         := ADD_TO_LIST2( {b}, {a});
-ADD_TO_LIST2( {e}, {a, b} ) := ADD_TO_LIST2( { CHECK_UNIQUE(e,b) }, {a} );
-ADD_TO_LIST2( {e}, {a}    ) := CHECK_UNIQUE(e,a);
+ADD_TO_LIST2( {e}, {a, b} ) := ADD_TO_LIST2( { CHECK_UNICITY(e,b) }, {a} );
+ADD_TO_LIST2( {e}, {a}    ) := CHECK_UNICITY(e,a);
 
 GET_VAR_LIST(a,b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
 GET_VAR_LIST(a+b)      := ADD_TO_LIST(  GET_VAR_LIST(a), GET_VAR_LIST(b) );
@@ -319,7 +319,10 @@ GET_VAR_LIST(a)        := 1;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LIST_RANK( a b ) :=  _eval( _gt( _elemid( a ) _elemid( b ) ) );
+ELEM_ID(a) := _elemid( a );
+ELEM_ID(a.b) := ELEM_ID(a)*16384+ELEM_ID(b);
+LIST_RANK2( a b ) :=  _eval( _gt( a b ) );
+LIST_RANK( a b ) :=  LIST_RANK2( ELEM_ID( a ) ELEM_ID( b ) );
 LIST_RANK( 1 a ) :=  0;
 LIST_RANK( a 1 ) :=  1;
 CHOOSE_VAR2(a,b) := ( LIST_RANK( a b ) ? a : b );

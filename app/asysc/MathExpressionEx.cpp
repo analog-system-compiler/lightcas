@@ -70,7 +70,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
     // ds.Append("\n\'\'\'\n");
     // ds.Print();
 
-    // Search for _getv and initialize components
+    // Find for _getv and initialize components
     pos_t pos = GetSize();
     while (pos)
     {
@@ -95,7 +95,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
       }
     }
 
-    // Search for results
+    // Find for results
     ds3.SetDebug();
     pos = GetSize();
     OP_CODE op = Pop(pos);

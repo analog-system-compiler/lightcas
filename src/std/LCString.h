@@ -47,7 +47,7 @@ public:
   virtual void Append( char c )                    { push_back( c ); }
   void SetLength( size_t n )                       { resize( n ); }
   int  Compare(  const CString& s ) const          { return compare( s ); }
-  size_t Search( char c ) const                    { return find( c ); }
+  size_t Find( char c ) const                      { return find( c ); }
   bool IsEmpty() const                             { return empty(); }
   char At( unsigned n ) const                      { return at( n ); }
   void ToLower()                                   { std::for_each( begin(), end(), ::tolower ); }

@@ -51,7 +51,7 @@ public:
   void Set( double v )                     { char buffer[32]; snprintf( buffer, sizeof( buffer ), "%.12g", v ); Copy( buffer ); }
   bool     IsEmpty() const                 { return( m_Length == 0 );  }
   unsigned GetLength() const               { return m_Length;  }
-  unsigned Search( char c ) const          { const char* s = strchr( m_Data, c ); return s ? s - m_Data : -1;  }
+  unsigned Find( char c ) const          { const char* s = strchr( m_Data, c ); return s ? s - m_Data : -1;  }
 
   int Compare( const CString& s ) const    { return Compare( m_Data, s.m_Data );  }
 
