@@ -22,10 +22,7 @@ extern int( *PUTS )( const char* );
 
 #ifdef _DEBUG
 
-#define DEBUG_LEVEL 1
-
-void TRACE( const char* s, ... );
-void TRACESTR( const char* s );
+#define DEBUG_LEVEL 2
 
 #ifdef __GNUC__
 

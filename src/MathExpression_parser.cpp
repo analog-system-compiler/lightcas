@@ -54,14 +54,14 @@ bool CMathExpression::ParseAtom(CParser &IC)
 int CMathExpression::GetLevel(CParser &IC)
 {
   int i = 0;
-  
+
   while (!IC.IsStopChar())
   {
     if (GetLevel(IC, 0))
       i++;
     else
     {
-      IC.Error(IC.GetBuffer());      
+      IC.Error(IC.GetBuffer());
       return -2; // IC.Error( CParserException::ID_ERROR_OPERATOR_EXPECTED );
     }
   }
@@ -128,7 +128,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_f
         CDisplay ds;
         ds.Clear();
         Display(ds);
-        TRACE(ds.GetBufferPtr());
+        ds.Log(LOG_DEBUG);
 #endif
         return 1;
       }
@@ -188,7 +188,7 @@ bool CMathExpression::ParseElement(CParser &IC)
       e->Display(ds);
       ds += ':';
       ds += CString(e->GetFunction()->GetParameterNb());
-      TRACE(ds.GetBufferPtr());
+      ds.Log(LOG_DEBUG);
 #endif
     }
     else
@@ -196,7 +196,7 @@ bool CMathExpression::ParseElement(CParser &IC)
       CDisplay ds;
       if (f->GetParameterNb() > (unsigned)i)
         ds = "Error: not enough parameters for: ";
-      else// if (f->GetParameterNb() < (unsigned)i)
+      else // if (f->GetParameterNb() < (unsigned)i)
         ds = "Error: too much parameters for: ";
       ds += e->GetName();
       ds += ". Expected:";

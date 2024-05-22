@@ -205,10 +205,10 @@ L1:
         {
           save_context.m_RuleDstPos = pos5;
           m_ContextStack.Push(save_context); // TODO: avoid push/pop
-          m_ContextStack.Push(save_context_new);          
+          m_ContextStack.Push(save_context_new);
           goto L1; // Do recursion
-        }        
-      }      
+        }
+      }
     }
     ReduceTree(save_context);
   }
@@ -218,7 +218,7 @@ L1:
     CDisplay ds;
     ds.Print("Simplify error:");
     Display(ds, false);
-    TRACE(ds.GetBufferPtr());
+    ds.Log(LOG_INFO);
   }
 #endif
 }
@@ -239,7 +239,7 @@ void CMathExpression::ReduceTree(const context_t &save_context)
   Move(save_context.m_Pos, pos1, pos2 - pos1);
 #if (DEBUG_LEVEL >= 1)
   Display(ds, false);
-  TRACESTR(ds.GetBufferPtr());
+  ds.Log(LOG_DEBUG);
 #endif
 }
 
@@ -445,7 +445,7 @@ bool CMathExpression::ExecuteDirective()
       ds += " == ";
       DisplayBranch(ds, pos1);
       ds.Log(LOG_INFO);
-    }    
+    }
     m_StackSize++;
     return false;
   }
@@ -467,7 +467,7 @@ bool CMathExpression::ExecuteDirective()
   if ((op3 == CElementDataBase::OP_SET) || (op3 == CElementDataBase::OP_GET) || (op3 == CElementDataBase::OP_RANK) || (op3 == CElementDataBase::OP_EVAL))
   {
     Display(ds);
-    TRACE(ds.GetBufferPtr());
+    ds.Log(LOG_DEBUG);
   }
 #endif
   return true;

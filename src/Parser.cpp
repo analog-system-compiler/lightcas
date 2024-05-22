@@ -331,7 +331,7 @@ bool CParser::LoadFromFile(const CString &name)
   file = fopen(name.GetBufferPtr(), "r");
   if (file)
   {
-    TRACE("Opening file %s", name.GetBufferPtr());
+    CDisplay::Log(LOG_INFO,"Opening file %s", name.GetBufferPtr());
 #if (DEBUG_LEVEL >= 1)
     CDisplay ds;
     ds.Append("Opening file ");

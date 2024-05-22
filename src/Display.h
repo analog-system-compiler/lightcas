@@ -30,7 +30,8 @@ typedef enum
 {
   LOG_INFO,
   LOG_WARN,
-  LOG_ERR
+  LOG_ERR,
+  LOG_DEBUG
 } log_t;
 
 class CDisplay : public CString
@@ -38,35 +39,52 @@ class CDisplay : public CString
 private:
   FILE *m_File;
   bool m_DebugMode;
+  FILE *m_DebugLogFile;
+  static char m_Buffer[2048];
 
 public:
   virtual void Print(const char *s) { puts(s); }
 
   static void Log(log_t type, const char *format, ...)
   {
-    char buffer[2048];
     va_list args;
     va_start(args, format);
-    vsnprintf(buffer, sizeof(buffer), format, args);
+    vsnprintf(m_Buffer, sizeof(m_Buffer), format, args);
     va_end(args);
-    CDisplay ds(buffer);
+    CDisplay ds(m_Buffer);
     ds.Log(type);
   }
 
   void Log(log_t type)
   {
-    Prepend(type == LOG_INFO ? CString("Info ") : type == LOG_WARN ? CString("Warning ")
-                                                                   : CString("Error "));
-    Print();
-    TRACE(GetBufferPtr());
+    if (type == LOG_DEBUG)
+    {
+      if (!m_DebugLogFile)
+      {
+        m_DebugLogFile = ::fopen("debug.log", "w+");
+      }
+
+      if (m_DebugLogFile)
+      {
+        ::fputs(GetBufferPtr(), m_DebugLogFile);
+        ::fputc('\n', m_DebugLogFile);
+      }
+    }
+    else
+    {
+      Prepend(type == LOG_INFO ? CString("Info: ") : type == LOG_WARN ? CString("Warning: ")
+                                                                      : CString("Error: "));
+
+      Print();
+    }
   }
 
   void Print()
   {
     if (m_File)
     {
-      fwrite(GetBufferPtr(), GetLength(), 1, m_File);
-      fputc('\n', m_File);
+      ::fputs(GetBufferPtr(), m_File);
+      ::fputc('\n', m_File);
     }
     else
       Print(GetBufferPtr());

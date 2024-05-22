@@ -47,7 +47,7 @@ APP_SRC = \
 	asysc/MathExpressionEx.cpp
 
 LIB_SRC = \
-    Debug.cpp \
+    Display.cpp \
 	Parser.cpp \
     Element.cpp \
     ElementDataBase.cpp \

@@ -30,7 +30,9 @@ void CElementDataBase::Check(const char *s1, const char *s2)
   CDisplay ds(true);
   CParser IC(s1);
   CMathExpression equ(this);
-  TRACE("** Check %s == %s", s1, s2);
+  
+  ds.Log(LOG_INFO,"** Check %s == %s", s1, s2);
+
   if (equ.Parse(IC))
   {
     equ.OptimizeTree();

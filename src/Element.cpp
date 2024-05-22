@@ -22,11 +22,11 @@
 #include "Function.h"
 #include "Display.h"
 
-CElement::CElement( const CString& name ) : m_Name( name )
+CElement::CElement(const CString &name) : m_Name(name)
 {
-  m_bAux   = false;
+  m_bAux = false;
   m_Global = false;
-  m_Ref    = 0;
+  m_Ref = 0;
   SetVar();
 }
 
@@ -34,16 +34,16 @@ CElement::~CElement()
 {
 #ifdef _DEBUG
   CDisplay ds;
-  ds.Append( "Unregistering : " );
-  ds.Append( m_Name );
-  TRACE( ds.GetBufferPtr() );
+  ds.Append("Unregistering : ");
+  ds.Append(m_Name);
+  ds.Log(LOG_DEBUG);
 #endif
-  CElementDataBase::UnRef( ToRef() );
+  CElementDataBase::UnRef(ToRef());
 }
 
-void CElement::Display( CDisplay& ds ) const
+void CElement::Display(CDisplay &ds) const
 {
-  ds.Append( m_Name );
+  ds.Append(m_Name);
 }
 
 void CElement::RemoveRules()
@@ -52,16 +52,16 @@ void CElement::RemoveRules()
   SetVar();
 }
 
-void CElement::SetEquation( const CMathExpression& dst )
+void CElement::SetEquation(const CMathExpression &dst)
 {
-  CMathExpression src( dst.GetElementDB() );
-  src.Init( this ); // f()
+  CMathExpression src(dst.GetElementDB());
+  src.Init(this); // f()
   RemoveRules();
-  AddFunction( src,  dst );
+  AddFunction(src, dst);
 }
 
-void CElement::AddFunction( const CMathExpression& src, const CMathExpression& dst, unsigned line_nb )
+void CElement::AddFunction(const CMathExpression &src, const CMathExpression &dst, unsigned line_nb)
 {
   SetFunct(); // to avoid function to be replaced by exp in "ConvertToRule"
-  m_Function.AddAlgebraRule( src, dst, line_nb );
+  m_Function.AddAlgebraRule(src, dst, line_nb);
 }

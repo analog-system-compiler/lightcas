@@ -256,7 +256,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
   ds += sss->m_Syntax;
   ds += " => ";
   sss->m_Equation.Display(ds);
-  TRACE(ds.GetBufferPtr());
+  ds.Log(LOG_DEBUG);
 #endif
   return true;
 }
@@ -425,7 +425,7 @@ unsigned CElementDataBase::Register(CElement *e, unsigned index)
   ds += m_Name;
   ds += '/';
   e->Display(ds);
-  TRACE(ds.GetBufferPtr());
+    ds.Log(LOG_INFO);
 #endif
 
   return n;

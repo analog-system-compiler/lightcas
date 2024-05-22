@@ -149,7 +149,7 @@ int InteractiveMode(CElementDataBase &db, const char *exe_path)
   CString root_path = CParser::GetPath(CString(exe_path));
   parser.SetRootPath(root_path);
   CDisplayEx ds((bool)ISATTY(1));
-  CElement *simplify = db.GetElement("SIMPLIFY");
+  const CElement *simplify = db.GetElement("SIMPLIFY");
   CElement *ans = db.GetElement("ans");
   OP_CODE simplify_op = simplify->ToRef();
   std::string expression_str;
