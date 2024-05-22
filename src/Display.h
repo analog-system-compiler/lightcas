@@ -39,11 +39,10 @@ class CDisplay : public CString
 private:
   FILE *m_File;
   bool m_DebugMode;
-  FILE *m_DebugLogFile;
+  static FILE *m_DebugLogFile;
   static char m_Buffer[2048];
 
 public:
-  virtual void Print(const char *s) { puts(s); }
 
   static void Log(log_t type, const char *format, ...)
   {
@@ -87,7 +86,7 @@ public:
       ::fputc('\n', m_File);
     }
     else
-      Print(GetBufferPtr());
+      ::puts((GetBufferPtr()));
   }
 
   bool StoreToFile(const CString &name)

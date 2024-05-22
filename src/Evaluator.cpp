@@ -64,8 +64,7 @@ void CEvaluator::Evaluate(unsigned size, const OP_CODE *op_code_ptr)
   unsigned n = m_FunctionArray.GetSize();
   for (unsigned pos = 0; pos < size; pos++)
   {
-    unsigned index = *op_code_ptr++;
-    m_LastOpCode = index;
+    unsigned index = *op_code_ptr++;    
 
     if (index < n)
     {
@@ -82,6 +81,7 @@ void CEvaluator::Evaluate(unsigned size, const OP_CODE *op_code_ptr)
     }
     else
     {
+      m_LastOpCode = index;
       const CValue &v = GetElementValue(index);
       Push(v.GetValue());
     }
@@ -119,7 +119,7 @@ void CEvaluator::SetElementValue(unsigned index)
 }
 
 const CValue &CEvaluator::GetElementValue(unsigned index) const
-{
+{  
   ASSERT(index < m_ElementValueArray.GetSize());
   return m_ElementValueArray.GetAt(index);
 }

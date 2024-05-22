@@ -425,7 +425,7 @@ unsigned CElementDataBase::Register(CElement *e, unsigned index)
   ds += m_Name;
   ds += '/';
   e->Display(ds);
-    ds.Log(LOG_INFO);
+  ds.Log(LOG_DEBUG);
 #endif
 
   return n;

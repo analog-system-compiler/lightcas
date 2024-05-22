@@ -28,19 +28,18 @@
 #define PATH_SEPARATOR '/'
 #endif
 
-const char CParser::m_CharTab[] =
-    {
-        /*                              \n       \r                                                      */
-        2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const char CParser::m_CharTab[] = {
+    /*                              \n       \r                                                      */
+    2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
-        /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0,
+    /*   !  "  #  $  %  &  '  (  )  *  +  ,  -  .  /  0  1  2  3  4  5  6  7  8  9  :  ;  <  =  >  ? */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0, 0, 0, 0, 0, 0,
 
-        /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
-        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1,
+    /*@  A  B  C  D  E  F  G  H  I  J  K  L  M  N  O  P  Q  R  S  T  U  V  W  X  Y  Z  [  \  ]  ^  _ */
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1,
 
-        /*   a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  {  |  }       */
-        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0};
+    /*   a  b  c  d  e  f  g  h  i  j  k  l  m  n  o  p  q  r  s  t  u  v  w  x  y  z  {  |  }       */
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0};
 
 CParser::CParser()
 {
@@ -311,6 +310,7 @@ CString CParser::GetPath(const CString &path)
   CString s;
   const char *exe_path_ptr = path.GetBufferPtr();
   const char *exe_ptr = ::strrchr(exe_path_ptr, PATH_SEPARATOR);
+
   if (exe_ptr)
   {
     s = path;
@@ -318,6 +318,7 @@ CString CParser::GetPath(const CString &path)
   }
   else
     s.Clear();
+
   return s;
 }
 
@@ -331,7 +332,7 @@ bool CParser::LoadFromFile(const CString &name)
   file = fopen(name.GetBufferPtr(), "r");
   if (file)
   {
-    CDisplay::Log(LOG_INFO,"Opening file %s", name.GetBufferPtr());
+    CDisplay::Log(LOG_INFO, "opening file %s", name.GetBufferPtr());
 #if (DEBUG_LEVEL >= 1)
     CDisplay ds;
     ds.Append("Opening file ");
@@ -356,7 +357,7 @@ bool CParser::LoadFromFile(const CString &name)
     m_LineStart = true;
     return true;
   }
-  Error(CString("failed to open file \"") + name + CString("\"") );
+  Error(CString("failed to open file \"") + name + CString("\""));
   return false;
 }
 
@@ -413,8 +414,7 @@ bool CParser::ProcessMacro()
 
 void CParser::Error(const CString &s) const
 {
-  CDisplay ds;
-  ds += s;
+  CDisplay ds(s);
   ds += " in line ";
   ds += CDisplay(GetLineNb(), 10);
   ds += " in file ";

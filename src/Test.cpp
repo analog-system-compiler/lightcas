@@ -30,7 +30,7 @@ void CElementDataBase::Check(const char *s1, const char *s2)
   CDisplay ds(true);
   CParser IC(s1);
   CMathExpression equ(this);
-  
+
   ds.Log(LOG_INFO,"** Check %s == %s", s1, s2);
 
   if (equ.Parse(IC))
@@ -77,7 +77,7 @@ void CElementDataBase::CheckSyntaxError(const char *s1)
   if (equ.Parse(IC))
   {
     CDisplay ds;
-    ds.Log(LOG_ERR,"Syntax check detected: %s", s1);
+    ds.Log(LOG_INFO,"Syntax check detected: %s", s1);
   }
 }
 
@@ -343,6 +343,7 @@ void CElementDataBase::Test()
   db.Check( "EXECUTE( f(x):=4*x; SIMPLIFY(f(z)-4*z+1) )", "f(x);1" );
   db.Check( "SIMPLIFY(f(z+z)-8*z)", "0" );
 #endif
+
   CParser IC;
   IC.SetRootPath(m_RootPath);
   if (IC.LoadFromFile(m_RootPath + CString("tests.txt")))

@@ -320,7 +320,7 @@ GET_VAR_LIST(a)        := 1;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ELEM_ID(a) := _elemid( a );
-ELEM_ID(a.b) := ELEM_ID(a)*16384+ELEM_ID(b);
+ELEM_ID(a.b) := _add( _mul( ELEM_ID(a) 16384) ELEM_ID(b) );
 LIST_RANK2( a b ) :=  _eval( _gt( a b ) );
 LIST_RANK( a b ) :=  LIST_RANK2( ELEM_ID( a ) ELEM_ID( b ) );
 LIST_RANK( 1 a ) :=  0;

@@ -17,5 +17,5 @@
 /*******************************************************************************/
 #include "Display.h"
 
-FILE * CDisplay::m_DebugLogFile=nullptr;
+FILE *CDisplay::m_DebugLogFile = nullptr;
 char CDisplay::m_Buffer[2048];

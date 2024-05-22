@@ -430,10 +430,11 @@ bool CMathExpression::ExecuteDirective()
   {
     pos_t pos1 = m_StackSize;
     pos_t pos2 = NextBranch(pos1);
-    CDisplay ds("assertion : ");
+    CDisplay ds;
     ds.SetDebug();
     if (!CompareBranch(pos1, pos2))
     {
+      ds += "assertion failure: ";
       DisplayBranch(ds, pos2);
       ds += " != ";
       DisplayBranch(ds, pos1);
@@ -441,6 +442,7 @@ bool CMathExpression::ExecuteDirective()
     }
     else
     {
+      ds += "assertion success: ";
       DisplayBranch(ds, pos2);
       ds += " == ";
       DisplayBranch(ds, pos1);
@@ -521,7 +523,7 @@ void CMathExpression::DisplayRuleMessage(const CElement *e) const
 {
   if (e->HasMessage())
   {
-    CDisplay ds;
-    ds.Print(e->GetMessage().GetBufferPtr());
+    CDisplay ds(e->GetMessage().GetBufferPtr());
+    ds.Print();
   }
 }
