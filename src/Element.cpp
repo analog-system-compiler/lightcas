@@ -34,8 +34,8 @@ CElement::~CElement()
 {
 #ifdef _DEBUG
   CDisplay ds;
-  ds.Append("Unregistering : ");
-  ds.Append(m_Name);
+  ds += "Unregistering : ";
+  ds += m_Name;
   ds.Log(LOG_DEBUG);
 #endif
   CElementDataBase::UnRef(ToRef());
@@ -43,7 +43,7 @@ CElement::~CElement()
 
 void CElement::Display(CDisplay &ds) const
 {
-  ds.Append(m_Name);
+  ds += m_Name;
 }
 
 void CElement::RemoveRules()

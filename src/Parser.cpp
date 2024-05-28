@@ -134,13 +134,13 @@ void CParser::SkipSpace()
       m_LineStart = true;
 #if (DEBUG_LEVEL >= 1)
       CDisplay ds;
-      ds.Append("# line ");
-      ds.Append(CString(m_LineNb));
-      ds.Append(" : ");
+      ds += "# line ";
+      ds += CString(m_LineNb);
+      ds += " : ";
       const char *pos = strchr(m_Pos, '\n');
       if (pos)
         ds.Append(m_Pos, pos - m_Pos);
-      ds.Log(LOG_INFO); // Can't use TRACE because of char '%'
+      ds.Log(LOG_INFO); 
 #endif
     }
     else if (isspace(c)) //\n is considered as space
@@ -332,12 +332,8 @@ bool CParser::LoadFromFile(const CString &name)
   file = fopen(name.GetBufferPtr(), "r");
   if (file)
   {
-    CDisplay::Log(LOG_INFO, "opening file %s", name.GetBufferPtr());
 #if (DEBUG_LEVEL >= 1)
-    CDisplay ds;
-    ds.Append("Opening file ");
-    ds.Append(name);
-    ds.Log(LOG_INFO);
+    CDisplay::Log(LOG_INFO, "opening file %s", name.GetBufferPtr());
 #endif
     fseek(file, 0, SEEK_END);
     size = ftell(file);

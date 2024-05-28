@@ -90,7 +90,7 @@ void CEvaluator::Evaluate(unsigned size, const OP_CODE *op_code_ptr)
   m_Value.SetValue(Pop());
   if (m_ValPos != 0)
   {
-    CDisplay::Log(LOG_ERR, "evaluation");
+    CDisplay::Log(LOG_ERR, "evaluation stack size");
   }
 }
 

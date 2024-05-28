@@ -196,10 +196,6 @@ unsigned CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &d
         dst.Replace(op, (OP_CODE)(CElementDataBase::OP_PAR0 + i));
         i++;
       }
-      else
-      {
-        //ASSERT(e->GetName() != "a");
-      }
     }
   }
   return i;

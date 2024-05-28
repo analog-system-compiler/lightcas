@@ -137,9 +137,7 @@ bool CElementDataBase::Initialize()
     }
     else
     {
-      CDisplay ds;
-      ds.Append("Error: rules description file not found.");
-      ds.Print();
+      CDisplay::Log(LOG_ERR,"rules description file not found.");
       return false;
     }
 #endif
@@ -230,7 +228,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
     if (::isalpha(c))
     {
       s.Clear();
-      s.Append(tolower(c));
+      s+=tolower(c);
       e = GetElement(s);
       ASSERT(e);
       if (e)
