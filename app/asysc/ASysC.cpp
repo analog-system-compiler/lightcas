@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     case 't':
       if (!::strcmp(optarg, "ac"))
         analysis_type = CAnalysisMode::AC_ANALYSIS;
-      else if (!strcmp(optarg, "trans"))
+      else if (!::strcmp(optarg, "trans"))
         analysis_type = CAnalysisMode::TRANS_ANALYSIS;
       continue;
     case 'c':

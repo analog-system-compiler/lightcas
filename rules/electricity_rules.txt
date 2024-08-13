@@ -16,24 +16,6 @@
 /*  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. */
 /*******************************************************************************/
 
-`symbol "a$p" UNIT_p( a )
-`symbol "a$n" UNIT_n( a )
-`symbol "a$u" UNIT_u( a )
-`symbol "a$m" UNIT_m( a )
-`symbol "a$k" UNIT_k( a )
-`symbol "a$K" UNIT_K( a )
-`symbol "a$M" UNIT_M( a )
-`symbol "a$G" UNIT_G( a )
-
-UNIT_p(a) := a * 1e-12;
-UNIT_n(a) := a * 1e-9;
-UNIT_u(a) := a * 1e-6;
-UNIT_m(a) := a * 1e-3;
-UNIT_k(a) := a * 1e3;
-UNIT_K(a) := a * 1e3;
-UNIT_M(a) := a * 1e6;
-UNIT_G(a) := a * 1e9;
-
 t := TIME();
 
 AC(a;b)       := (AC(a);AC(b));

@@ -215,8 +215,7 @@ L1:
 #if (DEBUG_LEVEL >= 1)
   if (NextBranch(m_StackSize) != 0)
   {
-    CDisplay ds;
-    ds.Print("Simplify error:");
+    CDisplay ds("Simplify error:");
     Display(ds, false);
     ds.Log(LOG_INFO);
   }

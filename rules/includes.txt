@@ -19,5 +19,6 @@
 `include <symbols.txt>
 `include <rules.txt>
 `include <matrix_vector_rules.txt>
+`include <units.txt>
 `include <electricity_rules.txt>
 
