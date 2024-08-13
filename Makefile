@@ -12,6 +12,7 @@ LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJDIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
 RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
+SRC_FILES   = $(shell find . -name *.cpp; find . -name *.h)
 
 #Compiler settings
 ifeq ($(USE_CLANG),1)
@@ -130,6 +131,9 @@ cppcheck:
 clang-tidy:
 	clang-tidy $(CPP_FILES) -- $(INCDIR)
 
+license:	
+	insert-license.exe --use-current-year --comment-style "/*| *| */" $(SRC_FILES) && sed -i -e 's|C:/msys64||' $(SRC_FILES)	
+	
 .PHONY: all clean rules archive
 .SILENT:
 #.SECONDARY:
