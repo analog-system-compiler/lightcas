@@ -17,15 +17,21 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-//Components definition
-NAME.CV(@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+SRC() };
+/********************************/
+/*  R,L,C                       */
+/********************************/
 NAME.CR(@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME.I };
 NAME.CL(@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
 NAME.CC(@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
 
-NAME.IAOP( @plus, @minus, @out, @GND ) := {
+/********************************/
+/*  Operation Amplifiers        */
+/********************************/
 
-	/* ideal AOP. Have to be used in loopback mode only */
+// Ideal Operation Amplifier
+NAME.IOPAMP( @plus, @minus, @out, @GND ) := {
+
+	/* ideal OPAMP. Have to be used in loopback mode only */
 	/* nodal equations */
 	NAME.Uout = ACROSS( @out, @GND );
 	NAME.Iout = THROUGH( @out, @GND );
@@ -38,7 +44,8 @@ NAME.IAOP( @plus, @minus, @out, @GND ) := {
 
 };
 
-NAME.AOP( @plus, @minus, @out, @GND, gain, vsat ) := { 
+//Saturated Operational Amplifier
+NAME.OPAMP( @plus, @minus, @out, @GND, gain, vsat ) := { 
 
 
 	/* nodal equations */
@@ -51,9 +58,13 @@ NAME.AOP( @plus, @minus, @out, @GND, gain, vsat ) := {
 
 };
 
-NAME.AOP( @plus, @minus, @out, @GND, gain ) := NAME.AOP( @plus, @minus, @out, @GND, gain, 10 );
-NAME.AOP( @plus, @minus, @out, @GND )       := NAME.AOP( @plus, @minus, @out, @GND, 10000, 10 );
+// Default 10V Saturated Operational Amplifier
+NAME.OPAMP( @plus, @minus, @out, @GND, gain ) := NAME.OPAMP( @plus, @minus, @out, @GND, gain, 10 );
 
+// Default 10V Saturated Operational Amplifier with defaukt gain of 10000
+NAME.OPAMP( @plus, @minus, @out, @GND )       := NAME.OPAMP( @plus, @minus, @out, @GND, 10000, 10 );
+
+// TO CHECK
 NAME.AOPV(@minus, @plus, @out, @vplus, @vminus, gain ) :=
 {
   /* nodal equations */
@@ -66,7 +77,10 @@ NAME.AOPV(@minus, @plus, @out, @vplus, @vminus, gain ) :=
   NAME.Uout = MIN( MAX( gain * NAME.Uin, 0 ), NAME.Upow )
 };
 
-//NAME.POTENTIOMETER( @1, @2, @3, value:=100, x:=0.5 )
+/********************************/
+/* Potentiometer                */
+/********************************/
+
 NAME.POTENTIOMETER( @1, @2, @3, value, x ) := { 
 
 	/* nodal equations */
@@ -107,6 +121,9 @@ NAME.MC( @1, @2, @3, @4, LA, LB ) := NAME.MC( @1, @2, @3, @4, LA, LB, 1 );
 /* current and voltages sources */
 /********************************/
 
+NAME.CV(@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+FSRC() };
+
+// Simple voltage source
 NAME.VS( @1, @2, value ) := { 
 	
 	/* nodal equations */
@@ -114,9 +131,10 @@ NAME.VS( @1, @2, value ) := {
 	NAME.I = THROUGH( @1, @2 );
 		
 	/* physical equation */
-	NAME.U = value
+	NAME.U = value+FSRC()
 };
 
+// Simple current source
 NAME.IS( @1, @2, value ) := { 
 
 	/* nodal equations */	
@@ -128,22 +146,22 @@ NAME.IS( @1, @2, value ) := {
 
 };
 
+// Simple sinus source
 NAME.VSIN( @1, @2, value, freq, phase, offset ) := { 
-
 
 	/* nodal equations */
 	NAME.U = ACROSS( @1, @2 );
 	NAME.I = THROUGH( @1, @2 );
 
 	/* physical equation */
-	NAME.U = value * SIN( 2 * PI * freq * t - phase ) + offset + SRC()
+	NAME.U = value * SIN( 2 * PI * freq * t - phase ) + offset + FSRC()
 		
 };
 
 NAME.VSIN( @1, @2, value, freq )        := NAME.VSIN( @1, @2, value, freq,     0, 0 );
 NAME.VSIN( @1, @2, value, freq, phase ) := NAME.VSIN( @1, @2, value, freq, phase, 0 );
 
-//NAME.VMOD( @1, @2, value:=1, freq1:=1, freq2:=5 )
+// Modulated signal
 NAME.VMOD( @1, @2, value, freq1, freq2 ) := { 
 
 
@@ -156,6 +174,7 @@ NAME.VMOD( @1, @2, value, freq1, freq2 ) := {
 		
 };
 
+// Slope
 NAME.VSLOPE( @1, @2, coeff, delay ) := { 
 
 	/* nodal equations */
@@ -165,44 +184,6 @@ NAME.VSLOPE( @1, @2, coeff, delay ) := {
 	/* physical equation */
 	td = t - delay;
 	NAME.U = ( td < 0 ) ? 0 : coeff * td
-
-};
-
-NAME.VSAW( @1, @2, value, duration, phase, offset ) := { 
-
-	/* nodal equations */
-	NAME.U = ACROSS( @1, @2 );
-	NAME.I = THROUGH( @1, @2 );
-
-	/* physical equation */
-	NAME.U = value * ( (t - phase) % duration ) + offset
-
-};
-
-NAME.VSAW( @1, @2, value, duration ) := NAME.VSAW( @1, @2, value, duration, 0, 0 );
-
-NAME.VPULSE( @1, @2, value, delay, duration, offset, tr, tf ) := { 
-
-	/* nodal equations */
-	NAME.U = ACROSS( @1, @2 );
-	NAME.I = THROUGH( @1, @2 );
-
-	/* physical equation */
-	NAME.U = value * 0.5 * ( TANH( ( t - delay ) / tr  ) - TANH( ( t - delay - duration ) / tf ) ) + offset
-
-};
-
-NAME.VPULSE( @1, @2, value, delay, duration ) := NAME.VPULSE( @1, @2, value, delay, duration, 0, 1n, 1n );
-
-//NAME.VSQR( @1, @2, value, freq, phase:=0, offset:=0, tr:=1n, tf:=1n )
-NAME.VSQR( @1, @2, value, freq, phase, offset, tr, tf ) := { 
-
-	/* nodal equations */
-	NAME.U = ACROSS( @1, @2 );
-	NAME.I = THROUGH( @1, @2 );
-
-	/* physical equation */
-	NAME.U = 0.5 * value * ( TANH( ( ( t - phase + 0.5 / freq )%( 1 / freq ) - 0.5 / freq ) / tr  ) - TANH( ( ( t - phase )%( 1 / freq )- 0.5 / freq ) / tf ) ) + offset
 
 };
 
@@ -217,8 +198,53 @@ NAME.VRAMP( @1, @2, @GND, min, max, rise_time, fall_time ) := {
 	NAME.val2 = ( NAME.Uout > min ) ? -fall_time : 0;
 
     DER( NAME.Uout , t) = ( NAME.Uin >= 0.5 ) ? NAME.val1 : NAME.val2
+};
+
+// Saw
+NAME.VSAW( @1, @2, value, duration, phase, offset ) := { 
+
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * ( (t - phase) % duration ) + offset
 
 };
+
+// Saw with defaut parameters
+NAME.VSAW( @1, @2, value, duration ) := NAME.VSAW( @1, @2, value, duration, 0, 0 );
+
+// Pulse
+NAME.VPULSE( @1, @2, value, delay, duration, offset, tr, tf ) := { 
+
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = value * 0.5 * ( TANH( ( t - delay ) / tr  ) - TANH( ( t - delay - duration ) / tf ) ) + offset
+
+};
+
+// Pulse with default parameters
+NAME.VPULSE( @1, @2, value, delay, duration ) := NAME.VPULSE( @1, @2, value, delay, duration, 0, 1n, 1n );
+
+// Square 
+NAME.VSQR( @1, @2, value, freq, phase, offset, tr, tf ) := { 
+
+	/* nodal equations */
+	NAME.U = ACROSS( @1, @2 );
+	NAME.I = THROUGH( @1, @2 );
+
+	/* physical equation */
+	NAME.U = 0.5 * value * ( TANH( ( ( t - phase + 0.5 / freq )%( 1 / freq ) - 0.5 / freq ) / tr  ) - TANH( ( ( t - phase )%( 1 / freq )- 0.5 / freq ) / tf ) ) + offset
+
+};
+
+// Square with default parameters
+NAME.VSQR( @1, @2, value, freq ) := NAME.VSQR( @1, @2, value, freq, 0, 0, 1n, 1n );
+
 
 /********************************/
 /* Measurement                  */
@@ -306,10 +332,10 @@ NAME.SWITCH( @1 , @2, command ) := {
 };
 
 /********************************/
-/* Non-linear components        */
+/* Diodes                       */
 /********************************/
 
-// ideal diode
+// Ideal diode
 NAME.ID( @plus, @minus ) := { 
 
     
@@ -322,7 +348,7 @@ NAME.ID( @plus, @minus ) := {
 
 };
 
-// diode
+// Real diode
 NAME.DD( @plus, @minus, ISS, UT  ) := { 
 
 	/* nodal equations */
@@ -336,7 +362,11 @@ NAME.DD( @plus, @minus, ISS, UT  ) := {
 
 NAME.DD( @plus, @minus ) := NAME.DD( @plus, @minus, 1e-15, 26e-3  );
 
-// Transistors (Ebers-Moll model)
+/********************************/
+/* NPN transistors              */
+/********************************/
+
+// NPN Transistor (Ebers-Moll model)
 NAME.NPN( @base, @collector, @emitter, beta, ISS, UT ) := {	
 
 	NAME.UBC = ACROSS( @base, @collector );
@@ -349,5 +379,6 @@ NAME.NPN( @base, @collector, @emitter, beta, ISS, UT ) := {
 	NAME.IBC = ISS * ( EXP( NAME.UBC / UT ) - EXP( NAME.UBE / UT ) + 1/beta * ( EXP( NAME.UBC / UT ) - 1 ) )
 };
 
+// Simplified NPN transistors with default parameters
 NAME.NPN( @base, @collector, @emitter, beta ) := NAME.NPN( @base, @collector, @emitter, beta, 1e-15, 26e-3 );
 NAME.NPN( @base, @collector, @emitter ) := NAME.NPN( @base, @collector, @emitter, 100 );

@@ -91,7 +91,7 @@ DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}, VSIZE({a}) ) );
 /**********************************************************************************/
 TED_MUL2( a, TED( b c ) ) := TED( a*b a*c );
 
-// TODO: give result like this {a}, {b}, {c} where c is the comatrix values, a is the unknown coefficient column and b is the source column.
+// TODO: give result like this {a}, {b}, {c} where c is the co-matrix values, a is the unknown coefficient column and b is the source column.
 /* works also
 DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( c )    }, {          e  } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
 DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( d, c ) }, { VECT_ROR(e) } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
@@ -120,7 +120,6 @@ DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d, DET_LI
 //DET_LINES( {  a,  TED( d e )  }, { f }, -1, 1 ) :=          TED_MUL2( -d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
 */
 
-//La rotation avec VECT_ROR() fait changer le signe du déterminant pour un nombre de paramètres pairs
 POLY_TED_REDUCE((a,b),v)       := POLY_TED_REDUCE1(POLY_TED_REDUCE(a,v),POLY_TED(b,v));
 POLY_TED_REDUCE(a,v)           := POLY_TED(a,v);
 
@@ -139,6 +138,7 @@ DET_LINES3({a}, {f}, m, 0) := TED(0 0);
 
 DET_LINES({a, TED(d e)}, {f}, m, n) := TED_ADD(DET_LINES3({a}, {f}, m - 1, d), TED_MUL2(VSIGN2(m), DET_LINES({VECT_ROR(a, TED(d e))}, {f}, m, n - 1)));
 DET_LINES({a, TED(d e)}, {f}, m, 1) := DET_LINES3({a}, {f}, m - 1, d);
+
 // Astuce ; avec VECT_ROR(), pas besoin de transférer l'arbre de droite vers la gauche.
 TED_TO_MATRIX(c, TED(a b)) := (TED_TO_MATRIX(c), b);
 TED_TO_MATRIX(TED(a b)) := b;
@@ -310,7 +310,6 @@ ONES(_const(a))   := ( ( a == 1 )  ? 1 : (ONES(a-1),1) );
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//CHECK_UNICITY(a)       := a; // never called
 CHECK_UNICITY(a,b)     := (a,b);
 CHECK_UNICITY(a,a)     := a;
 CHECK_UNICITY(a,1)     := a;
@@ -449,7 +448,7 @@ COMATRIX_SOLVE_COL( {    {b,c} }, {    {1,f} } ) := COMATRIX_SPLIT0( 1, f );*/
 
 ///////////////////////////////////////////////////////////////////
 // Solves with CRAMER algorithm
-//Solving both numerator and denominator {,} is maybe not a good idea because comatrixes are not the same
+//Solving both numerator and denominator {,} is maybe not a good idea because co-matrixes are not equals
 COMATRIX_SOLVE22( a )        := { COMATRIX_SOLVE23( TO_SPARSE(a) ) };
 COMATRIX_SOLVE23( {a}, {b} ) :=  COMATRIX_SOLVE24( {a}, {b}, {REMOVE_ONE(COMATRIX_GET_LIST(b))} ) ;
 COMATRIX_SOLVE24( {a}, {b}, {c} ) :=  COMATRIX_TO_TED( {a}, {b}, {c}, {c} ) ;
