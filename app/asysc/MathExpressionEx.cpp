@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include <ctype.h>
 #include "Element.h"
@@ -57,19 +55,9 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
   {
     const CAlgebraRuleArray &rule_array = e->GetFunction()->GetAlgebraRulesArray();
     Copy(rule_array.GetAt(0)->m_DstEquation);
-    // Push(e)
-
-    // ds.Append("\'\'\'\n");
-    // Display(ds);
-    // ds.Append("\n\'\'\'\n");
-    // ds.Print();
 
     OptimizeTree();
     ess->SetVar();
-    // ds.Append("\'\'\'\n");
-    // Display(ds);
-    // ds.Append("\n\'\'\'\n");
-    // ds.Print();
 
     // Find for _getv and initialize components
     pos_t pos = GetSize();
@@ -90,7 +78,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
           ds1.Append("\t\t");
           ds1.Append(ds4);
           ds1.Append(" = element('");
-          ds1.Append(ds4);
+          e->Display(ds1);
           ds1.Append("')\n");
         }
       }
@@ -115,17 +103,18 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
           ds3.Clear();
           ds4.Clear();
           pos = CMathExpression::DisplayBranch(ds3, pos);
+          pos_t pos1 = pos;
           pos = CMathExpression::DisplayBranch(ds4, pos);
 
           ds1.Append("\t\t");
           ds1.Append(ds4);
           ds1.Append(" = element('");
-          ds1.Append(ds4);
+          DisplayElement(ds1, pos1);
           ds1.Append("')\n");
 
           ds2.Append("\t\t");
           if (mode == CAnalysisMode::AC_ANALYSIS)
-          {            
+          {
             ds2.Append("self._setf(");
             ds2.Append(ds4);
             ds2.Append(",");
@@ -143,7 +132,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
         }
         else
         {
-          ds.Log(LOG_ERR,"Resolution error 1");
+          ds.Log(LOG_ERR, "Resolution error 1");
           ds.Clear();
           Display(ds);
           ds.Print();
@@ -153,7 +142,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
     }
     else
     {
-      ds.Log(LOG_ERR,"Resolution error 2");
+      ds.Log(LOG_ERR, "Resolution error 2");
       ds.Clear();
       Display(ds);
       ds.Print();
@@ -172,35 +161,37 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
   return true;
 }
 
+pos_t CMathExpressionEx::DisplayElement(CDisplay &ds, pos_t pos) const
+{
+  pos_t pos2 = pos;
+  pos = NextBranch(pos);
+  pos_t pos3 = pos;
+  while (pos3 != pos2)
+  {
+    OP_CODE op = Get(pos3);
+    if (op != m_op_getv)
+    {
+      RefToElement(op)->Display(ds);
+      if (pos3 != pos2 - 2)
+        ds += '_';
+    }
+    pos3++;
+    op = Get(pos3);
+    if (op == m_op_hier)
+      pos3++;
+  }
+  return pos;
+}
+
 pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
 {
-
-  OP_CODE op = Pop(pos);
-  if (op == m_op_hier)
+  if (Get(pos - 1) == m_op_hier)
   {
-    pos++;
-    pos_t pos2 = pos;
-    pos = NextBranch(pos);
-    pos_t pos3 = pos;
     ds += "self.";
-    while (pos3 != pos2)
-    {
-      op = Get(pos3);
-      if (op != m_op_getv)
-      {
-        RefToElement(op)->Display(ds);
-        if (pos3 != pos2 - 2)
-          ds += '_';
-      }
-      pos3++;
-      op = Get(pos3);
-      if (op == m_op_hier)
-        pos3++;
-    }
+    pos = DisplayElement(ds, pos);
   }
   else
   {
-    pos++;
     pos_t pos_array[CElementDataBase::MAX_PAR];
     const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
     for (unsigned i = 0; i < st.GetSize(); i++)

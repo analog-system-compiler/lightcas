@@ -37,6 +37,7 @@ private:
 
 public:
   bool ToPython(CDisplay &ds, CAnalysisMode mode, const char * circuit_name);
+  pos_t DisplayElement(CDisplay &ds, pos_t pos) const;
   pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const override;
   pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned priority = 0) const override;
 
