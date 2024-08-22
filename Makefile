@@ -131,8 +131,8 @@ cppcheck:
 clang-tidy:
 	clang-tidy $(CPP_FILES) -- $(INCDIR)
 
-license:	
-	insert-license.exe --use-current-year --comment-style "/*| *| */" $(SRC_FILES); sed -i -e 's|C:/msys64||' $(SRC_FILES)	
+header:	
+	insert-license --license-filepath=LICENSE --use-current-year --comment-style "/*| *| */" $(SRC_FILES); sed -i -e 's|C:/msys64||' $(SRC_FILES)	
 	
 .PHONY: all clean rules archive
 .SILENT:
