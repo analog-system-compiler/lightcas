@@ -14,6 +14,4 @@ LightCAS can:
 ## Version ##
 * Current version is alpha
 
-## Compile LightCAS ##
-* Visual Studio: open the solution file '*.sln' located into the build directory
-* gcc: use the Makefile located into the build directory
+
