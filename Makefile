@@ -14,6 +14,14 @@ RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
 SRC_FILES   = $(shell find . -name "*.cpp"; find . -name "*.h"; find . -name "*.txt")
 
+#options
+USE_CLANG   ?= 0
+USE_STD     ?= 1
+DEBUG       ?= 0
+TEST        ?= 0
+EMBED_RULES ?= 0
+GPROF       ?= 0
+
 #Compiler settings
 ifeq ($(USE_CLANG),1)
 	CXX = $(CROSS_COMPILE)clang++
@@ -24,14 +32,6 @@ else
 	LD  = $(CROSS_COMPILE)ld
 	AR  = $(CROSS_COMPILE)ar
 endif
-
-#options
-USE_CLANG   ?= 1
-USE_STD     ?= 1
-DEBUG       ?= 0
-TEST        ?= 0
-EMBED_RULES ?= 0
-GPROF       ?= 0
 
 ifeq ($(USE_STD),0)
 	INCDIR += -I$(LIB_DIR)/nostd 
