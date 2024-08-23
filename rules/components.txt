@@ -328,7 +328,7 @@ NAME.SWITCH( @1 , @2, command ) := {
 	NAME.U = ACROSS(  @1, @2 );
 	NAME.I = THROUGH( @1, @2 );
 
-    0 = ( ( command > 0.5 ) ? NAME.U : NAME.I )
+	( ( command < 0.5 ) ? NAME.I : NAME.U ) = 0
 };
 
 /********************************/
@@ -344,7 +344,7 @@ NAME.ID( @plus, @minus ) := {
 	NAME.I = THROUGH( @plus, @minus );
 		
 	/* physical equation */
-    0 = ( ( NAME.U + NAME.I ) > 0 ) ? NAME.U : NAME.I
+    ( ( ( NAME.U + NAME.I ) > 0 ) ? NAME.U : NAME.I ) = 0
 
 };
 
