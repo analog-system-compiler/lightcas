@@ -1,97 +1,99 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include "LCString.h"
 
 char const CString::m_NullString[1] = "";
 
-void CString::SetLength( unsigned len )
+void CString::SetLength(unsigned len)
 {
   m_Length = len;
-  m_Data = ( char* )realloc( m_Data, ( m_Length + 1 ) * sizeof( char ) );
-  m_Data[ len ] = '\0';
+  char *data_ptr = (char *)realloc(m_Data, (m_Length + 1) * sizeof(char));
+  if (!data_ptr)
+  {
+    free(m_Data);
+    exit(-1);
+  }
+  m_Data = data_ptr;
+  m_Data[len] = '\0';
 }
 
-void CString::Append( const char* s, unsigned i )
+void CString::Append(const char *s, unsigned i)
 {
-  if ( i != 0 )
+  if (i != 0)
   {
-    ASSERT( s != NULL );
+    ASSERT(s != NULL);
 
-    SetLength( m_Length + i );
+    SetLength(m_Length + i);
 
-    if ( i == 1 ) // char
+    if (i == 1) // char
     {
       m_Data[m_Length - 1] = *s;
     }
-    else  // string;
+    else // string;
     {
-      memcpy( &m_Data[m_Length - i], s, i * sizeof( char ) );
+      memcpy(&m_Data[m_Length - i], s, i * sizeof(char));
     }
 
     m_Data[m_Length] = '\0';
   }
 }
 
-int CString::Compare( const char* s1, const char* s2 )
+int CString::Compare(const char *s1, const char *s2)
 {
   int bcomp;
 
-  if( ( s1 == NULL ) && ( s2 == NULL ) )
+  if ((s1 == NULL) && (s2 == NULL))
   {
     bcomp = 0;
   }
-  else if( s1 == NULL )
+  else if (s1 == NULL)
   {
-    bcomp = ( *s2 == '\0' ) ? 0 : -1;
+    bcomp = (*s2 == '\0') ? 0 : -1;
   }
-  else  if( s2 == NULL )
+  else if (s2 == NULL)
   {
-    bcomp = ( *s1 == '\0' ) ? 0 : 1;
+    bcomp = (*s1 == '\0') ? 0 : 1;
   }
   else
   {
-    bcomp = strcmp( s1, s2 );
+    bcomp = strcmp(s1, s2);
   }
 
   return bcomp;
 }
 
-void CString::Set( unsigned i, unsigned base )
+void CString::Set(unsigned i, unsigned base)
 {
-  char m_Buffer[ 256 ];
-#if defined( __GNUG__ )
+  char m_Buffer[256];
+#if defined(__GNUG__)
   unsigned j;
-  unsigned k;
-  unsigned val;
 
-  j = sizeof( m_Buffer ) - 1;
-  m_Buffer[ j ] = '\0';
+  j = sizeof(m_Buffer) - 1;
+  m_Buffer[j] = '\0';
 
   do
   {
 
-    k = i / base;
-    val = i - k * base;
+    unsigned k = i / base;
+    unsigned val = i - k * base;
     i = k;
 
-    if( val < 10 )
+    if (val < 10)
     {
       val += '0';
     }
@@ -102,15 +104,13 @@ void CString::Set( unsigned i, unsigned base )
     }
 
     j--;
-    m_Buffer[ j ] = val;
+    m_Buffer[j] = val;
 
-  }
-  while( i && j );
+  } while (i && j);
 
-  Copy( m_Buffer + j );
+  Copy(m_Buffer + j);
 #else
-  _itoa_s( i, m_Buffer, base );
-  Copy( m_Buffer );
+  _itoa_s(i, m_Buffer, base);
+  Copy(m_Buffer);
 #endif
-
 }

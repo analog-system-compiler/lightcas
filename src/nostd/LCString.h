@@ -94,7 +94,7 @@ public:
   CString()                                { m_Data = NULL; m_Length = 0;  }
   CString( const char* s )                 { m_Data = NULL; Copy( s );  }
   CString( const CString& s )              { m_Data = NULL; Copy( s );  }
-  CString( int i, unsigned base = 10 )     { m_Data = NULL; Set( i, base ); }
+  CString( int i, unsigned base = 10 )     { m_Data = NULL; m_Length=0; Set( i, base ); }
   virtual ~CString()                       { Clear();  }
 
 };

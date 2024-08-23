@@ -65,7 +65,7 @@ public:
     ASSERT(m_Data != NULL);
     return m_Data[index];
   }
-  void SetAt(unsigned index, const T e)
+  void SetAt(unsigned index, const T& e)
   {
     ASSERT(index < m_Size);
     ASSERT(m_Data != NULL);

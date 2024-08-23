@@ -376,9 +376,9 @@ bool CMathExpression::ExecuteDirective()
   OP_CODE op3 = Pop(m_StackSize);
 
 #if (DEBUG_LEVEL >= 2)
-  CDisplay ds;
   if ((op3 == CElementDataBase::OP_SET) || (op3 == CElementDataBase::OP_GET) || (op3 == CElementDataBase::OP_RANK) || (op3 == CElementDataBase::OP_EVAL))
   {
+    CDisplay ds;
     ds += "Execute Command ";
     RefToElement(op3)->Display(ds);
     ds += " : ";
