@@ -376,9 +376,9 @@ bool CMathExpression::ExecuteDirective()
   OP_CODE op3 = Pop(m_StackSize);
 
 #if (DEBUG_LEVEL >= 2)
+  CDisplay ds;
   if ((op3 == CElementDataBase::OP_SET) || (op3 == CElementDataBase::OP_GET) || (op3 == CElementDataBase::OP_RANK) || (op3 == CElementDataBase::OP_EVAL))
   {
-    CDisplay ds;
     ds += "Execute Command ";
     RefToElement(op3)->Display(ds);
     ds += " : ";
@@ -430,23 +430,23 @@ bool CMathExpression::ExecuteDirective()
   {
     pos_t pos1 = m_StackSize;
     pos_t pos2 = NextBranch(pos1);
-    CDisplay ds;
-    ds.SetDebug();
+    CDisplay ds1;
+    ds1.SetDebug();
     if (!CompareBranch(pos1, pos2))
     {
-      ds += "assertion failure: ";
-      DisplayBranch(ds, pos2);
-      ds += " != ";
-      DisplayBranch(ds, pos1);
-      ds.Log(LOG_ERR);
+      ds1 += "assertion failure: ";
+      DisplayBranch(ds1, pos2);
+      ds1 += " != ";
+      DisplayBranch(ds1, pos1);
+      ds1.Log(LOG_ERR);
     }
     else
     {
-      ds += "assertion success: ";
-      DisplayBranch(ds, pos2);
-      ds += " == ";
-      DisplayBranch(ds, pos1);
-      ds.Log(LOG_INFO);
+      ds1 += "assertion success: ";
+      DisplayBranch(ds1, pos2);
+      ds1 += " == ";
+      DisplayBranch(ds1, pos1);
+      ds1.Log(LOG_INFO);
     }
     m_StackSize++;
     return false;
@@ -454,12 +454,12 @@ bool CMathExpression::ExecuteDirective()
 
   if (op3 == CElementDataBase::OP_PRINT)
   {
-    CDisplay ds;
+    CDisplay ds1;
     CMathExpression equ(m_ElementDB);
     pos_t pos = m_StackSize;
     equ.PushBranch(*this, pos);
-    equ.Display(ds);
-    ds.Print();
+    equ.Display(ds1);
+    ds1.Print();
     return false;
   }
 
