@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include <cctype>
 #include "Element.h"
@@ -95,16 +93,16 @@ bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
   return var_found;
 }
 
-int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_found)
+int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
 {
 
   char c;
   const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
   const char *char_pos = IC.GetPos();
 
-  while (precedence < st.GetSize())
+  while (index < st.GetSize())
   {
-    const char *sp = st[precedence]->m_Syntax;
+    const char *sp = st[index]->m_Syntax;
     bool check_var = !CParser::EOT(TryMatchExp(sp));
     if (check_var == var_found)
     {
@@ -116,7 +114,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_f
           if (IC.IsStopChar())
             return 2;
 
-          if (!GetLevel(IC, ::isupper(c) ? 0 : precedence + 1))
+          if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1))
             // return 2;
             goto next;
         }
@@ -124,7 +122,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_f
 
       if (CParser::EOT(*sp))
       {
-        Push(st[precedence]->m_Equation.GetLastOperator());
+        Push(st[index]->m_Equation.GetLastOperator());
 #if (DEBUG_LEVEL >= 3)
         CDisplay ds;
         ds.Clear();
@@ -136,7 +134,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &precedence, bool var_f
     }
   next:
     IC.SetPos(char_pos);
-    precedence++;
+    index++;
   }
 
   return 0;

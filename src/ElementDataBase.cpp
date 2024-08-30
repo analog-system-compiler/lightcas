@@ -96,6 +96,7 @@ CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent
   m_Evaluator = eval;
   m_SecureLimit = 0;
   m_Error = false;
+  m_Precedence = 0;
 
   if (parent)
   {
@@ -222,9 +223,9 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
   sss->m_Equation.ParseElement(IC);
 
   const char *sp = IC.GetSymbolBuffer().GetBufferPtr();
-  i = 0;
+  i = 0;  
   c = *sp++;
-  while (c && (i < sizeof(sss->m_Syntax) - 1))
+  while (c && !isspace(c) && (i < sizeof(sss->m_Syntax) - 1))
   {
     if (::isalpha(c))
     {
@@ -237,13 +238,13 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
         src_equ.Push(e);
       }
     }
-    if (!isspace(c))
-    {
-      sss->m_Syntax[i++] = c;
-    }
+    sss->m_Syntax[i++] = c;
     c = *sp++;
   }
   sss->m_Syntax[i] = '\0';
+  sss->m_Precedence = m_Precedence;
+  while (c && isspace(c)) c = *sp++;
+  if(c=='+') m_Precedence++;  
   CMathExpression::ConvertToRule(src_equ, sss->m_Equation);
   m_SymbolSyntaxArray.Append(sss);
 

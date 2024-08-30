@@ -181,6 +181,7 @@ public:
 
 struct CSymbolSyntaxStruct
 {
-  char m_Syntax[8];
+  char m_Syntax[9];
+  unsigned char m_Precedence;
   CMathExpression m_Equation;
 };

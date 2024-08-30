@@ -102,7 +102,7 @@ $(APP_DIR)/Rules_concat.txt: $(RULE_FILES)
 	cat $^ > $@
 
 $(APP_DIR)/%.ztxt: $(APP_DIR)/%.txt
-	cp $^ $@
+	cp $< $@
 	echo -e '\0' >> $@
 
 $(OBJ_DIR)/%.o: $(APP_DIR)/%.ztxt

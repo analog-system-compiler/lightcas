@@ -49,6 +49,7 @@ protected:
   CEvaluator*               m_Evaluator;
   unsigned                  m_SearchStart;
   bool                      m_Error;
+  unsigned char             m_Precedence;
   static unsigned           m_SecureLimit;
   static CElementArray      m_ElementRefArray;
   static CSymbolSyntaxArray m_SymbolSyntaxArray;
