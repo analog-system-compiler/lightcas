@@ -1,0 +1,40 @@
+Assignments:
+    a:=5
+    a:=b
+
+Simplifications:
+    a:=5
+    b:=a
+
+Supported operators:
+a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!
+
+Supported functions:
+MIN MAX MOD BOOL LNOT SIN COS TAN ASIN ACOS ATAN SINH COSH TANH ASINH ACOSH ATANH EXP LOG LOG10 SQRT SQR ABS FLOOR CEIL RAND
+
+Fonction definition:
+    f(x):=SIN(x)
+
+Derivatives:
+    DER(SIN(x),x)
+
+Taylor series:
+    TAYLOR(COS(x),x,0,1)
+
+Vectors:
+    Addition       : {a,b}+{5,6}
+    Substraction   : {a,b}-{5,6}
+
+Solving:
+    SOLVE(x-2,x)
+    SOLVE(x^2-2*x+4,x)
+    SOLVE({x-y+1,x-y+1},{x,y})
+
+Complex numbers:
+    IM(x+j*y)
+    RE(x+j*y)
+
+Conversion:
+    0b1110
+    0xABCE
+

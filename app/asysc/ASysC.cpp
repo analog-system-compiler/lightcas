@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include <cstdio>
 #include <cstring>
@@ -25,6 +23,8 @@
 #include "Element.h"
 #include "DisplayEx.h"
 #include "MathExpressionEx.h"
+
+extern const char help_txt[] asm("_binary_app_asysc_Help_ztxt_start");
 
 // #define _TEST
 typedef enum
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 
   CEvaluator eval;
   CElementDataBase db_root("Root", NULL, &eval, argv[0]);
-  if(!db_root.Initialize())
+  if (!db_root.Initialize())
     return -1;
   CElementDataBase db("User", &db_root);
 
@@ -217,45 +217,5 @@ int InteractiveMode(CElementDataBase &db, const char *exe_path)
 
 void Help()
 {
-  std::cout << "Help\n"
-               "----\n"
-               "Assignments:\n"
-               "  a:=5\n"
-               "  a:=b\n"
-               "\n"
-               "Simplifications:\n"
-               "  a:=5\n"
-               "  b:=a\n"
-               "\n"
-               "Supported operators:\n"
-               "a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!\n"
-               "\n"
-               "Supported functions:\n"
-               "MIN MAX MOD BOOL LNOT SIN COS TAN ASIN ACOS ATAN SINH COSH TANH ASINH ACOSH ATANH EXP LOG LOG10 SQRT SQR ABS FLOOR CEIL RAND"
-               "\n"
-               "Fonction definition:\n"
-               "  f(x):=SIN(x)\n"
-               "\n"
-               "Derivatives:\n"
-               "  DER(SIN(x),x)\n"
-               "\n"
-               "Taylor series:\n"
-               "  TAYLOR(COS(x),x,0,1)\n"
-               "\n"
-               "Vectors:\n"
-               "  Addition       : {a,b}+{5,6}\n"
-               "  Substraction   : {a,b}-{5,6}\n"
-               "\n"
-               "Solving:\n"
-               "  SOLVE(x-2,x)\n"
-               "  SOLVE(x^2-2*x+4,x)\n"
-               "  SOLVE({x-y+1,x-y+1},{x,y})\n"
-               "\n"
-               "Complex numbers:\n"
-               "  IM(x+j*y)\n"
-               "  RE(x+j*y)\n"
-               "\n"
-               "Conversion:\n"
-               "  0b1110\n"
-               "  0xABCE\n";
+  std::cout << help_txt;
 }

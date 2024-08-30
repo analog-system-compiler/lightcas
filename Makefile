@@ -5,10 +5,10 @@ EXE         = asysc
 LIB_DIR     = src
 APP_DIR     = app
 RULES_DIR   = rules
-OBJDIR      = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
+OBJ_DIR     = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
 LIB         = lib$(EXE).a
-EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJDIR)/%.o)
-LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJDIR)/%.o)
+EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
+LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
 RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
@@ -79,9 +79,10 @@ ifeq ($(TEST),1)
 	CPPFLAGS += -D_TEST
 endif
 
+LIB_OBJS += $(OBJ_DIR)/asysc/Help.o
 ifeq ($(EMBED_RULES),1)
 	CPPFLAGS += -DEMBED_RULES
-	LIB_OBJS += $(OBJDIR)/Rules.o
+	LIB_OBJS += $(OBJ_DIR)/Rules_concat.o
 endif
 
 all: $(EXE) rules
@@ -89,18 +90,22 @@ all: $(EXE) rules
 -include $(LIB_OBJS:.o=.d)
 -include $(EXE_OBJ:.o=.d)
 
-$(OBJDIR)/%.o: $(APP_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(APP_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(OBJDIR)/%.o: $(LIB_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(LIB_DIR)/%.cpp
 	echo 'Compiling  $(notdir $< )'
 	$(CXX) $(CPPFLAGS) -c $< -o $@
 
-$(OBJDIR)/rules_tmp.txt : $(RULE_FILES)
-	printf "%s\0" "$$(cat $^)" > $@
+$(APP_DIR)/Rules_concat.txt: $(RULE_FILES)
+	cat $^ > $@
 
-$(OBJDIR)/Rules.o: $(OBJDIR)/rules_tmp.txt
+$(APP_DIR)/%.ztxt: $(APP_DIR)/%.txt
+	cp $^ $@
+	echo -e '\0' >> $@
+
+$(OBJ_DIR)/%.o: $(APP_DIR)/%.ztxt
 	echo 'Packaging  $(notdir $< )'	
 	$(LD) -r -b binary $< -o $@
 
@@ -120,7 +125,7 @@ endif
 
 clean:
 	@echo 'Cleaning  ...'
-	rm -rf $(LIB) $(EXE) $(OBJDIR)
+	rm -rf $(LIB) $(EXE) $(OBJ_DIR)
 
 archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
