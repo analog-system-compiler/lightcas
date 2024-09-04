@@ -185,7 +185,7 @@ pos_t CMathExpressionEx::DisplayElement(CDisplay &ds, pos_t pos) const
   return pos;
 }
 
-pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
+pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned char precedence) const
 {
   if (Get(pos - 1) == m_op_hier)
   {
@@ -221,13 +221,13 @@ pos_t CMathExpressionEx::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precede
   return pos;
 }
 
-pos_t CMathExpressionEx::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority) const
+pos_t CMathExpressionEx::DisplayBranch(CDisplay &ds, pos_t pos, unsigned char precedence) const
 {
   const CElement *e;
   unsigned pos2;
 
   ASSERT(pos);
-  pos2 = DisplaySymbol(ds, pos, priority);
+  pos2 = DisplaySymbol(ds, pos, precedence);
 
   if (pos == pos2) // no symbol displayed
   {

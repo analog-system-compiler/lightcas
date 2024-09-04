@@ -38,8 +38,8 @@ private:
 public:
   bool ToPython(CDisplay &ds, CAnalysisMode mode, const char * circuit_name);
   pos_t DisplayElement(CDisplay &ds, pos_t pos) const;
-  pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const override;
-  pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned priority = 0) const override;
+  pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const override;
+  pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const override;
 
 public:
   CMathExpressionEx(CElementDataBase *edb = NULL) : CMathExpression(edb), m_op_hier(CElementDataBase::OP_NONE), m_op_getv(CElementDataBase::OP_NONE) {};

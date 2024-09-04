@@ -24,7 +24,7 @@
 #include "DisplayEx.h"
 #include "MathExpressionEx.h"
 
-extern const char help_txt[] asm("_binary_app_asysc_Help_ztxt_start");
+extern const char help_txt[] asm("_binary_objs_asysc_Help_ztxt_start");
 
 // #define _TEST
 typedef enum

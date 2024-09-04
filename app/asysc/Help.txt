@@ -19,7 +19,7 @@ Derivatives:
     DER(SIN(x),x)
 
 Taylor series:
-    TAYLOR(COS(x),x,0,1)
+    TAYLOR(COS(x),x,0,10)
 
 Vectors:
     Addition       : {a,b}+{5,6}

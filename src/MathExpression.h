@@ -126,9 +126,9 @@ protected:
   }
 
   // Display funct
-  virtual pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
-  virtual pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned priority = 0) const;
-  void DisplaySymbolString(const char *sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay &ds) const;
+  virtual pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const;
+  virtual pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const;
+  void DisplaySymbolString(const char *sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned char precedence, CDisplay &ds) const;
 
 public:
   void Initialize(CElementDataBase *db);

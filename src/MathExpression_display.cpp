@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include <cctype>
 #include "Element.h"
@@ -46,13 +44,13 @@ void CMathExpression::Display(CDisplay &ds, bool bAll) const
   }
 }
 
-pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority) const
+pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned char precedence) const
 {
   const CElement *e;
   unsigned pos2;
 
   ASSERT(pos);
-  pos2 = DisplaySymbol(ds, pos, priority);
+  pos2 = DisplaySymbol(ds, pos, precedence);
 
   if (pos == pos2) // no symbol displayed
   {
@@ -92,7 +90,7 @@ pos_t CMathExpression::DisplayBranch(CDisplay &ds, pos_t pos, unsigned priority)
   return pos;
 }
 
-pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedence) const
+pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned char index) const
 {
   pos_t pos_array[CElementDataBase::MAX_PAR];
 
@@ -104,16 +102,16 @@ pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedenc
     if (pos1 != pos)
     {
       const char *sp = ss->m_Syntax;
-
-      if ((i < precedence) || (ds.IsDebug() && (i == precedence)) )
+      unsigned char precedence = ss->m_Precedence;
+      if ((precedence < index) || (ds.IsDebug() && (precedence == index)))
       {
         ds += '(';
-        DisplaySymbolString(sp, pos_array, i, ds);
+        DisplaySymbolString(sp, pos_array, precedence, ds);
         ds += ')';
       }
       else
       {
-        DisplaySymbolString(sp, pos_array, i, ds);
+        DisplaySymbolString(sp, pos_array, precedence, ds);
       }
       pos = pos1;
       break;
@@ -122,11 +120,11 @@ pos_t CMathExpression::DisplaySymbol(CDisplay &ds, pos_t pos, unsigned precedenc
   return pos;
 }
 
-void CMathExpression::DisplaySymbolString(const char *sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned precedence, CDisplay &ds) const
+void CMathExpression::DisplaySymbolString(const char *sp, pos_t pos_array[CElementDataBase::MAX_PAR], unsigned char precedence, CDisplay &ds) const
 {
   char c;
   unsigned i;
-  unsigned precedence2;
+  unsigned char precedence2;
 
   while ((c = *sp++))
   {
@@ -140,6 +138,8 @@ void CMathExpression::DisplaySymbolString(const char *sp, pos_t pos_array[CEleme
       {
         precedence--;
       }
+      else
+        ASSERT(false);
     }
     else if ((c == CParser::m_OperatorExclude) || (c == CParser::m_OperatorAlpha))
     {

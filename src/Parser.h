@@ -71,11 +71,12 @@ public:
   void  Error(const CString& s) const;
   bool  ProcessMacro();
   int   GetQuotes();
+  int   GetInt(int base = 10 )                     { return (int)strtol ( m_Pos, (char **)&m_Pos, base ); }
   const CString& GetWord();
-  const CString& GetBuffer() const                 { return m_Buffer;  }
-  const CString& GetSymbolBuffer() const           { return m_SymbolBuffer; }
+  const CString& GetBuffer() const                 { return m_Buffer;         }
+  const CString& GetSymbolBuffer() const           { return m_SymbolBuffer;   }
   const CString& GetFileName() const               { return m_FileName;       }
-  char  GetChar() const                            { return( *m_Pos ); }
+  char  GetChar() const                            { return( *m_Pos );        }
   void  CopyBuffer( const char s[], unsigned len ) { m_Buffer.Copy( s, len ); }
   void  CopyBuffer( const CString& s )             { m_Buffer = s;            }
   unsigned  GetLineNb() const                      { return m_LineNb;         }  

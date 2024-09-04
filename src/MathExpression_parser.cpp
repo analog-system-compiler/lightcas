@@ -147,7 +147,6 @@ bool CMathExpression::ParseElement(CParser &IC)
   int i = 0;
   bool is_funct = false;
 
-  ASSERT(IC.IsWord());
   e = m_ElementDB->GetElement(IC.GetWord());
 
   if (!e)

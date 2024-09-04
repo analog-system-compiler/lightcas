@@ -28,7 +28,7 @@ CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;
 unsigned CElementDataBase::m_SecureLimit;
 
 #ifdef EMBED_RULES
-extern const char embedded_rules_txt[] asm("_binary_app_Rules_concat_ztxt_start");
+extern const char embedded_rules_txt[] asm("_binary_objs_Rules_concat_ztxt_start");
 #endif
 
 const SProperties CElementDataBase::m_FunctionProperties[] =
@@ -220,8 +220,8 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
 
   sss = new CSymbolSyntaxStruct();
   sss->m_Equation.Initialize(this);
-  sss->m_Equation.ParseElement(IC);
-
+  sss->m_Precedence = (unsigned char)IC.GetInt();  
+  sss->m_Equation.ParseElement(IC);  
   const char *sp = IC.GetSymbolBuffer().GetBufferPtr();
   i = 0;  
   c = *sp++;
@@ -241,10 +241,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
     sss->m_Syntax[i++] = c;
     c = *sp++;
   }
-  sss->m_Syntax[i] = '\0';
-  sss->m_Precedence = m_Precedence;
-  while (c && isspace(c)) c = *sp++;
-  if(c=='+') m_Precedence++;  
+  sss->m_Syntax[i] = '\0';  
   CMathExpression::ConvertToRule(src_equ, sss->m_Equation);
   m_SymbolSyntaxArray.Append(sss);
 
