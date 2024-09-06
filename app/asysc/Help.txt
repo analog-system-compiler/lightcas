@@ -28,7 +28,7 @@ Vectors:
 Solving:
     SOLVE(x-2,x)
     SOLVE(x^2-2*x+4,x)
-    SOLVE({x-y+1,x-y+1},{x,y})
+    SOLVE({x-y+1,x+y-5},{x,y})
 
 Complex numbers:
     IM(x+j*y)

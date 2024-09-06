@@ -84,6 +84,7 @@ SYSTEM_AUTO_SOLVE2({a},{c})    := SYSTEM_AUTO_SOLVE3({a}); //end
 //entry points
 SOLVE(a=b,v)                   := SOLVE(a-b,v);
 SOLVE(a,v)                     := SOLVE2(POLY_TED(a v));
+SOLVE({a},{v})                 := SYSTEM_SOLVE({a},{v});
 
 //Anciennes fonctions toujours OK
 SYSTEM_SOLVE_LEGACY({a},{x})   := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
