@@ -17,52 +17,62 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-POLY_TED((a,b),v)   := (POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(a+b,v)     := TED_ADD(POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(a-b,v)     := TED_SUB(POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(a*b,v)     := TED_MUL(POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(a/b,v)     := TED_DIV(POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(a^b,v)     := TED_POW(POLY_TED(a,v),POLY_TED(b,v));
-POLY_TED(-a,v)      := TED_NEG(POLY_TED(a,v));
-POLY_TED(v,v)       := TED(1 0);
-POLY_TED(a,v)       := TED(0 a);
+POLY_TED((a,b) v)   := (POLY_TED(a v),POLY_TED(b v));
+POLY_TED(a+b v)     := TED_ADD(POLY_TED(a v) POLY_TED(b v));
+POLY_TED(a-b v)     := TED_SUB(POLY_TED(a v) POLY_TED(b v));
+POLY_TED(a*b v)     := TED_MUL(POLY_TED(a v) POLY_TED(b v));
+POLY_TED(a/b v)     := TED_DIV(POLY_TED(a v) POLY_TED(b v));
+POLY_TED(a^b v)     := TED_POW(POLY_TED(a v) POLY_TED(b v));
+POLY_TED(-a v)      := TED_NEG(POLY_TED(a v));
+POLY_TED(v v)       := TED(1 0);
+POLY_TED(a v)       := TED(0 a);
 
-TED_ADD(TED(a b),TED(c d)) := TED( a+c b+d );
-TED_SUB(TED(a b),TED(c d)) := TED( a-c b-d );
-TED_MUL(TED(a b),TED(c d)) := TED( TED(a*c b*c+a*d) b*d ); 
-TED_DIV(TED(a b),TED(0 d)) := TED( a/d b/d );
-TED_DIV(TED(a b),TED(c d)) := ERROR(8);
-TED_POW(TED(a b),TED(0 1)) := TED(a b);
-TED_POW(TED(a b),TED(0 0)) := TED(0 1);
-TED_POW(TED(a b),TED(c d)) := ERROR(10);
-TED_NEG(TED(a b))          := TED( 0-a 0-b );
-TED_POW(TED(a b),TED(0 _const(d))) := TED_MUL(TED(a b),TED_POW(TED(a b),TED(0 d-1)));
+TED_ADD(TED(a b) TED(c d)) := TED( TED_ADD(a c) b+d );
+TED_SUB(TED(a b) TED(c d)) := TED( TED_SUB(a c) b-d );
+TED_MUL(TED(a b) TED(c d)) := TED( TED_ADD( TED( TED_MUL(a c) 0 ) TED_ADD( TED_MUL(b c) TED_MUL(a d) ) ) b*d ); 
+TED_DIV(TED(a b) TED(0 d)) := TED( a/d b/d );
+TED_DIV(TED(a b) TED(c d)) := ERROR(8);
+TED_POW(TED(a b) TED(c d)) := ERROR(10);
+TED_POW(TED(a b) TED(0 1)) := TED(a b);
+TED_POW(TED(a b) TED(0 0)) := TED(0 1);
+TED_POW(TED(a b) TED(0 _const(d))) := TED_MUL(TED(a b) TED_POW(TED(a b) TED(0 d-1)));
+TED_NEG(TED(a b))          := TED( (-a) (-b) );
+
+TED_MUL(TED(a b) c ) := TED( TED_MUL(a c) b*c ); 
+TED_MUL(c  TED(a b) ):= TED( TED_MUL(c a) c*b ); 
+TED_MUL(a  b)        := TED( 0  a*b ); 
+TED_ADD(TED(a b)  c ):= TED( a  b+c ); 
+TED_ADD(c TED(a b) ) := TED( a  c+b ); 
+TED_ADD(a b)         := TED( 0  a+b ); 
+TED_SUB(TED(a b) c ) := TED( a  b-c ); 
+TED_SUB(c TED(a b) ) := TED( a  c-b ); 
+TED_SUB(a b)         := TED( 0  a-b ); 
 
 TED( TED( 0 a ) b ) := TED( a b );
 
 IPOLY_TED((a,b),v)             := (IPOLY_TED(a,v),IPOLY_TED(b,v)); //parenthesis are important there!!!
 IPOLY_TED(TED(a b),v)          := a*v+b;
 
-REDUCE(    TED(a b),TED(0 d))  := (TED(a b), TED(0 d));
-REDUCE(    TED(0 b),TED(c d))  := (TED(c d), TED(0 b));
-REDUCE(    TED(a b),TED(c d))  := (TED(c d), TED(0 c*b-d*a));
-REDUCE( e, TED(a b),TED(0 d))  := (REDUCE( e, TED(a b)), TED(0 d));
-REDUCE( e, TED(0 b),TED(c d))  := (REDUCE( e, TED(c d)), TED(0 b));
-REDUCE( e, TED(a b),TED(c d))  := (REDUCE( e, TED(c d)), TED(0 c*b-d*a));
+REDUCE(    TED(a b), TED(0 d))  := (TED(a b), TED(0 d));
+REDUCE(    TED(0 b), TED(c d))  := (TED(c d), TED(0 b));
+REDUCE(    TED(a b), TED(c d))  := (TED(c d), TED(0 c*b-d*a));
+REDUCE( e, TED(a b), TED(0 d))  := (REDUCE( e, TED(a b)), TED(0 d));
+REDUCE( e, TED(0 b), TED(c d))  := (REDUCE( e, TED(c d)), TED(0 b));
+REDUCE( e, TED(a b), TED(c d))  := (REDUCE( e, TED(c d)), TED(0 c*b-d*a));
 
 SOLVE2(TED(TED(a b) c)/e)      := SOLVE2(TED(TED(a b) c));
 SOLVE2(TED(TED(a b) c))        := { SIMPLIFY((-b-SQRT(b^2-4*a*c))/(2*a)), SIMPLIFY((-b+SQRT(b^2-4*a*c))/(2*a)) };
 SOLVE2(TED(a b)/e)             := SOLVE2(TED(a b));
 SOLVE2(TED(a b))               := -b/a;
 
-SYSTEM_SOLVE3({a},{x,y})       := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(POLY_TED(a,y)),y)},{x});
-SYSTEM_SOLVE3({a},{x})         := IPOLY_TED(REDUCE(POLY_TED(a,x)),x);
+SYSTEM_SOLVE3({a},{x,y})       := SYSTEM_SOLVE3({IPOLY_TED(REDUCE(POLY_TED(a y)),y)},{x});
+SYSTEM_SOLVE3({a},{x})         := IPOLY_TED(REDUCE(POLY_TED(a x)),x);
 
 SYSTEM_SOLVE4({a,b},{x,y})     := (SYSTEM_SOLVE4({a},{x}),SYSTEM_SOLVE4({b},{y}));
 SYSTEM_SOLVE4({a},{x})         := SOLVE(a,x);
 
 POLY_NORM(TED(a b),v)          := (v=-b/a);
-VECTOR_NORM(a,b)               := POLY_NORM(POLY_TED(a,b),b);
+VECTOR_NORM(a,b)               := POLY_NORM(POLY_TED(a b),b);
 
 SYSTEM_NORM({a,b})             := (SYSTEM_NORM({a}),SYSTEM_NORM({b}));
 SYSTEM_NORM({a})               := VECTOR_NORM(a,GETVAR(a));
@@ -73,11 +83,11 @@ SYSTEM_AUTO_SOLVE2({a},{c})    := SYSTEM_AUTO_SOLVE3({a}); //end
 
 //entry points
 SOLVE(a=b,v)                   := SOLVE(a-b,v);
-SOLVE(a,v)                     := SOLVE2(POLY_TED(a,v));
+SOLVE(a,v)                     := SOLVE2(POLY_TED(a v));
 
 //Anciennes fonctions toujours OK
-SYSTEM_SOLVE_LEGACY({a},{x})          := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
-SYSTEM_AUTO_SOLVE_LEGACY({a})         := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
+SYSTEM_SOLVE_LEGACY({a},{x})   := {SYSTEM_SOLVE4({SYSTEM_SOLVE3({a},{x})},{x})};
+SYSTEM_AUTO_SOLVE_LEGACY({a})  := {SYSTEM_NORM({SYSTEM_AUTO_SOLVE2({a},{a})})};
 
 VECT_TO_LIST(a;b) := (VECT_TO_LIST(a),b);
 VECT_TO_LIST(a)   := a;
@@ -89,39 +99,41 @@ TED_1( TED( a b ) ) := a;
 DET({a}, {b}) := TED_1( DET_LINES2( {a}, {b}, VSIZE({a}) ) );
 
 /**********************************************************************************/
-TED_MUL2( a, TED( b c ) ) := TED( a*b a*c );
+//Faster functs for matrix resolution
+TED_MUL2( a       TED( b c ) ) := TED( a*b a*c );
+TED_ADD2(TED(a b) TED( c d ) ) := TED( a+c b+d );
 
 // TODO: give result like this {a}, {b}, {c} where c is the co-matrix values, a is the unknown coefficient column and b is the source column.
 /* works also
-DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( c )    }, {          e  } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
-DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX( d, c ) }, { VECT_ROR(e) } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
-DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a , DET_LINES2( {TED_TO_MATRIX(    c ) }, { VECT_ROR(e) } ) );
+DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a  DET_LINES2( {TED_TO_MATRIX( c )    }, {          e  } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
+DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a  DET_LINES2( {TED_TO_MATRIX( d, c ) }, { VECT_ROR(e) } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
+DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a  DET_LINES2( {TED_TO_MATRIX(    c ) }, { VECT_ROR(e) } ) );
 */
 
 // Normal case
 // DET_LINES( { {    TED( a b ) }        }, { c } ) := TED( a b );
-// DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( { ( TED_TO_MATRIX(              c   ) ) }, { e } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
-// DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a , DET_LINES2( { VECT_ROR( TED_TO_MATRIX( ( d, c ) ) ) }, { e } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
-// DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a , DET_LINES2( { VECT_ROR( TED_TO_MATRIX( (    c ) ) ) }, { e } ) );
+// DET_LINES( { { c, TED( a b ) }        }, { e } ) := TED_SUB( TED_MUL2( a  DET_LINES2( { ( TED_TO_MATRIX(              c   ) ) }, { e } ) ), DET_LINES( { { c }, {     TED( a b ) } }, { e } ) );
+// DET_LINES( { { c, TED( a b ) }, { d } }, { e } ) := TED_SUB( TED_MUL2( a  DET_LINES2( { VECT_ROR( TED_TO_MATRIX( ( d, c ) ) ) }, { e } ) ), DET_LINES( { { c }, { d , TED( a b ) } }, { e } ) );
+// DET_LINES( { {    TED( a b ) }, { c } }, { e } ) :=          TED_MUL2( a  DET_LINES2( { VECT_ROR( TED_TO_MATRIX( (    c ) ) ) }, { e } ) );
 
 // //Optimisation
 // DET_LINES( { { c, TED( 0 b ) }        }, { e } ) := TED_NEG( DET_LINES( { { c }, {     TED( 0 b ) } }, { e } ) );
 // DET_LINES( { { c, TED( 0 b ) }, { d } }, { e } ) := TED_NEG( DET_LINES( { { c }, { d , TED( 0 b ) } }, { e } ) );
 // DET_LINES( { {    TED( 0 b ) }, { c } }, { e } ) := TED( 0 0 );
 
-//DET_LINES( {  a,  TED( d e )  }, { f }, n ) := TED_ADD( TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), TED_MUL2( -((n-(n/2)*2)*4-1), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
-//DET_LINES( {  a,  TED( d e )  }, { f }, 1 ) :=          TED_MUL2( d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+//DET_LINES( {  a,  TED( d e )  }, { f }, n ) := TED_ADD2( TED_MUL2( d DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), TED_MUL2( -((n-(n/2)*2)*4-1) DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, n - 1 ) ) );
+//DET_LINES( {  a,  TED( d e )  }, { f }, 1 ) :=          TED_MUL2( d DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
 
 /* OK 3x3
-DET_LINES2( {a}, { c    } ) := POLY_TED( a, c );
-DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a, d ) }, { c }, 1, VSIZE( {a}) );
-DET_LINES( {  a,  TED( d e )  }, { f }, g, n ) := TED_ADD( TED_MUL2(   d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, -g, n - 1 ) );
-DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
-//DET_LINES( {  a,  TED( d e )  }, { f }, -1, 1 ) :=          TED_MUL2( -d, DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+DET_LINES2( {a}, { c    } ) := POLY_TED( a c );
+DET_LINES2( {a}, { c, d } ) := DET_LINES( { POLY_TED( a d ) }, { c }, 1, VSIZE( {a}) );
+DET_LINES( {  a,  TED( d e )  }, { f }, g, n ) := TED_ADD2( TED_MUL2(   d DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) ), DET_LINES( { VECT_ROR( a, TED( d e ) ) }, { f }, -g, n - 1 ) );
+DET_LINES( {  a,  TED( d e )  }, { f }, g, 1 ) :=          TED_MUL2( g*d DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
+//DET_LINES( {  a,  TED( d e )  }, { f }, -1, 1 ) :=          TED_MUL2( -d DET_LINES2( { TED_TO_MATRIX( a ) }, { f } ) );
 */
 
-POLY_TED_REDUCE((a,b),v)       := POLY_TED_REDUCE1(POLY_TED_REDUCE(a,v),POLY_TED(b,v));
-POLY_TED_REDUCE(a,v)           := POLY_TED(a,v);
+POLY_TED_REDUCE((a,b),v)       := POLY_TED_REDUCE1(POLY_TED_REDUCE(a,v),POLY_TED(b v));
+POLY_TED_REDUCE(a,v)           := POLY_TED(a v);
 
 POLY_TED_REDUCE1(a,TED(0 0))   := TED(0 0);
 POLY_TED_REDUCE1(TED(0 0),b)   := TED(0 0);
@@ -133,10 +145,10 @@ DET_LINES2({a}, {c, d}, m) := DET_LINES4({POLY_TED_REDUCE(a, d)}, {c}, m ); // V
 DET_LINES4({a},          {c}, m ) := DET_LINES({a}, {c}, m, m);
 DET_LINES4({TED( 0 0 )}, {c}, m ) := TED( 0 0 );
 
-DET_LINES3({a}, {f}, m, d) := TED_MUL2(d, DET_LINES2({TED_TO_MATRIX(a)}, {f}, m));
+DET_LINES3({a}, {f}, m, d) := TED_MUL2(d DET_LINES2({TED_TO_MATRIX(a)}, {f}, m));
 DET_LINES3({a}, {f}, m, 0) := TED(0 0);
 
-DET_LINES({a, TED(d e)}, {f}, m, n) := TED_ADD(DET_LINES3({a}, {f}, m - 1, d), TED_MUL2(VSIGN2(m), DET_LINES({VECT_ROR(a, TED(d e))}, {f}, m, n - 1)));
+DET_LINES({a, TED(d e)}, {f}, m, n) := TED_ADD2(DET_LINES3({a}, {f}, m - 1, d) TED_MUL2(VSIGN2(m) DET_LINES({VECT_ROR(a, TED(d e))}, {f}, m, n - 1)));
 DET_LINES({a, TED(d e)}, {f}, m, 1) := DET_LINES3({a}, {f}, m - 1, d);
 
 // Astuce ; avec VECT_ROR(), pas besoin de transférer l'arbre de droite vers la gauche.
@@ -366,7 +378,7 @@ TO_SPARSE_SPLIT2(           (c, d) ) := (  {c},  {d});
 
 // Process one line
 TO_SPARSE_LINE(a)  := TO_SPARSE_LINE3( a, GET_VAR2(a) );
-TO_SPARSE_LINE3( a, b ) := TO_SPARSE_LINE2( POLY_TED( a, b ), b );
+TO_SPARSE_LINE3( a, b ) := TO_SPARSE_LINE2( POLY_TED( a b ), b );
 TO_SPARSE_LINE3( a, 1 ) := ( {a}, {1} );
 
 TO_SPARSE_LINE2( TED( a b ), c ) := TO_SPARSE_SPLIT2( TO_SPARSE_LINE(b) , (a,c) );
@@ -405,13 +417,13 @@ COMATRIX_SOLVE5( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE6( {a}, {b}, {f} );
 COMATRIX_SOLVE6( {a}, {b}, {f,e} )  := IPOLY_TED4( COMATRIX_SOLVE3( {a}, {b}, {f,e}, VSIZE({b}) ), e );
 COMATRIX_SOLVE6( {a}, {b}, {  e} )  := IPOLY_TED4( COMATRIX_SOLVE3( {a}, {b}, {  e}, VSIZE({b}) ), e );
 
-COMATRIX_SOLVE3( {a}, {b}, {f}, n ) := TED_ADD( TED_MUL2( VSIGN( b ), COMATRIX_SOLVE3( {VECT_ROR(a)}, {VECT_ROR(b)}, {f}, n-1) ), COMATRIX_SOLVE4( {a}, {b}, {f} ) );
+COMATRIX_SOLVE3( {a}, {b}, {f}, n ) := TED_ADD2( TED_MUL2( VSIGN( b ) COMATRIX_SOLVE3( {VECT_ROR(a)}, {VECT_ROR(b)}, {f}, n-1) ) COMATRIX_SOLVE4( {a}, {b}, {f} ) );
 COMATRIX_SOLVE3( {a}, {b}, {f}, 1 ) := COMATRIX_SOLVE4( {a}, {b}, {f} ) ;
 
-COMATRIX_SOLVE7({a}, {b}, {f}, TED(  c d ), m  ) := TED_MUL2( COMATRIX( {a}, {b}, {f}, m, m ), TED(  c d ) );
+COMATRIX_SOLVE7({a}, {b}, {f}, TED(  c d ), m  ) := TED_MUL2( COMATRIX( {a}, {b}, {f}, m, m ) TED(  c d ) );
 COMATRIX_SOLVE7({a}, {b}, {f}, TED(  0 0 ), m  ) := TED( 0 0 );
 
-COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := COMATRIX_SOLVE7({a}, {b}, {f}, TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) ), VSIZE({b}) ); //TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ), TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) ) );
+COMATRIX_SOLVE4( { a, d }, { b, c }, { f, e } ) := COMATRIX_SOLVE7({a}, {b}, {f}, TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) ), VSIZE({b}) ); //TED_MUL2( COMATRIX( {a}, {b}, {f}, VSIZE({b}) ) TED(  COMATRIX_GET_COEFF( ( d, c ), e )  COMATRIX_GET_COEFF( ( d, c ), 1 ) ) );
 COMATRIX_SOLVE4( {    d },    { c },    { e } ) := TED( COMATRIX_GET_COEFF( ( d, c ), e ) COMATRIX_GET_COEFF( ( d, c ), 1 ) );
 
 //Main routine

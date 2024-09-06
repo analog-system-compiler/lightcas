@@ -47,7 +47,6 @@ NAME.IOPAMP( @plus, @minus, @out, @GND ) := {
 //Saturated Operational Amplifier
 NAME.OPAMP( @plus, @minus, @out, @GND, gain, vsat ) := { 
 
-
 	/* nodal equations */
 	NAME.Uout = ACROSS( @out, @GND );
 	NAME.Iout = THROUGH( @out, @GND );

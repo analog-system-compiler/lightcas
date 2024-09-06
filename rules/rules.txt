@@ -34,7 +34,6 @@ MONMUL(a MONDIV(b c))            := MONDIV( MONMUL(a b)  c );                   
 MONMUL(MONDIV(a c) b)            := MONDIV( MONMUL(a b)  c );                                     //a/c*b   := (a*b)/c
 MONMUL(MONDIV(a b) MONDIV(c d))  := MONDIV( MONMUL(a c)  MONMUL(b d) );                           //a/b*c/d := (a*c)/(b*d)
 MONDIV(MONDIV(a b) c)            := MONDIV( a MONMUL(c b ) );                                     //(a/b)/c := a/(c*b)
-MONPOW(a b)                      := MONPOWCONST(a, b, FLOOR(b)==b);
 
 POLY(-a v)                       := MONNEG( POLY(a v) );
 POLY(/a v)                       := MONDIV( POLY(1 v)   POLY(a v)    );
@@ -95,15 +94,18 @@ MONDIV( MON(a b) MON(c d))                 := MON(a/c b-d);
 MONDIV( POLYSTORE(a MON(b c)) MON(d e) )   := MONADD(MONDIV(a MON(d e)) MONDIV(MON(b c) MON(d e)));
 
 //Pow
-MONPOW( MON(a b)  c )            := MON(a^c b*c);
+MONPOW(a b)                      := MONPOWCONST(a, b, FLOOR(b)==b);
 MONPOW( MON(1 0)  b )            := MON(1 0);
-MONPOW( a  1 )                   := a;
+MONPOW( a 1 )                    := a;
 
-MONPOWCONST( a, e, 1 )             := MONMUL( MONPOW(a e-1) a );
-MONPOWCONST( a,-e, 1 )             := MONDIV( MON(1 0) MONPOW(a e) );
-
-//MONPOW( a CONSTINT(e) )        := MONMUL( MONPOW(a e-1) a );
-//MONPOW( a (-CONSTINT(e)) )       := MONDIV( MON(1 0) MONPOW(a e) );
+//Unevaluable exponent
+MONPOWCONST( MON(a b), c, FLOOR(c)==c ) := MON(a^c b*c);
+//Decimal exponent
+MONPOWCONST( MON(a b), c, 0 )    := MON(a^c b*c);
+//Integer exponent
+MONPOWCONST( a, 1, 1 )           := a;
+MONPOWCONST( a, e, 1 )           := MONMUL( MONPOWCONST(a, e-1, 1) a );
+MONPOWCONST( a,-e, 1 )           := MONDIV( MON(1 0) MONPOWCONST(a, e, 1) );
 
 //Logic
 MON(1 1) |  MON(1 1)      := MON(1 1);

@@ -10,7 +10,7 @@ LIB         = lib$(EXE).a
 EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
 LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
-RULE_FILES  = $(wildcard $(RULES_DIR)/*.txt)
+RULE_FILES  = $(addprefix $(RULES_DIR)/, $(shell awk -F '<|>' '$$1~/`include/ {print $$2}' $(RULES_DIR)/includes.txt))
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
 SRC_FILES   = $(shell find . -name "*.cpp"; find . -name "*.h"; find . -name "*.txt")
 
@@ -40,8 +40,8 @@ else
 endif
 
 
-CPPFLAGS  = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
-LDFLAGS   = -Wl,-Map=$(EXE).map
+CPPFLAGS = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
+LDFLAGS  = -Wl,-Map=$(EXE).map
 
 APP_SRC = \
 	asysc/ASysC.cpp \
@@ -101,13 +101,14 @@ $(OBJ_DIR)/%.o: $(LIB_DIR)/%.cpp
 $(APP_DIR)/Rules_concat.txt: $(RULE_FILES)
 	cat $^ > $@
 
-$(APP_DIR)/%.ztxt: $(APP_DIR)/%.txt
+$(OBJ_DIR)/%.ztxt: $(APP_DIR)/%.txt
 	cp $< $@
 	echo -e '\0' >> $@
 
-$(OBJ_DIR)/%.o: $(APP_DIR)/%.ztxt
+$(OBJ_DIR)/%.o: $(OBJ_DIR)/%.ztxt
 	echo 'Packaging  $(notdir $< )'	
 	$(LD) -r -b binary $< -o $@
+	#objdump -t $@
 
 $(LIB): $(LIB_OBJS)
 	echo 'Archiving  $(notdir $@)'

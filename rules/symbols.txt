@@ -1,19 +1,19 @@
 
 
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
@@ -22,39 +22,39 @@
 // Uppercase: new precedence = 0
 // Parenthesis are used for display only
 
-`symbol "a;\}b   " 0 SYST(a b)    
-`symbol "a:=b    " 1 _set(a b)
-`symbol "a,(b)   " 2 CONCAT(a b)
-`symbol "a=\=b   " 3 EQV(a b)
-`symbol "a?B     " 4 IF3(a b)   
-`symbol "a:\=b   " 5 COL(a b) 
-`symbol "a==b    " 6 EQ(a b)    
-`symbol "a<>b    " 7 NEQ(a b)   
-`symbol "a!=b    " 8 NEQ(a b)   
-`symbol "a<=(b)  " 9 LTE(a b)   
-`symbol "a<(b)   " 9 LT(a b)    
-`symbol "a>=(b)  " 9 GTE(a b)   
-`symbol "a>(b)   " 9 GT(a b)    
+`symbol "a;\}b   "  0 SYST(a b)
+`symbol "a:=b    "  1 _set(a b)
+`symbol "a,(b)   "  2 CONCAT(a b)
+`symbol "a=\=b   "  3 EQV(a b)
+`symbol "a?B     "  4 IF3(a b)
+`symbol "a:\=b   "  5 COL(a b)
+`symbol "a==b    "  6 EQ(a b)
+`symbol "a<>b    "  7 NEQ(a b)
+`symbol "a!=b    "  8 NEQ(a b)
+`symbol "a<=(b)  "  9 LTE(a b)
+`symbol "a<(b)   "  9 LT(a b)
+`symbol "a>=(b)  "  9 GTE(a b)
+`symbol "a>(b)   "  9 GT(a b)
 `symbol "a->b    " 10 RANGE(a b)
-`symbol "a||b    " 11 LOR(a b)   
-`symbol "a&&b    " 12 LAND(a b)    
-`symbol "a|\|b   " 13 OR(a b)    
-`symbol "a~b     " 14 XOR(a b)   
-`symbol "a+b     " 15 ADD(a b)   
-`symbol "a-\>(b) " 15 SUB(a b)   
-`symbol "a&\&b   " 16 AND(a b)   
-`symbol "a%b     " 17 MOD(a b)   
-`symbol "a*b     " 18 MUL(a b)   
-`symbol "a/(b)   " 19 DIV(a b)   
-`symbol "(a)^(b) " 20 POW(a b)   
-`symbol "a<<(b)  " 21 SHL(a b)   
-`symbol "a>>(b)  " 21 SHR(a b)   
-`symbol "a[B]    " 22 AT(a b)    
-`symbol "a.b     " 23 HIER(a b)  
-`symbol "-a      " 24 NEG(a)     
-`symbol "/a      " 25 INV(a)     
-`symbol "!a      " 26 LNOT(a)    
-`symbol "~a      " 26 NOT(a)     
-`symbol "a!      " 26 FACT(a)    
-`symbol "{A}     " 26 VECT(a)    
+`symbol "a||b    " 11 LOR(a b)
+`symbol "a&&b    " 12 LAND(a b)
+`symbol "a|\|b   " 13 OR(a b)
+`symbol "a~b     " 14 XOR(a b)
+`symbol "a+b     " 15 ADD(a b)
+`symbol "a-\>(b) " 15 SUB(a b)
+`symbol "a&\&b   " 16 AND(a b)
+`symbol "a%b     " 17 MOD(a b)
+`symbol "a*b     " 18 MUL(a b)
+`symbol "a/(b)   " 19 DIV(a b)
+`symbol "a<<(b)  " 20 SHL(a b)
+`symbol "a>>(b)  " 20 SHR(a b)
+`symbol "a[B]    " 21 AT(a b)
+`symbol "-a      " 22 NEG(a)
+`symbol "/a      " 22 INV(a)
+`symbol "!a      " 22 LNOT(a)
+`symbol "~a      " 22 NOT(a)
+`symbol "(a)^(b) " 23 POW(a b)
+`symbol "a!      " 24 FACT(a)
+`symbol "a.b     " 25 HIER(a b)
+`symbol "{A}     " 26 VECT(a)
 `symbol "{A;}    " 26 VECT(a)

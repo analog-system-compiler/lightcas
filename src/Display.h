@@ -72,8 +72,8 @@ public:
     }
     else
     {
-      Prepend(type == LOG_INFO ? CString("Info: ") : type == LOG_WARN ? CString("Warning: ")
-                                                                      : CString("Error: "));
+      Prepend(type == LOG_INFO ? CString("Info: ") : ( type == LOG_WARN ? CString("Warning: ")
+                                                                      : CString("Error: ")) );
 
       Print();
     }
@@ -93,8 +93,8 @@ public:
   bool StoreToFile(const CString &name)
   {
     if (m_File)
-      fclose(m_File);
-    m_File = fopen(name.GetBufferPtr(), "w+");
+      ::fclose(m_File);
+    m_File = ::fopen(name.GetBufferPtr(), "w+");
     return m_File != NULL;
   }
 
@@ -124,6 +124,6 @@ public:
   ~CDisplay()
   {
     if (m_File)
-      fclose(m_File);
+      ::fclose(m_File);
   }
 };

@@ -23,7 +23,7 @@ extern int( *PUTS )( const char* );
 
 #ifdef _DEBUG
 
-#define DEBUG_LEVEL 2
+#define DEBUG_LEVEL 1
 
 #ifdef __GNUC__
 
