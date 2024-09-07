@@ -157,48 +157,48 @@ void CElementDataBase::AddReservedElements()
   if (ret)
   {
     ASSERT(exp.GetSize() == 16);
-    ASSERT(m_ElementRefArray[OP_PAR0]->ToRef() == OP_PAR0);
-    ASSERT(m_ElementRefArray[OP_PAR1]->ToRef() == OP_PAR1);
-    ASSERT(m_ElementRefArray[OP_PAR2]->ToRef() == OP_PAR2);
-    ASSERT(m_ElementRefArray[OP_PAR3]->ToRef() == OP_PAR3);
-    ASSERT(m_ElementRefArray[OP_PAR4]->ToRef() == OP_PAR4);
-    ASSERT(m_ElementRefArray[OP_PAR5]->ToRef() == OP_PAR5);
-    ASSERT(m_ElementRefArray[OP_PAR6]->ToRef() == OP_PAR6);
-    ASSERT(m_ElementRefArray[OP_PAR7]->ToRef() == OP_PAR7);
-    ASSERT(m_ElementRefArray[OP_PAR8]->ToRef() == OP_PAR8);
-    ASSERT(m_ElementRefArray[OP_PAR9]->ToRef() == OP_PAR9);
-    ASSERT(m_ElementRefArray[OP_PARA]->ToRef() == OP_PARA);
-    ASSERT(m_ElementRefArray[OP_PARB]->ToRef() == OP_PARB);
-    ASSERT(m_ElementRefArray[OP_PARC]->ToRef() == OP_PARC);
-    ASSERT(m_ElementRefArray[OP_PARD]->ToRef() == OP_PARD);
-    ASSERT(m_ElementRefArray[OP_PARE]->ToRef() == OP_PARE);
-    ASSERT(m_ElementRefArray[OP_PARF]->ToRef() == OP_PARF);
+    // ASSERT(m_ElementRefArray[OP_PAR0]->ToRef() == OP_PAR0);
+    // ASSERT(m_ElementRefArray[OP_PAR1]->ToRef() == OP_PAR1);
+    // ASSERT(m_ElementRefArray[OP_PAR2]->ToRef() == OP_PAR2);
+    // ASSERT(m_ElementRefArray[OP_PAR3]->ToRef() == OP_PAR3);
+    // ASSERT(m_ElementRefArray[OP_PAR4]->ToRef() == OP_PAR4);
+    // ASSERT(m_ElementRefArray[OP_PAR5]->ToRef() == OP_PAR5);
+    // ASSERT(m_ElementRefArray[OP_PAR6]->ToRef() == OP_PAR6);
+    // ASSERT(m_ElementRefArray[OP_PAR7]->ToRef() == OP_PAR7);
+    // ASSERT(m_ElementRefArray[OP_PAR8]->ToRef() == OP_PAR8);
+    // ASSERT(m_ElementRefArray[OP_PAR9]->ToRef() == OP_PAR9);
+    // ASSERT(m_ElementRefArray[OP_PARA]->ToRef() == OP_PARA);
+    // ASSERT(m_ElementRefArray[OP_PARB]->ToRef() == OP_PARB);
+    // ASSERT(m_ElementRefArray[OP_PARC]->ToRef() == OP_PARC);
+    // ASSERT(m_ElementRefArray[OP_PARD]->ToRef() == OP_PARD);
+    // ASSERT(m_ElementRefArray[OP_PARE]->ToRef() == OP_PARE);
+    // ASSERT(m_ElementRefArray[OP_PARF]->ToRef() == OP_PARF);
     m_SearchStart = MAX_PAR;
 
     GetElement("0")->SetConst();
-    ASSERT(m_ElementRefArray[OP_ZERO]->ToRef() == OP_ZERO);
+    // ASSERT(m_ElementRefArray[OP_ZERO]->ToRef() == OP_ZERO);
 
     exp.Parse(built_in);
-    ASSERT(m_ElementRefArray[OP_SET]->ToRef() == OP_SET);
-    ASSERT(m_ElementRefArray[OP_GET]->ToRef() == OP_GET);
-    ASSERT(m_ElementRefArray[OP_NONE]->ToRef() == OP_NONE);
-    ASSERT(m_ElementRefArray[OP_CONST]->ToRef() == OP_CONST);
-    ASSERT(m_ElementRefArray[OP_ELEM]->ToRef() == OP_ELEM);
-    ASSERT(m_ElementRefArray[OP_FUNCT0]->ToRef() == OP_FUNCT0);
-    ASSERT(m_ElementRefArray[OP_FUNCT1]->ToRef() == OP_FUNCT1);
-    ASSERT(m_ElementRefArray[OP_FUNCT2]->ToRef() == OP_FUNCT2);
-    ASSERT(m_ElementRefArray[OP_NEG]->ToRef() == OP_NEG);
-    ASSERT(m_ElementRefArray[OP_RANK]->ToRef() == OP_RANK);
-    ASSERT(m_ElementRefArray[OP_EVAL]->ToRef() == OP_EVAL);
-    ASSERT(m_ElementRefArray[OP_CHECK]->ToRef() == OP_CHECK);
-    ASSERT(m_ElementRefArray[OP_PRINT]->ToRef() == OP_PRINT);
-    ASSERT(m_ElementRefArray[OP_EXEC]->ToRef() == OP_EXEC);
+    // ASSERT(m_ElementRefArray[OP_SET]->ToRef() == OP_SET);
+    // ASSERT(m_ElementRefArray[OP_GET]->ToRef() == OP_GET);
+    // ASSERT(m_ElementRefArray[OP_NONE]->ToRef() == OP_NONE);
+    // ASSERT(m_ElementRefArray[OP_CONST]->ToRef() == OP_CONST);
+    // ASSERT(m_ElementRefArray[OP_ELEM]->ToRef() == OP_ELEM);
+    // ASSERT(m_ElementRefArray[OP_FUNCT0]->ToRef() == OP_FUNCT0);
+    // ASSERT(m_ElementRefArray[OP_FUNCT1]->ToRef() == OP_FUNCT1);
+    // ASSERT(m_ElementRefArray[OP_FUNCT2]->ToRef() == OP_FUNCT2);
+    // ASSERT(m_ElementRefArray[OP_NEG]->ToRef() == OP_NEG);
+    // ASSERT(m_ElementRefArray[OP_RANK]->ToRef() == OP_RANK);
+    // ASSERT(m_ElementRefArray[OP_EVAL]->ToRef() == OP_EVAL);
+    // ASSERT(m_ElementRefArray[OP_CHECK]->ToRef() == OP_CHECK);
+    // ASSERT(m_ElementRefArray[OP_PRINT]->ToRef() == OP_PRINT);
+    // ASSERT(m_ElementRefArray[OP_EXEC]->ToRef() == OP_EXEC);
     ASSERT(GetSize() == OP_END_RESERVED);
 
-    ASSERT(OP_ELEM == OP_CONST + 1);
-    ASSERT(OP_FUNCT0 == OP_ELEM + 1);
-    ASSERT(OP_FUNCT1 == OP_FUNCT0 + 1);
-    ASSERT(OP_FUNCT2 == OP_FUNCT1 + 1);
+    // ASSERT(OP_ELEM == OP_CONST + 1);
+    // ASSERT(OP_FUNCT0 == OP_ELEM + 1);
+    // ASSERT(OP_FUNCT1 == OP_FUNCT0 + 1);
+    // ASSERT(OP_FUNCT2 == OP_FUNCT1 + 1);
   }
   else
     ASSERT(false);

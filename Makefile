@@ -1,11 +1,12 @@
 
 MAKEFLAGS = --jobs 4
 
-EXE         = asysc
+BIN_DIR     = $(shell mkdir -p bin) bin
 LIB_DIR     = src
 APP_DIR     = app
 RULES_DIR   = rules
-OBJ_DIR     = $(shell mkdir -p ./objs ./objs/nostd ./objs/asysc ) ./objs
+EXE         = $(BIN_DIR)/asysc
+OBJ_DIR     = $(shell mkdir -p objs objs/nostd objs/asysc ) objs
 LIB         = lib$(EXE).a
 EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
 LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
@@ -41,7 +42,6 @@ endif
 
 
 CPPFLAGS = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
-LDFLAGS  = -Wl,-Map=$(EXE).map
 
 APP_SRC = \
 	asysc/ASysC.cpp \
@@ -67,6 +67,7 @@ endif
 
 ifeq ($(DEBUG),1)
 	CPPFLAGS += -g -D_DEBUG
+	LDFLAGS  += -Wl,-Map=$(EXE).map
 else ifeq ($(GPROF),1)
 	CPPFLAGS += -pg
 	LDFLAGS  += -pg
@@ -121,7 +122,7 @@ $(EXE): $(EXE_OBJ) $(LIB)
 rules: $(RULE_FILES)
 ifeq ($(EMBED_RULES),0)
 	echo 'Copying    $(notdir $^)'
-	cp $(RULE_FILES) .
+	cp -r $(RULES_DIR) $(BIN_DIR)
 endif
 
 clean:
