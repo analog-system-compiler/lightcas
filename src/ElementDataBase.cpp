@@ -132,7 +132,7 @@ bool CElementDataBase::Initialize()
     AddAlgebraRuleTable(IC);
 #else
     IC.SetRootPath(m_RootPath);
-    if (IC.LoadFromFile(m_RootPath + CString("rules/includes.txt")))
+    if (IC.LoadFromFile(m_RootPath + CString("rules/includes.rul")))
     {
       AddAlgebraRuleTable(IC);
       IC.CloseFile();

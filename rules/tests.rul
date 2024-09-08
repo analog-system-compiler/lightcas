@@ -315,7 +315,7 @@ _check( SYS_CONCAT_ENTRY( {{a;{b;g};c};{d;e;f}} )     {a;g;b;c;f;e;d}   );
 _check( SYS_CONCAT_ENTRY( {{a;b;{c;g}};{d;e;f}} )     {a;b;g;c;f;e;d}   );
 _check( SYS_CONCAT_ENTRY( {{a;b;{c;g}};{d;e;{f;h}}} ) {a;b;g;c;f;h;e;d} );
 
-`include <components.txt>
+`include <components.rul>
 
 //Define RLC circuit for testing purposes
 RLC() := { 
