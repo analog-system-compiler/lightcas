@@ -308,13 +308,13 @@ int CParser::GetQuotes()
 CString CParser::GetPath(const CString &path)
 {
   CString s;
-  const char *exe_path_ptr = path.GetBufferPtr();
-  const char *exe_ptr = ::strrchr(exe_path_ptr, PATH_SEPARATOR);
+  const char *full_path = path.GetBufferPtr();
+  const char *basename_path = ::strrchr(full_path, PATH_SEPARATOR);
 
-  if (exe_ptr)
+  if (basename_path)
   {
-    s = path;
-    s.SetLength(exe_ptr - exe_path_ptr + 1);
+    s = full_path;
+    s.SetLength(basename_path - full_path + 1);
   }
   else
     s.Clear();
@@ -387,7 +387,7 @@ bool CParser::ProcessMacro()
     }
     else if (type == 2)
     {
-      ret = LoadFromFile(GetPath(m_RootPath) + GetBuffer());
+      ret = LoadFromFile(m_RootPath + GetBuffer());
     }
   }
   else if (m_Buffer == "symbol")
@@ -413,7 +413,7 @@ void CParser::Error(const CString &s) const
   CDisplay ds(s);
   ds += " in line ";
   ds += CDisplay(GetLineNb(), 10);
-  ds += " in file ";
+  ds += " of file ";
   ds += GetFileName();
   ds.Log(LOG_ERR);
 }

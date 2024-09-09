@@ -35,8 +35,8 @@ typedef enum
 } lang_t;
 
 void Help();
-int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name, const char *exe_path);
-int InteractiveMode(CElementDataBase &db, const char *exe_path);
+int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name);
+int InteractiveMode(CElementDataBase &db);
 
 int main(int argc, char *argv[])
 {
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
   if (input_filename)
   {
-    FileMode(db, input_filename, output_filename, language, analysis_type, circuit_name, argv[0]);
+    FileMode(db, input_filename, output_filename, language, analysis_type, circuit_name);
   }
   else
   {
@@ -116,39 +116,33 @@ int main(int argc, char *argv[])
     std::cout << "*** (C) Cyril Collineau 2006-2024 ***\n";
     std::cout << "*************************************\n";
     std::cout << "Type \"help\" for help.\n";
-    InteractiveMode(db, argv[0]);
+    InteractiveMode(db);
   }
 
   return 0;
 }
 
-int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name, const char *exe_path)
+int FileMode(CElementDataBase &db, const char *input_filename, const char *output_filename, lang_t language, CAnalysisMode analysis_type, const char *circuit_name)
 {
+  bool ret = false;
   CMathExpressionEx equ(&db);
-  CDisplay ds;
-  CParser parser;
-  CString root_path = CParser::GetPath(CString(exe_path));
-
-  parser.SetRootPath(root_path);
-  if (parser.LoadFromFile(input_filename))
+  if (db.LoadFromFile(CString(input_filename), equ))
   {
+    CDisplay ds;
     if (ds.StoreToFile(output_filename))
     {
-      equ.Parse(parser);
-      equ.Compile();
       if (language == LANG_PYTHON)
-        equ.ToPython(ds, analysis_type, circuit_name);
+        ret = equ.ToPython(ds, analysis_type, circuit_name);
     }
   }
-  return 0;
+  return ret ? 0 : 1;
 }
 
-int InteractiveMode(CElementDataBase &db, const char *exe_path)
+int InteractiveMode(CElementDataBase &db)
 {
   CMathExpression equ(&db);
   CParser parser;
-  CString root_path = CParser::GetPath(CString(exe_path));
-  parser.SetRootPath(root_path);
+  parser.SetRootPath(db.GetRootPath());
   CDisplayEx ds((bool)ISATTY(1));
   const CElement *simplify = db.GetElement("SIMPLIFY");
   CElement *ans = db.GetElement("ans");

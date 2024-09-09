@@ -67,7 +67,7 @@ endif
 
 ifeq ($(DEBUG),1)
 	CPPFLAGS += -g -D_DEBUG
-	LDFLAGS  += -Wl,-Map=$(EXE).map
+	#LDFLAGS  += -Wl,-Map=$(EXE).map
 else ifeq ($(GPROF),1)
 	CPPFLAGS += -pg
 	LDFLAGS  += -pg

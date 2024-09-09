@@ -1,21 +1,19 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
-
-
 
 #include <string.h>
 #include <cctype>
@@ -106,7 +104,7 @@ CElementDataBase::CElementDataBase(const CString &name, CElementDataBase *parent
   }
   else
   {
-    m_RootPath = CParser::GetPath(exe_path);
+    m_RootPath = CParser::GetPath(exe_path) + "rules/";
     m_Name = name;
   }
 }
@@ -126,26 +124,31 @@ bool CElementDataBase::Initialize()
     AddReservedFunctions();
     SetSecureLimit(GetSize());
     InitAlgebraRuleTable();
-    CParser IC;
+    CMathExpression src(this);
 #ifdef EMBED_RULES
+    CParser IC;
     IC.SetPos(embedded_rules_txt);
-    AddAlgebraRuleTable(IC);
+    AddAlgebraRuleTable(IC, src);
 #else
-    IC.SetRootPath(m_RootPath);
-    if (IC.LoadFromFile(m_RootPath + CString("rules/includes.rul")))
-    {
-      AddAlgebraRuleTable(IC);
-      IC.CloseFile();
-    }
-    else
-    {
-      CDisplay::Log(LOG_ERR,"rules description file not found.");
-      return false;
-    }
+    LoadFromFile(m_RootPath + CString("includes.rul"), src);
 #endif
     // CleanTempElements();
   }
   return true;
+}
+
+bool CElementDataBase::LoadFromFile(const CString &file_name, CMathExpression &src)
+{
+  CParser IC;
+  IC.SetRootPath(m_RootPath);
+  if (IC.LoadFromFile(file_name))
+  {
+    AddAlgebraRuleTable(IC, src);
+    IC.CloseFile();
+    return true;
+  }
+  CDisplay::Log(LOG_ERR, "rules description file not found.");
+  return false;  
 }
 
 void CElementDataBase::AddReservedElements()
@@ -157,48 +160,14 @@ void CElementDataBase::AddReservedElements()
   if (ret)
   {
     ASSERT(exp.GetSize() == 16);
-    // ASSERT(m_ElementRefArray[OP_PAR0]->ToRef() == OP_PAR0);
-    // ASSERT(m_ElementRefArray[OP_PAR1]->ToRef() == OP_PAR1);
-    // ASSERT(m_ElementRefArray[OP_PAR2]->ToRef() == OP_PAR2);
-    // ASSERT(m_ElementRefArray[OP_PAR3]->ToRef() == OP_PAR3);
-    // ASSERT(m_ElementRefArray[OP_PAR4]->ToRef() == OP_PAR4);
-    // ASSERT(m_ElementRefArray[OP_PAR5]->ToRef() == OP_PAR5);
-    // ASSERT(m_ElementRefArray[OP_PAR6]->ToRef() == OP_PAR6);
-    // ASSERT(m_ElementRefArray[OP_PAR7]->ToRef() == OP_PAR7);
-    // ASSERT(m_ElementRefArray[OP_PAR8]->ToRef() == OP_PAR8);
-    // ASSERT(m_ElementRefArray[OP_PAR9]->ToRef() == OP_PAR9);
-    // ASSERT(m_ElementRefArray[OP_PARA]->ToRef() == OP_PARA);
-    // ASSERT(m_ElementRefArray[OP_PARB]->ToRef() == OP_PARB);
-    // ASSERT(m_ElementRefArray[OP_PARC]->ToRef() == OP_PARC);
-    // ASSERT(m_ElementRefArray[OP_PARD]->ToRef() == OP_PARD);
-    // ASSERT(m_ElementRefArray[OP_PARE]->ToRef() == OP_PARE);
-    // ASSERT(m_ElementRefArray[OP_PARF]->ToRef() == OP_PARF);
     m_SearchStart = MAX_PAR;
-
     GetElement("0")->SetConst();
-    // ASSERT(m_ElementRefArray[OP_ZERO]->ToRef() == OP_ZERO);
-
     exp.Parse(built_in);
-    // ASSERT(m_ElementRefArray[OP_SET]->ToRef() == OP_SET);
-    // ASSERT(m_ElementRefArray[OP_GET]->ToRef() == OP_GET);
-    // ASSERT(m_ElementRefArray[OP_NONE]->ToRef() == OP_NONE);
-    // ASSERT(m_ElementRefArray[OP_CONST]->ToRef() == OP_CONST);
-    // ASSERT(m_ElementRefArray[OP_ELEM]->ToRef() == OP_ELEM);
-    // ASSERT(m_ElementRefArray[OP_FUNCT0]->ToRef() == OP_FUNCT0);
-    // ASSERT(m_ElementRefArray[OP_FUNCT1]->ToRef() == OP_FUNCT1);
-    // ASSERT(m_ElementRefArray[OP_FUNCT2]->ToRef() == OP_FUNCT2);
-    // ASSERT(m_ElementRefArray[OP_NEG]->ToRef() == OP_NEG);
-    // ASSERT(m_ElementRefArray[OP_RANK]->ToRef() == OP_RANK);
-    // ASSERT(m_ElementRefArray[OP_EVAL]->ToRef() == OP_EVAL);
-    // ASSERT(m_ElementRefArray[OP_CHECK]->ToRef() == OP_CHECK);
-    // ASSERT(m_ElementRefArray[OP_PRINT]->ToRef() == OP_PRINT);
-    // ASSERT(m_ElementRefArray[OP_EXEC]->ToRef() == OP_EXEC);
     ASSERT(GetSize() == OP_END_RESERVED);
-
-    // ASSERT(OP_ELEM == OP_CONST + 1);
-    // ASSERT(OP_FUNCT0 == OP_ELEM + 1);
-    // ASSERT(OP_FUNCT1 == OP_FUNCT0 + 1);
-    // ASSERT(OP_FUNCT2 == OP_FUNCT1 + 1);
+    ASSERT(OP_ELEM == OP_CONST + 1);
+    ASSERT(OP_FUNCT0 == OP_ELEM + 1);
+    ASSERT(OP_FUNCT1 == OP_FUNCT0 + 1);
+    ASSERT(OP_FUNCT2 == OP_FUNCT1 + 1);
   }
   else
     ASSERT(false);
@@ -220,17 +189,17 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
 
   sss = new CSymbolSyntaxStruct();
   sss->m_Equation.Initialize(this);
-  sss->m_Precedence = (unsigned char)IC.GetInt();  
-  sss->m_Equation.ParseElement(IC);  
+  sss->m_Precedence = (unsigned char)IC.GetInt();
+  sss->m_Equation.ParseElement(IC);
   const char *sp = IC.GetSymbolBuffer().GetBufferPtr();
-  i = 0;  
+  i = 0;
   c = *sp++;
   while (c && !isspace(c) && (i < sizeof(sss->m_Syntax) - 1))
   {
     if (::isalpha(c))
     {
       s.Clear();
-      s+=tolower(c);
+      s += tolower(c);
       e = GetElement(s);
       ASSERT(e);
       if (e)
@@ -241,7 +210,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
     sss->m_Syntax[i++] = c;
     c = *sp++;
   }
-  sss->m_Syntax[i] = '\0';  
+  sss->m_Syntax[i] = '\0';
   CMathExpression::ConvertToRule(src_equ, sss->m_Equation);
   m_SymbolSyntaxArray.Append(sss);
 
@@ -269,9 +238,8 @@ void CElementDataBase::InitAlgebraRuleTable()
   src.OptimizeTree();
 }
 
-void CElementDataBase::AddAlgebraRuleTable(CParser &IC)
+void CElementDataBase::AddAlgebraRuleTable(CParser &IC, CMathExpression &src)
 {
-  CMathExpression src(this);
   src.Parse(IC);
   src.Compile();
 }

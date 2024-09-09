@@ -102,7 +102,7 @@ protected:
   CElement*     CreateElement( const CString& string, unsigned pos );
   virtual void  AddReservedElements();
   virtual void  AddReservedFunctions();
-  virtual void  AddAlgebraRuleTable( CParser& IC );
+  virtual void  AddAlgebraRuleTable( CParser& IC, CMathExpression& equ );
   virtual void  AddEvalFunctionTable( const SProperties* property_table, unsigned size );
   virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
   void          InitAlgebraRuleTable();
@@ -114,6 +114,7 @@ public:
   void            Clear();
   bool            IsOK()                           { return !m_Error; }
   const CString&  GetName() const                  { return m_Name; }
+  const CString&  GetRootPath() const              { return m_RootPath; }
   void            SetName( const CString& name )   { m_Name = name; }
   bool            Initialize();
   CEvaluator*     GetEvaluator() const             { return m_Evaluator; }
@@ -123,6 +124,7 @@ public:
   CElement*       GetElement( const CString& );
   CElement*       SearchElement( const CString&, unsigned& pos ) const;
   bool            AssociateSymbol( CParser& IC );
+  bool            LoadFromFile(const CString& file_name, CMathExpression& src);
 
   //static OP_CODE    ElementToRef( const CElement* e );
   static CElement*  RefToElement( OP_CODE op )       { return m_ElementRefArray[ ( unsigned )op ]; }
