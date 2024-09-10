@@ -143,7 +143,8 @@ bool CElementDataBase::LoadFromFile(const CString &file_name, CMathExpression &s
   IC.SetRootPath(m_RootPath);
   if (IC.LoadFromFile(file_name))
   {
-    AddAlgebraRuleTable(IC, src);
+    src.Parse(IC);
+    src.Compile();
     IC.CloseFile();
     return true;
   }
@@ -188,8 +189,8 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
   CMathExpression src_equ(this);
 
   sss = new CSymbolSyntaxStruct();
-  sss->m_Equation.Initialize(this);
   sss->m_Precedence = (unsigned char)IC.GetInt();
+  sss->m_Equation.Initialize(this);
   sss->m_Equation.ParseElement(IC);
   const char *sp = IC.GetSymbolBuffer().GetBufferPtr();
   i = 0;
@@ -236,12 +237,6 @@ void CElementDataBase::InitAlgebraRuleTable()
   src.OptimizeTree();
   src.Parse("_set( _exec( a )  a )");
   src.OptimizeTree();
-}
-
-void CElementDataBase::AddAlgebraRuleTable(CParser &IC, CMathExpression &src)
-{
-  src.Parse(IC);
-  src.Compile();
 }
 
 void CElementDataBase::CleanTempElements()

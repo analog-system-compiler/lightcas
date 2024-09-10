@@ -190,13 +190,13 @@ _check( SIMPLIFY(57>>3)  7.125 );
 _check( NORM((4+a*(6+32*a))/(2+a*(2+72*a)), a)  (2+3*a+(4*a)^2)/(1+a+(6*a)^2) );
 
 /*********** Assignment ***/
-_check( SIMPLIFY( yyy:=a+b; zzz:=a-b; yyy-zzz )   (yyy();zzz();2*b) );
+_check( SIMPLIFY( yyy:=a+b; zzz:=a-b; yyy-zzz )   (a+b;a-b;2*b) );
 
 /********** Equation solving **********/
 //Initialize();
 _check( SOLVE(x^2-4,x)  {-2,2} );
 _check( SOLVE(x^2+4,x)  {-(2*j),2*j} );
-_check( SOLVE(2*x^2-4*x+2,x)  {0,18} );
+_check( SIMPLIFY(SOLVE(x^2-2*x+4,x))  {1-1.73205080757*j,1+1.73205080757*j} );
 _check( SIMPLIFY(SOLVE(x^2-4,x)[1]-2)  0 );
 
 /***** System solving *****/
@@ -303,10 +303,10 @@ _check( TAYLOR(COS(x),x,0,1)  1 );
 _check( TAYLOR(COS(x),x,0,3)  1-x^2/2 );
 _check( TAYLOR(EXP(x),x,0,5)  1+x+x^2/2+x^3/6+x^4/24+x^5/120 );
 
-_check( y:=6 y );
-_check( SIMPLIFY( r:=6; r-5 ) r;1 );
+_check( y:=6 6 );
+_check( SIMPLIFY( r:=6; r-5 ) 6;1 );
 // _check( ( POLY(f(a),1) := POLYF( f( SIMPLIFY(a) ) ) ) POLY(f(a),1) ); //FIXME
-_check( SIMPLIFY( m(x):=4*x; m(z)-4*z+1 ) (m(x);1) );
+_check( SIMPLIFY( m(x):=4*x; m(z)-3*z+1 ) (4*x;z+1) );
 //_check( SIMPLIFY( t(x):=4*x; t(z+z)-8*z) (t(x);0) );
 
 /**** Components ****/

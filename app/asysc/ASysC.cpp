@@ -190,7 +190,6 @@ int InteractiveMode(CElementDataBase &db)
     else
     {
       parser.SetPos(expression_str.c_str());
-
       if (!equ.Parse(parser))
       {
         std::cerr << "ERROR: " << parser.GetBuffer().GetBufferPtr() << " at line " << parser.GetLineNb() << "\n";

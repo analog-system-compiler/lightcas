@@ -102,7 +102,6 @@ protected:
   CElement*     CreateElement( const CString& string, unsigned pos );
   virtual void  AddReservedElements();
   virtual void  AddReservedFunctions();
-  virtual void  AddAlgebraRuleTable( CParser& IC, CMathExpression& equ );
   virtual void  AddEvalFunctionTable( const SProperties* property_table, unsigned size );
   virtual void  AddEvalFunction( const CString& name, unsigned parameter_nb, CEvaluatorFunct funct );
   void          InitAlgebraRuleTable();

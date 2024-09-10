@@ -391,12 +391,12 @@ bool CMathExpression::ExecuteDirective()
   {
     CMathExpression equ_dst(m_ElementDB);
     CMathExpression equ_src(m_ElementDB);
-    equ_dst.PushBranch(*this, m_StackSize);
-    pos_t pos = m_StackSize;
-    equ_src.PushBranch(*this, pos);
+    equ_dst.PushBranch(*this, m_StackSize);    
+    equ_src.PushBranch(*this, m_StackSize);
     OP_CODE op1 = equ_src.GetLastOperator();
     CElement *e = RefToElement(op1);
     e->AddFunction(equ_src, equ_dst);
+    Push(equ_dst);
     return false;
   }
 
