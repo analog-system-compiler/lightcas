@@ -130,7 +130,7 @@ bool CElementDataBase::Initialize()
     IC.SetPos(embedded_rules_txt);
     AddAlgebraRuleTable(IC, src);
 #else
-    LoadFromFile(m_RootPath + CString("includes.rul"), src);
+    LoadFromFile(m_RootPath + CString("includes.rule"), src);
 #endif
     // CleanTempElements();
   }

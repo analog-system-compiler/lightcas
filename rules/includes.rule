@@ -17,9 +17,9 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-`include <symbols.rul>
-`include <main.rul>
-`include <matrix_vector.rul>
-`include <units.rul>
-`include <electricity.rul>
+`include <symbols.rule>
+`include <main.rule>
+`include <matrix_vector.rule>
+`include <units.rule>
+`include <electricity.rule>
 

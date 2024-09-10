@@ -17,7 +17,7 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-`include <logic.rul>
+`include <logic.rule>
 
 NAME.NE555( @trigger,  @threshold,  @discharge, @output,  @vcc, @gnd ) :=
 {

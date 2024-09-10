@@ -347,7 +347,7 @@ void CElementDataBase::Test()
 
   CParser IC;
   IC.SetRootPath(m_RootPath);
-  if (IC.LoadFromFile(m_RootPath + CString("tests.rul")))
+  if (IC.LoadFromFile(m_RootPath + CString("tests.rule")))
   {
     CMathExpression equ(this);
     AddAlgebraRuleTable(IC, equ);

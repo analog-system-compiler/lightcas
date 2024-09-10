@@ -286,6 +286,12 @@ int CParser::GetQuotes()
       m_Pos = pos + 1;
       ret = 1;
     }
+    else
+    {
+      CString s(" not found");
+      s.Prepend(m_StringDelimiter);
+      Error(s);
+    }
   }
   else if (TryFind(m_HeaderDelimiterIn))
   {
@@ -295,6 +301,12 @@ int CParser::GetQuotes()
       m_Buffer.Copy(m_Pos, pos - m_Pos);
       m_Pos = pos + 1;
       ret = 2;
+    }
+    else
+    {
+      CString s(" not found");
+      s.Prepend(m_HeaderDelimiterIn);
+      Error(s);
     }
   }
   else

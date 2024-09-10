@@ -11,7 +11,7 @@ LIB         = lib$(EXE).a
 EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
 LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
-RULE_FILES  = $(addprefix $(RULES_DIR)/, $(shell awk -F '<|>' '$$1~/`include/ {print $$2}' $(RULES_DIR)/includes.rul))
+RULE_FILES  = $(addprefix $(RULES_DIR)/, $(shell awk -F '<|>' '$$1~/`include/ {print $$2}' $(RULES_DIR)/includes.rule))
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
 SRC_FILES   = $(shell find . -name "*.cpp"; find . -name "*.h"; find . -name "*.txt")
 
