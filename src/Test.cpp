@@ -350,7 +350,8 @@ void CElementDataBase::Test()
   if (IC.LoadFromFile(m_RootPath + CString("tests.rule")))
   {
     CMathExpression equ(this);
-    AddAlgebraRuleTable(IC, equ);
+    equ.Parse(IC);
+    equ.Compile();    
     IC.CloseFile();
   }
   else

@@ -1,11 +1,11 @@
 
 MAKEFLAGS = --jobs 4
 
+EXE         = asysc
 BIN_DIR     = $(shell mkdir -p bin) bin
 LIB_DIR     = src
 APP_DIR     = app
 RULES_DIR   = rules
-EXE         = $(BIN_DIR)/asysc
 OBJ_DIR     = $(shell mkdir -p objs objs/nostd objs/asysc ) objs
 LIB         = lib$(EXE).a
 EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
@@ -86,7 +86,7 @@ ifeq ($(EMBED_RULES),1)
 	LIB_OBJS += $(OBJ_DIR)/Rules_concat.o
 endif
 
-all: $(EXE) rules
+all: $(BIN_DIR)/$(EXE) rules
 
 -include $(LIB_OBJS:.o=.d)
 -include $(EXE_OBJ:.o=.d)
@@ -115,7 +115,7 @@ $(LIB): $(LIB_OBJS)
 	echo 'Archiving  $(notdir $@)'
 	$(AR) rcs $@ $^
 
-$(EXE): $(EXE_OBJ) $(LIB)
+$(BIN_DIR)/$(EXE): $(EXE_OBJ) $(LIB)
 	echo 'Linking    $(notdir $@)'
 	$(CXX) -o $@ $(LDFLAGS) $(EXE_OBJ) $(LIB)
 

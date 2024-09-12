@@ -121,23 +121,8 @@ POLY(a v)             := MON(a 0);
 
 POLYF(a)              := MON(a 0);
 
-REDUCE_COMPLEX(MON(a 0))         := MON(a 0);
-REDUCE_COMPLEX(MON(a 1))         := MON(a 1);
-REDUCE_COMPLEX(MON(a _const(b)))  := REDUCE_COMPLEX(MON(-a b-2));
-REDUCE_COMPLEX(MON(a (-_const(b)))) := REDUCE_COMPLEX(MON(-a 2-b));
-REDUCE_COMPLEX(POLYSTORE(a b))   := MONADD(REDUCE_COMPLEX(a) REDUCE_COMPLEX(b));
-REDUCE_COMPLEX(MONDIV(a b))      := MONDIV(REDUCE_COMPLEX(a) REDUCE_COMPLEX(b));
-
 SIMPLIFY(MON(a b))               := MON(SIMPLIFY(a) SIMPLIFY(b));
 SIMPLIFY(POLYSTORE(a b))         := POLYSTORE(SIMPLIFY(a) SIMPLIFY(b));
-
-RE(POLYSTORE(a b))               := RE(a)+RE(b);
-RE(MON(a 1))                     := 0;
-RE(MON(b 0))                     := b;
-
-IM(POLYSTORE(a b))               := IM(a)+IM(b);
-IM(MON(a 1))                     := a;
-IM(MON(b 0))                     := 0;
 
 GET_POWER(POLYSTORE(a b) c)      := GET_POWER(a c)+GET_POWER(b c);
 GET_POWER(MON(a b) b)            := a;
@@ -234,6 +219,8 @@ a^0              := 1  ;
 a^1              := a  ;
 a^-b             := 1/(a^b) ;
 
+/******** Logic **************/
+
 ~0       := -1 ;
 ~-1      := 0  ;
 0|b      := b  ;
@@ -262,8 +249,25 @@ BOOL(a<b)          := (a<b);
 BOOL(!a)           := !a   ;
 BOOL(a)            := (a<>0);
 
-RE(a)                 := RE(REDUCE_COMPLEX(POLY(a j)));
-IM(a)                 := IM(REDUCE_COMPLEX(POLY(a j)));
+/******** Imaginary **************/
+REDUCE_COMPLEX(MON(a 0))         := MON(a 0);
+REDUCE_COMPLEX(MON(a 1))         := MON(a 1);
+REDUCE_COMPLEX(MON(a _const(b)))  := REDUCE_COMPLEX(MON(-a b-2));
+REDUCE_COMPLEX(MON(a (-_const(b)))) := REDUCE_COMPLEX(MON(-a 2-b));
+REDUCE_COMPLEX(POLYSTORE(a b))   := MONADD(REDUCE_COMPLEX(a) REDUCE_COMPLEX(b));
+REDUCE_COMPLEX(MONDIV(a b))      := MONDIV(REDUCE_COMPLEX(a) REDUCE_COMPLEX(b));
+
+RE(POLYSTORE(a b))               := RE(a)+RE(b);
+RE(MON(a 1))                     := 0;
+RE(MON(b 0))                     := b;
+IM(POLYSTORE(a b))               := IM(a)+IM(b);
+IM(MON(a 1))                     := a;
+IM(MON(b 0))                     := 0;
+
+RE(a) := RE(REDUCE_COMPLEX(POLY(a j)));
+IM(a) := IM(REDUCE_COMPLEX(POLY(a j)));
+CONJ(a) := RE(a)-IM(a)*j;
+
 
 HIER(a GLOBAL(b))     := b; // ??
 
@@ -313,6 +317,8 @@ CHOOSEVAR(a b)        := _rank(a b);
 CHOOSEVARDIV(1 b)     := b;
 CHOOSEVARDIV(a b)     := a; //No RANK there !!!
 
+/******** Derivals **************/
+
 DERN(a,b,0)     := a;
 DERN(a,b,_const(n))   := DERN(DER(a,b),b,n-1);
 DER(_const(a),c) := 0;
@@ -341,9 +347,14 @@ DIFF(a,b,n)  := DERN(a,b,n);
 //RANGE( _const(a) _const(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ) : ( (a > b) ? ( RANGE( a b+1 ), b ) : b ) );
 RANGE( _const(a) _const(b) ) := ( (a == b) ? a : ( (a < b) ? ( RANGE( a b-1 ), b ) : ( RANGE( a b+1 ), b ) ) );
 
-SIN(a,b)                  := (SIN(a),SIN(b));
-COS(a,b)                  := (COS(a),COS(b));
-TAN(a,b)                  := (TAN(a),TAN(b));
+// SIN(a,b)                  := (SIN(a),SIN(b));
+// COS(a,b)                  := (COS(a),COS(b));
+// TAN(a,b)                  := (TAN(a),TAN(b));
+
+// _funct1( { a } b )  := { _funct1( a b ) };
+// _funct1( (a, b) c ) := ( _funct1( a c ), _funct1( b c ) );
+
+/******** Matrixes **************/
 
 VSIZE({a,b,c,d,e,f,g,h})  := VSIZE({a})+7;
 VSIZE({a,b,c,d})          := VSIZE({a})+3;
