@@ -42,20 +42,25 @@ TRANS(-a)        := -TRANS(a);
 TRANS(FSRC())     := 0;
 TRANS(DER(a,TIME())) := _der1( TRANS(a) ) * TRANS(a) + _der0( TRANS(a) );
 TRANS(a.b)       := a.b;
-TRANS( _funct1( a   f ) ) := _funct1( TRANS(a) f );
-TRANS( _funct2( a b f ) ) := _funct2( TRANS(a) TRANS(b) f );
+
 TRANS(a)           := a;
+TRANS(LAST(a))     := LAST(a);
 TRANS({a})         := {TRANS(a)};
-TRANS(IF((a:b) c)) := LIN_IF((a:b) c);
+TRANS(IF((a:b) c)) := LIN_IF((TRANS(a):TRANS(b)) c);
 TRANS(EXP(a))      := LIN_EXP(a);
 TRANS(MOD(a b))    := LIN_MOD(a b);
 
-TRANS(GT ( a b ) ) :=  GT(  LAST(a)  LAST(b) );
 TRANS(EQ ( a b ) ) :=  EQ(  LAST(a)  LAST(b) );
 TRANS(NEQ( a b ) ) :=  NEQ( LAST(a)  LAST(b) );
 TRANS(LTE( a b ) ) :=  LTE( LAST(a)  LAST(b) );
 TRANS(LT ( a b ) ) :=  LT(  LAST(a)  LAST(b) );
 TRANS(GTE( a b ) ) :=  GTE( LAST(a)  LAST(b) );
+TRANS(GT ( a b ) ) :=  GT(  LAST(a)  LAST(b) );
+TRANS(NOT( a ) )   :=  NOT( LAST(a) );
+
+// other functions
+TRANS( _funct1( a   f ) ) := _funct1( TRANS(a) f );
+TRANS( _funct2( a b f ) ) := _funct2( TRANS(a) TRANS(b) f );
 
 LIN_EXP(a)      := EXP( LAST(a) ) * a + ( 1 - LAST( a ) ) * EXP( LAST( a ) );
 LIN_IF((a:b) c) := a*LAST(c) + b*(LNOT(LAST(c)));
@@ -63,7 +68,9 @@ LIN_MOD(a b)    := LAST(a) % LAST(b);
 
 LAST(TIME()) := TIME();
 LAST( _const( a ) ) := a;
+LAST( LAST(a) )   := _last( a );
 LAST( a )   := _last( a );
+LAST( ~a )  := ~LAST( a );
 LAST(a+b)   := LAST(a) + LAST(b);
 LAST(a-b)   := LAST(a) - LAST(b);
 LAST(a*b)   := LAST(a) * LAST(b);

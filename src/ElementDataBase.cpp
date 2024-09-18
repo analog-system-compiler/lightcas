@@ -155,7 +155,7 @@ bool CElementDataBase::LoadFromFile(const CString &file_name, CMathExpression &s
 void CElementDataBase::AddReservedElements()
 {
   CMathExpression exp(this);
-  static const char parameters[] = "_a _b _c _d _e _f _g _h _i _j _k _l _m _n _o _q";
+  static const char parameters[] = "_1 _2 _3 _4 _5 _6 _7 _8 _9 _10 _11 _12 _13 _14 _15 _16";
   static const char built_in[] = "_set(0 0) _get(0) _none _const(0) _elem(0) _funct0(0) _funct1(0 0) _funct2(0 0 0) NEG(0) _rank(0 0) _eval(0) _check(0 0) _print(0) _exec(0)";
   bool ret = exp.Parse(parameters);
   if (ret)

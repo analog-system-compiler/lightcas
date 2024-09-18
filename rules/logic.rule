@@ -17,7 +17,7 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-NAME.ANDC( @in1, @in2, @out, @GND ) :=
+NAME.ANDC( @in1, @in2, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin1 = ACROSS( @in1, @GND );
@@ -26,10 +26,10 @@ NAME.ANDC( @in1, @in2, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.Uout = NAME.Uin1 & NAME.Uin2
+	NAME.Uout = VCC * ( ( NAME.Uin1 > (VCC/2)) & ( NAME.Uin2 > (VCC/2) ) )
 };
 
-NAME.ORC( @in1, @in2, @out, @GND ) :=
+NAME.ORC( @in1, @in2, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin1 = ACROSS( @in1, @GND );
@@ -38,10 +38,10 @@ NAME.ORC( @in1, @in2, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.Uout = NAME.Uin1 | NAME.Uin2
+	NAME.Uout = VCC * ( ( NAME.Uin1 > (VCC/2) ) | ( NAME.Uin2 > (VCC/2) ) )
 };
 
-NAME.XORC( @in1, @in2, @out, @GND ) :=
+NAME.XORC( @in1, @in2, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin1 = ACROSS( @in1, @GND );
@@ -50,10 +50,10 @@ NAME.XORC( @in1, @in2, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.Uout = XOR( NAME.Uin1  NAME.Uin2 )	
+	NAME.Uout = VCC * XOR( ( NAME.Uin1 > (VCC/2) ) ( NAME.Uin2 > (VCC/2) ) )	
 };
 
-NAME.NOTC( @in, @out, @GND ) :=
+NAME.NOTC( @in, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin = ACROSS( @in, @GND );
@@ -61,10 +61,10 @@ NAME.NOTC( @in, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.Uout = LNOT( NAME.Uin )
+	NAME.Uout = VCC * (NAME.Uin <= (VCC/2))
 };
 
-NAME.SRFFC( @in1, @in2, @out, @GND ) :=
+NAME.SRFFC( @in1, @in2, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin1 = ACROSS( @in1, @GND );
@@ -73,10 +73,10 @@ NAME.SRFFC( @in1, @in2, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.Uout = ( ( NAME.Uout>0.5) | ( NAME.Uin1 > 0.5) ) & ( NAME.Uin2 > 0.5 )
+	NAME.Uout = VCC * ( ( ( NAME.Uout>(VCC/2)) | ( NAME.Uin1 > (VCC/2)) ) & ( NAME.Uin2 > (VCC/2) ) )
 };
 
-NAME.FFC( @in, @clk, @out, @GND ) :=
+NAME.FFC( @in, @clk, @out, @GND, VCC ) :=
 {
 	/* nodal equations */
 	NAME.Uin  = ACROSS( @in, @GND );
@@ -85,7 +85,7 @@ NAME.FFC( @in, @clk, @out, @GND ) :=
 	NAME.Iout = THROUGH( @out, @GND );
 	
 	/* physical equation */				
-	NAME.aux1 = ( NAME.Uclk > 0.5 );
-	NAME.aux2 = ( NAME.Uclk > 0.5 ) & ( NAME.aux1==0 );
-	NAME.Uout = ( ( (NAME.Uout>0.5) & (NAME.aux2==0) ) | ( (NAME.Uin>0.5) & (NAME.aux2==1) ) )
+	NAME.aux1  = ( NAME.Uclk > (VCC/2) );
+	NAME.aux2  = ( NAME.Uclk > (VCC/2) ) & ( NAME.aux1 == 0 );
+	NAME.Uout = VCC * ( NAME.aux2 == 1 ? NAME.Uin> (VCC/2) : NAME.Uout> (VCC/2) )
 };

@@ -117,7 +117,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
           {
             ds2.Append("self._setf(");
             ds2.Append(ds4);
-            ds2.Append(",");
+            ds2.Append(", ");
             ds2.Append(ds3);
             ds2.Append(", self.freq)\n");
           }
@@ -125,7 +125,7 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
           {
             ds2.Append("self._setc(");
             ds2.Append(ds4);
-            ds2.Append(",");
+            ds2.Append(", ");
             ds2.Append(ds3);
             ds2.Append(")\n");
           }

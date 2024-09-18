@@ -242,7 +242,7 @@ NAME.VSQR( @1, @2, value, freq, phase, offset, tr, tf ) := {
 };
 
 // Square with default parameters
-NAME.VSQR( @1, @2, value, freq ) := NAME.VSQR( @1, @2, value, freq, 0, 0, 1n, 1n );
+NAME.VSQR( @1, @2, value, freq ) := NAME.VSQR( @1, @2, value, freq, 0, value, 1n, 1n );
 
 
 /********************************/
