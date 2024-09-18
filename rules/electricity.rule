@@ -68,7 +68,7 @@ LIN_MOD(a b)    := LAST(a) % LAST(b);
 
 LAST(TIME()) := TIME();
 LAST( _const( a ) ) := a;
-LAST( LAST(a) )   := _last( a );
+LAST( _delay( a, b ) ) := _delay( a, b );
 LAST( a )   := _last( a );
 LAST( ~a )  := ~LAST( a );
 LAST(a+b)   := LAST(a) + LAST(b);

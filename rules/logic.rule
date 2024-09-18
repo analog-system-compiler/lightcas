@@ -17,75 +17,82 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-NAME.ANDC( @in1, @in2, @out, @GND, VCC ) :=
+NAME.ANDC( @in1, @in2, @out, @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin1 = ACROSS( @in1, @GND );
-	NAME.Uin2 = ACROSS( @in2, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin1 = ACROSS( @in1, @gnd );
+	NAME.Uin2 = ACROSS( @in2, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.Uout = VCC * ( ( NAME.Uin1 > (VCC/2)) & ( NAME.Uin2 > (VCC/2) ) )
+	NAME.Uout = NAME.VCC * ( ( NAME.Uin1 > (NAME.VCC/2)) & ( NAME.Uin2 > (NAME.VCC/2) ) )
 };
 
-NAME.ORC( @in1, @in2, @out, @GND, VCC ) :=
+NAME.ORC( @in1, @in2, @out,  @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin1 = ACROSS( @in1, @GND );
-	NAME.Uin2 = ACROSS( @in2, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin1 = ACROSS( @in1, @gnd );
+	NAME.Uin2 = ACROSS( @in2, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.Uout = VCC * ( ( NAME.Uin1 > (VCC/2) ) | ( NAME.Uin2 > (VCC/2) ) )
+	NAME.Uout = NAME.VCC * ( ( NAME.Uin1 > (NAME.VCC/2) ) | ( NAME.Uin2 > (NAME.VCC/2) ) )
 };
 
-NAME.XORC( @in1, @in2, @out, @GND, VCC ) :=
+NAME.XORC( @in1, @in2, @out,  @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin1 = ACROSS( @in1, @GND );
-	NAME.Uin2 = ACROSS( @in2, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin1 = ACROSS( @in1, @gnd );
+	NAME.Uin2 = ACROSS( @in2, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.Uout = VCC * XOR( ( NAME.Uin1 > (VCC/2) ) ( NAME.Uin2 > (VCC/2) ) )	
+	NAME.Uout = NAME.VCC * XOR( ( NAME.Uin1 > (NAME.VCC/2) ) ( NAME.Uin2 > (NAME.VCC/2) ) )	
 };
 
-NAME.NOTC( @in, @out, @GND, VCC ) :=
+NAME.NOTC( @in, @out, @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin = ACROSS( @in, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin = ACROSS( @in, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.Uout = VCC * (NAME.Uin <= (VCC/2))
+	NAME.Uout = NAME.VCC * ( NAME.Uin <= (NAME.VCC/2))
 };
 
-NAME.SRFFC( @in1, @in2, @out, @GND, VCC ) :=
+NAME.SRFFC( @in1, @in2, @out, @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin1 = ACROSS( @in1, @GND );
-	NAME.Uin2 = ACROSS( @in2, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin1 = ACROSS( @in1, @gnd );
+	NAME.Uin2 = ACROSS( @in2, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.Uout = VCC * ( ( ( NAME.Uout>(VCC/2)) | ( NAME.Uin1 > (VCC/2)) ) & ( NAME.Uin2 > (VCC/2) ) )
+	//NAME.Uout = NAME.VCC * ( ( ( NAME.Uout>(NAME.VCC/2)) | ( NAME.Uin1 > (NAME.VCC/2)) ) & ( NAME.Uin2 > (NAME.VCC/2) ) )
+	NAME.Uout = NAME.VCC * ( ( ( NAME.Uout > 0.5) | ( NAME.Uin1 > 0.5) ) & ( NAME.Uin2 > 0.5 ) )
 };
 
-NAME.FFC( @in, @clk, @out, @GND, VCC ) :=
+NAME.FFC( @in, @clk, @out, @vcc, @gnd ) :=
 {
 	/* nodal equations */
-	NAME.Uin  = ACROSS( @in, @GND );
-	NAME.Uclk = ACROSS( @clk, @GND );
-	NAME.Uout = ACROSS( @out, @GND );
-	NAME.Iout = THROUGH( @out, @GND );
+	NAME.Uin  = ACROSS( @in, @gnd );
+	NAME.Uclk = ACROSS( @clk, @gnd );
+	NAME.Uout = ACROSS( @out, @gnd );
+	NAME.Iout = THROUGH( @out, @gnd );
+	NAME.VCC  = ACROSS(  @vcc, @gnd );
 	
 	/* physical equation */				
-	NAME.aux1  = ( NAME.Uclk > (VCC/2) );
-	NAME.aux2  = ( NAME.Uclk > (VCC/2) ) & ( NAME.aux1 == 0 );
-	NAME.Uout = VCC * ( NAME.aux2 == 1 ? NAME.Uin> (VCC/2) : NAME.Uout> (VCC/2) )
+	NAME.aux1  = ( NAME.Uclk > (NAME.VCC/2) );
+	NAME.aux2  = ( NAME.Uclk > (NAME.VCC/2) ) & ( NAME.aux1 == 0 );
+	NAME.Uout = NAME.VCC * ( NAME.aux2 == 1 ? NAME.Uin> (NAME.VCC/2) : NAME.Uout> (NAME.VCC/2) )
 };
