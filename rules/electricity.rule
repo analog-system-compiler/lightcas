@@ -124,8 +124,8 @@ INODE_REMOVE(a,NODE(b,_none))            := (INODE_REMOVE(a),NODE(b,_none));
 INODE_REMOVE(a,NODE(b,c))                := a;
 INODE_REMOVE(a)                          := a;
 
-KIRCHHOFF_NODE(a)                        := INODE_TRANS( INODE_REMOVE( NODE_TRANS2( a ) ) );
-KIRCHHOFF_NODE({a})                      := {KIRCHHOFF_NODE(a)};
+KIRCHHOFF_JUNCTION(a)                        := INODE_TRANS( INODE_REMOVE( NODE_TRANS2( a ) ) );
+KIRCHHOFF_JUNCTION({a})                      := {KIRCHHOFF_JUNCTION(a)};
 
 POLY(  ACROSS( a, b ) c ) := POLYF(  ACROSS( _get(a), _get(b) ) );
 POLY( THROUGH( a, b ) c ) := POLYF( THROUGH( _get(a), _get(b) ) );
@@ -147,8 +147,8 @@ SYS_CONCAT2({a})   := SYS_CONCAT2(a);
 
 SYS_CONCAT_ENTRY({a}) := {SYS_CONCAT2(a)};
 
-AC_TRANSFORM( a )        := KIRCHHOFF_LOOP( KIRCHHOFF_NODE( AC( REM_DC ( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) ) );
-TRANSIENT_TRANSFORM( a ) := KIRCHHOFF_LOOP( KIRCHHOFF_NODE( TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) );
+AC_TRANSFORM( a )        := KIRCHHOFF_LOOP( KIRCHHOFF_JUNCTION( AC( REM_DC ( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) ) );
+TRANSIENT_TRANSFORM( a ) := KIRCHHOFF_LOOP( KIRCHHOFF_JUNCTION( TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) );
 
 SOLVE_TRANS_LEGACY( a ) := SYSTEM_AUTO_SOLVE_LEGACY( VECT_TO_LIST( TRANSIENT_TRANSFORM( _get( a ) ) ) );
 //OK SOLVE_TRANS( a ) := SYSTEM_AUTO_SOLVE( VECT_TO_LIST( TRANSIENT_TRANSFORM( _get( a ) ) ) );

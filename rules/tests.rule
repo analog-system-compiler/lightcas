@@ -336,4 +336,4 @@ _check( SIMPLIFY( TEST_SYSTEM() ) {((((((-(1/((0.001*s()+1e-08*s()^2)+1)),-((0.0
 
 _check( SIMPLIFY(1n)  1e-9 );
 _check( SIMPLIFY(1m) 0.001 );
-_check( SIMPLIFY(1K)  1000 );
+_check( SIMPLIFY(1K)  1000 )

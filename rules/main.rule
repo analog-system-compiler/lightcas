@@ -203,14 +203,14 @@ SQR(a)*SQR(b)    := SQR(a*b)  ;
 a/1              := a  ;
 a/0              := DIVIDE_BY_ZERO_ERROR();
 -a/b             := -(a/b)  ; // to simplify consts
-a/-b             := -(a/b)   ; // to simplify consts
-a/-b             := -a/b     ;
-(a/b)/c          := a/(b*c)  ;
+a/-b             := -(a/b)  ; // to simplify consts
+a/-b             := -a/b    ;
+(a/b)/c          := a/(b*c) ;
 
 LOG(EXP(1))      := 1         ;
 EXP(a)/EXP(b)    := EXP(a-b)  ;
 SQRT(a)/SQRT(b)  := SQRT(a/b) ;
-SQRT(-_const(a))  := SQRT(a)*j ;
+SQRT(-_const(a)) := SQRT(a)*j ;
 SQR(a)/SQR(b)    := SQR(a/b)  ;
 
 a^0              := 1  ;

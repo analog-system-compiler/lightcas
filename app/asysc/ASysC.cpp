@@ -184,17 +184,13 @@ int InteractiveMode(CElementDataBase &db)
     else if (expression_str == "clr")
     {
       db.Clear();
-      std::cout << "Clearing previous results."
+      std::cout << "Clearing previous assignments."
                 << "\n";
     }
     else
     {
       parser.SetPos(expression_str.c_str());
-      if (!equ.Parse(parser))
-      {
-        std::cerr << "ERROR: " << parser.GetBuffer().GetBufferPtr() << " at line " << parser.GetLineNb() << "\n";
-      }
-      else
+      if (equ.Parse(parser)>0)
       {
         equ.UnaryOperation(simplify_op);
         ans->SetEquation(equ);

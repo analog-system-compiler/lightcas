@@ -1,3 +1,10 @@
+Commands:
+    help: this help
+    hex: display in hexadecimal mode
+    bin: display in binary mode
+    dec: display in decimal mode
+    clr: clear all assignments
+
 Assignments:
     a:=5
     a:=b
