@@ -213,8 +213,3 @@ void CMathExpression::Replace(OP_CODE op1, OP_CODE op2, pos_t pos)
   }
 }
 
-void CMathExpression::Compile()
-{
-  Push(CElementDataBase::OP_EXEC);
-  OptimizeTree();
-}

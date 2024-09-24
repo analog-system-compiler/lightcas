@@ -84,8 +84,6 @@ bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
   {
     unsigned precedence = var_found ? priority : 0;
     ret = ParseOperator(IC, precedence, var_found);
-    if (ret == 2)
-      return false;
     if (ret == 1)
       var_found = true;
   }
@@ -112,10 +110,9 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
         if (c)
         {
           if (IC.IsStopChar())
-            return 2;
+            goto next;
 
-          if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1))
-            // return 2;
+          if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1 ))
             goto next;
         }
       }

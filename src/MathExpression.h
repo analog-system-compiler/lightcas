@@ -149,11 +149,9 @@ public:
     Push(e);
   }
   bool IsEmpty() const { return (m_StackSize == 0); }
-
   bool Compare(const CMathExpression &equ) const;
   void Copy(const CMathExpression &equ);
   void Display(CDisplay &ds, bool bAll = true) const;
-  // bool  GetFromString( CParser& IC )        { return ( Parse( IC ) > 0 ); }
   int Parse(CParser &IC);
   int Parse(const char *text)
   {
@@ -163,12 +161,11 @@ public:
   void OptimizeTree();
   bool Match(const CMathExpression &equ) const;
   void Evaluate() const;
-  void Compile();
-
   static unsigned ConvertToRule(CMathExpression &src, CMathExpression &dst);
 
   OP_CODE GetLastOperator() const { return IsEmpty() ? CElementDataBase::OP_ZERO : Get(m_StackSize - 1); }
   pos_t GetSize() const { return m_StackSize; }
+  void Compile() { UnaryOperation(CElementDataBase::OP_EXEC); }
   CElementDataBase *GetElementDB() const { return m_ElementDB; }
 
   explicit CMathExpression(CElementDataBase *db = NULL);

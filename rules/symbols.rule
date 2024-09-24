@@ -57,4 +57,4 @@
 `symbol "a!      " 24 FACT(a)
 `symbol "a.b     " 25 HIER(a b)
 `symbol "{A}     " 26 VECT(a)
-//`symbol "a;      " 26 a
+
