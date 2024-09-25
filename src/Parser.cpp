@@ -420,12 +420,25 @@ bool CParser::ProcessMacro()
   return ret;
 }
 
+bool CParser::CheckEOT() const
+{
+  if (!EOT(*m_Pos))
+  {
+    CString s("extra character found at end of line: ");
+    s += *m_Pos;
+    Error(s);
+    return false;
+  }
+  return true;
+}
+
 void CParser::Error(const CString &s) const
 {
   CDisplay ds(s);
   ds += " in line ";
   ds += CDisplay(GetLineNb(), 10);
-  ds += " of file ";
+  ds += " of file \"";
   ds += GetFileName();
+  ds += "\"";
   ds.Log(LOG_ERR);
 }

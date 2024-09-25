@@ -40,6 +40,7 @@ public:
   pos_t DisplayElement(CDisplay &ds, pos_t pos) const;
   pos_t DisplayBranch(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const override;
   pos_t DisplaySymbol(CDisplay &ds, pos_t pos, unsigned char precedence = 0) const override;
+  bool ChangeSymbol(OP_CODE op, const char *new_symbol );
 
 public:
   CMathExpressionEx(CElementDataBase *edb = NULL) : CMathExpression(edb), m_op_hier(CElementDataBase::OP_NONE), m_op_getv(CElementDataBase::OP_NONE) {};

@@ -19,10 +19,18 @@
 #include "Element.h"
 #include "MathExpression.h"
 
+enum{
+  PARSE_NOTFOUND=0,
+  PARSE_FOUND,
+  PARSE_ERROR,
+};
+
 int CMathExpression::Parse(CParser &IC)
 {
   Clear();
-  return GetLevel(IC);
+  int ret=GetLevel(IC);
+  IC.CheckEOT();
+  return ret;
 }
 
 bool CMathExpression::ParseAtom(CParser &IC)
@@ -84,7 +92,9 @@ bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
   {
     unsigned precedence = var_found ? priority : 0;
     ret = ParseOperator(IC, precedence, var_found);
-    if (ret == 1)
+     if (ret == PARSE_ERROR)
+      return false;
+    if (ret == PARSE_FOUND)
       var_found = true;
   }
 
@@ -110,7 +120,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
         if (c)
         {
           if (IC.IsStopChar())
-            goto next;
+             return PARSE_ERROR;
 
           if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1 ))
             goto next;
@@ -126,7 +136,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
         Display(ds);
         ds.Log(LOG_DEBUG);
 #endif
-        return 1;
+        return PARSE_FOUND;
       }
     }
   next:
@@ -134,7 +144,7 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
     index++;
   }
 
-  return 0;
+  return PARSE_NOTFOUND;
 }
 
 bool CMathExpression::ParseElement(CParser &IC)

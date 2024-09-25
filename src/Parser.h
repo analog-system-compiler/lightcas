@@ -71,6 +71,7 @@ public:
   void  Error(const CString& s) const;
   bool  ProcessMacro();
   int   GetQuotes();
+  bool  CheckEOT() const;
   int   GetInt(int base = 10 )                     { return (int)strtol ( m_Pos, (char **)&m_Pos, base ); }
   const CString& GetWord();
   const CString& GetBuffer() const                 { return m_Buffer;         }

@@ -16,6 +16,7 @@
  */
 
 #include <ctype.h>
+#include <cstring>
 #include "Element.h"
 #include "MathExpressionEx.h"
 
@@ -25,9 +26,8 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
   CDisplay ds1, ds2, ds3, ds4;
   CElementArray element_array;
 
-  m_ElementDB->GetElement("RESOLVE_TRANS")->SetMessage("Solving transient system...");
-  m_ElementDB->GetElement("RESOLVE_AC")->SetMessage("Solving AC system...");
-  m_ElementDB->GetElement("SIMPLIFY")->SetMessage("Simplifying system...");
+  // m_ElementDB->GetElement("SOLVE_TRANS")->SetMessage("Solving transient system...");
+  // m_ElementDB->GetElement("SOLVE_AC")->SetMessage("Solving AC system...");
   eth = m_ElementDB->GetElement("TANH");
   es = m_ElementDB->GetElement("SIN");
   ec = m_ElementDB->GetElement("COS");
@@ -39,6 +39,8 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
   OP_CODE op_concat = m_ElementDB->GetElement("CONCAT")->ToRef();
   OP_CODE op_vect = m_ElementDB->GetElement("VECT")->ToRef();
   OP_CODE op_eqv = m_ElementDB->GetElement("EQV")->ToRef();
+  OP_CODE op_pow = m_ElementDB->GetElement("POW")->ToRef();
+  ChangeSymbol(op_pow, "(a)**(b)" ); // use Python exponent symbol
 
   eth->SetName("tanh");
   eth->SetNumeric();
@@ -268,4 +270,20 @@ pos_t CMathExpressionEx::DisplayBranch(CDisplay &ds, pos_t pos, unsigned char pr
   }
 
   return pos;
+}
+
+bool CMathExpressionEx::ChangeSymbol(OP_CODE op, const char *new_symbol )
+{
+  const CSymbolSyntaxArray &st = m_ElementDB->GetSymbolTable();
+  for (unsigned i = 0; i < st.GetSize(); i++)
+  {
+    CSymbolSyntaxStruct *ss = st[i];
+    if (op == ss->m_Equation.GetLastOperator())
+    {
+      ASSERT(strlen(new_symbol) < sizeof(ss->m_Syntax));
+      ::strcpy( ss->m_Syntax, new_symbol );
+      return true;
+    }
+  }
+  return false;
 }
