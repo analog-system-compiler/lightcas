@@ -443,8 +443,6 @@ bool CMathExpression::ExecuteDirective()
     else
     {
       ds1 += "assertion success: ";
-      DisplayBranch(ds1, pos2);
-      ds1 += " == ";
       DisplayBranch(ds1, pos1);
       ds1.Log(LOG_INFO);
     }
