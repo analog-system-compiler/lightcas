@@ -1,0 +1,68 @@
+
+
+/*
+ * Copyright (C) 2006-2024 The LightCAS project                        
+ *                                                                    
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or   
+ * any later version.                                                  
+ *                                                                    
+ * This program is distributed in the hope that it will be useful,     
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of      
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
+ * GNU General Public License for more details.                        
+ *                                                                    
+ * You should have received a copy of the GNU General Public License   
+ * along with this program; If not, see <https://www.gnu.org/licenses/>
+ */
+
+ADD(   _const(a)  _const(b)  )  := _eval( _add( a b )  );
+SUB(   _const(a)  _const(b)  )  := _eval( _sub( a b )  );
+OR(    _const(a)  _const(b)  )  := _eval( _or(  a b )  );
+LOR(   _const(a)  _const(b)  )  := _eval( _lor( a b )  );
+XOR(   _const(a)  _const(b)  )  := _eval( _xor( a b )  );
+MUL(   _const(a)  _const(b)  )  := _eval( _mul( a b )  );
+DIV(   _const(a)  _const(b)  )  := _eval( _div( a b )  );
+AND(   _const(a)  _const(b)  )  := _eval( _and( a b )  );
+LAND(  _const(a)  _const(b)  )  := _eval( _land( a b ) );
+EQ(    _const(a)  _const(b)  )  := _eval( _eq(  a b )  );
+NEQ(   _const(a)  _const(b)  )  := _eval( _neq( a b )  );
+LTE(   _const(a)  _const(b)  )  := _eval( _lte( a b )  );
+SHL(   _const(a)  _const(b)  )  := _eval( _shl( a b )  );
+LT(    _const(a)  _const(b)  )  := _eval( _lt(  a b )  );
+GTE(   _const(a)  _const(b)  )  := _eval( _gte( a b )  );
+SHR(   _const(a)  _const(b)  )  := _eval( _shr( a b )  );
+GT(    _const(a)  _const(b)  )  := _eval( _gt(  a b )  );
+MIN(   _const(a), _const(b)  )  := _eval( _min( a b )  );
+MAX(   _const(a), _const(b)  )  := _eval( _max( a b )  );
+MOD(   _const(a)  _const(b)  )  := _eval( _mod( a b )  );
+POW(   _const(a)  _const(b)  )  := _eval( _pow( a b )  );
+//NEG(   _const(a)             )  := _eval( _neg( a )    );
+INV(   _const(a)             )  := _eval( _inv( a )    );
+NOT(   _const(a)             )  := _eval( _not( a )    );
+ID(    _const(a)             )  := _eval( _id(  a )    );
+BOOL(  _const(a)             )  := _eval( _bool( a )   );
+LNOT(  _const(a)             )  := _eval( _lnot( a )   );
+SIN(   _const(a)             )  := _eval( _sin( a )    );
+COS(   _const(a)             )  := _eval( _cos( a )    );
+TAN(   _const(a)             )  := _eval( _tan( a )    );
+ASIN(  _const(a)             )  := _eval( _asin( a )   );
+ACOS(  _const(a)             )  := _eval( _acos( a )   );
+ATAN(  _const(a)             )  := _eval( _atan( a )   );
+SINH(  _const(a)             )  := _eval( _sinh( a )   );
+COSH(  _const(a)             )  := _eval( _cosh( a )   );
+TANH(  _const(a)             )  := _eval( _tanh( a )   );
+ASINH( _const(a)             )  := _eval( _asinh( a )  );
+ACOSH( _const(a)             )  := _eval( _acosh( a )  );
+ATANH( _const(a)             )  := _eval( _atanh( a )  );
+EXP(   _const(a)             )  := _eval( _exp( a )    );
+LOG(   _const(a)             )  := _eval( _log( a )    );
+LOG10( _const(a)             )  := _eval( _log10( a )  );
+SQRT(  _const(a)             )  := _eval( _sqrt( a )   );
+SQR(   _const(a)             )  := _eval( _sqr( a )    );
+FACT(  _const(a)             )  := _eval( _fact( a )   );
+ABS(   _const(a)             )  := _eval( _abs( a )    );
+FLOOR( _const(a)             )  := _eval( _floor( a )  );
+CEIL(  _const(a)             )  := _eval( _ceil( a )   );
+RAND(                        )  := _eval( _rand()      );

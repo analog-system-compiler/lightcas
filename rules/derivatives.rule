@@ -17,11 +17,31 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-`include <symbols.rule>
-`include <main.rule>
-`include <derivatives.rule>
-`include <evaluation.rule>
-`include <matrix_vector.rule>
-`include <units.rule>
-`include <electricity.rule>
+/******** Derivatives **************/
 
+DERN(a,b,0)     := a;
+DERN(a,b,_const(n))   := DERN(DER(a,b),b,n-1);
+DER(_const(a),c) := 0;
+DER(c,c)        := 1;
+DER(a+b,c)      := DER(a,c)+DER(b,c);
+DER(a-b,c)      := DER(a,c)-DER(b,c);
+DER(a*b,c)      := b*DER(a,c)+DER(b,c)*a;
+DER(a/b,c)      := (b*DER(a,c)-DER(b,c)*a)/SQR(b);
+DER(a^b,c)      := DER(a,c)*b*a^(b-1);
+DER(-a,c)       := -DER(a,c);
+DER(/a,c)       := -DER(a,c)/SQR(a);
+DER(SIN(b),c)   := DER(b,c)*COS(b);
+DER(COS(b),c)   := -(DER(b,c)*SIN(b));
+DER(TAN(b),c)   := DER(b,c)*(1+TAN(b)^2);
+DER(ASIN(b),c)  := DER(b,c)/SQRT(1-b^2);
+DER(ACOS(b),c)  := -(DER(b,c)/SQRT(1-b^2));
+DER(ATAN(b),c)  := DER(b,c)/(1+b^2);
+DER(TANH(b),c)  := DER(b,c)*(1-TANH(b)^2);
+DER(EXP(b),c)   := DER(b,c)*EXP(b);
+DER(LOG(a),c)   := DER(a,c)/a;
+
+//Maxima compatibility
+DIFF(a,b,n)  := DERN(a,b,n);
+
+TAYLOR(a,x,xo,0)          := SUBST2(a x xo);
+TAYLOR(a,x,xo,_const(n))  := TAYLOR(a,x,xo,n-1)+SUBST2(DERN(a,x,n) x xo)*(x-xo)^n/n!;
