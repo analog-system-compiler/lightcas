@@ -1,28 +1,29 @@
 /*
- * Copyright (C) 2006-2024 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2024 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-
-
+#include <time.h>
 #include <cstring>
 #include "Debug.h"
 #include "LCVector.h"
 #include "MathExpression.h"
 #include "Element.h"
 #include "Function.h"
+
+static clock_t clock_begin;
 
 #ifdef RECURSIVE_ALGO
 
@@ -160,6 +161,7 @@ CContextArray CMathExpression::m_ContextStack;
 void CMathExpression::OptimizeTree()
 {
   context_t save_context, save_context_new;
+  clock_begin = clock();
 
   if (IsEmpty())
     return;
@@ -391,7 +393,7 @@ bool CMathExpression::ExecuteDirective()
   {
     CMathExpression equ_dst(m_ElementDB);
     CMathExpression equ_src(m_ElementDB);
-    equ_dst.PushBranch(*this, m_StackSize);    
+    equ_dst.PushBranch(*this, m_StackSize);
     equ_src.PushBranch(*this, m_StackSize);
     OP_CODE op1 = equ_src.GetLastOperator();
     CElement *e = RefToElement(op1);
@@ -432,6 +434,11 @@ bool CMathExpression::ExecuteDirective()
     pos_t pos2 = NextBranch(pos1);
     CDisplay ds1;
     ds1.SetDebug();
+    double time_spent = (double)(clock() - clock_begin) / (CLOCKS_PER_SEC / 1000);
+    clock_begin = clock();
+    ds1 += "[";
+    ds1 += CString((int)time_spent);
+    ds1 += "ms] ";
     if (!CompareBranch(pos1, pos2))
     {
       ds1 += "assertion failure: ";
