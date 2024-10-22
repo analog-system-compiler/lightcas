@@ -120,7 +120,7 @@ NAME.MC( @1, @2, @3, @4, LA, LB ) := NAME.MC( @1, @2, @3, @4, LA, LB, 1 );
 /* current and voltages sources */
 /********************************/
 
-NAME.CV(@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V+FSRC() };
+NAME.CV(@1,@2,V) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=V };
 
 // Simple voltage source
 NAME.VS( @1, @2, value ) := { 
@@ -130,7 +130,7 @@ NAME.VS( @1, @2, value ) := {
 	NAME.I = THROUGH( @1, @2 );
 		
 	/* physical equation */
-	NAME.U = value+FSRC()
+	NAME.U = value
 };
 
 // Simple current source
@@ -153,10 +153,12 @@ NAME.VSIN( @1, @2, value, freq, phase, offset ) := {
 	NAME.I = THROUGH( @1, @2 );
 
 	/* physical equation */
-	NAME.U = value * SIN( 2 * PI * freq * t - phase ) + offset + FSRC()
+	NAME.U = value * ( SIN( 2 * PI * freq * t - phase ) + FSRC() ) + offset
 		
 };
 
+NAME.VSIN( @1, @2 )                     := NAME.VSIN( @1, @2,     1,   0,      0, 0 );
+NAME.VSIN( @1, @2, value )              := NAME.VSIN( @1, @2, value,   0,      0, 0 );
 NAME.VSIN( @1, @2, value, freq )        := NAME.VSIN( @1, @2, value, freq,     0, 0 );
 NAME.VSIN( @1, @2, value, freq, phase ) := NAME.VSIN( @1, @2, value, freq, phase, 0 );
 
