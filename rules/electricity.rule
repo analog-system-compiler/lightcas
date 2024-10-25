@@ -127,8 +127,8 @@ INODE_REMOVE(a)                          := a;
 KIRCHHOFF_JUNCTION(a)                        := INODE_TRANS( INODE_REMOVE( NODE_TRANS2( a ) ) );
 KIRCHHOFF_JUNCTION({a})                      := {KIRCHHOFF_JUNCTION(a)};
 
-POLY(  ACROSS( a, b ) c ) := POLYF(  ACROSS( _get(a), _get(b) ) );
-POLY( THROUGH( a, b ) c ) := POLYF( THROUGH( _get(a), _get(b) ) );
+POLY(  ACROSS( a, b ) c ) := POLYF(  ACROSS( a, b ) );
+POLY( THROUGH( a, b ) c ) := POLYF( THROUGH( a, b ) );
 
 ZERO_EQU(a)         := (a,ERROR(4));
 ZERO_EQU(a=b)       := a-b;
