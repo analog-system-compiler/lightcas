@@ -133,7 +133,11 @@ int FileMode(CElementDataBase &db, const char *input_filename, const char *outpu
     {
       if (language == LANG_PYTHON)
         ret = equ.ToPython(ds, analysis_type, circuit_name);
+      else
+        std::cout << "Output language not supported.";
     }
+    else
+      std::cout << "Error opening output file for writing.";
   }
   return ret ? 0 : 1;
 }
@@ -190,7 +194,7 @@ int InteractiveMode(CElementDataBase &db)
     else
     {
       parser.SetPos(expression_str.c_str());
-      if (equ.Parse(parser)>0)
+      if (equ.Parse(parser) > 0)
       {
         equ.UnaryOperation(simplify_op);
         ans->SetEquation(equ);
