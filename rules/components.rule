@@ -64,17 +64,17 @@ NAME.OPAMP( @plus, @minus, @out, @GND, gain ) := NAME.OPAMP( @plus, @minus, @out
 NAME.OPAMP( @plus, @minus, @out, @GND )       := NAME.OPAMP( @plus, @minus, @out, @GND, 10000, 10 );
 
 // TO CHECK
-NAME.AOPV(@minus, @plus, @out, @vplus, @vminus, gain ) :=
-{
-  /* nodal equations */
-  NAME.Uout = ACROSS( @out,   @vminus );
-  NAME.Iout = THROUGH( @out,  @vminus );
-  NAME.Uin  = ACROSS( @plus,  @minus  );
-  NAME.Upow = ACROSS( @vplus, @vminus );
+// NAME.AOPV(@minus, @plus, @out, @vplus, @vminus, gain ) :=
+// {
+//   /* nodal equations */
+//   NAME.Uout = ACROSS( @out,   @vminus );
+//   NAME.Iout = THROUGH( @out,  @vminus );
+//   NAME.Uin  = ACROSS( @plus,  @minus  );
+//   NAME.Upow = ACROSS( @vplus, @vminus );
 
-  /* physical equation */
-  NAME.Uout = MIN( MAX( gain * NAME.Uin, 0 ), NAME.Upow )
-};
+//   /* physical equation */
+//   NAME.Uout = MIN( MAX( gain * NAME.Uin, 0 ), NAME.Upow )
+// };
 
 /********************************/
 /* Potentiometer                */
@@ -183,8 +183,8 @@ NAME.VSLOPE( @1, @2, coeff, delay ) := {
 	NAME.I = THROUGH( @1, @2 );
 
 	/* physical equation */
-	td = t - delay;
-	NAME.U = ( td < 0 ) ? 0 : coeff * td
+	NAME.td = t - delay;
+	NAME.U = ( NAME.td < 0 ) ? 0 : coeff * NAME.td
 
 };
 
@@ -337,7 +337,7 @@ NAME.SWITCH( @1 , @2, command ) := {
 /********************************/
 
 // Ideal diode
-NAME.ID( @plus, @minus ) := { 
+NAME.IDIODE( @plus, @minus, threshold ) := { 
 
     
 	/* nodal equations */
@@ -345,23 +345,25 @@ NAME.ID( @plus, @minus ) := {
 	NAME.I = THROUGH( @plus, @minus );
 		
 	/* physical equation */
-    ( ( ( NAME.U + NAME.I ) > 0 ) ? NAME.U : NAME.I ) = 0
+	NAME.UD =  NAME.U - threshold;
+    ( ( ( NAME.UD + NAME.I ) > 0 ) ? NAME.UD : NAME.I ) = 0
 
 };
 
+NAME.IDIODE( @plus, @minus ) := NAME.IDIODE( @plus, @minus, 0.6 );
+
 // Real diode
-NAME.DD( @plus, @minus, ISS, UT  ) := { 
+NAME.DIODE( @plus, @minus, ISS, UT  ) := { 
 
 	/* nodal equations */
 	NAME.U = ACROSS( @plus, @minus );
 	NAME.I = THROUGH( @plus, @minus );
 		
 	/* physical equation */
-	
 	NAME.I = ISS * ( EXP( NAME.U / UT ) - 1 )
 };
 
-NAME.DD( @plus, @minus ) := NAME.DD( @plus, @minus, 1e-15, 26e-3  );
+NAME.DIODE( @plus, @minus ) := NAME.DIODE( @plus, @minus, 1e-15, 26e-3  );
 
 /********************************/
 /* NPN transistors              */
