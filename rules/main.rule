@@ -268,7 +268,7 @@ IM(a) := IM(REDUCE_COMPLEX(POLY(a j)));
 CONJ(a) := RE(a)-IM(a)*j;
 
 
-HIER(a GLOBAL(b))     := b; // ??
+//HIER(a GLOBAL(b))     := b; // ??
 
 POLY((a,b) v)         := (POLY(a v),POLY(b v)); //parenthesis are important there!!!
 POLY({a} v)           := {POLY(a v)};
@@ -318,7 +318,7 @@ CHOOSEVARDIV(a b)     := a; //No RANK there !!!
 
 //Range
 //RANGE( _const(a) _const(b) ) := ( (a < b) ? ( RANGE( a b-1 ), b ) : ( (a > b) ? ( RANGE( a b+1 ), b ) : b ) );
-RANGE( _const(a) _const(b) ) := ( (a == b) ? a : ( (a < b) ? ( RANGE( a b-1 ), b ) : ( RANGE( a b+1 ), b ) ) );
+//RANGE( _const(a) _const(b) ) := ( (a == b) ? a : ( (a < b) ? ( RANGE( a b-1 ), b ) : ( RANGE( a b+1 ), b ) ) );
 
 // SIN(a,b)                  := (SIN(a),SIN(b));
 // COS(a,b)                  := (COS(a),COS(b));

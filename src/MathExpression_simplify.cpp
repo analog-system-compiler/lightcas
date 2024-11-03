@@ -24,6 +24,7 @@
 #include "Function.h"
 
 static clock_t clock_begin;
+static constexpr unsigned MAX_ITERATION=100000000;
 
 #ifdef RECURSIVE_ALGO
 
@@ -162,6 +163,7 @@ void CMathExpression::OptimizeTree()
 {
   context_t save_context, save_context_new;
   clock_begin = clock();
+  unsigned iteration = MAX_ITERATION;
 
   if (IsEmpty())
     return;
@@ -175,7 +177,7 @@ void CMathExpression::OptimizeTree()
   }
 
 L1:
-  while (m_ContextStack.GetSize())
+  while (m_ContextStack.GetSize() && iteration)
   {
     save_context = m_ContextStack.Pop();
     pos_t n = save_context.m_RuleDstExp->GetSize();
@@ -193,7 +195,7 @@ L1:
         if (!CElementDataBase::IsFunctionOP(op3))
         {
           pos_t pos1 = NextBranch(pos2);      // TODO: optimize
-          Move(GetSize(), pos1, pos2 - pos1); // Append to end of equation
+          Move(GetSize(), pos1, pos2 - pos1); // Append at the end of equation
           continue;
         }
         pos5++;
@@ -209,11 +211,16 @@ L1:
           save_context.m_RuleDstPos = pos5;
           m_ContextStack.Push(save_context); // TODO: avoid push/pop
           m_ContextStack.Push(save_context_new);
+          iteration--;
           goto L1; // Do recursion
         }
       }
     }
     ReduceTree(save_context);
+  }
+  if (iteration == 0)
+  {
+    Init(m_ElementDB->GetElement("ITERATION_LIMIT_ERROR"));
   }
 #if (DEBUG_LEVEL >= 1)
   if (NextBranch(m_StackSize) != 0)
@@ -271,7 +278,7 @@ bool CMathExpression::RuleSearch(const CElement *e, context_t &save_context)
         if (rule->m_bHasRule)
         {
           save_context.m_Pos = pos;        // low stack limit
-          save_context.m_Size = GetSize(); // high stack limit, start of subsquent expressions
+          save_context.m_Size = GetSize(); // high stack limit, start of subsequent expressions
           save_context.m_RuleDstPos = 0;   // index in the rule. From 0 to m_DstEquation.GetSize()
           save_context.m_RuleDstExp = &(rule->m_DstEquation);
 #ifdef _DEBUG

@@ -193,7 +193,6 @@ _check( NORM((4+a*(6+32*a))/(2+a*(2+72*a)), a)  (2+3*a+(4*a)^2)/(1+a+(6*a)^2) );
 _check( SIMPLIFY( yyy:=a+b; zzz:=a-b; yyy-zzz )   (a+b;a-b;2*b) );
 
 /********** Equation solving **********/
-//Initialize();
 _check( SOLVE(x^2-4,x)  {-2,2} );
 _check( SOLVE(x^2+4,x)  {-(2*j),2*j} );
 _check( SIMPLIFY(SOLVE(x^2-2*x+4,x))  {1-1.73205080757*j,1+1.73205080757*j} );
@@ -216,7 +215,7 @@ _check( GET_VAR_LIST(x+y+z+u-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-
 
 _check( TO_SPARSE( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) {{-1,1,1,1,1},{-3,1,2,2,2},{-5,1,2,3,3},{-9,1,2,4,3}},{{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z}} );
 _check( TO_SPARSE( {x+z-1, y+2*z, x+2*y+3*u-5, x+2*y-9} )                           {{-1,1,1},{1,2},{-5,1,2,3},{-9,1,2}},{{1,x,z},{y,z},{1,x,y,u},{1,x,y}} );
-_check( COMATRIX_GET_LIST( {1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z} )             (1,x,y,u,z) );
+_check( COMATRIX_GET_LIST( {1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z},{1,x,y,u,z} )        (1,x,y,u,z) );
 
 _check( COMATRIX_ENTRY( {y+x+u+z,   x+2*y+2*z+2*u,   x+2*y+3*z+3*u,   x+2*y+3*z+4*u} )   (-1) );
 _check( COMATRIX_ENTRY( {y+x+u+z-1, x+2*y+2*z+2*u-3, x+2*y+3*z+3*u-5, x+2*y+3*z+4*u-9} ) (-1) );
@@ -328,8 +327,8 @@ RLC() := {
 SOLVE_RLC2(a) := SYSTEM_SOLVE( VECT_TO_LIST( AC_TRANSFORM( a ) ), {C.U,R.U,L.U,R.I,V.I,C.I,L.I,V.U} );
 TEST_SYSTEM() := SOLVE_RLC2( RLC );
 
-//_check( KIRCHHOFF_NODE(KIRCHHOFF_LOOP( SYST( SYST( SYST( SYST( SYST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) SYST(SYST(SYST(J+I V-U) H-V-U) s-I+J) );
-_check( KIRCHHOFF_LOOP(SYST( SYST( SYST( SYST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) ) SYST(U24-(U14-U12) U32-U34+U24) );
+//_check( KIRCHHOFF_NODE(KIRCHHOFF_LOOP( LIST( LIST( LIST( LIST( LIST( I-THROUGH(@1,@2) U-ACROSS(@1,@2) ) H-V-U ) s-I+J ) V-ACROSS(@1,@2) ) J-THROUGH(@1,@2) ) ) ) LIST(LIST(LIST(J+I V-U) H-V-U) s-I+J) );
+_check( KIRCHHOFF_LOOP(LIST( LIST( LIST( LIST( U12-ACROSS(@1,@2) U34-ACROSS(@3,@4) ) U24-ACROSS(@2,@4) ) U32-ACROSS(@3,@2) ) U14-ACROSS(@1,@4) ) ) LIST(U24-(U14-U12) U32-U34+U24) );
 
 _check( AC_TRANSFORM( RLC ) {(((((((V.U+(R.U+(L.U+C.U));V.I-C.I);C.I-L.I);L.I-R.I);V.U-1);R.U-100*R.I);L.U-0.001*(L.I*s()));C.I-1e-05*(C.U*s()))} );
 _check( SIMPLIFY( TEST_SYSTEM() ) {((((((-(1/((0.001*s()+1e-08*s()^2)+1)),-((0.001*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-08*s()^2)/((1+0.001*s())+1e-08*s()^2))),-((1e-05*s())/((1+1e-08*s()^2)+0.001*s()))),-((1e-05*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-05*s())/((0.001*s()+1)+1e-08*s()^2))),-((1e-05*s())/((1+1e-08*s()^2)+0.001*s()))),((1e-08*s()^2+1)+0.001*s())/((1e-08*s()^2+1)+0.001*s())} );

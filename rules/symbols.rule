@@ -22,7 +22,7 @@
 // Uppercase: new precedence = 0
 // Parenthesis are used for display only
 
-`symbol "a;b     "  0 SYST(a b)
+`symbol "a;b     "  0 LIST(a b)
 `symbol "a:=b    "  1 _set(a b)
 `symbol "a,(b)   "  2 CONCAT(a b)
 `symbol "a=\=b   "  3 EQV(a b)

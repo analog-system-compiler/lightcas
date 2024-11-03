@@ -231,7 +231,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
 void CElementDataBase::InitAlgebraRuleTable()
 {
   CMathExpression src(this);
-  src.Parse("_set( _exec( SYST( a b ) ) SYST( _exec( a ) _exec( b ) )  )");
+  src.Parse("_set( _exec( LIST( a b ) ) LIST( _exec( a ) _exec( b ) )  )");
   src.OptimizeTree();
   src.Parse("_set( _exec( _set( a b ) ) _set( a b ) )");
   src.OptimizeTree();
