@@ -17,14 +17,14 @@
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-`symbol "a$p" UNIT_p( a )
-`symbol "a$n" UNIT_n( a )
-`symbol "a$u" UNIT_u( a )
-`symbol "a$m" UNIT_m( a )
-`symbol "a$k" UNIT_k( a )
-`symbol "a$K" UNIT_K( a )
-`symbol "a$M" UNIT_M( a )
-`symbol "a$G" UNIT_G( a )
+`symbol "a$p" 31 UNIT_p( a )
+`symbol "a$n" 31 UNIT_n( a )
+`symbol "a$u" 31 UNIT_u( a )
+`symbol "a$m" 31 UNIT_m( a )
+`symbol "a$k" 31 UNIT_k( a )
+`symbol "a$K" 31 UNIT_K( a )
+`symbol "a$M" 31 UNIT_M( a )
+`symbol "a$G" 31 UNIT_G( a )
 
 UNIT_p(a) := a * 1e-12;
 UNIT_n(a) := a * 1e-9;
