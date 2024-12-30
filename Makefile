@@ -8,12 +8,13 @@ APP_DIR     = app
 RULES_DIR   = rules
 OBJ_DIR     = $(shell mkdir -p objs objs/nostd objs/asysc ) objs
 LIB         = lib$(EXE).a
-EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o)
+EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o) $(OBJ_DIR)/asysc/Help.o
 LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
 RULE_FILES  = $(addprefix $(RULES_DIR)/, $(shell awk -F '<|>' '$$1~/`include/ {print $$2}' $(RULES_DIR)/includes.rule))
 CPP_FILES   = $(addprefix $(LIB_DIR)/, $(LIB_SRC) )  $(addprefix $(APP_DIR)/, $(APP_SRC) ) 
 SRC_FILES   = $(shell find . -name "*.cpp"; find . -name "*.h"; find . -name "*.txt")
+LDFLAGS     = -z noexecstack
 
 #options
 USE_CLANG   ?= 0
@@ -80,7 +81,6 @@ ifeq ($(TEST),1)
 	CPPFLAGS += -D_TEST
 endif
 
-LIB_OBJS += $(OBJ_DIR)/asysc/Help.o
 ifeq ($(EMBED_RULES),1)
 	CPPFLAGS += -DEMBED_RULES
 	LIB_OBJS += $(OBJ_DIR)/Rules_concat.o
@@ -127,7 +127,7 @@ endif
 
 clean:
 	@echo 'Cleaning  ...'
-	rm -rf $(LIB) $(EXE) $(OBJ_DIR)
+	rm -rf $(LIB) $(EXE) $(OBJ_DIR) $(EXE_OBJ)
 
 archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
@@ -141,6 +141,6 @@ clang-tidy:
 header:	
 	insert-license --license-filepath=LICENSE --use-current-year --comment-style "/*| *| */" $(SRC_FILES); sed -i -e 's|C:/msys64||' $(SRC_FILES)	
 	
-.PHONY: all clean rules archive
+.PHONY: all clean rules archive cppcheck clang-tidy header
 .SILENT:
 #.SECONDARY:

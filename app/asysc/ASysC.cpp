@@ -41,7 +41,7 @@ int InteractiveMode(CElementDataBase &db);
 int main(int argc, char *argv[])
 {
   lang_t language = LANG_PYTHON;
-  char *input_filename = NULL;
+  const char *input_filename = NULL;
   const char *output_filename = "out";
   const char *circuit_name = "CIRCUIT";
 
