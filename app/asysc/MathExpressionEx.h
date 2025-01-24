@@ -43,5 +43,8 @@ public:
   bool ChangeSymbol(OP_CODE op, const char *new_symbol );
 
 public:
-  CMathExpressionEx(CElementDataBase *edb = NULL) : CMathExpression(edb), m_op_hier(CElementDataBase::OP_NONE), m_op_getv(CElementDataBase::OP_NONE) {};
+  CMathExpressionEx(CElementDataBase *edb = NULL) : CMathExpression(edb), 
+  m_op_hier(CElementDataBase::OP_NONE), 
+  m_op_getv(CElementDataBase::OP_NONE)
+  {};
 };

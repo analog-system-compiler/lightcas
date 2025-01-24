@@ -281,7 +281,8 @@ bool CMathExpressionEx::ChangeSymbol(OP_CODE op, const char *new_symbol)
     if (op == ss->m_Equation.GetLastOperator())
     {
       ASSERT(strlen(new_symbol) < sizeof(ss->m_Syntax));
-      ::strlcpy(ss->m_Syntax, new_symbol, sizeof(ss->m_Syntax));
+      ::strncpy(ss->m_Syntax, new_symbol, sizeof(ss->m_Syntax));
+      ss->m_Syntax[sizeof(ss->m_Syntax)-1]='\0';
       return true;
     }
   }
