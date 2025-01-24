@@ -249,6 +249,7 @@ BOOL(!a)           := !a   ;
 BOOL(a)            := (a<>0);
 
 /******** Imaginary **************/
+
 REDUCE_COMPLEX(MON(a 0))         := MON(a 0);
 REDUCE_COMPLEX(MON(a 1))         := MON(a 1);
 REDUCE_COMPLEX(MON(a _const(b)))  := REDUCE_COMPLEX(MON(-a b-2));
@@ -354,6 +355,14 @@ SUBST( a                x xo  )   := a;
 
 ASSERT(1)    := 0;
 ASSERT(x)    := ERROR(1);
+
+//list min
+MIN((a,b),c)   := MIN(a,MIN(b,c));
+MIN(b,c)       := ((b < c)? b:c);
+
+//list max
+MAX((a,b),c)   := MAX(a,MAX(b,c));
+MAX(b,c)       := ((b > c)? b:c);
 
 _exec( _check(  a               b ) ) := _check( a  b );
 _exec( _check( _funct0( a )     b ) ) := _check( _funct0( a )     b );  

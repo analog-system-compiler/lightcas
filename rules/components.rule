@@ -36,32 +36,34 @@ NAME.IOPAMP( @plus, @minus, @out, @GND ) := {
 	NAME.Uout = ACROSS( @out, @GND );
 	NAME.Iout = THROUGH( @out, @GND );
 	NAME.Uin  = ACROSS(  @plus, @minus );
-	NAME.Iin  = THROUGH( @plus, @minus );	
+	//NAME.Iin  = THROUGH( @plus, @minus );	
 
 	/* physical equation */
-	NAME.Uin = 0;
-	NAME.Iin = 0
+	NAME.Uin = 0
+	//NAME.Iin = 0
 
 };
 
 //Saturated Operational Amplifier
-NAME.OPAMP( @plus, @minus, @out, @GND, gain, vsat ) := { 
+NAME.OPAMP( @plus, @minus, @out, @GND, @VP, @VN, gain ) := { 
 
 	/* nodal equations */
 	NAME.Uout = ACROSS( @out, @GND );
 	NAME.Iout = THROUGH( @out, @GND );
 	NAME.Uin  = ACROSS(  @plus, @minus );
+	//NAME.Iin  = THROUGH( @plus, @minus );	
+	NAME.VP   = ACROSS(  @VP, @GND );
+	NAME.VN   = ACROSS(  @VN, @GND );
 
 	/* physical equation */
-	NAME.Uout = MIN( MAX( gain * NAME.Uin, -vsat ), vsat )
+	//NAME.Uout = MAX( MIN( gain * NAME.Uin, NAME.VP ), NAME.VN )
+	NAME.Uout =  MIN( MAX( gain * NAME.Uin, NAME.VN ), NAME.VP )
+	//NAME.Iin = 0
 
 };
 
-// Default 10V Saturated Operational Amplifier
-NAME.OPAMP( @plus, @minus, @out, @GND, gain ) := NAME.OPAMP( @plus, @minus, @out, @GND, gain, 10 );
-
-// Default 10V Saturated Operational Amplifier with default gain of 10000
-NAME.OPAMP( @plus, @minus, @out, @GND )       := NAME.OPAMP( @plus, @minus, @out, @GND, 10000, 10 );
+// Default Operational Amplifier with default gain of 10000
+NAME.OPAMP( @plus, @minus, @out,  @GND, @VP, @VN ) := NAME.OPAMP( @plus, @minus, @out, @GND, @VP, @VN, 10000 );
 
 // TO CHECK
 // NAME.AOPV(@minus, @plus, @out, @vplus, @vminus, gain ) :=

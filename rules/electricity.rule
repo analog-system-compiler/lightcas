@@ -19,6 +19,7 @@
 
 t := TIME();
 
+// AC transform
 AC(a;b)       := (AC(a);AC(b));
 AC(a+b)       := AC(a)+AC(b);
 AC(a-b)       := AC(a)-AC(b);
@@ -33,6 +34,7 @@ AC(TIME())        := 0;
 AC(a)         := a;
 AC({a})       := {AC(a)};
 
+// Transient transform
 TRANS(a;b)       := (TRANS(a);TRANS(b));
 TRANS(a+b)       := TRANS(a)+TRANS(b);
 TRANS(a-b)       := TRANS(a)-TRANS(b);
@@ -46,7 +48,9 @@ TRANS(a.b)       := a.b;
 TRANS(a)           := a;
 TRANS(LAST(a))     := LAST(a);
 TRANS({a})         := {TRANS(a)};
-TRANS(IF((a:b) c)) := LIN_IF((TRANS(a):TRANS(b)) c);
+TRANS(IF((a:b) c)) := LIN_IF((TRANS(a):TRANS(b)) TRANS(c));
+TRANS(MIN(a,b))    := TRANS(IF((a:b) (a<b)));
+TRANS(MAX(a,b))    := TRANS(IF((a:b) (a>b)));
 TRANS(EXP(a))      := LIN_EXP(a);
 TRANS(MOD(a b))    := LIN_MOD(a b);
 
@@ -63,7 +67,8 @@ TRANS( _funct1( a   f ) ) := _funct1( TRANS(a) f );
 TRANS( _funct2( a b f ) ) := _funct2( TRANS(a) TRANS(b) f );
 
 LIN_EXP(a)      := EXP( LAST(a) ) * a + ( 1 - LAST( a ) ) * EXP( LAST( a ) );
-LIN_IF((a:b) c) := a*LAST(c) + b*(LNOT(LAST(c)));
+//LIN_IF((a:b) c) := a*LAST(c) + b*(LNOT(LAST(c)));
+//LIN_IF((a:b) c) := a*c + b*LNOT(c);
 LIN_MOD(a b)    := LAST(a) % LAST(b);
 
 LAST(TIME()) := TIME();
@@ -80,11 +85,13 @@ LAST(a>=b)  := LAST(a) >= LAST(b);
 LAST(a<b)   := LAST(a) < LAST(b);
 LAST(a<=b)  := LAST(a) <= LAST(b);
 LAST(a==b)  := LAST(a) == LAST(b);
+LAST(IF((a:b) c)) := LIN_IF((LAST(a):LAST(b)) LAST(c));
 
-// TODO check functions below. Don't work
+// TODO check functions below. Doesn't work
 //LAST( _funct1( a   f ) ) := _funct1( LAST(a) f );
 //LAST( _funct2( a b f ) ) := _funct2( LAST(a) LAST(b) f );
 
+// Remove DC 
 REM_DC(a;b)   := (REM_DC(a);REM_DC(b));
 REM_DC(a+b)   := REM_DC(a)+REM_DC(b);
 REM_DC(a-b)   := REM_DC(a)-REM_DC(b);
@@ -93,6 +100,7 @@ REM_DC(-_const(a)) := 0;
 REM_DC( _const(a)) := 0;
 REM_DC(a)     := a;
 
+// Kirchhoff laws
 ACROSS( a, a)                            := 0;
 LOOP_CHECK(a-ACROSS(c,d);b-ACROSS(c,e))  := (b-a)-ACROSS(d,e);
 LOOP_CHECK(a-ACROSS(c,d);b-ACROSS(d,e))  := (a+b)-ACROSS(c,e);
@@ -147,6 +155,7 @@ SYS_CONCAT2({a})   := SYS_CONCAT2(a);
 
 SYS_CONCAT_ENTRY({a}) := {SYS_CONCAT2(a)};
 
+// Transforms
 AC_TRANSFORM( a )        := KIRCHHOFF_LOOP( KIRCHHOFF_JUNCTION( AC( REM_DC ( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) ) );
 TRANSIENT_TRANSFORM( a ) := KIRCHHOFF_LOOP( KIRCHHOFF_JUNCTION( TRANS( ZERO_SYS_ENTRY( SYS_CONCAT_ENTRY( _get( a ) ) ) ) ) );
 
