@@ -24,7 +24,7 @@
 #include "Function.h"
 
 static clock_t clock_begin;
-static constexpr unsigned MAX_ITERATION=100000000;
+static constexpr unsigned MAX_ITERATION = 100000000;
 
 #ifdef RECURSIVE_ALGO
 
@@ -32,11 +32,10 @@ void CMathExpression::OptimizeTree()
 {
   pos_t pos;
   pos_t pos_array[CElementDataBase::MAX_PAR + 1];
-  CAlgebraRule *rule;
 
   if (ExecuteCommand())
   {
-    rule = RuleSearch(pos, pos_array);
+    const CAlgebraRule *rule = RuleSearch(pos, pos_array);
     if (rule)
     {
 #ifdef _TEST

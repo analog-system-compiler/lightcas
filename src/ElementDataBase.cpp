@@ -149,7 +149,7 @@ bool CElementDataBase::LoadFromFile(const CString &file_name, CMathExpression &s
     return true;
   }
   CDisplay::Log(LOG_ERR, "rules description file not found.");
-  return false;  
+  return false;
 }
 
 void CElementDataBase::AddReservedElements()
@@ -184,7 +184,6 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
   char c;
   unsigned i;
   CString s;
-  CElement *e;
   CSymbolSyntaxStruct *sss;
   CMathExpression src_equ(this);
 
@@ -201,7 +200,7 @@ bool CElementDataBase::AssociateSymbol(CParser &IC)
     {
       s.Clear();
       s += tolower(c);
-      e = GetElement(s);
+      const CElement *e = GetElement(s);
       ASSERT(e);
       if (e)
       {
