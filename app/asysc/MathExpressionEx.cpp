@@ -157,7 +157,10 @@ bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *c
     ds.Append("\nclass circuit( circuit_base ):\n");
     ds.Append("\n\tdef __init__(self):\n\t\tsuper().__init__()\n");
     ds.Append(ds1);
-    ds.Append("\n\tdef step(self):\n");
+    if (mode == CAnalysisMode::AC_ANALYSIS)
+      ds.Append("\n\tdef compute_f(self):\n");
+    else
+      ds.Append("\n\tdef compute_t(self):\n");
     ds.Append(ds2);
     ds.Print();
   }
@@ -282,7 +285,7 @@ bool CMathExpressionEx::ChangeSymbol(OP_CODE op, const char *new_symbol)
     {
       ASSERT(strlen(new_symbol) < sizeof(ss->m_Syntax));
       ::strncpy(ss->m_Syntax, new_symbol, sizeof(ss->m_Syntax));
-      ss->m_Syntax[sizeof(ss->m_Syntax)-1]='\0';
+      ss->m_Syntax[sizeof(ss->m_Syntax) - 1] = '\0';
       return true;
     }
   }
