@@ -49,6 +49,7 @@ TRANS({a})         := {TRANS(a)};
 TRANS(IF((a:b) c)) := LIN_IF((TRANS(a):TRANS(b)) c);
 TRANS(EXP(a))      := LIN_EXP(a);
 TRANS(MOD(a b))    := LIN_MOD(a b);
+TRANS(SAT(a, min, max )) := TRANS(a>max)*(max-a) + TRANS(a<min)*(min-a) + a;
 
 TRANS(EQ ( a b ) ) :=  EQ(  LAST(a)  LAST(b) );
 TRANS(NEQ( a b ) ) :=  NEQ( LAST(a)  LAST(b) );
