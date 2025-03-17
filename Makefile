@@ -127,7 +127,7 @@ endif
 
 clean:
 	@echo 'Cleaning  ...'
-	rm -rf $(LIB) $(EXE) $(OBJ_DIR) $(EXE_OBJ)
+	rm -rf $(LIB) $(BIN_DIR) $(OBJ_DIR) $(EXE_OBJ)
 
 archive:
 	cd ..; mkdir -p archive; git ls-files | xargs zip archive/lightcas_`date +%y%m%d`.zip
