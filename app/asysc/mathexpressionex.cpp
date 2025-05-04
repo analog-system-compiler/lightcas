@@ -17,8 +17,8 @@
 
 #include <ctype.h>
 #include <cstring>
-#include "Element.h"
-#include "MathExpressionEx.h"
+#include "element.h"
+#include "mathexpressionex.h"
 
 bool CMathExpressionEx::ToPython(CDisplay &ds, CAnalysisMode mode, const char *circuit_name)
 {

@@ -1,28 +1,27 @@
 /*
- * Copyright (C) 2006-2025 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2025 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-
 #include <cstring>
 #include <climits>
-#include "Debug.h"
-#include "LCVector.h"
-#include "MathExpression.h"
-#include "Element.h"
-#include "Function.h"
+#include "debug.h"
+#include "lcvector.h"
+#include "mathexpression.h"
+#include "element.h"
+#include "function.h"
 
 CMathExpression::CMathExpression(CElementDataBase *db)
 {
@@ -125,7 +124,7 @@ pos_t CMathExpression::NextBranch(pos_t pos) const
   do // while( pos && i )
   {
     OP_CODE op = Pop(pos);
-    const CElement * e = RefToElement(op);
+    const CElement *e = RefToElement(op);
     ASSERT(e);
     i += e->GetOperandNb();
     i--;
@@ -190,7 +189,7 @@ unsigned CMathExpression::ConvertToRule(CMathExpression &src, CMathExpression &d
     OP_CODE op = src.Get(pos);
     if (op >= CElementDataBase::GetSecureLimit())
     {
-      const CElement * e = RefToElement(op);
+      const CElement *e = RefToElement(op);
       if (e->IsVar())
       {
         src.Replace(op, (OP_CODE)(CElementDataBase::OP_PAR0 + i));
@@ -212,4 +211,3 @@ void CMathExpression::Replace(OP_CODE op1, OP_CODE op2, pos_t pos)
     }
   }
 }
-

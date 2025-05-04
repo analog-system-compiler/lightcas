@@ -17,9 +17,9 @@
 
 #include <string.h>
 #include <cctype>
-#include "Debug.h"
-#include "Element.h"
-#include "ElementDataBase.h"
+#include "debug.h"
+#include "element.h"
+#include "elementdatabase.h"
 
 CElementArray CElementDataBase::m_ElementRefArray;
 CSymbolSyntaxArray CElementDataBase::m_SymbolSyntaxArray;

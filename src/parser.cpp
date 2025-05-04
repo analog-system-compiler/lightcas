@@ -17,9 +17,9 @@
 
 #include <cstring>
 #include <cctype>
-#include "Debug.h"
-#include "Parser.h"
-#include "Display.h"
+#include "debug.h"
+#include "parser.h"
+#include "display.h"
 
 #ifdef _WIN32
 #define PATH_SEPARATOR '\\'

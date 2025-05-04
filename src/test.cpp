@@ -1,30 +1,28 @@
 /*
- * Copyright (C) 2006-2025 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2025 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-
-
 #ifdef _TEST
 
-#include "Debug.h"
-#include "MathExpression.h"
-#include "ElementDataBase.h"
-#include "Element.h"
-#include "Parser.h"
-#include "Display.h"
+#include "debug.h"
+#include "mathexpression.h"
+#include "elementdatabase.h"
+#include "element.h"
+#include "parser.h"
+#include "display.h"
 
 void CElementDataBase::Check(const char *s1, const char *s2)
 {
@@ -32,7 +30,7 @@ void CElementDataBase::Check(const char *s1, const char *s2)
   CParser IC(s1);
   CMathExpression equ(this);
 
-  ds.Log(LOG_INFO,"** Check %s == %s", s1, s2);
+  ds.Log(LOG_INFO, "** Check %s == %s", s1, s2);
 
   if (equ.Parse(IC))
   {
@@ -51,7 +49,7 @@ void CElementDataBase::Check(const char *s1, const char *s2)
     ds.Log(LOG_ERR, "FAIL: Test exception: %s => %s", s1, s2);
     return;
   }
-  ds.Log(LOG_INFO,"OK: %s => %s", s1, s2);
+  ds.Log(LOG_INFO, "OK: %s => %s", s1, s2);
 }
 
 void CElementDataBase::CheckEval(const char *s1, const CValue &v1)
@@ -65,10 +63,10 @@ void CElementDataBase::CheckEval(const char *s1, const CValue &v1)
   if (v2.GetValue() != v1.GetValue())
   {
     ASSERT(false);
-    ds.Log(LOG_ERR,"FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue());
+    ds.Log(LOG_ERR, "FAIL: %s => %g != %g", s1, v2.GetValue(), v1.GetValue());
     return;
   }
-  ds.Log(LOG_INFO,"OK: %s => %g", s1, v1.GetValue());
+  ds.Log(LOG_INFO, "OK: %s => %g", s1, v1.GetValue());
 }
 
 void CElementDataBase::CheckSyntaxError(const char *s1)
@@ -78,7 +76,7 @@ void CElementDataBase::CheckSyntaxError(const char *s1)
   if (equ.Parse(IC))
   {
     CDisplay ds;
-    ds.Log(LOG_INFO,"Syntax check detected: %s", s1);
+    ds.Log(LOG_INFO, "Syntax check detected: %s", s1);
   }
 }
 
@@ -90,19 +88,19 @@ void CElementDataBase::DisplayStats()
     CElement *e = m_ElementRefArray.GetAt(i);
     if (e)
     {
-      ds.Log(LOG_INFO,"********************* #%04d %s *************************", i, e->GetName().GetBufferPtr());
+      ds.Log(LOG_INFO, "********************* #%04d %s *************************", i, e->GetName().GetBufferPtr());
       const CFunction *funct = e->GetFunction();
       for (unsigned j = 0; j < funct->m_AlgebraRuleArray.GetSize(); j++)
       {
         CAlgebraRule *rule = funct->m_AlgebraRuleArray.GetAt(j);
         ds.Clear();
         rule->Display(j, ds);
-        ds.Log(LOG_INFO,"%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr());
+        ds.Log(LOG_INFO, "%4d\t%s", rule->m_AccessNb, ds.GetBufferPtr());
       }
     }
     else
     {
-      ds.Log(LOG_INFO,"********************* #%04d No element *************************", i);
+      ds.Log(LOG_INFO, "********************* #%04d No element *************************", i);
     }
   }
 }
@@ -110,7 +108,7 @@ void CElementDataBase::DisplayStats()
 void CElementDataBase::Test()
 {
   CDisplay ds;
-  ds.Log(LOG_INFO,"Running tests...");
+  ds.Log(LOG_INFO, "Running tests...");
 
   /***** Some basic tests *****/
   CheckSyntaxError("sin(x");
@@ -351,7 +349,7 @@ void CElementDataBase::Test()
   {
     CMathExpression equ(this);
     equ.Parse(IC);
-    equ.Compile();    
+    equ.Compile();
     IC.CloseFile();
   }
   else

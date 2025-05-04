@@ -1,27 +1,25 @@
 /*
- * Copyright (C) 2006-2025 The LightCAS project                        
- *                                                                    
+ * Copyright (C) 2006-2025 The LightCAS project
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
+ * the Free Software Foundation; either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
  * along with this program; If not, see <https://www.gnu.org/licenses/>
  */
 
-
-
 #include <cstdlib>
 #include <cmath>
-#include "Evaluator.h"
-#include "Debug.h"
-#include "Display.h"
+#include "evaluator.h"
+#include "debug.h"
+#include "display.h"
 
 CEvaluator::CEvaluator()
 {
@@ -59,13 +57,13 @@ void CEvaluator::Evaluate(unsigned size, const OP_CODE *op_code_ptr)
     m_Value.SetValue(0.);
     return;
   }
-  
+
   AllocateStack(size);
 
   unsigned n = m_FunctionArray.GetSize();
   for (unsigned pos = 0; pos < size; pos++)
   {
-    unsigned index = *op_code_ptr++;    
+    unsigned index = *op_code_ptr++;
 
     if (index < n)
     {
@@ -120,7 +118,7 @@ void CEvaluator::SetElementValue(unsigned index)
 }
 
 const CValue &CEvaluator::GetElementValue(unsigned index) const
-{  
+{
   ASSERT(index < m_ElementValueArray.GetSize());
   return m_ElementValueArray.GetAt(index);
 }

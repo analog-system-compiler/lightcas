@@ -1,3 +1,4 @@
-objs
+objs/
+bin/
 asysc.*
 debug.log

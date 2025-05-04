@@ -16,8 +16,8 @@
  */
 
 #include <cctype>
-#include "Element.h"
-#include "MathExpression.h"
+#include "element.h"
+#include "mathexpression.h"
 
 void CMathExpression::Display(CDisplay &ds, bool bAll) const
 {

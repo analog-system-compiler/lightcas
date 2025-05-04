@@ -17,11 +17,11 @@
 
 #include <time.h>
 #include <cstring>
-#include "Debug.h"
-#include "LCVector.h"
-#include "MathExpression.h"
-#include "Element.h"
-#include "Function.h"
+#include "debug.h"
+#include "lcvector.h"
+#include "mathexpression.h"
+#include "element.h"
+#include "function.h"
 
 static clock_t clock_begin;
 static constexpr unsigned MAX_ITERATION = 100000000;

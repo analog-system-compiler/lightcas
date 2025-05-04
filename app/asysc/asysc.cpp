@@ -19,10 +19,10 @@
 #include <cstring>
 #include <iostream>
 
-#include "Parser.h"
-#include "Element.h"
-#include "DisplayEx.h"
-#include "MathExpressionEx.h"
+#include "parser.h"
+#include "element.h"
+#include "displayex.h"
+#include "mathexpressionex.h"
 
 extern const char help_txt[] asm("_binary_objs_asysc_help_ztxt_start");
 

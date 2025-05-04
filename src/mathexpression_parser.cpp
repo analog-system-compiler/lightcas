@@ -16,11 +16,12 @@
  */
 
 #include <cctype>
-#include "Element.h"
-#include "MathExpression.h"
+#include "element.h"
+#include "mathexpression.h"
 
-enum{
-  PARSE_NOTFOUND=0,
+enum
+{
+  PARSE_NOTFOUND = 0,
   PARSE_FOUND,
   PARSE_ERROR,
 };
@@ -28,7 +29,7 @@ enum{
 int CMathExpression::Parse(CParser &IC)
 {
   Clear();
-  int ret=GetLevel(IC);
+  int ret = GetLevel(IC);
   IC.CheckEOT();
   return ret;
 }
@@ -92,7 +93,7 @@ bool CMathExpression::GetLevel(CParser &IC, unsigned priority)
   {
     unsigned precedence = var_found ? priority : 0;
     ret = ParseOperator(IC, precedence, var_found);
-     if (ret == PARSE_ERROR)
+    if (ret == PARSE_ERROR)
       return false;
     if (ret == PARSE_FOUND)
       var_found = true;
@@ -120,9 +121,9 @@ int CMathExpression::ParseOperator(CParser &IC, unsigned &index, bool var_found)
         if (c)
         {
           if (IC.IsStopChar())
-             return PARSE_ERROR;
+            return PARSE_ERROR;
 
-          if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1 ))
+          if (!GetLevel(IC, ::isupper(c) ? 0 : index + 1))
             goto next;
         }
       }
