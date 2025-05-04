@@ -8,7 +8,7 @@ APP_DIR     = app
 RULES_DIR   = rules
 OBJ_DIR     = $(shell mkdir -p objs objs/nostd objs/asysc ) objs
 LIB         = lib$(EXE).a
-EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o) $(OBJ_DIR)/asysc/Help.o
+EXE_OBJ     = $(APP_SRC:%.cpp=$(OBJ_DIR)/%.o) $(OBJ_DIR)/asysc/help.o
 LIB_OBJS    = $(LIB_SRC:%.cpp=$(OBJ_DIR)/%.o)
 INCDIR      = -I$(LIB_DIR)
 RULE_FILES  = $(addprefix $(RULES_DIR)/, $(shell awk -F '<|>' '$$1~/`include/ {print $$2}' $(RULES_DIR)/includes.rule))
@@ -45,22 +45,22 @@ endif
 CPPFLAGS = -MMD -Wall -fno-rtti -fno-exceptions $(INCDIR)
 
 APP_SRC = \
-	asysc/ASysC.cpp \
-	asysc/MathExpressionEx.cpp
+	asysc/asysc.cpp \
+	asysc/mathexpressionex.cpp
 
 LIB_SRC = \
-    Display.cpp \
-	Parser.cpp \
-    Element.cpp \
-    ElementDataBase.cpp \
-    Function.cpp \
-    MathExpression_core.cpp \
-    MathExpression_display.cpp \
-    MathExpression_parser.cpp \
-    MathExpression_simplify.cpp \
-	Value.cpp \
-	Evaluator.cpp \
-    Test.cpp
+    display.cpp \
+	parser.cpp \
+    element.cpp \
+    elementdatabase.cpp \
+    function.cpp \
+    mathexpression_core.cpp \
+    mathexpression_display.cpp \
+    mathexpression_parser.cpp \
+    mathexpression_simplify.cpp \
+	value.cpp \
+	evaluator.cpp \
+    test.cpp
 	
 ifeq ($(USE_STD),0)
 	LIB_SRC  += nostd/LCString.cpp  
