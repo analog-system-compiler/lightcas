@@ -45,7 +45,6 @@ extern int( *PUTS )( const char* );
 #else // defined( _DEBUG )
 
 #define DEBUG_LEVEL 0
-#define TRACE( s, ... )
 #define ASSERT(s)
 #define ASSERT_NAN( x )
 #define IS_NAN( x ) 0

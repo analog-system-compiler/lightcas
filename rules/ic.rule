@@ -30,8 +30,9 @@ NAME.NE555( @trigger,  @threshold,  @discharge, @output,  @vcc, @gnd ) :=
   
   NAME.UIN1    = ( NAME.UTRIG  <  ( NAME.VCC / 3 )     );
   NAME.UIN2    = ( NAME.UTRESH <  ( NAME.VCC * 2 / 3 ) );
+  NAME.USW     = ( NAME.UOUT   <  ( NAME.VCC / 2 )     );
 
-  NAME.SW.SWITCH( @discharge, @gnd, NAME.UOUT < (NAME.VCC/2) );
+  NAME.SW.SWITCH( @discharge, @gnd, NAME.USW );
   NAME.SR.SRFFC( NAME.@in1, NAME.@in2, @output, @vcc, @gnd)
 };
 
