@@ -20,9 +20,9 @@
 /********************************/
 /*  R,L,C                       */
 /********************************/
-NAME.CR(@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=R*NAME.I };
-NAME.CL(@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U=L*DER(NAME.I,t) };
-NAME.CC(@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I=C*DER(NAME.U,t) };
+NAME.CR(@1,@2,R) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U = R * NAME.I };
+NAME.CL(@1,@2,L) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.U = L * DER(NAME.I,t) };
+NAME.CC(@1,@2,C) := { NAME.U=ACROSS(@1,@2); NAME.I=THROUGH(@1,@2); NAME.I = C * DER(NAME.U,t) };
 
 /********************************/
 /*  Operational Amplifiers      */
@@ -250,10 +250,16 @@ NAME.VSQR( @1, @2, value, freq ) := NAME.VSQR( @1, @2, value, freq, 0, value, 1n
 /* Measurement                  */
 /********************************/
 
-NAME.PROBE( @1, @2 ) := { 
+NAME.UPROBE( @1, @2 ) := { 
 
 	/* nodal equations */
 	NAME.U = ACROSS( @1, @2 )
+};
+
+NAME.IPROBE( @1, @2 ) := { 
+
+	/* nodal equations */
+	NAME.I = THROUGH( @1, @2 )
 };
 
 /********************************/
