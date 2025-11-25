@@ -42,7 +42,7 @@ CElement::~CElement()
 
 void CElement::Display(CDisplay &ds) const
 {
-  ds += m_Name;
+  ds.Append( m_Name );
 }
 
 void CElement::RemoveRules()

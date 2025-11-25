@@ -70,7 +70,6 @@ public:
     else
     {
       Prepend(type == LOG_INFO ? CString("Info: ") : (type == LOG_WARN ? CString("Warning: ") : CString("Error: ")));
-
       Print();
     }
   }

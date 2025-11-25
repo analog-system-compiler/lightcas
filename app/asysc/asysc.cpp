@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
     setlocale(LC_NUMERIC, "C");
     std::cout << "*************************************\n";
     std::cout << "*** ASysC Console                 ***\n";
-    std::cout << "*** © Cyril Collineau, 2006-2024  ***\n";
+    std::cout << "*** © Cyril Collineau, 2006-2025  ***\n";
     std::cout << "*************************************\n";
     std::cout << "Type \"help\" for help.\n";
     InteractiveMode(db);

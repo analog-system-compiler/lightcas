@@ -54,12 +54,9 @@ public:
   char At( unsigned n ) const                      { return at( n ); }
   void ToLower()                                   { std::for_each( begin(), end(), ::tolower ); }
   void Set( double v )                             { char buffer[32]; snprintf( buffer, sizeof( buffer ), "%.12g", v ); Copy( buffer ); }
-#ifdef __GNUC__
-  void Set( unsigned i, unsigned base = 10 ) { char buffer[32]; snprintf( buffer, sizeof( buffer ), ( base == 16 ? "%x" : ( base == 10 ? "%d" : "%o" ) ), i ); Copy( buffer ); }
-#else
-  void Set( unsigned i, unsigned base = 10 )       { char buffer[32]; _itoa_s( i, buffer, base ); Copy( buffer ); }
-#endif
   operator const char* () const                    { return c_str();  }
+  void Set( unsigned i, unsigned base = 10 );
+
   //Constructors
   CString(): std::string()                              {}
   CString( const char* s ): std::string( s )            {}
