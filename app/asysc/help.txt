@@ -1,26 +1,10 @@
-/*
- * Copyright (C) 2006-2025 The LightCAS project                        
- *                                                                    
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or   
- * any later version.                                                  
- *                                                                    
- * This program is distributed in the hope that it will be useful,     
- * but WITHOUT ANY WARRANTY; without even the implied warranty of      
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
- * GNU General Public License for more details.                        
- *                                                                    
- * You should have received a copy of the GNU General Public License   
- * along with this program; If not, see <https://www.gnu.org/licenses/>
- */
 
 Commands:
     help: this help
-    hex: display in hexadecimal mode
-    bin: display in binary mode
-    dec: display in decimal mode
-    clr: clear all assignments
+    hex:  display in hexadecimal mode
+    bin:  display in binary mode
+    dec:  display in decimal mode
+    clr:  clear all assignments
 
 Assignments:
     a:=5
@@ -30,11 +14,14 @@ Simplifications:
     a:=5
     b:=a
 
+Last assignment value:
+    ans
+
 Supported operators:
-a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!
+    a?b:c a|b a~b a+b a-b a&b a*b a//b a^b a<<b a>>b a==b a<>b a<=b a<b a>=b a>b a||b a&&b a[B] -a /a !a ~a a!
 
 Supported functions:
-MIN MAX MOD BOOL LNOT SIN COS TAN ASIN ACOS ATAN SINH COSH TANH ASINH ACOSH ATANH EXP LOG LOG10 SQRT SQR ABS FLOOR CEIL RAND
+    MIN MAX MOD BOOL LNOT SIN COS TAN ASIN ACOS ATAN SINH COSH TANH ASINH ACOSH ATANH EXP LOG LOG10 SQRT SQR ABS FLOOR CEIL RAND
 
 Fonction definition:
     f(x):=SIN(x)
@@ -46,8 +33,8 @@ Taylor series:
     TAYLOR(COS(x),x,0,10)
 
 Vectors:
-    Addition       : {a,b}+{5,6}
-    Substraction   : {a,b}-{5,6}
+    Addition     : {a,b}+{5,6}
+    Substraction : {a,b}-{5,6}
 
 Equation and system solving:
     SOLVE(x-2,x)
@@ -59,7 +46,7 @@ Complex numbers:
     IM(x+j*y)
     RE(x+j*y)
 
-Conversions:
-    0b1110
-    0xABCE
+Bases:
+    Binary      : 0b1110
+    Hexadecimal : 0xABCE
 
